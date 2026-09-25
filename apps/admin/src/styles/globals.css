@@ -1,0 +1,88 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #18362d;
+  background: #f4f6f3;
+  color-scheme: light;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+.admin-shell {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+.admin-header {
+  background: #fff;
+  padding: 1.75rem clamp(1.5rem, 5vw, 5rem);
+  border-bottom: 1px solid #dce3d9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.brand {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+.brand-dot {
+  color: #287959;
+}
+.workspace-label {
+  color: #52655b;
+  font-size: 0.8rem;
+  border-left: 1px solid #dce3d9;
+  padding-left: 1rem;
+}
+main {
+  flex: 1;
+  display: grid;
+  align-items: center;
+  padding: 3rem clamp(1.5rem, 5vw, 5rem);
+}
+.welcome {
+  max-width: 46rem;
+}
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #287959;
+}
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  margin: 1.5rem 0;
+}
+.welcome > p:last-child {
+  line-height: 1.8;
+  color: #52655b;
+}
+footer {
+  color: #52655b;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  padding: 1.75rem clamp(1.5rem, 5vw, 5rem);
+}
+.skip-link {
+  position: absolute;
+  top: -5rem;
+  left: 1rem;
+  background: #fff;
+  color: #18362d;
+  padding: 0.75rem;
+}
+.skip-link:focus {
+  top: 1rem;
+  outline: 3px solid #19775b;
+  outline-offset: 3px;
+}

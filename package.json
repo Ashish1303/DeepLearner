@@ -1,0 +1,38 @@
+{
+  "name": "deeplearner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11 <12"
+  },
+  "packageManager": "npm@11.12.1",
+  "scripts": {
+    "build:packages": "npm run build --workspace=@deeplearner/shared-types && npm run build --workspace=@deeplearner/validation",
+    "watch:packages": "concurrently --kill-others -n types,validation \"npm run dev --workspace=@deeplearner/shared-types\" \"npm run dev --workspace=@deeplearner/validation\"",
+    "dev": "npm run build:packages && concurrently --kill-others -n packages,web,admin,api \"npm run watch:packages\" \"npm run dev --workspace=@deeplearner/web\" \"npm run dev --workspace=@deeplearner/admin\" \"npm run dev --workspace=@deeplearner/api\"",
+    "dev:web": "npm run build:packages && concurrently --kill-others -n packages,web \"npm run watch:packages\" \"npm run dev --workspace=@deeplearner/web\"",
+    "dev:admin": "npm run build:packages && concurrently --kill-others -n packages,admin \"npm run watch:packages\" \"npm run dev --workspace=@deeplearner/admin\"",
+    "dev:api": "npm run build:packages && concurrently --kill-others -n packages,api \"npm run watch:packages\" \"npm run dev --workspace=@deeplearner/api\"",
+    "build": "npm run build:packages && npm run build --workspace=@deeplearner/web && npm run build --workspace=@deeplearner/admin && npm run build --workspace=@deeplearner/api",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "npm run build:packages && npm run typecheck --workspaces",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "concurrently": "^9.2.0",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.0",
+    "globals": "^16.5.0",
+    "prettier": "^3.6.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.0"
+  }
+}
