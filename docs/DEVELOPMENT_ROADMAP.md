@@ -108,9 +108,11 @@ Codex must STOP at `READY_FOR_REVIEW`.
 
 ---
 
-# 5. Current Feature
+# 5. Completed Feature Record
 
 ## F001 — Public Landing Page
+
+**Feature Record:** [F001 landing page](features/F001-landing-page.md)
 
 **Status:** `APPROVED_COMPLETE`
 
@@ -222,7 +224,38 @@ Status: `APPROVED_COMPLETE`
 ### F002 — Login Page UI
 **Goal:** Implement approved login design only.  
 **Dependencies:** F001  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Approved Scope:** `/login`, split-panel Stitch design, local email/password validation, password visibility, Google UI notice, unavailable signup/reset actions, static product preview, responsive styling and accessibility. No authentication, API calls, persistence, or new dependencies. Use existing fonts and teal tokens with dark button text and darker teal links/focus. Omit the state-demo toolbar and remember-device checkbox.
+
+**Completion Notes:** Implemented the approved F002 UI only. The `/login` route uses a server-rendered split-panel page and static product preview, with a client form for email/password validation, password visibility, and explicit mock login/Google notices. Existing fonts, color tokens, button base styles, and icons are reused without changing F001. No new dependencies, backend calls, authentication, or persistence. Signup/reset controls remain unavailable and clearly labeled. No F003 implementation.
+
+**Exact Files Changed:**
+
+- Created `apps/web/src/app/(public)/login/page.tsx`.
+- Created `apps/web/src/components/login/login-form.tsx`.
+- Created `apps/web/src/components/login/login-product-preview.tsx`.
+- Created `apps/web/src/components/login/login.module.css`.
+- Modified `docs/DEVELOPMENT_ROADMAP.md` (F002 scope, status, results, and current-feature pointer; F001 completion preserved).
+
+**Verification Results:**
+
+- PASS: `npm.cmd run build` (all workspaces), `npm.cmd run lint`, and `npm.cmd run typecheck`.
+- PASS: Prettier check of all four F002 source files.
+- PASS: isolated installed-Chrome smoke checks against the production build: empty email/password errors, invalid email, first-error focus, show/hide password, mock login notice, Google notice, and no redirect.
+- PASS: keyboard skip-link activation/focus and visible focus indicator; labeled controls and associated inline errors reviewed.
+- PASS: no POST/API requests, local/session storage, cookies, or JavaScript runtime exceptions during the interaction checks.
+- PASS: `/login` and `/` return 200; an unknown route returns 404.
+- PASS: overflow measurements and screenshot review at 1440, 1024, 768, 375, and 320 CSS pixels. Desktop split and tablet/mobile stacking match the approved responsive plan. Reduced-motion preference checked.
+- PASS: source/diff scope review; F001, API, admin, shared packages, configuration, and dependencies unchanged. Markdown hard-break spaces preserved.
+
+**Known Limitations:** UI-only by design; no account access, Google OAuth, password reset, signup, or live learning data. Browser checks used desktop Chrome emulation, not physical mobile devices or a full cross-browser/screen-reader audit. Existing repository-wide AGENTS.md formatting and missing favicon are outside F002. Browser test scripts/screenshots were temporary verification artifacts, not a new committed test framework. The pre-existing `.gitignore` change was preserved.
+
+**Login-navigation follow-up:** Added a secondary desktop Log in link before Start Learning Free and a mobile-menu equivalent, both targeting `/login`. Existing CTA and signup behavior are unchanged. Modified `apps/web/src/components/layout/public-header.tsx`, `mobile-navigation.tsx`, and `public-layout.module.css`. Created [F001 feature record](features/F001-landing-page.md) and [F002 feature record](features/F002-login-page.md), separating historical delivery from this follow-up.
+
+**Follow-up Verification:** Build, lint, typecheck, and changed-file formatting passed. Chrome checks at 1440, 1101, 1100, 768, 375, and 320 CSS pixels passed for login discovery, keyboard activation, menu opening/Escape/focus return, Home navigation, no duplicate visible login entries, preserved CTA fill, and no page-wide overflow. Desktop/mobile screenshots reviewed. `/` and `/login` return 200; unknown route returns 404. Source diff reviewed; no login form, backend, dependency, or F003 changes.
+
+**Owner Review:** Approved after the login-navigation follow-up. The owner requested committing and pushing the completed F002 changes. F003 remains NOT_STARTED pending its own plan and approval.
 
 ### F003 — Signup + Email Verification UI
 **Goal:** Build account creation and verification screens.  
@@ -852,11 +885,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** `F001 — Public Landing Page`  
+**Current Feature:** `F002 — Login Page UI`  
 **Current Status:** `APPROVED_COMPLETE`  
-**Next Feature:** `F002 — Login Page UI`
+**Next Feature:** `F003 — Signup + Email Verification UI`
 
-**Rule:** F002 cannot begin until F001 is `APPROVED_COMPLETE`, unless the project owner explicitly changes the sequence.
+**Rule:** F003 cannot begin until F002 is `APPROVED_COMPLETE`, unless the project owner explicitly changes the sequence.
 
 ---
 

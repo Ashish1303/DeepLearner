@@ -50,6 +50,26 @@
   justify-items: center;
   gap: 0.15rem;
 }
+.loginLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.5rem;
+  color: var(--ink-secondary);
+  font-size: 0.875rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.loginLink:hover {
+  color: var(--teal);
+  text-decoration: underline;
+}
+.loginLink:focus-visible,
+.mobilePanel a:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 3px;
+}
 .account span {
   font-size: 0.625rem;
   color: var(--ink-secondary);
@@ -121,6 +141,9 @@
   font-size: 0.75rem;
 }
 @media (max-width: 1100px) {
+  .loginLink {
+    display: none;
+  }
   .desktopNav {
     display: none;
   }

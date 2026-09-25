@@ -16,6 +16,9 @@ export function PublicHeader() {
           <a href="#visual-learning">Visual Learning</a>
           <a href="#interview-prep">Interview Prep</a>
         </nav>
+        <Link className={styles.loginLink} href="/login">
+          Log in
+        </Link>
         <div className={styles.account}>
           <ButtonLink unavailable>Start Learning Free</ButtonLink>
           <span>Accounts coming soon</span>

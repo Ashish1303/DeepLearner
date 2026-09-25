@@ -19,3 +19,8 @@ temp/
 Thumbs.db
 *.pem
 *.key
+
+# Local editor settings, agent instructions, and design references
+/.vscode/
+/AGENTS.md
+/docs/designs/

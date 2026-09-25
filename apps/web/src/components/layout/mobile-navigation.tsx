@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Link from 'next/link';
 import styles from './public-layout.module.css';
 
 export function MobileNavigation() {
@@ -42,6 +43,9 @@ export function MobileNavigation() {
             {label}
           </a>
         ))}
+        <Link href="/login" onClick={() => setOpen(false)}>
+          Log in
+        </Link>
         <span>Accounts coming soon</span>
       </nav>
     </div>
