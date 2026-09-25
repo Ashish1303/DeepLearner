@@ -1,0 +1,27 @@
+import Link from 'next/link';
+import { ButtonLink } from '../ui/button-link';
+import { MobileNavigation } from './mobile-navigation';
+import styles from './public-layout.module.css';
+
+export function PublicHeader() {
+  return (
+    <header className={styles.header}>
+      <div className={styles.headerInner}>
+        <Link className={styles.brand} href="/">
+          DeepLearner<span className={styles.beta}>BETA</span>
+        </Link>
+        <nav aria-label="Main navigation" className={styles.desktopNav}>
+          <a href="#learning-method">Learn</a>
+          <a href="#technologies">Technologies</a>
+          <a href="#visual-learning">Visual Learning</a>
+          <a href="#interview-prep">Interview Prep</a>
+        </nav>
+        <div className={styles.account}>
+          <ButtonLink unavailable>Start Learning Free</ButtonLink>
+          <span>Accounts coming soon</span>
+        </div>
+        <MobileNavigation />
+      </div>
+    </header>
+  );
+}

@@ -1,7 +1,29 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import { PublicHeader } from './public-header';
+import { PublicFooter } from './public-footer';
 
-export function PublicShell({ children }: { children: ReactNode }) {
+export function PublicShell({
+  children,
+  landing = false,
+}: {
+  children: ReactNode;
+  landing?: boolean;
+}) {
+  if (landing) {
+    return (
+      <div className="site-shell">
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
+        <PublicHeader />
+        <main id="main-content" tabIndex={-1}>
+          {children}
+        </main>
+        <PublicFooter />
+      </div>
+    );
+  }
   return (
     <div className="site-shell">
       <a className="skip-link" href="#main-content">

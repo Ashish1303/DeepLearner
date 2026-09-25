@@ -1,8 +1,16 @@
 :root {
+  --ink: #0f172a;
+  --ink-secondary: #475569;
+  --surface: #fafaf9;
+  --surface-subtle: #f5f5f4;
+  --border: #e2e8f0;
+  --accent: #18abaf;
+  --action: #18abaf;
+  --teal: #0f766e;
   color-scheme: light;
-  font-family: Arial, Helvetica, sans-serif;
-  color: #18362d;
-  background: #f7f8f2;
+  font-family: var(--font-geist), Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  background: var(--surface);
   font-synthesis: none;
 }
 * {
@@ -10,6 +18,29 @@
 }
 body {
   margin: 0;
+  line-height: 1.6;
+}
+section[id] {
+  scroll-margin-top: 6rem;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible,
+a:focus-visible,
+[tabindex='0']:focus-visible {
+  outline: 3px solid var(--action);
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
 }
 a {
   color: inherit;
@@ -91,6 +122,7 @@ h1 {
   border-top: 1px solid #dce3d9;
 }
 .skip-link {
+  z-index: 100;
   position: absolute;
   top: -5rem;
   left: 1rem;
