@@ -25,7 +25,7 @@ app.use(
         );
       }
     },
-    credentials: true,
+    credentials: false,
     exposedHeaders: ['X-Request-Id'],
   }),
 );

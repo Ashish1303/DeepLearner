@@ -303,7 +303,38 @@ Status: `APPROVED_COMPLETE`
 **Goal:** Finalize common backend behavior before auth.  
 **Scope:** error model, standardized response envelope, request IDs, structured logging, validation pattern, versioned routing, CORS, security headers, request limits, sanitized errors.  
 **Dependencies:** F000  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Owner Approval:** Explicitly approved on 2026-09-26 after verification, including the separately approved environment-validation fix. Commit reference: `feat(api): complete F004 backend common foundation` on `dev`. F005 remains NOT_STARTED and requires its own plan and approval.
+
+**Approved Plan:** [F004 Backend Common Foundation](features/F004-backend-common-foundation.md). Preserve the modular monolith and health route; complete common responses/errors, safe logging, validation, CORS/security, and focused tests. Owner approved API_DESIGN.md envelopes, ROUTE_NOT_FOUND, disabled CORS credentials for this phase, and dependency-free API test configuration. No F005, authentication, or database implementation.
+
+**Completion Notes:** Extended the existing error/response foundation with safe details, controlled parser errors, route labels, Pino redaction, typed Zod request validation, and focused Node tests. Health remains process liveness only. During verification, malformed CORS origins exposed an existing URL parsing exception that could print rejected input. Work paused; the owner separately approved a URL.canParse guard in env.ts. No new dependencies, shared-package changes, frontend integration, authentication, or database work.
+
+**Exact Files Changed:**
+
+- Created `apps/api/src/middleware/validate.ts`.
+- Created `apps/api/tests/foundation.test.ts`.
+- Created `apps/api/tests/logging.test.ts`.
+- Created `apps/api/tests/env.test.ts`.
+- Created `apps/api/tsconfig.test.json`.
+- Created `docs/features/F004-backend-common-foundation.md`.
+- Modified `apps/api/src/app.ts`.
+- Modified `apps/api/src/common/errors/app-error.ts`.
+- Modified `apps/api/src/common/http/response.ts`.
+- Modified `apps/api/src/common/logging/logger.ts`.
+- Modified `apps/api/src/config/env.ts` (separately approved fix).
+- Modified `apps/api/src/middleware/error-handler.ts`.
+- Modified `apps/api/src/middleware/not-found.ts`.
+- Modified `apps/api/src/middleware/request-logger.ts`.
+- Modified `apps/api/src/modules/health/health.routes.ts`.
+- Modified `apps/api/src/types/express.d.ts`.
+- Modified `apps/api/package.json`.
+- Modified `docs/DEVELOPMENT_ROADMAP.md`.
+
+**Verification Results:** PASS: monorepo build, lint, typecheck, all 15 API tests, changed API/feature-document formatting, and final diff/whitespace review. Built-app smoke checks passed for health 200, standardized unknown-route 404, malformed-JSON 400, origin rejection 403, matching request IDs, logs, CORS, and Helmet headers. Tests additionally cover validation transforms/defaults, safe details, sync/async unexpected failures, duplicate/invalid IDs, JSON limits/encoding, preflight, sensitive-value exclusion, and environment validation. Initial sandbox failures for tsx OS-user lookup and existing Google Fonts network access were resolved by permissioned reruns without configuration changes.
+
+**Known Limitations:** No auth/database/rate limiter or deployment hardening. Log callers must select safe data; configured redaction is not arbitrary-depth/free-text sanitization. Finish-event logs exclude prematurely disconnected requests. Validation detail paths can fall back to a parent for opaque/dynamic schemas. CORS credentials remain disabled by design. Full details and acceptance checklist are in the feature record. F004 is owner-approved; F005 remains NOT_STARTED.
 
 ---
 
@@ -918,11 +949,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** `F003 — Signup + Email Verification UI`  
+**Current Feature:** `F004 — Backend Common Foundation`  
 **Current Status:** `APPROVED_COMPLETE`  
-**Next Feature:** `F004 — Backend Common Foundation`
+**Next Feature:** `F005 — MongoDB Connection Foundation`
 
-**Rule:** F004 cannot begin until F003 is `APPROVED_COMPLETE`, unless the project owner explicitly changes the sequence.
+**Rule:** F005 cannot begin until F004 is `APPROVED_COMPLETE`, unless the project owner explicitly changes the sequence.
 
 ---
 

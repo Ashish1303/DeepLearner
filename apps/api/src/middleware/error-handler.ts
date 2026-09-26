@@ -1,7 +1,7 @@
-import type { ApiError } from '@deeplearner/shared-types';
 import type { ErrorRequestHandler } from 'express';
 import { AppError } from '../common/errors/app-error.js';
 import { logger } from '../common/logging/logger.js';
+import { errorResponse } from '../common/http/response.js';
 
 export const errorHandler: ErrorRequestHandler = (
   error: unknown,
@@ -34,20 +34,30 @@ export const errorHandler: ErrorRequestHandler = (
         'PAYLOAD_TOO_LARGE',
         'Request body is too large',
       );
+    } else if (
+      error.type === 'encoding.unsupported' ||
+      error.type === 'charset.unsupported'
+    ) {
+      failure = new AppError(
+        415,
+        'UNSUPPORTED_MEDIA_TYPE',
+        'Unsupported request body encoding or charset',
+      );
     }
   }
 
   if (failure.statusCode >= 500) {
     logger.error(
-      { requestId: req.requestId, code: failure.code },
+      {
+        requestId: req.requestId,
+        method: req.method,
+        route: req.routeLabel ?? 'before_route',
+        status: failure.statusCode,
+        errorCode: failure.code,
+      },
       'Request failed',
     );
   }
 
-  const response: ApiError = {
-    success: false,
-    error: { code: failure.code, message: failure.message },
-    meta: { requestId: req.requestId },
-  };
-  res.status(failure.statusCode).json(response);
+  res.status(failure.statusCode).json(errorResponse(failure, req.requestId));
 };

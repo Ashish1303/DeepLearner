@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 const origin = z.url().refine((value) => {
+  if (!URL.canParse(value)) return false;
   const url = new URL(value);
   return ['http:', 'https:'].includes(url.protocol) && url.origin === value;
 }, 'Expected an exact HTTP(S) origin without a path or trailing slash');
