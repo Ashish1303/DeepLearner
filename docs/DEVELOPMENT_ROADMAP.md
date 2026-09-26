@@ -260,7 +260,40 @@ Status: `APPROVED_COMPLETE`
 ### F003 — Signup + Email Verification UI
 **Goal:** Build account creation and verification screens.  
 **Dependencies:** F002  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Approved Scope:** `/signup`, local registration-field validation, password visibility, an explicitly simulated email-verification view, static product preview, and signup navigation from landing/login. No account creation, email sending, token handling, persistence, or new dependencies.
+
+**Completion Notes:** Implemented the approved signup form and same-route verification preview. Names/email/password receive local validation, first-error focus, and associated errors. Valid submission clears the password; verification and resend explicitly state that no account or email exists. Back preserves names/email in memory and focuses email; reload resets the form. Google remains a mock notice. Responsive static learning preview follows Stitch with existing fonts and teal styling. Landing header/hero/final CTA/mobile menu and login now link to `/signup`. No F004 implementation.
+
+**Exact Files Changed:**
+
+- Created `apps/web/src/app/(public)/signup/page.tsx`.
+- Created `apps/web/src/components/signup/signup-form.tsx`.
+- Created `apps/web/src/components/signup/verification-preview.tsx`.
+- Created `apps/web/src/components/signup/signup-product-preview.tsx`.
+- Created `apps/web/src/components/signup/signup.module.css`.
+- Created `docs/features/F003-signup-email-verification.md`.
+- Modified `apps/web/src/components/layout/public-header.tsx`.
+- Modified `apps/web/src/components/layout/mobile-navigation.tsx`.
+- Modified `apps/web/src/components/landing/hero-section.tsx`.
+- Modified `apps/web/src/components/landing/final-cta-section.tsx`.
+- Modified `apps/web/src/components/login/login-form.tsx`.
+- Modified `docs/features/F001-landing-page.md`.
+- Modified `docs/features/F002-login-page.md`.
+- Modified `docs/DEVELOPMENT_ROADMAP.md`.
+
+**Verification Results:**
+
+- PASS: `npm.cmd run build`, `npm.cmd run lint`, and `npm.cmd run typecheck` across the monorepo; changed source and feature-document Prettier checks.
+- PASS: production-build Chrome signup checks covering empty/invalid fields, trimmed-name boundaries (1/80 accepted, 81 rejected), password boundaries (10/128 accepted, 9/129 rejected), visibility, first-error focus, verification focus, resend, back/password clearing, reload reset, and Google mock feedback.
+- PASS: keyboard skip link, visible focus, Enter submission, input labels, associated errors, and reduced-motion preference.
+- PASS: signup and verification overflow checks at 1440, 1024, 768, 375, and 320 CSS pixels; desktop/tablet/mobile screenshot review.
+- PASS: desktop/mobile landing-to-signup, login-to-signup, signup-to-login, and Home navigation. `/`, `/login`, and `/signup` return 200; unknown route returns 404.
+- PASS: no POST/API requests, app storage, cookies, credential query strings, or JavaScript runtime exceptions observed during signup checks.
+- PASS: source/diff scope review; backend, admin, shared packages, configuration, dependency manifests, and lockfile unchanged.
+
+**Known Limitations:** UI-only; no registration, email delivery, OAuth, verification tokens, legal agreement, or real learning data. Chrome emulation is not a complete cross-browser, physical-device, or screen-reader audit. No existing test runner is configured; temporary browser scripts were used without adding a test framework. Existing missing favicon and unrelated repository formatting remain outside scope. Full implementation/verification details: [F003 feature record](features/F003-signup-email-verification.md). The owner approved F003 completion and requested committing and pushing the changes. F004 remains NOT_STARTED.
 
 ---
 
@@ -885,11 +918,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** `F002 — Login Page UI`  
+**Current Feature:** `F003 — Signup + Email Verification UI`  
 **Current Status:** `APPROVED_COMPLETE`  
-**Next Feature:** `F003 — Signup + Email Verification UI`
+**Next Feature:** `F004 — Backend Common Foundation`
 
-**Rule:** F003 cannot begin until F002 is `APPROVED_COMPLETE`, unless the project owner explicitly changes the sequence.
+**Rule:** F004 cannot begin until F003 is `APPROVED_COMPLETE`, unless the project owner explicitly changes the sequence.
 
 ---
 

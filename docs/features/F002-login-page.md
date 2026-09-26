@@ -32,7 +32,7 @@ Authentication API, tokens, cookies, sessions, OAuth, password-reset backend, Mo
 
 The login page and product preview are server components. The form is a client component using native controls and React state. It validates missing email/password and invalid email syntax, focuses the first invalid field, toggles password visibility, and associates inline errors with inputs.
 
-Valid submission shows “UI preview only. Sign-in is not connected yet.” Google activation shows “Google sign-in is not connected yet.” Neither redirects or transmits credentials. Signup/reset controls are disabled and labeled Coming soon.
+Valid submission shows “UI preview only. Sign-in is not connected yet.” Google activation shows “Google sign-in is not connected yet.” Neither redirects or transmits credentials. Signup/reset controls were disabled at original delivery. F003 subsequently connects Create an account to `/signup`; password reset remains unavailable.
 
 The approved implementation omits Stitch's state-demo toolbar, remember-device checkbox, and unsupported security/live-session claims. Example progress and learner information are labeled illustrative.
 
@@ -94,7 +94,7 @@ Navigation follow-up passed monorepo build, lint, typecheck, and changed-file fo
 ## Known Limitations
 
 - Login remains UI-only. Reaching the page does not enable account access.
-- Signup and password reset remain unavailable.
+- Signup UI is now available through F003; registration and password reset remain unavailable.
 - Browser verification uses Chrome emulation, not physical devices or a complete cross-browser/screen-reader audit.
 - Existing missing favicon and unrelated AGENTS.md formatting remain outside scope.
 - No permanent automated test framework was added; browser checks use temporary tooling.
@@ -102,3 +102,5 @@ Navigation follow-up passed monorepo build, lint, typecheck, and changed-file fo
 ## Completion Notes
 
 The original login UI reached READY_FOR_REVIEW before this explicitly approved navigation/documentation follow-up. F001's original completion approval is preserved. After verification, the owner approved F002 and requested a commit and push to dev. F003 remains NOT_STARTED; no implementation of the next feature is included.
+
+The preceding completion note describes the F002 delivery point. In the subsequent approved F003 implementation, only the login form's Create an account control changes to a `/signup` link. Login submission and authentication boundaries remain unchanged. Bidirectional signup/login navigation passed Chrome smoke checks; see [F003](F003-signup-email-verification.md) for current verification and file details.

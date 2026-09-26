@@ -18,13 +18,13 @@ export function HeroSection() {
           through visual explanations, code examples, practice, and revision.
         </p>
         <div className={styles.actions}>
-          <ButtonLink unavailable>Start Learning Free</ButtonLink>
+          <ButtonLink href="/signup">Start Learning Free</ButtonLink>
           <ButtonLink variant="secondary" href="#visual-learning">
             Explore Visual Learning
           </ButtonLink>
         </div>
         <p className={styles.hint}>
-          Accounts are coming soon. Explore the previews below.
+          Explore the signup UI preview. Account creation is not connected yet.
         </p>
         <div className={styles.heroNote}>
           <span>BUILT FOR DEVELOPERS &amp; INTERVIEW PREP</span>

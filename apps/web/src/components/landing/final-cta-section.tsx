@@ -12,13 +12,13 @@ export function FinalCtaSection() {
         </h2>
         <p>A clearer way to learn how software works, one concept at a time.</p>
         <div className={styles.actions}>
-          <ButtonLink unavailable>Start Learning Free</ButtonLink>
+          <ButtonLink href="/signup">Start Learning Free</ButtonLink>
           <ButtonLink href="#technologies" variant="secondary">
             Explore Technologies
           </ButtonLink>
         </div>
         <small>
-          Accounts are coming soon. Learning previews are available above.
+          Explore the signup UI preview. Account creation is not connected yet.
         </small>
       </div>
     </section>

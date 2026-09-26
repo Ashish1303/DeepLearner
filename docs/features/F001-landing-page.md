@@ -28,7 +28,7 @@ Authentication, signup, APIs, persistence, dashboards, live progress, real code 
 
 Next.js server components compose the page; only the mobile navigation disclosure requires client state. CSS Modules and global tokens provide styling. Geist and JetBrains Mono are loaded through next/font. Action and accent tokens use owner-requested `#18abaf`.
 
-Previews are static and labeled illustrative. JavaScript is the first planned technology; other catalog cards are planned. Account-creation CTAs remain disabled. Section anchors provide working exploration paths.
+Previews are static and labeled illustrative. JavaScript is the first planned technology; other catalog cards are planned. Account-creation CTAs were disabled at original delivery. F003 now links them to the signup UI preview. Section anchors provide working exploration paths.
 
 The subsequent F002 navigation follow-up adds a plain header Log in link and mobile-menu equivalent to `/login`. This was not part of the original F001 delivery; see [F002](F002-login-page.md).
 
@@ -71,7 +71,7 @@ All desktop sections and an initial 375px mobile view were reviewed. Full origin
 
 ## Known Limitations
 
-- Account creation and demo controls are unavailable previews.
+- Account creation and demo controls remain unavailable; signup UI navigation is available through F003.
 - Requested teal has insufficient contrast for some normal text on light surfaces and white text on teal; full contrast compliance is not claimed.
 - No usable production logo asset or favicon was added.
 - Google fonts need build-time access when not cached, then are served locally.
@@ -80,3 +80,5 @@ All desktop sections and an initial 375px mobile view were reviewed. Full origin
 ## Completion Notes
 
 F001 was approved and pushed before F002 implementation. The original roadmap sentence that F002 was not started describes that historical delivery point, not its current status. The later login-link adjustment is owned by F002. No signup behavior or hero/footer CTA changed in that follow-up.
+
+F003 subsequently connects Start Learning Free in the header, hero, final CTA, and mobile menu to `/signup`, preserving its primary styling and clarifying that registration is a preview. Its checks and exact changed files are recorded in [F003](F003-signup-email-verification.md); this does not rewrite the original F001 verification history.

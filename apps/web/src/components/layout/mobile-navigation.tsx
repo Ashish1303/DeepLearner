@@ -46,7 +46,10 @@ export function MobileNavigation() {
         <Link href="/login" onClick={() => setOpen(false)}>
           Log in
         </Link>
-        <span>Accounts coming soon</span>
+        <Link href="/signup" onClick={() => setOpen(false)}>
+          Start Learning Free
+        </Link>
+        <span>Signup UI preview</span>
       </nav>
     </div>
   );

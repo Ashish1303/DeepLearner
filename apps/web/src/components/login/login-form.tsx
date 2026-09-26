@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, type FormEvent } from 'react';
+import Link from 'next/link';
 import buttons from '../ui/ui.module.css';
 import styles from './login.module.css';
 
@@ -146,10 +147,7 @@ export function LoginForm() {
         </button>
       </form>
       <p className={styles.signup}>
-        New to DeepLearner?{' '}
-        <button type="button" disabled className={styles.unavailable}>
-          Create an account <span>Coming soon</span>
-        </button>
+        New to DeepLearner? <Link href="/signup">Create an account</Link>
       </p>
       <p id="login-preview-note" className={styles.previewNote}>
         Try the form with example details. Authentication is not available in

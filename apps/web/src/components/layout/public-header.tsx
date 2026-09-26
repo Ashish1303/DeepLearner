@@ -20,8 +20,8 @@ export function PublicHeader() {
           Log in
         </Link>
         <div className={styles.account}>
-          <ButtonLink unavailable>Start Learning Free</ButtonLink>
-          <span>Accounts coming soon</span>
+          <ButtonLink href="/signup">Start Learning Free</ButtonLink>
+          <span>Signup UI preview</span>
         </div>
         <MobileNavigation />
       </div>
