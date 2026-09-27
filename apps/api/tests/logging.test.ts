@@ -34,7 +34,7 @@ test('structured logs correlate requests and exclude secrets, raw paths and erro
       await res.text();
       await new Promise(resolve => server.close(resolve));
     }
-    logger.info({ password: 'SECRET_SENTINEL', passwordHash: 'SECRET_SENTINEL', accessToken: 'SECRET_SENTINEL', refreshToken: 'SECRET_SENTINEL', headers: { authorization: 'SECRET_SENTINEL' }, body: { password: 'SECRET_SENTINEL' }, req: { url: 'SECRET_SENTINEL' }, err: new Error('SECRET_SENTINEL'), context: { apiKey: 'SECRET_SENTINEL', cookie: 'SECRET_SENTINEL', tokenHash: 'SECRET_SENTINEL' } }, 'Redaction probe');
+    logger.info({ MONGODB_URI: 'SECRET_SENTINEL', mongodbUri: 'SECRET_SENTINEL', connectionString: 'SECRET_SENTINEL', password: 'SECRET_SENTINEL', passwordHash: 'SECRET_SENTINEL', accessToken: 'SECRET_SENTINEL', refreshToken: 'SECRET_SENTINEL', headers: { authorization: 'SECRET_SENTINEL' }, body: { password: 'SECRET_SENTINEL' }, req: { url: 'SECRET_SENTINEL' }, err: new Error('SECRET_SENTINEL'), context: { MONGODB_URI: 'SECRET_SENTINEL', mongodbUri: 'SECRET_SENTINEL', connectionString: 'SECRET_SENTINEL', apiKey: 'SECRET_SENTINEL', cookie: 'SECRET_SENTINEL', tokenHash: 'SECRET_SENTINEL' } }, 'Redaction probe');
   `,
     ],
     {
@@ -42,6 +42,8 @@ test('structured logs correlate requests and exclude secrets, raw paths and erro
       env: {
         ...process.env,
         APP_ENV: 'LOCAL',
+        MONGODB_URI: 'mongodb://127.0.0.1:27017',
+        MONGODB_DB_NAME: 'deeplearner-test',
         CORS_ORIGINS: 'http://localhost:3000,http://localhost:5173',
         LOG_LEVEL: 'info',
       },

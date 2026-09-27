@@ -1,31 +1,56 @@
+import { createServer } from 'node:http';
 import { app } from './app.js';
+import { createLifecycle } from './bootstrap.js';
 import { logger } from './common/logging/logger.js';
+import { createDatabase, mongoose } from './config/database.js';
 import { env } from './config/env.js';
 
-const server = app.listen(env.PORT, () => {
-  logger.info({ port: env.PORT, environment: env.APP_ENV }, 'API listening');
+const server = createServer(app);
+const database = createDatabase(mongoose, env, logger);
+const lifecycle = createLifecycle({
+  database,
+  log: logger,
+  listen: () =>
+    new Promise<void>((resolve, reject) => {
+      function onError() {
+        reject(new Error('HTTP startup failed'));
+      }
+      server.once('error', onError);
+      server.listen(env.PORT, () => {
+        server.off('error', onError);
+        logger.info(
+          { port: env.PORT, environment: env.APP_ENV },
+          'API listening',
+        );
+        resolve();
+      });
+    }),
+  closeHTTP: () =>
+    new Promise<void>((resolve, reject) => {
+      if (!server.listening) {
+        resolve();
+        return;
+      }
+      server.close((error) =>
+        error ? reject(new Error('HTTP shutdown failed')) : resolve(),
+      );
+    }),
+  exit: (code) => {
+    process.exitCode = code;
+  },
+  forceExit: (code) => {
+    process.exit(code);
+  },
 });
 
 server.on('error', () => {
-  logger.fatal('API server failed to start');
-  process.exitCode = 1;
+  logger.fatal('API server error');
+  void lifecycle.stop(true);
 });
-
-let shuttingDown = false;
-function shutdown(signal: string) {
-  if (shuttingDown) return;
-  shuttingDown = true;
-  logger.info({ signal }, 'Shutting down API');
-  const deadline = setTimeout(() => {
-    logger.error('Shutdown timed out');
-    process.exit(1);
-  }, 10_000);
-  deadline.unref();
-  server.close((error) => {
-    clearTimeout(deadline);
-    process.exitCode = error ? 1 : 0;
-  });
-}
-
-process.once('SIGINT', () => shutdown('SIGINT'));
-process.once('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => {
+  void lifecycle.stop();
+});
+process.on('SIGTERM', () => {
+  void lifecycle.stop();
+});
+await lifecycle.start();

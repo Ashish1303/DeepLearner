@@ -343,7 +343,11 @@ Status: `APPROVED_COMPLETE`
 ### F005 — MongoDB Connection Foundation
 **Goal:** Connect API safely to MongoDB Atlas.  
 **Dependencies:** F004  
-**Status:** `NOT_STARTED`
+**Status:** `READY_FOR_REVIEW`
+
+**Approved Plan:** [F005 MongoDB Connection Foundation](features/F005-mongodb-connection-foundation.md). Owner approved implementation on 2026-09-27: validated configuration, one Mongoose connection, connect-before-listen, safe logging, graceful shutdown, and tests. No models, authentication, frontend integration, or new endpoints. Live verification requires a privately configured non-production database.
+
+**Verification:** Approved P2 TLS fix verified: 28 API tests, build, lint, typecheck, formatting and scope/secrets review passed. Prior compiled startup-failure and isolated health/404 smoke passed. Live Atlas connectivity and database-backed server startup remain unverified. READY_FOR_REVIEW follows the owner's latest instruction with that limitation retained. Details: feature record. F006 remains NOT_STARTED.
 
 ### F006 — User + Session Models
 **Goal:** Implement users, sessions, verification tokens, reset tokens, indexes and TTL indexes.  
@@ -949,11 +953,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** `F004 — Backend Common Foundation`  
-**Current Status:** `APPROVED_COMPLETE`  
-**Next Feature:** `F005 — MongoDB Connection Foundation`
+**Current Feature:** `F005 — MongoDB Connection Foundation`  
+**Current Status:** `READY_FOR_REVIEW`  
+**Next Feature:** `F006 — User + Session Models`
 
-**Rule:** F005 cannot begin until F004 is `APPROVED_COMPLETE`, unless the project owner explicitly changes the sequence.
+**Rule:** F005 implementation is approved; required live verification is pending. F006 cannot begin until F005 is `APPROVED_COMPLETE`, unless the project owner explicitly changes the sequence.
 
 ---
 

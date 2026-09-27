@@ -4,12 +4,18 @@ import { request } from 'node:http';
 import { after, before, test } from 'node:test';
 import express from 'express';
 import { z } from 'zod';
-import { app } from '../src/app.js';
 import { AppError } from '../src/common/errors/app-error.js';
 import { successResponse } from '../src/common/http/response.js';
-import { errorHandler } from '../src/middleware/error-handler.js';
 import { requestId } from '../src/middleware/request-id.js';
 import { validateRequest } from '../src/middleware/validate.js';
+
+process.env.APP_ENV = 'LOCAL';
+process.env.CORS_ORIGINS = 'http://localhost:3000,http://localhost:5173';
+process.env.LOG_LEVEL = 'silent';
+process.env.MONGODB_URI = 'mongodb://127.0.0.1:27017';
+process.env.MONGODB_DB_NAME = 'deeplearner-test';
+const { app } = await import('../src/app.js');
+const { errorHandler } = await import('../src/middleware/error-handler.js');
 
 const envelope = z.discriminatedUnion('success', [
   z.object({

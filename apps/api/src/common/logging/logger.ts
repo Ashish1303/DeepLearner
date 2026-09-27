@@ -4,6 +4,9 @@ import { env } from '../../config/env.js';
 // Defense in depth for accidental root/one-level structured fields. Callers
 // must still select safe operational data and use fixed log messages.
 const sensitiveFields = [
+  'MONGODB_URI',
+  'mongodbUri',
+  'connectionString',
   'password',
   'passwordHash',
   'currentPassword',

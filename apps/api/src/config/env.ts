@@ -8,6 +8,37 @@ const origin = z.url().refine((value) => {
 
 const schema = z
   .object({
+    MONGODB_URI: z
+      .string()
+      .min(1)
+      .refine((value) => {
+        if (!/^mongodb(?:\+srv)?:\/\/[^\s]+$/.test(value) || /[<>]/.test(value))
+          return false;
+        const query = new URLSearchParams(value.split('?')[1] ?? '');
+        for (const [key, option] of query) {
+          const name = key.toLowerCase();
+          if (['tls', 'ssl'].includes(name) && option.toLowerCase() !== 'true')
+            return false;
+          if (
+            [
+              'tlsinsecure',
+              'tlsallowinvalidcertificates',
+              'tlsallowinvalidhostnames',
+              'tlsdisablecertificaterevocationcheck',
+              'tlsdisableocspendpointcheck',
+            ].includes(name) &&
+            option.toLowerCase() !== 'false'
+          )
+            return false;
+        }
+        return true;
+      }),
+    MONGODB_DB_NAME: z
+      .string()
+      .regex(/^[a-zA-Z0-9_-]{1,63}$/)
+      .refine(
+        (value) => !['admin', 'local', 'config'].includes(value.toLowerCase()),
+      ),
     APP_ENV: z.enum(['LOCAL', 'DEVELOPMENT', 'PRODUCTION']).default('LOCAL'),
     PORT: z.coerce.number().int().min(1).max(65535).default(4000),
     CORS_ORIGINS: z
