@@ -352,7 +352,11 @@ Status: `APPROVED_COMPLETE`
 ### F006 — User + Session Models
 **Goal:** Implement users, sessions, verification tokens, reset tokens, indexes and TTL indexes.  
 **Dependencies:** F005  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Plan:** [F006 approved scope and verification](features/F006-user-session-models.md). Persistence models and offline tests only; no database provisioning.
+
+**Verification:** Owner approved completion on 2026-09-28, including the resolved P2 profile-array validation issue. PASS: 10/10 User tests, 53/53 complete API tests, build, lint, typecheck, formatting and scope/secrets review. Database-enforced uniqueness: NOT_VERIFIED; actual query projections: NOT_VERIFIED; TTL execution: NOT_VERIFIED; Atlas TLS/connectivity: DEFERRED — NOT_VERIFIED.
 
 ### F007 — Email Registration + Verification
 **Dependencies:** F006  
@@ -953,11 +957,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** `F005 — MongoDB Connection Foundation`  
+**Current Feature:** `F006 — User + Session Models`  
 **Current Status:** `APPROVED_COMPLETE`  
-**Next Feature:** `F006 — User + Session Models`
+**Next Feature:** `F007 — Email Registration + Verification`
 
-**Rule:** F005 is owner-approved complete with Atlas verification explicitly deferred. F006 requires a separate plan and owner approval; do not start automatically.
+**Rule:** F006 is owner-approved complete with verification limitations preserved. F007 is the next proposed feature, remains NOT_STARTED and requires separate planning and owner authorization. Do not start automatically.
 
 ---
 
