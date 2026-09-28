@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { databaseTLS } from './database.js';
 
 const origin = z.url().refine((value) => {
   if (!URL.canParse(value)) return false;
@@ -14,25 +15,12 @@ const schema = z
       .refine((value) => {
         if (!/^mongodb(?:\+srv)?:\/\/[^\s]+$/.test(value) || /[<>]/.test(value))
           return false;
-        const query = new URLSearchParams(value.split('?')[1] ?? '');
-        for (const [key, option] of query) {
-          const name = key.toLowerCase();
-          if (['tls', 'ssl'].includes(name) && option.toLowerCase() !== 'true')
-            return false;
-          if (
-            [
-              'tlsinsecure',
-              'tlsallowinvalidcertificates',
-              'tlsallowinvalidhostnames',
-              'tlsdisablecertificaterevocationcheck',
-              'tlsdisableocspendpointcheck',
-            ].includes(name) &&
-            option.toLowerCase() !== 'false'
-          )
-            return false;
-        }
         return true;
       }),
+    MONGODB_TLS: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((value) => value === 'true'),
     MONGODB_DB_NAME: z
       .string()
       .regex(/^[a-zA-Z0-9_-]{1,63}$/)
@@ -51,6 +39,15 @@ const schema = z
       .default('info'),
   })
   .superRefine((value, context) => {
+    try {
+      databaseTLS(value);
+    } catch {
+      context.addIssue({
+        code: 'custom',
+        path: ['MONGODB_URI'],
+        message: 'Invalid database TLS policy',
+      });
+    }
     if (
       value.APP_ENV !== 'LOCAL' &&
       value.CORS_ORIGINS.some((entry) => !entry.startsWith('https://'))

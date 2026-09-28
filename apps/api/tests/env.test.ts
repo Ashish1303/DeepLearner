@@ -21,6 +21,7 @@ function check(values: NodeJS.ProcessEnv) {
         ...environment,
         MONGODB_URI: 'mongodb://127.0.0.1:27017',
         MONGODB_DB_NAME: 'deeplearner-test',
+        MONGODB_TLS: 'true',
         ...values,
       },
       encoding: 'utf8',
@@ -64,6 +65,26 @@ test('TLS validation preserves production and local security boundaries', () => 
       if (!valid) assert.match(result.stderr, /Invalid API configuration/);
     }
   }
+});
+
+test('plaintext requires explicit LOCAL opt-in and literal loopback', () => {
+  for (const [APP_ENV, MONGODB_URI, valid] of [
+    ['LOCAL', 'mongodb://127.0.0.1:27017/?tls=false', true],
+    ['LOCAL', 'mongodb://localhost:27017/', false],
+    ['LOCAL', 'mongodb://127.0.0.1,remote.example/', false],
+    ['LOCAL', 'mongodb+srv://cluster.example/', false],
+    ['DEVELOPMENT', 'mongodb://127.0.0.1/', false],
+    ['PRODUCTION', 'mongodb://127.0.0.1/', false],
+  ] as const) {
+    const result = check({
+      APP_ENV,
+      MONGODB_URI,
+      MONGODB_TLS: 'false',
+      CORS_ORIGINS: 'https://web.example',
+    });
+    assert.equal(result.status === 0, valid);
+  }
+  assert.notEqual(check({ MONGODB_TLS: 'invalid' }).status, 0);
 });
 
 test('invalid configuration fails with field names, never configuration values', () => {

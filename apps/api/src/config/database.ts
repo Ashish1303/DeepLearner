@@ -4,6 +4,54 @@ import type { Logger } from 'pino';
 // Future models must use this instance. Importing it never opens a connection.
 export const mongoose = new Mongoose();
 
+interface DatabaseConfig {
+  MONGODB_URI: string;
+  MONGODB_DB_NAME: string;
+  APP_ENV?: 'LOCAL' | 'DEVELOPMENT' | 'PRODUCTION';
+  MONGODB_TLS?: boolean;
+}
+
+export function databaseTLS(config: DatabaseConfig): boolean {
+  const tls = config.MONGODB_TLS ?? true;
+  const uri = config.MONGODB_URI;
+  // Match the literal authority, not a DNS alias or a normalized IP spelling.
+  // Single-host direct mode below also prevents replica-set host discovery.
+  if (
+    !tls &&
+    (config.APP_ENV !== 'LOCAL' ||
+      !/^mongodb:\/\/(?:[^@/?#\s]+@)?127\.0\.0\.1(?::[0-9]+)?(?:\/[^?#\s]*)?(?:\?[^#\s]*)?$/.test(
+        uri,
+      ))
+  ) {
+    throw new Error('Invalid database TLS policy');
+  }
+  for (const [key, value] of new URLSearchParams(uri.split('?')[1] ?? '')) {
+    const name = key.toLowerCase();
+    const option = value.toLowerCase();
+    if (['tls', 'ssl'].includes(name) && option !== String(tls))
+      throw new Error('Invalid database TLS policy');
+    if (
+      [
+        'tlsinsecure',
+        'tlsallowinvalidcertificates',
+        'tlsallowinvalidhostnames',
+        'tlsdisablecertificaterevocationcheck',
+        'tlsdisableocspendpointcheck',
+      ].includes(name) &&
+      option !== 'false'
+    )
+      throw new Error('Invalid database TLS policy');
+    if (
+      !tls &&
+      (name.startsWith('proxy') ||
+        (name === 'directconnection' && option !== 'true') ||
+        (name === 'loadbalanced' && option !== 'false'))
+    )
+      throw new Error('Invalid database TLS policy');
+  }
+  return tls;
+}
+
 function normalizeTLSURI(uri: string): string {
   const separator = uri.indexOf('?');
   if (separator === -1) return uri;
@@ -37,7 +85,7 @@ interface DatabaseDriver {
 
 export function createDatabase(
   driver: DatabaseDriver,
-  config: { MONGODB_URI: string; MONGODB_DB_NAME: string },
+  config: DatabaseConfig,
   log: Pick<Logger, 'info' | 'warn' | 'error'>,
 ) {
   let state: 'disconnected' | 'connecting' | 'connected' | 'error' =
@@ -80,9 +128,11 @@ export function createDatabase(
     transition('connecting');
     connecting = Promise.resolve().then(async () => {
       try {
+        const tls = databaseTLS(config);
         await driver.connect(normalizeTLSURI(config.MONGODB_URI), {
           dbName: config.MONGODB_DB_NAME,
-          tls: true,
+          tls,
+          ...(!tls ? { directConnection: true } : {}),
           tlsAllowInvalidCertificates: false,
           tlsAllowInvalidHostnames: false,
           serverSelectionTimeoutMS: 30_000,

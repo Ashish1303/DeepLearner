@@ -2,7 +2,7 @@
 
 ## Status
 
-READY_FOR_REVIEW per the owner's latest instruction after successful P2 follow-up verification. TLS certificate/hostname verification remains required. Live Atlas connectivity is still unverified; this review status does not imply that it passed or that F005 is approved complete.
+APPROVED_COMPLETE. Owner approved local verification and closure on 2026-09-28. Atlas connectivity/TLS is DEFERRED — NOT_VERIFIED to a future deployment-readiness task. External OS signal delivery remains unverified.
 
 ## Goal
 
@@ -54,7 +54,7 @@ config/database.ts owns Mongoose configuration, connection state, connect/discon
 | ------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | MONGODB_URI               | Required nonblank secret                          | Atlas connection/authentication information; no embedded real value or fallback                      |
 | MONGODB_DB_NAME           | Required explicit database name                   | Avoid accidental use of the driver's default database; authoritative over any URI database component |
-| TLS                       | Enabled, normal certificate/hostname verification | Preserve database security baseline                                                                  |
+| TLS                       | Verified TLS by default; approved local exception | Preserve database security baseline                                                                  |
 | serverSelectionTimeoutMS  | 30000                                             | Retain normal failover tolerance for Atlas replica sets                                              |
 | connectTimeoutMS          | 10000                                             | Bound an individual connection attempt                                                               |
 | waitQueueTimeoutMS        | 10000                                             | Bound waiting for a pooled connection                                                                |
@@ -66,9 +66,9 @@ Pool and timeout defaults stay centralized in connection code for this phase; do
 
 ### Environment validation
 
-Extend apps/api/src/config/env.ts; do not use shared validation packages. Validate the MongoDB URI scheme (mongodb:// or mongodb+srv://), reject blanks/placeholders, and reject options that disable TLS/certificate/hostname verification. Let the driver validate the full MongoDB grammar; do not invent a full URI parser. Catch and sanitize parse/connection errors. Validate MONGODB_DB_NAME as a bounded simple identifier (letters, digits, hyphen, underscore; maximum 63 ASCII characters), rejecting admin, local, and config. Never print rejected values.
+Extend apps/api/src/config/env.ts; do not use shared validation packages. Validate the MongoDB URI scheme (mongodb:// or mongodb+srv://), reject blanks/placeholders, and reject certificate/hostname bypass options and TLS disabling outside the explicit local exception. Let the driver validate the full MongoDB grammar; do not invent a full URI parser. Catch and sanitize parse/connection errors. Validate MONGODB_DB_NAME as a bounded simple identifier (letters, digits, hyphen, underscore; maximum 63 ASCII characters), rejecting admin, local, and config. Never print rejected values.
 
-MONGODB_DB_NAME is the sole authoritative application database setting. The examples explain this explicitly, including when a URI also contains a database name. LOCAL uses a dedicated non-production Atlas database; DEVELOPMENT and PRODUCTION use separate database credentials and databases. Follow the existing deeplearner-dev/deeplearner-prod naming guidance, with deeplearner-local recommended for local isolation. Actual isolation must also be enforced through credentials, not inferred from a name alone.
+MONGODB_DB_NAME is the sole authoritative application database setting. The examples explain this explicitly, including when a URI also contains a database name. LOCAL may use the installed loopback MongoDB instance under the approved TLS exception or a dedicated non-production Atlas database; DEVELOPMENT and PRODUCTION use separate database credentials and databases. Follow the existing deeplearner-dev/deeplearner-prod naming guidance, with deeplearner-local recommended for local isolation. Actual isolation must also be enforced through credentials, not inferred from a name alone.
 
 Promote MONGODB_URI out of the inactive future-integration block in .env.example and add MONGODB_DB_NAME. Keep URI examples blank or unmistakably non-secret placeholders. Real values belong in the ignored API .env or hosted secret configuration. Do not read, print, create, or change real credentials as part of planning. All authentication/provider variables remain inactive.
 
@@ -95,7 +95,7 @@ Connection startup failures are process failures, not fabricated HTTP responses.
 - Use existing Pino with fixed event/message names, module=database, and safe state/failure codes. Process-level events have no invented HTTP request ID.
 - Never log the URI, credentials, database server addresses, raw driver errors, causes/stacks, connection-option objects, environment values, or query content. Keep Mongoose debug logging off.
 - Extend existing logger redaction for MONGODB_URI/mongodbUri/connectionString as defense in depth; explicit field selection remains mandatory.
-- Require TLS and certificate verification; do not offer insecure development bypasses.
+- Require verified TLS except the approved explicit LOCAL/single-127.0.0.1 plaintext mode. Never bypass certificate/hostname checks for TLS connections.
 - Use a dedicated Atlas database user limited to the intended database, with only required privileges. No cluster-admin credentials and no broad 0.0.0.0/0 access recommendation.
 - The owner supplies existing non-production Atlas credentials/network access securely before real connection smoke testing. Do not provision Atlas resources or change network rules automatically.
 - No collections or indexes are created, and no documents are read/written during the connection-only smoke test.
@@ -145,11 +145,11 @@ Mongoose and its transitive MongoDB driver were approved as part of this plan. I
 - [x] Buffering, autoCreate, autoIndex, and debug logging disabled; no models/collections/indexes created.
 - [x] F004 health, CORS, errors, request IDs, and logging regressions pass unchanged.
 - [x] Unit/lifecycle tests pass without a real database or credentials.
-- [ ] Required live non-production Atlas connect/ping/disconnect and full server smoke pass; currently blocked by missing private configuration.
+- [x] Local non-writing connection and full server smoke passed; owner explicitly deferred Atlas connectivity/TLS (DEFERRED — NOT_VERIFIED).
 - [x] Build, lint, typecheck, formatting, and final scope/diff review pass.
 - [x] Approved P2 follow-up checks passed; READY_FOR_REVIEW as directed, with the live verification gap retained above.
 
-## Verification
+## Historical Verification — 2026-09-27
 
 2026-09-27:
 
@@ -181,11 +181,11 @@ F006 starts only after F005 owner approval. It receives the configured Mongoose 
 - Driver reconnection and a connection-state flag do not replace future per-operation error handling.
 - Pool/timeouts are conservative starting values, not a load-tested capacity claim.
 - Atlas provisioning, real secrets, and network rules are external prerequisites, not changes this plan authorizes.
-- The only newly proposed runtime environment name is MONGODB_DB_NAME; MONGODB_URI already exists as a placeholder and becomes required.
+- MONGODB_URI and MONGODB_DB_NAME are required. MONGODB_TLS defaults to true; false requires the approved local-only policy.
 
-## Completion Notes
+## Implementation History
 
-Owner approved implementation on 2026-09-27; status was set to IN_PROGRESS before code changes. Connection lifecycle, validated configuration, redaction, tests and the separate smoke command are implemented. No models, data operations, auth, endpoints, shared-package or frontend changes. The owner subsequently directed READY_FOR_REVIEW after successful P2 follow-up verification while retaining the live Atlas gap. F006 remains NOT_STARTED. No commit or push performed.
+Owner approved implementation on 2026-09-27; status was set to IN_PROGRESS before code changes. Connection lifecycle, validated configuration, redaction, tests and the separate smoke command are implemented. No models, data operations, auth, endpoints, shared-package or frontend changes. The owner subsequently directed READY_FOR_REVIEW after successful P2 follow-up verification while retaining the live Atlas gap. F006 remains NOT_STARTED. Initial foundation and P2 fix committed and pushed as 37f7066; local TLS follow-up is included in the closure commit.
 
 ## Approved P2 TLS Follow-up
 
@@ -194,3 +194,34 @@ Review found that the driver rejects tlsInsecure=false alongside explicit certif
 Changed: apps/api/src/config/database.ts, apps/api/tests/database.test.ts, apps/api/tests/env.test.ts, this record and the roadmap. No new dependencies, endpoints or architecture changes.
 
 The first regression run exposed incorrect test expectations for retained input option names. Work stopped; the owner approved correcting assertions to the driver's effective settings: tls=true, rejectUnauthorized=true and default hostname verification. All 28 API tests, full build, lint, typecheck, formatting and scope/secrets review now pass. Parser tests open no database connection and cover secure combinations; environment tests reject weakened combinations in LOCAL and PRODUCTION. Live Atlas verification remains unperformed.
+
+## Local Verification — 2026-09-28
+
+Owner authorized existing Windows MongoDB for development verification. PASS: Community Server 8.2 installed, service running, loopback port 27017 reachable. Read-only runtime configuration inspection succeeded without credentials; authorization and TLS are not configured. Diagnostic client closed. Created apps/api/.env from the template only after confirming Git ignores it; LOCAL and deeplearner-local selected, with no credentials. No service settings, users, models, collections or indexes changed.
+
+FAIL: approved test:db command exited 1 after connection selection timed out; application-enforced TLS is incompatible with the local non-TLS service. Cleanup emitted disconnected and the process exited. NOT_VERIFIED: successful application connect/ping/disconnect, database-connected API startup/health and graceful shutdown. PASS: 28/28 API regression tests, including F004 behavior. Atlas verification remains separately pending. A narrowly scoped local TLS policy change or system TLS setup requires explicit approval before further work. F005 remains READY_FOR_REVIEW, not approved complete.
+
+## Approved Local TLS Exception — 2026-09-28
+
+Owner explicitly approved MONGODB_TLS=false only with APP_ENV=LOCAL and a single literal 127.0.0.1 host in a mongodb:// URI. Strict verified TLS remains mandatory by default and for Atlas, hosted environments and other hosts. Configuration validation and connection setup share the same policy. Plaintext forces directConnection=true to prevent replica-set discovery; aliases, alternate IP forms, SRV, mixed hosts, proxy settings and contradictory options are rejected. Certificate/hostname bypass options remain prohibited everywhere.
+
+Changed: apps/api/src/config/database.ts, apps/api/src/config/env.ts, apps/api/.env.example, apps/api/tests/database.test.ts, apps/api/tests/env.test.ts, this document; ignored apps/api/.env opts into the local exception. No dependencies, F004 contracts, models, collections, indexes, database users or service settings changed.
+
+| Check                                              | Result                                                                                                                      |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Approved non-writing local connect/ping/disconnect | PASS, exit 0                                                                                                                |
+| Database connection precedes HTTP startup          | PASS, live event ordering                                                                                                   |
+| Existing health 200 and unknown-route 404          | PASS, live API with local MongoDB                                                                                           |
+| Graceful/repeated shutdown                         | PASS, repeated installed SIGINT/SIGTERM handler dispatch caused one shutdown; database state 0, exit 0 and closed HTTP port |
+| Security/API regression tests                      | PASS, 31/31                                                                                                                 |
+| Build, lint, typecheck, formatting                 | PASS                                                                                                                        |
+| Scope/secrets review                               | PASS; .env remains ignored, no actual credentials in changed files                                                          |
+| Atlas TLS/connectivity/networking                  | NOT_VERIFIED                                                                                                                |
+
+Windows live shutdown verification dispatched the installed signal handlers in-process through a temporary harness; external OS signal delivery was not tested. No persistent harness or implementation changes outside scope. Owner subsequently approved these local results and explicitly deferred Atlas connectivity/TLS to deployment readiness. F005 is APPROVED_COMPLETE; F006 remains NOT_STARTED and requires separate approval.
+
+## Closure — 2026-09-28
+
+Owner-approved evidence: 31/31 tests; successful build, lint, typecheck, formatting, non-writing local connect/ping/disconnect, connect-before-HTTP startup, health/404 contracts and graceful/repeated shutdown-handler checks. Windows handlers were dispatched in-process; external OS signal delivery is NOT_VERIFIED. Atlas connectivity, TLS and networking: DEFERRED — NOT_VERIFIED, to a future deployment-readiness task; never recorded as PASS.
+
+Preserve explicit LOCAL/single-127.0.0.1 TLS opt-out, direct mode and strict verified TLS elsewhere. No models, collections, indexes, authentication or F006 work. Closure commit on dev includes approved local policy code/tests and documentation. Local .env is ignored and excluded; push awaits separate owner approval.

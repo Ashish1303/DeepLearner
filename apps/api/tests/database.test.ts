@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { test } from 'node:test';
 import pino from 'pino';
-import { createDatabase, mongoose } from '../src/config/database.js';
+import {
+  createDatabase,
+  databaseTLS,
+  mongoose,
+} from '../src/config/database.js';
 
 const config = {
   MONGODB_URI: 'mongodb://SECRET_SENTINEL@localhost',
@@ -186,6 +190,75 @@ test('TLS normalization never accepts insecure or contradictory tlsInsecure valu
     assert.deepEqual(f.counts(), [0, 0]);
     await db.disconnect();
   }
+});
+
+test('local TLS exception rejects host, environment and option bypasses', () => {
+  const local = { ...config, APP_ENV: 'LOCAL' as const, MONGODB_TLS: false };
+  for (const uri of [
+    'mongodb://localhost/',
+    'mongodb://127.1/',
+    'mongodb://2130706433/',
+    'mongodb://[::1]/',
+    'mongodb://127.0.0.1.remote.example/',
+    'mongodb://127.0.0.1,remote.example/',
+    'mongodb://remote.example,127.0.0.1/',
+    'mongodb+srv://127.0.0.1/',
+    'mongodb://127.0.0.1@remote.example/',
+    'mongodb://%31%32%37.0.0.1/',
+    ...[
+      'tls=true',
+      'tls=false&ssl=true',
+      'tlsInsecure=true',
+      'tlsAllowInvalidCertificates=true',
+      'tlsAllowInvalidHostnames=true',
+      'directConnection=false',
+      'proxyHost=remote.example',
+      'loadBalanced=true',
+    ].map((q) => `mongodb://127.0.0.1/?${q}`),
+  ])
+    assert.throws(
+      () => databaseTLS({ ...local, MONGODB_URI: uri }),
+      /Invalid database TLS policy/,
+    );
+  for (const APP_ENV of ['DEVELOPMENT', 'PRODUCTION'] as const)
+    assert.throws(() =>
+      databaseTLS({ ...local, APP_ENV, MONGODB_URI: 'mongodb://127.0.0.1/' }),
+    );
+  assert.equal(
+    databaseTLS({ ...config, MONGODB_URI: 'mongodb+srv://cluster.example/' }),
+    true,
+  );
+});
+
+test('real driver parser uses plaintext direct loopback only after explicit opt-in', async () => {
+  const f = fixture();
+  let parsed = false;
+  f.driver.connect = async (uri, options) => {
+    const { autoCreate, autoIndex, bufferCommands, ...driverOptions } = options;
+    assert.equal(autoCreate, false);
+    assert.equal(autoIndex, false);
+    assert.equal(bufferCommands, false);
+    const client = new mongoose.mongo.MongoClient(uri, driverOptions);
+    assert.equal(client.options.tls, false);
+    assert.equal(client.options.directConnection, true);
+    assert.equal(client.options.hosts.length, 1);
+    assert.equal(client.options.hosts[0]?.host, '127.0.0.1');
+    parsed = true;
+    await client.close();
+  };
+  const db = createDatabase(
+    f.driver,
+    {
+      ...config,
+      APP_ENV: 'LOCAL',
+      MONGODB_TLS: false,
+      MONGODB_URI: 'mongodb://127.0.0.1:27017/?tls=false',
+    },
+    f.log,
+  );
+  await db.connect();
+  assert(parsed);
+  await db.disconnect();
 });
 
 test('real Mongoose malformed URI error is sanitized without opening a socket', async () => {
