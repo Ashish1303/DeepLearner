@@ -347,7 +347,7 @@ Status: `APPROVED_COMPLETE`
 
 **Approved Plan:** [F005 MongoDB Connection Foundation](features/F005-mongodb-connection-foundation.md). Owner approved closure on 2026-09-28, including the explicit LOCAL/single-127.0.0.1 TLS exception; verified TLS remains mandatory elsewhere. No models, authentication, frontend integration, or new endpoints.
 
-**Verification:** PASS: 31/31 tests, build, lint, typecheck, formatting, local connect/ping/disconnect, connect-before-HTTP, health/404, graceful/repeated shutdown handlers and scope/secrets review. Windows handlers tested in-process; external OS signal delivery NOT_VERIFIED. Atlas connectivity/TLS: DEFERRED — NOT_VERIFIED to deployment readiness by explicit owner approval. F006 remains NOT_STARTED.
+**Verification:** PASS: 31/31 tests, build, lint, typecheck, formatting, local connect/ping/disconnect, connect-before-HTTP, health/404, graceful/repeated shutdown handlers and scope/secrets review. Windows handlers tested in-process; external OS signal delivery NOT_VERIFIED. Controlled Atlas verification PASS on 2026-09-29: connection, strict TLS, authentication, ping and disconnect, using process-only DNS/TLS overrides. Persistent DNS/configuration issues remain unresolved; normal Atlas startup without overrides, database uniqueness/TTL execution and application read/write privileges remain NOT_VERIFIED. See the [F005 verification record](features/F005-mongodb-connection-foundation.md).
 
 ### F006 — User + Session Models
 **Goal:** Implement users, sessions, verification tokens, reset tokens, indexes and TTL indexes.  

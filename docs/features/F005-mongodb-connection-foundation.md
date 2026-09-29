@@ -2,7 +2,7 @@
 
 ## Status
 
-APPROVED_COMPLETE. Owner approved local verification and closure on 2026-09-28. Atlas connectivity/TLS is DEFERRED — NOT_VERIFIED to a future deployment-readiness task. External OS signal delivery remains unverified.
+APPROVED_COMPLETE. Owner approved local verification and closure on 2026-09-28. Controlled development Atlas connection, strict TLS, authentication, ping and disconnect verified on 2026-09-29 using temporary process-only DNS/TLS overrides. Normal Atlas application startup without overrides and external OS signal delivery remain NOT_VERIFIED. Earlier results below retain the evidence available at their respective review dates.
 
 ## Goal
 
@@ -185,7 +185,7 @@ F006 starts only after F005 owner approval. It receives the configured Mongoose 
 
 ## Implementation History
 
-Owner approved implementation on 2026-09-27; status was set to IN_PROGRESS before code changes. Connection lifecycle, validated configuration, redaction, tests and the separate smoke command are implemented. No models, data operations, auth, endpoints, shared-package or frontend changes. The owner subsequently directed READY_FOR_REVIEW after successful P2 follow-up verification while retaining the live Atlas gap. F006 remains NOT_STARTED. Initial foundation and P2 fix committed and pushed as 37f7066; local TLS follow-up is included in the closure commit.
+Owner approved implementation on 2026-09-27; status was set to IN_PROGRESS before code changes. Connection lifecycle, validated configuration, redaction, tests and the separate smoke command are implemented. No models, data operations, auth, endpoints, shared-package or frontend changes. The owner subsequently directed READY_FOR_REVIEW after successful P2 follow-up verification while retaining the live Atlas gap. At the earlier F005 closure review on 2026-09-28, F006 was NOT_STARTED; this is historical, not its current status. Initial foundation and P2 fix committed and pushed as 37f7066; local TLS follow-up is included in the closure commit.
 
 ## Approved P2 TLS Follow-up
 
@@ -218,10 +218,24 @@ Changed: apps/api/src/config/database.ts, apps/api/src/config/env.ts, apps/api/.
 | Scope/secrets review                               | PASS; .env remains ignored, no actual credentials in changed files                                                          |
 | Atlas TLS/connectivity/networking                  | NOT_VERIFIED                                                                                                                |
 
-Windows live shutdown verification dispatched the installed signal handlers in-process through a temporary harness; external OS signal delivery was not tested. No persistent harness or implementation changes outside scope. Owner subsequently approved these local results and explicitly deferred Atlas connectivity/TLS to deployment readiness. F005 is APPROVED_COMPLETE; F006 remains NOT_STARTED and requires separate approval.
+Windows live shutdown verification dispatched the installed signal handlers in-process through a temporary harness; external OS signal delivery was not tested. No persistent harness or implementation changes outside scope. Owner subsequently approved these local results and explicitly deferred Atlas connectivity/TLS to deployment readiness. At that F005 closure review on 2026-09-28, F005 was APPROVED_COMPLETE and F006 was NOT_STARTED, awaiting separate approval; F006 has since been approved complete.
 
 ## Closure — 2026-09-28
 
 Owner-approved evidence: 31/31 tests; successful build, lint, typecheck, formatting, non-writing local connect/ping/disconnect, connect-before-HTTP startup, health/404 contracts and graceful/repeated shutdown-handler checks. Windows handlers were dispatched in-process; external OS signal delivery is NOT_VERIFIED. Atlas connectivity, TLS and networking: DEFERRED — NOT_VERIFIED, to a future deployment-readiness task; never recorded as PASS.
 
 Preserve explicit LOCAL/single-127.0.0.1 TLS opt-out, direct mode and strict verified TLS elsewhere. No models, collections, indexes, authentication or F006 work. Closure commit on dev includes approved local policy code/tests and documentation. Local .env is ignored and excluded; push awaits separate owner approval.
+
+## Controlled Atlas Verification — 2026-09-29
+
+Owner-approved diagnostic used the existing API-owned Mongoose connection against the approved development Atlas target and exited with code 0.
+
+**PASS:** target preflight; Atlas connection; strict certificate and hostname verification; credentialed authentication; read-only ping; clean Mongoose disconnection.
+
+Temporary overrides were `dns.setServers(['192.168.31.1'])` and `MONGODB_TLS=true`, confined to the diagnostic process. No database writes, collection/index creation, file changes or persistent settings changes occurred. Completed before the 45-second diagnostic and 60-second hard deadlines; timeout paths were not exercised.
+
+**Unresolved:** Node's default resolver remains `127.0.0.1`; `.env` remains unchanged, including `MONGODB_TLS=false`. Successful controlled verification does not establish normal application readiness.
+
+**NOT_VERIFIED:** normal Atlas startup without overrides; Atlas-backed HTTP startup/health/shutdown; database-enforced unique indexes; actual query projections; TTL execution; application data read/write privileges; external OS signal delivery.
+
+F005's local-only TLS exception and mandatory verified TLS elsewhere remain unchanged. Historical deferred Atlas connectivity/TLS evidence is superseded only for this controlled test. F005 and F006 remain APPROVED_COMPLETE; F007 remains NOT_STARTED. Persistent DNS investigation or configuration changes require separate approval.
