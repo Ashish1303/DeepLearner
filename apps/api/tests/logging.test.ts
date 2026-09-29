@@ -16,6 +16,7 @@ test('structured logs correlate requests and exclude secrets, raw paths and erro
     import express from 'express';
     import { app } from './src/app.ts';
     import { logger } from './src/common/logging/logger.ts';
+    logger.info({ RESEND_API_KEY: 'SECRET_SENTINEL', rawToken: 'SECRET_SENTINEL', verificationUrl: 'SECRET_SENTINEL', email: 'SECRET_SENTINEL', to: 'SECRET_SENTINEL', html: 'SECRET_SENTINEL', text: 'SECRET_SENTINEL' }, 'F007 redaction probe');
     import { requestId } from './src/middleware/request-id.ts';
     import { requestLogger, routeLabel } from './src/middleware/request-logger.ts';
     import { errorHandler } from './src/middleware/error-handler.ts';

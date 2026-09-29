@@ -14,6 +14,34 @@ const fields = {
   passwordHash,
 };
 
+test('Argon2id accepts both supported parameter orders and rejects malformed hashes', async () => {
+  for (const value of [
+    passwordHash,
+    passwordHash.replace('t=3,p=1', 'p=1,t=3'),
+  ]) {
+    const user = new User({ ...fields, passwordHash: value });
+    await user.validate();
+    assert.equal(user.passwordHash, value);
+  }
+  for (const value of [
+    passwordHash.replace('argon2id', 'argon2i'),
+    passwordHash.replace('v=19', 'v=16'),
+    passwordHash.replace('m=65536', 'm=0'),
+    passwordHash.replace('t=3', 't=0'),
+    passwordHash.replace('p=1', 'p=-1'),
+    passwordHash.replace('t=3,p=1', 'p=1,t=0'),
+    passwordHash.replace('t=3,p=1', 't=3,t=1'),
+    passwordHash.replace(',p=1', ''),
+    passwordHash.replace('p=1', 'p=1,x=2'),
+    passwordHash.replace('c3ludGhldGljc2FsdA', ''),
+    passwordHash.replace('c3ludGhldGljaGFzaA', ''),
+    `${passwordHash}!`,
+  ])
+    await assert.rejects(
+      new User({ ...fields, passwordHash: value }).validate(),
+    );
+});
+
 test('user normalization, defaults, optional profile and derived name', async () => {
   const user = new User(fields);
   await user.validate();

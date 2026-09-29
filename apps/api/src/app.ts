@@ -8,28 +8,36 @@ import { notFound } from './middleware/not-found.js';
 import { requestId } from './middleware/request-id.js';
 import { requestLogger } from './middleware/request-logger.js';
 import { healthRouter } from './modules/health/health.routes.js';
+import { createAuthRouter } from './modules/auth/auth.routes.js';
+import type { RegistrationService } from './modules/auth/registration.service.js';
+import type { AuthLimits } from './modules/auth/auth-rate-limit.js';
 
-export const app = express();
-app.disable('x-powered-by');
-app.use(requestId);
-app.use(requestLogger);
-app.use(helmet());
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin || env.CORS_ORIGINS.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(
-          new AppError(403, 'ORIGIN_NOT_ALLOWED', 'Origin is not allowed'),
-        );
-      }
-    },
-    credentials: false,
-    exposedHeaders: ['X-Request-Id'],
-  }),
-);
-app.use(express.json({ limit: '256kb' }));
-app.use('/api/v1/health', healthRouter);
-app.use(notFound);
-app.use(errorHandler);
+export function createApp(service?: RegistrationService, limits?: AuthLimits) {
+  const app = express();
+  app.disable('x-powered-by');
+  app.use(requestId);
+  app.use(requestLogger);
+  app.use(helmet());
+  app.use(
+    cors({
+      origin(origin, callback) {
+        if (!origin || env.CORS_ORIGINS.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(
+            new AppError(403, 'ORIGIN_NOT_ALLOWED', 'Origin is not allowed'),
+          );
+        }
+      },
+      credentials: false,
+      exposedHeaders: ['X-Request-Id'],
+    }),
+  );
+  app.use(express.json({ limit: '256kb' }));
+  app.use('/api/v1/health', healthRouter);
+  app.use('/api/v1/auth', createAuthRouter(service, limits));
+  app.use(notFound);
+  app.use(errorHandler);
+  return app;
+}
+export const app = createApp();

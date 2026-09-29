@@ -61,3 +61,9 @@ PASS: User model tests 10/10; complete API suite 53/53 (all original 50 still pa
 ## Completion — 2026-09-28
 
 Owner approved the four persistence models, schema/index declarations, sensitive-field protection and offline tests, including the resolved profile-array validation issue. F006 is APPROVED_COMPLETE with the verification limitations above preserved. This closure changes documentation/status only. F007 — Email Registration + Verification is the next proposed feature, remains NOT_STARTED and requires separate planning and owner authorization.
+
+## F007 Compatibility Correction — 2026-09-29
+
+Owner authorized the narrow password-hash validator correction: installed `argon2@0.45.1` emits `m,p,t`; the previous validator accepted only `m,t,p`. Both orders now pass without rewriting hashes. Algorithm/version, positive parameter values and nonempty salt/hash representation checks remain unchanged; no other schema fields, indexes or persistence settings changed.
+
+Changed `apps/api/src/modules/users/user.model.ts`, `apps/api/tests/user-model.test.ts`, `apps/api/tests/password.test.ts` and F006/F007 documentation. Regression coverage includes a real generated hash, the previous ordering and malformed/unsupported representations. PASS: 11/11 User tests, 70/70 complete API tests (including all previous 53), root build/lint/typecheck/formatting. Database-dependent verification remains NOT_VERIFIED. F006's existing owner-approved status is unchanged; F007 is now IN_PROGRESS, superseding the historical next-feature note above.

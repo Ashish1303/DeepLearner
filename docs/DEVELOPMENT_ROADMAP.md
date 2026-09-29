@@ -360,7 +360,11 @@ Status: `APPROVED_COMPLETE`
 
 ### F007 — Email Registration + Verification
 **Dependencies:** F006  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Plan:** [Approved F007 backend scope](features/F007-email-registration-verification.md). Offline implementation/checks authorized; database integration writes and real email require separate approval.
+
+**Verification:** 2026-09-29: PASS 70/70 offline API tests; isolated database integration exit 0; expired-record-present rejection; observed verification-first race; rollback, uniqueness, replay prevention and sensitive projections; build/lint/typecheck/formatting, scope/secrets review and complete temporary-instance cleanup. Approved F006 Argon2id compatibility correction included. Owner approved backend-only completion on 2026-09-29; dedicated code review found no actionable P0/P1/P2/P3 defects. Resend-first ordering not observed; actual TTL deletion, real Resend delivery and normal Atlas startup without overrides NOT_VERIFIED. Browser integration is outside F007. See the feature record for test boundaries and three non-blocking future coverage opportunities (not completed tests); no Atlas writes or real emails.
 
 ### F008 — Login + Access/Refresh Tokens
 **Dependencies:** F007  
@@ -957,11 +961,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** `F006 — User + Session Models`  
+**Current Feature:** `F007 — Email Registration + Verification`  
 **Current Status:** `APPROVED_COMPLETE`  
-**Next Feature:** `F007 — Email Registration + Verification`
+**Next Feature:** `F008 — Login + Access/Refresh Tokens`
 
-**Rule:** F006 is owner-approved complete with verification limitations preserved. F007 is the next proposed feature, remains NOT_STARTED and requires separate planning and owner authorization. Do not start automatically.
+**Rule:** F007 is owner-approved complete within its backend-only scope and recorded limitations. F008 remains NOT_STARTED and requires separate approval. Additional database tests and real email remain separately gated.
 
 ---
 

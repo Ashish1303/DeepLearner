@@ -28,6 +28,31 @@ const schema = z
         (value) => !['admin', 'local', 'config'].includes(value.toLowerCase()),
       ),
     APP_ENV: z.enum(['LOCAL', 'DEVELOPMENT', 'PRODUCTION']).default('LOCAL'),
+    EMAIL_PROVIDER: z.enum(['disabled', 'resend']).default('disabled'),
+    EMAIL_FROM: z.string().trim().pipe(z.email()).optional(),
+    RESEND_API_KEY: z.string().min(1).optional(),
+    WEB_ORIGIN: origin.default('http://localhost:3000'),
+    AUTH_REGISTER_LIMIT: z.coerce.number().int().min(1).max(1000).default(5),
+    AUTH_REGISTER_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(3600000),
+    AUTH_VERIFY_LIMIT: z.coerce.number().int().min(1).max(1000).default(10),
+    AUTH_VERIFY_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(900000),
+    AUTH_RESEND_LIMIT: z.coerce.number().int().min(1).max(1000).default(3),
+    AUTH_RESEND_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(3600000),
     PORT: z.coerce.number().int().min(1).max(65535).default(4000),
     CORS_ORIGINS: z
       .string()
@@ -39,6 +64,40 @@ const schema = z
       .default('info'),
   })
   .superRefine((value, context) => {
+    if (value.APP_ENV !== 'LOCAL' && value.EMAIL_PROVIDER !== 'resend') {
+      context.addIssue({
+        code: 'custom',
+        path: ['EMAIL_PROVIDER'],
+        message: 'Hosted delivery must be configured',
+      });
+    }
+    if (value.EMAIL_PROVIDER === 'resend') {
+      for (const key of ['EMAIL_FROM', 'RESEND_API_KEY'] as const) {
+        if (!value[key])
+          context.addIssue({
+            code: 'custom',
+            path: [key],
+            message: 'Required for email delivery',
+          });
+      }
+    }
+    const web = URL.canParse(value.WEB_ORIGIN)
+      ? new URL(value.WEB_ORIGIN)
+      : undefined;
+    if (
+      web &&
+      web.protocol !== 'https:' &&
+      !(
+        value.APP_ENV === 'LOCAL' &&
+        ['localhost', '127.0.0.1', '[::1]'].includes(web.hostname)
+      )
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['WEB_ORIGIN'],
+        message: 'HTTPS or local loopback origin required',
+      });
+    }
     try {
       databaseTLS(value);
     } catch {

@@ -4,7 +4,17 @@ import { test } from 'node:test';
 
 function check(values: NodeJS.ProcessEnv) {
   const environment = { ...process.env };
-  for (const key of ['APP_ENV', 'PORT', 'CORS_ORIGINS', 'LOG_LEVEL'])
+  for (const key of [
+    'APP_ENV',
+    'PORT',
+    'CORS_ORIGINS',
+    'LOG_LEVEL',
+    'EMAIL_PROVIDER',
+    'EMAIL_FROM',
+    'RESEND_API_KEY',
+    'WEB_ORIGIN',
+    ...Object.keys(environment).filter((key) => key.startsWith('AUTH_')),
+  ])
     delete environment[key];
   return spawnSync(
     process.execPath,
@@ -22,6 +32,14 @@ function check(values: NodeJS.ProcessEnv) {
         MONGODB_URI: 'mongodb://127.0.0.1:27017',
         MONGODB_DB_NAME: 'deeplearner-test',
         MONGODB_TLS: 'true',
+        ...(values.APP_ENV === 'PRODUCTION' || values.APP_ENV === 'DEVELOPMENT'
+          ? {
+              EMAIL_PROVIDER: 'resend',
+              EMAIL_FROM: 'verify@example.com',
+              RESEND_API_KEY: 'test-only-key',
+              WEB_ORIGIN: 'https://web.example',
+            }
+          : {}),
         ...values,
       },
       encoding: 'utf8',
@@ -115,6 +133,34 @@ test('invalid configuration fails with field names, never configuration values',
     { CORS_ORIGINS: 'https://example.com/' },
     { APP_ENV: 'PRODUCTION' },
     { APP_ENV: 'DEVELOPMENT', CORS_ORIGINS: 'http://localhost:3000' },
+  ]) {
+    const result = check(values);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Invalid API configuration/);
+    assert(!result.stderr.includes('SECRET_SENTINEL'));
+  }
+});
+
+test('F007 email and limiter configuration is validated without exposing values', () => {
+  for (const values of [
+    {
+      APP_ENV: 'PRODUCTION',
+      CORS_ORIGINS: 'https://web.example',
+      EMAIL_PROVIDER: 'disabled',
+    },
+    { EMAIL_PROVIDER: 'resend' },
+    {
+      EMAIL_PROVIDER: 'resend',
+      EMAIL_FROM: 'verify@example.com',
+      RESEND_API_KEY: '',
+    },
+    { EMAIL_FROM: 'SECRET_SENTINEL' },
+    { WEB_ORIGIN: 'SECRET_SENTINEL' },
+    { WEB_ORIGIN: 'http://remote.example' },
+    { WEB_ORIGIN: 'https://example.com/path' },
+    { AUTH_REGISTER_LIMIT: '0' },
+    { AUTH_VERIFY_WINDOW_MS: '-1' },
+    { AUTH_RESEND_LIMIT: '1.5' },
   ]) {
     const result = check(values);
     assert.notEqual(result.status, 0);

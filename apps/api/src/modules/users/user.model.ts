@@ -99,7 +99,7 @@ export const userSchema = new Schema(
       select: false,
       validate: (value: string | null) =>
         value === null ||
-        /^\$argon2id\$v=19\$m=[1-9]\d*,t=[1-9]\d*,p=[1-9]\d*\$[A-Za-z0-9+/]+\$[A-Za-z0-9+/]+$/.test(
+        /^\$argon2id\$v=19\$m=[1-9]\d*,(?:t=[1-9]\d*,p=[1-9]\d*|p=[1-9]\d*,t=[1-9]\d*)\$[A-Za-z0-9+/]+\$[A-Za-z0-9+/]+$/.test(
           value,
         ),
     },
