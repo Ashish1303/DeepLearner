@@ -9,6 +9,41 @@ const origin = z.url().refine((value) => {
 
 const schema = z
   .object({
+    ACCESS_TOKEN_SECRET: z.string().refine((value) => {
+      const decoded = Buffer.from(value, 'base64');
+      return (
+        decoded.length >= 32 &&
+        decoded.toString('base64') === value &&
+        new Set(decoded).size >= 16
+      );
+    }, 'Independent random base64 signing secret required'),
+    ACCESS_TOKEN_ISSUER: z.string().min(1).max(255),
+    ACCESS_TOKEN_AUDIENCE: z.string().min(1).max(255),
+    AUTH_COOKIE_SECURE: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((value) => value === 'true'),
+    AUTH_LOGIN_LIMIT: z.coerce.number().int().min(1).max(1000).default(5),
+    AUTH_LOGIN_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(900000),
+    AUTH_LOGIN_IP_LIMIT: z.coerce.number().int().min(1).max(1000).default(20),
+    AUTH_LOGIN_IP_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(900000),
+    AUTH_REFRESH_LIMIT: z.coerce.number().int().min(1).max(1000).default(60),
+    AUTH_REFRESH_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(60000),
     MONGODB_URI: z
       .string()
       .min(1)
@@ -64,6 +99,24 @@ const schema = z
       .default('info'),
   })
   .superRefine((value, context) => {
+    if (
+      !value.AUTH_COOKIE_SECURE &&
+      (value.APP_ENV !== 'LOCAL' ||
+        value.CORS_ORIGINS.some(
+          (entry) =>
+            !URL.canParse(entry) ||
+            !['localhost', '127.0.0.1', '[::1]'].includes(
+              new URL(entry).hostname,
+            ),
+        ))
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['AUTH_COOKIE_SECURE'],
+        message:
+          'Insecure cookies require explicit LOCAL loopback configuration',
+      });
+    }
     if (value.APP_ENV !== 'LOCAL' && value.EMAIL_PROVIDER !== 'resend') {
       context.addIssue({
         code: 'custom',

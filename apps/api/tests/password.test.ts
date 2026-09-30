@@ -34,3 +34,19 @@ test('verification tokens are random, hashed and expire after fifteen minutes', 
   assert.notEqual(first.raw, issueVerificationToken(now).raw);
   assert.equal(first.expiresAt.getTime() - now.getTime(), 900000);
 });
+
+test('F008 verifies installed Argon2id hashes without accepting incorrect or unsupported credentials', async () => {
+  const { verifyPassword } =
+    await import('../src/modules/auth/password.service.js');
+  const encoded = await hashPassword('synthetic-password');
+  assert.equal(await verifyPassword('synthetic-password', encoded), true);
+  assert.equal(await verifyPassword('wrong-password', encoded), false);
+  assert.equal(await verifyPassword('synthetic-password', 'malformed'), false);
+  assert.equal(
+    await verifyPassword(
+      'synthetic-password',
+      encoded.replace('$argon2id$', '$argon2i$'),
+    ),
+    false,
+  );
+});

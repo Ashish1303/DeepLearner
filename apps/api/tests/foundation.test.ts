@@ -9,6 +9,11 @@ import { successResponse } from '../src/common/http/response.js';
 import { requestId } from '../src/middleware/request-id.js';
 import { validateRequest } from '../src/middleware/validate.js';
 
+process.env.ACCESS_TOKEN_SECRET = Buffer.from(
+  Array.from({ length: 32 }, (_, i) => i + 1),
+).toString('base64');
+process.env.ACCESS_TOKEN_ISSUER = 'test-api';
+process.env.ACCESS_TOKEN_AUDIENCE = 'test-client';
 process.env.APP_ENV = 'LOCAL';
 process.env.CORS_ORIGINS = 'http://localhost:3000,http://localhost:5173';
 process.env.LOG_LEVEL = 'silent';

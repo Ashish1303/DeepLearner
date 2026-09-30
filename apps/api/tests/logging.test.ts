@@ -42,6 +42,11 @@ test('structured logs correlate requests and exclude secrets, raw paths and erro
       cwd: new URL('..', import.meta.url),
       env: {
         ...process.env,
+        ACCESS_TOKEN_SECRET: Buffer.from(
+          Array.from({ length: 32 }, (_, i) => i + 1),
+        ).toString('base64'),
+        ACCESS_TOKEN_ISSUER: 'test-api',
+        ACCESS_TOKEN_AUDIENCE: 'test-client',
         APP_ENV: 'LOCAL',
         MONGODB_URI: 'mongodb://127.0.0.1:27017',
         MONGODB_DB_NAME: 'deeplearner-test',

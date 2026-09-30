@@ -5,6 +5,11 @@ import { z } from 'zod';
 import { AppError } from '../src/common/errors/app-error.js';
 import type { RegistrationService } from '../src/modules/auth/registration.service.js';
 
+process.env.ACCESS_TOKEN_SECRET = Buffer.from(
+  Array.from({ length: 32 }, (_, i) => i + 1),
+).toString('base64');
+process.env.ACCESS_TOKEN_ISSUER = 'test-api';
+process.env.ACCESS_TOKEN_AUDIENCE = 'test-client';
 process.env.APP_ENV = 'LOCAL';
 process.env.EMAIL_PROVIDER = 'disabled';
 process.env.MONGODB_URI = 'mongodb://127.0.0.1:27017';

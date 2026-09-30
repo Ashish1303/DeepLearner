@@ -368,7 +368,11 @@ Status: `APPROVED_COMPLETE`
 
 ### F008 — Login + Access/Refresh Tokens
 **Dependencies:** F007  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Plan:** [Approved backend-only F008 plan](features/F008-login-access-refresh-tokens.md). Owner approved backend-only completion on 2026-09-30 after accepting final implementation, verification and code-review evidence.
+
+**Verification:** Initial 2026-09-29 offline API 83/83 PASS; final 2026-09-30 offline API 84/84 PASS after the regression-tested P2 malformed CORS configuration correction; build/lint/typecheck/formatting, dependency and security/secrets checks PASS. 2026-09-30 isolated MongoDB integration 7/7 PASS, exit 0: transactional login/audits, fixed 30-day expiry, rotation/reuse, concurrent one-success/reuse-rejection/session-revocation, disabled protection/expired suspension, login/refresh rollback, projections, hash uniqueness and expired-record-present rejection. Disposable cleanup and port release PASS; suite 8.5s, overall 13.1s. TTL deletion, real browser cookies and normal Atlas startup without overrides remain NOT_VERIFIED; rate limiting is single-process. Final code review: no actionable P0-P3 findings. Malformed URL-parser exceptions/stacks are prevented; Node may still emit the standard stack for the sanitized configuration Error. See feature record for evidence boundaries.
 
 ### F009 — Logout + Session Management
 **Dependencies:** F008  
@@ -961,11 +965,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** `F007 — Email Registration + Verification`  
-**Current Status:** `APPROVED_COMPLETE`  
-**Next Feature:** `F008 — Login + Access/Refresh Tokens`
+**Current Feature:** `F008 — Login + Access/Refresh Tokens`
+**Current Status:** `APPROVED_COMPLETE`
+**Next Feature:** `F009 — Logout + Session Management`
 
-**Rule:** F007 is owner-approved complete within its backend-only scope and recorded limitations. F008 remains NOT_STARTED and requires separate approval. Additional database tests and real email remain separately gated.
+**Rule:** F005-F008 are APPROVED_COMPLETE. F008 owner approval is dated 2026-09-30 and preserves its backend-only scope and documented limitations. F009 remains NOT_STARTED and requires separate approval.
 
 ---
 

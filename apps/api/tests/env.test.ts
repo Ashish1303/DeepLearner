@@ -29,6 +29,11 @@ function check(values: NodeJS.ProcessEnv) {
       cwd: new URL('..', import.meta.url),
       env: {
         ...environment,
+        ACCESS_TOKEN_SECRET: Buffer.from(
+          Array.from({ length: 32 }, (_, i) => i + 1),
+        ).toString('base64'),
+        ACCESS_TOKEN_ISSUER: 'test-api',
+        ACCESS_TOKEN_AUDIENCE: 'test-client',
         MONGODB_URI: 'mongodb://127.0.0.1:27017',
         MONGODB_DB_NAME: 'deeplearner-test',
         MONGODB_TLS: 'true',
@@ -47,7 +52,7 @@ function check(values: NodeJS.ProcessEnv) {
   );
 }
 
-test('local defaults and explicit hosted HTTPS origins validate without future secrets', () => {
+test('local defaults and hosted HTTPS origins validate with required signing configuration', () => {
   for (const values of [
     {},
     {
@@ -166,5 +171,45 @@ test('F007 email and limiter configuration is validated without exposing values'
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /Invalid API configuration/);
     assert(!result.stderr.includes('SECRET_SENTINEL'));
+  }
+});
+
+test('F008 signing configuration and insecure-cookie exception fail closed', () => {
+  for (const values of [
+    { ACCESS_TOKEN_SECRET: '' },
+    { ACCESS_TOKEN_SECRET: Buffer.alloc(32).toString('base64') },
+    { ACCESS_TOKEN_ISSUER: '' },
+    { ACCESS_TOKEN_AUDIENCE: '' },
+    { APP_ENV: 'PRODUCTION', AUTH_COOKIE_SECURE: 'false' },
+    {
+      APP_ENV: 'LOCAL',
+      AUTH_COOKIE_SECURE: 'false',
+      CORS_ORIGINS: 'https://example.com',
+    },
+  ])
+    assert.notEqual(check(values).status, 0);
+  assert.equal(
+    check({ APP_ENV: 'LOCAL', AUTH_COOKIE_SECURE: 'false' }).status,
+    0,
+  );
+});
+
+test('malformed CORS origins use sanitized configuration errors with local cookies', () => {
+  const sentinel = 'F008_MALFORMED_ORIGIN_SENTINEL_9f3b7c';
+  for (const AUTH_COOKIE_SECURE of ['false', 'true']) {
+    const result = check({
+      APP_ENV: 'LOCAL',
+      AUTH_COOKIE_SECURE,
+      CORS_ORIGINS: `http://127.0.0.1:3000,http://[${sentinel}`,
+    });
+    assert.equal(result.status, 1);
+    assert.match(
+      result.stderr,
+      /Error: Invalid API configuration: CORS_ORIGINS\.1(?:, AUTH_COOKIE_SECURE)?/,
+    );
+    const output = result.stdout + result.stderr;
+    assert(!output.includes(sentinel));
+    assert(!output.includes('http://['));
+    assert.doesNotMatch(output, /ERR_INVALID_URL|TypeError: Invalid URL/);
   }
 });
