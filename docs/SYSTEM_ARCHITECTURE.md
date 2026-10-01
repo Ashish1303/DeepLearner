@@ -324,7 +324,7 @@ Refresh tokens are not treated as permanently valid bearer strings. A server-sid
 - Session revocation
 - Token rotation
 - Password-change invalidation
-- Future logout-all-devices functionality
+- Logout-all-devices functionality (F009)
 
 Detailed session collection fields are deferred to Database Architecture.
 

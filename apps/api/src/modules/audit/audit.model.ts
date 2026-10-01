@@ -13,6 +13,8 @@ export const auditSchema = new Schema(
         'AUTH_LOGIN_FAILED',
         'AUTH_REFRESH_SUCCESS',
         'AUTH_REFRESH_REUSE_DETECTED',
+        'AUTH_LOGOUT',
+        'AUTH_LOGOUT_ALL',
       ],
       required: true,
       immutable: true,
@@ -50,10 +52,15 @@ export const auditSchema = new Schema(
         {
           source: {
             type: String,
-            enum: ['EMAIL_PASSWORD', 'REFRESH_TOKEN'],
+            enum: ['EMAIL_PASSWORD', 'REFRESH_TOKEN', 'ACCESS_TOKEN'],
             required: true,
           },
           sessionId: { type: Schema.Types.ObjectId },
+          revokedSessions: {
+            type: Number,
+            min: 0,
+            validate: Number.isSafeInteger,
+          },
           failureReason: {
             type: String,
             enum: [
@@ -100,6 +107,30 @@ auditSchema.pre('validate', function () {
   )
     this.invalidate('actorId', 'Matching subject IDs required');
   if (!meta) return;
+  if (action === 'AUTH_LOGOUT' || action === 'AUTH_LOGOUT_ALL') {
+    const all = action === 'AUTH_LOGOUT_ALL';
+    if (meta.source !== (all ? 'ACCESS_TOKEN' : 'REFRESH_TOKEN'))
+      this.invalidate('metadata.source', 'Invalid logout source');
+    if (Boolean(meta.sessionId) !== !all)
+      this.invalidate(
+        'metadata.sessionId',
+        'Session metadata must match action',
+      );
+    if (
+      all
+        ? meta.revokedSessions === undefined
+        : meta.revokedSessions !== undefined
+    )
+      this.invalidate('metadata.revokedSessions', 'Count must match action');
+    if (
+      meta.failureReason !== undefined ||
+      meta.reactivatedFromExpiredSuspension !== undefined
+    )
+      this.invalidate('metadata', 'Logout metadata prohibited');
+    return;
+  }
+  if (meta.revokedSessions !== undefined)
+    this.invalidate('metadata.revokedSessions', 'Logout-all only');
   if (meta.source !== (refresh ? 'REFRESH_TOKEN' : 'EMAIL_PASSWORD'))
     this.invalidate('metadata.source', 'Invalid source');
   if ((success || refresh) !== Boolean(meta.sessionId))

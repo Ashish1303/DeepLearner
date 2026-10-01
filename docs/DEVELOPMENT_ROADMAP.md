@@ -376,7 +376,11 @@ Status: `APPROVED_COMPLETE`
 
 ### F009 — Logout + Session Management
 **Dependencies:** F008  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Plan:** [Approved F009 backend scope and evidence](features/F009-logout-session-management.md). Owner approved backend-only completion on 2026-10-01 after reviewing implementation, verification evidence, integration results, documentation and final code review, preserving the recorded limitations.
+
+**Verification:** 89/89 offline API tests and build/lint/typecheck/formatting/scope-secrets review PASS. 2026-10-01 isolated MongoDB integration 8/8 PASS, explicit child SUITE_EXIT=0: logout revocation/audits, idempotency, logout-all counts/isolation, rollback, projections, disabled/suspended state preservation, version-only User coordination, approved races, revoked-refresh rejection and expiry/digest preservation. Cleanup/shutdown/port release PASS. Final review: no actionable P0–P3 findings. Outer wrapper exit 1 resulted only from an empty runner ExitCode property—a reporting limitation, not application failure. TTL deletion, deployed browser cookies and normal Atlas startup without overrides remain NOT_VERIFIED; approved refresh-first stale logout preserves the rotated session and existing access JWTs retain normal expiry. See feature record for observed race orderings; no Atlas operations or real emails.
 
 ### F010 — Forgot / Reset / Change Password
 **Dependencies:** F008  
@@ -965,11 +969,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** `F008 — Login + Access/Refresh Tokens`
+**Current Feature:** `F009 — Logout + Session Management`
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** `F009 — Logout + Session Management`
+**Next Feature:** `F010 — Forgot / Reset / Change Password`
 
-**Rule:** F005-F008 are APPROVED_COMPLETE. F008 owner approval is dated 2026-09-30 and preserves its backend-only scope and documented limitations. F009 remains NOT_STARTED and requires separate approval.
+**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 remains NOT_STARTED and requires separate approval.
 
 ---
 

@@ -1,3 +1,4 @@
+import type { LogoutService } from './modules/auth/logout.service.js';
 import type { LoginService } from './modules/auth/login.service.js';
 import type { LoginLimits } from './modules/auth/login-rate-limit.js';
 import cors from 'cors';
@@ -19,6 +20,7 @@ export function createApp(
   limits?: AuthLimits,
   loginService?: LoginService,
   loginLimits?: LoginLimits,
+  logoutService?: LogoutService,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -37,9 +39,10 @@ export function createApp(
             );
           }
         },
-        credentials: /^\/api\/v1\/auth\/(login|refresh)\/?$/i.test(
-          req.url.split('?')[0] ?? '',
-        ),
+        credentials:
+          /^\/api\/v1\/auth\/(login|refresh|logout|logout-all)\/?$/i.test(
+            req.url.split('?')[0] ?? '',
+          ),
         exposedHeaders: ['X-Request-Id'],
       }),
     ),
@@ -48,7 +51,7 @@ export function createApp(
   app.use('/api/v1/health', healthRouter);
   app.use(
     '/api/v1/auth',
-    createAuthRouter(service, limits, loginService, loginLimits),
+    createAuthRouter(service, limits, loginService, loginLimits, logoutService),
   );
   app.use(notFound);
   app.use(errorHandler);

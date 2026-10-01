@@ -1,6 +1,40 @@
 import type { ClientSession, Types } from 'mongoose';
 import { Audit } from './audit.model.js';
 
+type LogoutAudit = {
+  userId: Types.ObjectId;
+  requestId: string;
+} & (
+  | { action: 'AUTH_LOGOUT'; sessionId: Types.ObjectId }
+  | { action: 'AUTH_LOGOUT_ALL'; revokedSessions: number }
+);
+
+export async function appendLogoutAudit(
+  input: LogoutAudit,
+  session: ClientSession,
+) {
+  await Audit.create(
+    [
+      {
+        category: 'AUTH',
+        action: input.action,
+        actorId: input.userId,
+        resourceId: input.userId,
+        resourceType: 'USER',
+        requestId: input.requestId,
+        metadata:
+          input.action === 'AUTH_LOGOUT'
+            ? { source: 'REFRESH_TOKEN', sessionId: input.sessionId }
+            : {
+                source: 'ACCESS_TOKEN',
+                revokedSessions: input.revokedSessions,
+              },
+      },
+    ],
+    { session },
+  );
+}
+
 export async function appendAuthAudit(
   action: 'AUTH_REGISTERED' | 'AUTH_EMAIL_VERIFIED',
   userId: Types.ObjectId,

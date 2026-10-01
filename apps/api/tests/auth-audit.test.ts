@@ -27,6 +27,7 @@ test('audit schema accepts only bounded F007 actions and metadata offline', asyn
   assert.deepEqual(Object.keys(repository), [
     'appendAuthAudit',
     'appendLoginAudit',
+    'appendLogoutAudit',
   ]);
   assert.equal(Audit.db.readyState, 0);
   assert.equal(auditSchema.options.autoCreate, false);
@@ -101,4 +102,51 @@ test('F008 audit actions constrain subjects, session IDs, source and failure met
     await assert.rejects(
       new Audit({ ...base, action: 'AUTH_LOGIN_FAILED', metadata }).validate(),
     );
+});
+
+test('F009 audit fields are action-specific and preserve previous constraints', async () => {
+  const id = new Types.ObjectId();
+  const base = {
+    category: 'AUTH',
+    actorId: id,
+    resourceId: id,
+    resourceType: 'USER',
+    requestId: 'request',
+  };
+  const current = {
+    ...base,
+    action: 'AUTH_LOGOUT',
+    metadata: { source: 'REFRESH_TOKEN', sessionId: id },
+  };
+  const all = {
+    ...base,
+    action: 'AUTH_LOGOUT_ALL',
+    metadata: { source: 'ACCESS_TOKEN', revokedSessions: 0 },
+  };
+  await new Audit(current).validate();
+  await new Audit(all).validate();
+  for (const input of [
+    { ...current, actorId: null, resourceId: null },
+    { ...current, metadata: { source: 'REFRESH_TOKEN' } },
+    { ...current, metadata: { ...current.metadata, revokedSessions: 1 } },
+    { ...all, metadata: { source: 'ACCESS_TOKEN' } },
+    ...[-1, 0.5, null, NaN].map((revokedSessions) => ({
+      ...all,
+      metadata: { ...all.metadata, revokedSessions },
+    })),
+    { ...all, metadata: { ...all.metadata, sessionId: id } },
+    { ...all, metadata: { ...all.metadata, source: 'EMAIL_PASSWORD' } },
+    { ...all, metadata: { ...all.metadata, failureReason: 'TOKEN_REUSE' } },
+    {
+      ...all,
+      metadata: { ...all.metadata, reactivatedFromExpiredSuspension: true },
+    },
+    { ...all, metadata: { ...all.metadata, refreshToken: 'private' } },
+    {
+      ...all,
+      action: 'AUTH_REGISTERED',
+      metadata: { source: 'EMAIL_PASSWORD', revokedSessions: 0 },
+    },
+  ])
+    await assert.rejects(new Audit(input).validate());
 });

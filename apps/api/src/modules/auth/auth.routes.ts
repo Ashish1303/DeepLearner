@@ -1,3 +1,8 @@
+import { authenticate } from '../../middleware/authenticate.js';
+import { createLogoutController } from './logout.controller.js';
+import { createLogoutService, type LogoutService } from './logout.service.js';
+import { logoutRepository } from './logout.repository.js';
+import { logoutRequest } from './logout.schema.js';
 import { authOrigin } from '../../middleware/auth-origin.js';
 import { createAccessTokens } from './access-token.service.js';
 import { createLoginController } from './login.controller.js';
@@ -36,6 +41,7 @@ export function createAuthRouter(
     log: logger,
   }),
   loginLimits: LoginLimits = env,
+  logoutService: LogoutService = createLogoutService(logoutRepository),
 ) {
   const router = Router();
   const controller = createAuthController(service);
@@ -89,6 +95,27 @@ export function createAuthRouter(
     validateRequest(refreshRequest, (req, res) => {
       req.routeLabel = '/api/v1/auth/refresh';
       return loginController.refresh(req, res);
+    }),
+  );
+  const logoutController = createLogoutController(
+    logoutService,
+    env.AUTH_COOKIE_SECURE,
+  );
+  router.post(
+    '/logout',
+    authOrigin(env),
+    validateRequest(logoutRequest, (req, res) => {
+      req.routeLabel = '/api/v1/auth/logout';
+      return logoutController.logout(req, res);
+    }),
+  );
+  router.post(
+    '/logout-all',
+    authOrigin(env),
+    authenticate(createAccessTokens(env)),
+    validateRequest(logoutRequest, (req, res) => {
+      req.routeLabel = '/api/v1/auth/logout-all';
+      return logoutController.logoutAll(req, res);
     }),
   );
   return router;
