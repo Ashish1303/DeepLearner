@@ -213,3 +213,30 @@ test('malformed CORS origins use sanitized configuration errors with local cooki
     assert.doesNotMatch(output, /ERR_INVALID_URL|TypeError: Invalid URL/);
   }
 });
+
+test('F010 recovery budgets accept bounded configuration and sanitize invalid field values', () => {
+  assert.equal(
+    check({
+      AUTH_FORGOT_LIMIT: '3',
+      AUTH_RESET_LIMIT: '10',
+      AUTH_CHANGE_LIMIT: '5',
+      AUTH_CHANGE_IP_LIMIT: '20',
+    }).status,
+    0,
+  );
+  const result = check({
+    AUTH_FORGOT_LIMIT: '0',
+    AUTH_RESET_WINDOW_MS: '999',
+    AUTH_CHANGE_LIMIT: '1001',
+    AUTH_CHANGE_IP_WINDOW_MS: 'PRIVATE_SENTINEL',
+  });
+  assert.notEqual(result.status, 0);
+  for (const field of [
+    'AUTH_FORGOT_LIMIT',
+    'AUTH_RESET_WINDOW_MS',
+    'AUTH_CHANGE_LIMIT',
+    'AUTH_CHANGE_IP_WINDOW_MS',
+  ])
+    assert(result.stderr.includes(field));
+  assert(!result.stderr.includes('PRIVATE_SENTINEL'));
+});

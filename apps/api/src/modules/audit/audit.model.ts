@@ -15,6 +15,9 @@ export const auditSchema = new Schema(
         'AUTH_REFRESH_REUSE_DETECTED',
         'AUTH_LOGOUT',
         'AUTH_LOGOUT_ALL',
+        'AUTH_PASSWORD_RESET_REQUESTED',
+        'AUTH_PASSWORD_RESET',
+        'AUTH_PASSWORD_CHANGED',
       ],
       required: true,
       immutable: true,
@@ -52,7 +55,13 @@ export const auditSchema = new Schema(
         {
           source: {
             type: String,
-            enum: ['EMAIL_PASSWORD', 'REFRESH_TOKEN', 'ACCESS_TOKEN'],
+            enum: [
+              'EMAIL_PASSWORD',
+              'REFRESH_TOKEN',
+              'ACCESS_TOKEN',
+              'EMAIL_RECOVERY',
+              'RESET_TOKEN',
+            ],
             required: true,
           },
           sessionId: { type: Schema.Types.ObjectId },
@@ -107,6 +116,31 @@ auditSchema.pre('validate', function () {
   )
     this.invalidate('actorId', 'Matching subject IDs required');
   if (!meta) return;
+  if (action?.startsWith('AUTH_PASSWORD_')) {
+    const requested = action === 'AUTH_PASSWORD_RESET_REQUESTED';
+    const changed = action === 'AUTH_PASSWORD_CHANGED';
+    const source = requested
+      ? 'EMAIL_RECOVERY'
+      : changed
+        ? 'ACCESS_TOKEN'
+        : 'RESET_TOKEN';
+    if (meta.source !== source)
+      this.invalidate('metadata.source', 'Invalid recovery source');
+    if (changed ? !meta.sessionId : meta.sessionId !== undefined)
+      this.invalidate('metadata.sessionId', 'Invalid recovery session');
+    if (
+      requested
+        ? meta.revokedSessions !== undefined
+        : !Number.isSafeInteger(meta.revokedSessions)
+    )
+      this.invalidate('metadata.revokedSessions', 'Invalid recovery count');
+    if (
+      meta.failureReason !== undefined ||
+      meta.reactivatedFromExpiredSuspension !== undefined
+    )
+      this.invalidate('metadata', 'Recovery metadata prohibited');
+    return;
+  }
   if (action === 'AUTH_LOGOUT' || action === 'AUTH_LOGOUT_ALL') {
     const all = action === 'AUTH_LOGOUT_ALL';
     if (meta.source !== (all ? 'ACCESS_TOKEN' : 'REFRESH_TOKEN'))

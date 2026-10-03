@@ -1,6 +1,47 @@
 import type { ClientSession, Types } from 'mongoose';
 import { Audit } from './audit.model.js';
 
+type RecoveryAudit = { userId: Types.ObjectId; requestId: string } & (
+  | { action: 'AUTH_PASSWORD_RESET_REQUESTED' }
+  | { action: 'AUTH_PASSWORD_RESET'; revokedSessions: number }
+  | {
+      action: 'AUTH_PASSWORD_CHANGED';
+      revokedSessions: number;
+      sessionId: Types.ObjectId;
+    }
+);
+export async function appendRecoveryAudit(
+  input: RecoveryAudit,
+  session: ClientSession,
+) {
+  await Audit.create(
+    [
+      {
+        category: 'AUTH',
+        action: input.action,
+        actorId: input.userId,
+        resourceId: input.userId,
+        resourceType: 'USER',
+        requestId: input.requestId,
+        metadata:
+          input.action === 'AUTH_PASSWORD_RESET_REQUESTED'
+            ? { source: 'EMAIL_RECOVERY' }
+            : {
+                source:
+                  input.action === 'AUTH_PASSWORD_CHANGED'
+                    ? 'ACCESS_TOKEN'
+                    : 'RESET_TOKEN',
+                revokedSessions: input.revokedSessions,
+                ...(input.action === 'AUTH_PASSWORD_CHANGED'
+                  ? { sessionId: input.sessionId }
+                  : {}),
+              },
+      },
+    ],
+    { session },
+  );
+}
+
 type LogoutAudit = {
   userId: Types.ObjectId;
   requestId: string;

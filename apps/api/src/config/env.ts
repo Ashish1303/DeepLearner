@@ -23,6 +23,34 @@ const schema = z
       .enum(['true', 'false'])
       .default('true')
       .transform((value) => value === 'true'),
+    AUTH_FORGOT_LIMIT: z.coerce.number().int().min(1).max(1000).default(3),
+    AUTH_FORGOT_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(3600000),
+    AUTH_RESET_LIMIT: z.coerce.number().int().min(1).max(1000).default(10),
+    AUTH_RESET_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(900000),
+    AUTH_CHANGE_LIMIT: z.coerce.number().int().min(1).max(1000).default(5),
+    AUTH_CHANGE_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(900000),
+    AUTH_CHANGE_IP_LIMIT: z.coerce.number().int().min(1).max(1000).default(20),
+    AUTH_CHANGE_IP_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(900000),
     AUTH_LOGIN_LIMIT: z.coerce.number().int().min(1).max(1000).default(5),
     AUTH_LOGIN_WINDOW_MS: z.coerce
       .number()

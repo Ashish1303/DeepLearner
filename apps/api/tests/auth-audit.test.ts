@@ -28,6 +28,7 @@ test('audit schema accepts only bounded F007 actions and metadata offline', asyn
     'appendAuthAudit',
     'appendLoginAudit',
     'appendLogoutAudit',
+    'appendRecoveryAudit',
   ]);
   assert.equal(Audit.db.readyState, 0);
   assert.equal(auditSchema.options.autoCreate, false);
@@ -149,4 +150,49 @@ test('F009 audit fields are action-specific and preserve previous constraints', 
     },
   ])
     await assert.rejects(new Audit(input).validate());
+});
+
+test('F010 audit metadata allows only action-specific source, subject, session and count', async () => {
+  const id = new Types.ObjectId();
+  const base = {
+    category: 'AUTH',
+    actorId: id,
+    resourceId: id,
+    resourceType: 'USER',
+    requestId: 'request',
+  };
+  for (const [action, metadata] of [
+    ['AUTH_PASSWORD_RESET_REQUESTED', { source: 'EMAIL_RECOVERY' }],
+    ['AUTH_PASSWORD_RESET', { source: 'RESET_TOKEN', revokedSessions: 2 }],
+    [
+      'AUTH_PASSWORD_CHANGED',
+      { source: 'ACCESS_TOKEN', sessionId: id, revokedSessions: 0 },
+    ],
+  ] as const) {
+    await new Audit({ ...base, action, metadata }).validate();
+    for (const patch of [
+      { actorId: null },
+      { resourceId: new Types.ObjectId() },
+      { metadata: { ...metadata, source: 'EMAIL_PASSWORD' } },
+      { metadata: { ...metadata, email: 'private@example.com' } },
+      { metadata: { ...metadata, failureReason: 'TOKEN_REUSE' } },
+    ])
+      await assert.rejects(
+        new Audit({ ...base, action, metadata, ...patch }).validate(),
+      );
+  }
+  for (const metadata of [
+    { source: 'RESET_TOKEN' },
+    { source: 'RESET_TOKEN', revokedSessions: -1 },
+    { source: 'RESET_TOKEN', revokedSessions: null },
+    { source: 'RESET_TOKEN', revokedSessions: 1.5 },
+    { source: 'RESET_TOKEN', revokedSessions: 0, sessionId: id },
+  ])
+    await assert.rejects(
+      new Audit({
+        ...base,
+        action: 'AUTH_PASSWORD_RESET',
+        metadata,
+      }).validate(),
+    );
 });

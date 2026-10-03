@@ -63,3 +63,17 @@ test('ambiguous network errors are swallowed and retry at most once', async () =
   assert.equal(await service.sendVerification(input), 'NOT_CONFIRMED');
   assert.equal(count, 2);
 });
+
+test('shared transport preserves F007 verification URL, subject and idempotency namespace', async () => {
+  const service = createEmailService(config, async (_url, init) => {
+    assert(init);
+    assert.equal(
+      new Headers(init.headers).get('Idempotency-Key'),
+      'verification/' + input.tokenId,
+    );
+    assert(String(init.body).includes('/verify-email#token='));
+    assert(String(init.body).includes('Verify your DeepLearner email'));
+    return new Response(null, { status: 200 });
+  });
+  assert.equal(await service.sendVerification(input), 'ACCEPTED');
+});

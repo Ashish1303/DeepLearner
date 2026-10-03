@@ -3,6 +3,8 @@ export const authConfig = {
   accessLifetimeSeconds: 900,
   sessionLifetimeMs: 30 * 24 * 60 * 60 * 1000,
   tokenLifetimeMs: 15 * 60 * 1000,
+  resetTokenLifetimeMs: 30 * 60 * 1000,
+  recoveryResponseFloorMs: 3500,
   emailTimeoutMs: 1500,
   emailRetryDelayMs: 100,
   resendResponseFloorMs: 3500,

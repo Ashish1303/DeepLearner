@@ -1,3 +1,19 @@
+import {
+  createPasswordRecoveryService,
+  type PasswordRecoveryService,
+} from './password-recovery.service.js';
+import { passwordRecoveryRepository } from './password-recovery.repository.js';
+import { createPasswordRecoveryController } from './password-recovery.controller.js';
+import {
+  createRecoveryRateLimits,
+  type RecoveryLimits,
+} from './password-recovery-rate-limit.js';
+import {
+  forgotPasswordRequest,
+  resetPasswordRequest,
+  changePasswordRequest,
+} from './password-recovery.schema.js';
+import { createRecoveryEmailService } from '../../common/email/email.service.js';
 import { authenticate } from '../../middleware/authenticate.js';
 import { createLogoutController } from './logout.controller.js';
 import { createLogoutService, type LogoutService } from './logout.service.js';
@@ -42,6 +58,12 @@ export function createAuthRouter(
   }),
   loginLimits: LoginLimits = env,
   logoutService: LogoutService = createLogoutService(logoutRepository),
+  recoveryService: PasswordRecoveryService = createPasswordRecoveryService({
+    repository: passwordRecoveryRepository,
+    email: createRecoveryEmailService(env),
+    log: logger,
+  }),
+  recoveryLimits: RecoveryLimits = env,
 ) {
   const router = Router();
   const controller = createAuthController(service);
@@ -116,6 +138,39 @@ export function createAuthRouter(
     validateRequest(logoutRequest, (req, res) => {
       req.routeLabel = '/api/v1/auth/logout-all';
       return logoutController.logoutAll(req, res);
+    }),
+  );
+  const recovery = createPasswordRecoveryController(
+    recoveryService,
+    env.AUTH_COOKIE_SECURE,
+  );
+  const recoveryLimit = createRecoveryRateLimits(recoveryLimits);
+  router.post(
+    '/forgot-password',
+    ...recoveryLimit.forgot,
+    validateRequest(forgotPasswordRequest, (req, res, input) => {
+      req.routeLabel = '/api/v1/auth/forgot-password';
+      return recovery.forgot(req, res, input.body.email);
+    }),
+  );
+  router.post(
+    '/reset-password',
+    authOrigin(env),
+    recoveryLimit.reset,
+    validateRequest(resetPasswordRequest, (req, res, input) => {
+      req.routeLabel = '/api/v1/auth/reset-password';
+      return recovery.reset(req, res, input.body);
+    }),
+  );
+  router.post(
+    '/change-password',
+    authOrigin(env),
+    recoveryLimit.changeIp,
+    authenticate(createAccessTokens(env)),
+    recoveryLimit.changeUser,
+    validateRequest(changePasswordRequest, (req, res, input) => {
+      req.routeLabel = '/api/v1/auth/change-password';
+      return recovery.change(req, res, input.body);
     }),
   );
   return router;

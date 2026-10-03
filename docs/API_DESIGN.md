@@ -696,12 +696,14 @@ Always generic:
 {
   "success": true,
   "data": null,
-  "message": "If the account can reset its password, reset instructions have been sent.",
+  "message": "If the account is eligible, password reset instructions will be requested. Check your email or try again later.",
   "meta": { "requestId": "..." }
 }
 ```
 
-For an eligible user, invalidate existing reset tokens and create a new **30-minute** hashed token.
+For a verified ACTIVE user with an existing password hash, invalidate existing reset tokens and create a new **30-minute** hashed token. Unknown, passwordless and otherwise ineligible accounts receive the same generic response without token issuance.
+
+Pre-commit database, prerequisite or transaction failures return sanitized `503 DEPENDENCY_UNAVAILABLE`. Post-commit disabled/failed/timed-out delivery preserves the token and generic `202`; provider acceptance is not guaranteed delivery. Selective write failures can differ from ineligible read-only paths; perfect failure-path indistinguishability is not claimed.
 
 ---
 
@@ -725,8 +727,8 @@ For an eligible user, invalidate existing reset tokens and create a new **30-min
 
 - Validate one-time reset token.
 - Hash new password using Argon2id.
-- Set/replace `passwordHash`.
-- Ensure email/password provider capability is present.
+- Replace an existing `passwordHash` only for a verified ACTIVE account.
+- Never create a first password or reactivate an account; first-password creation remains the separate `/auth/set-password` contract.
 - Consume all outstanding reset tokens.
 - Revoke **all existing sessions**.
 - Audit `AUTH_PASSWORD_RESET`.

@@ -1,3 +1,5 @@
+import type { PasswordRecoveryService } from './modules/auth/password-recovery.service.js';
+import type { RecoveryLimits } from './modules/auth/password-recovery-rate-limit.js';
 import type { LogoutService } from './modules/auth/logout.service.js';
 import type { LoginService } from './modules/auth/login.service.js';
 import type { LoginLimits } from './modules/auth/login-rate-limit.js';
@@ -21,6 +23,8 @@ export function createApp(
   loginService?: LoginService,
   loginLimits?: LoginLimits,
   logoutService?: LogoutService,
+  recoveryService?: PasswordRecoveryService,
+  recoveryLimits?: RecoveryLimits,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -40,7 +44,7 @@ export function createApp(
           }
         },
         credentials:
-          /^\/api\/v1\/auth\/(login|refresh|logout|logout-all)\/?$/i.test(
+          /^\/api\/v1\/auth\/(login|refresh|logout|logout-all|reset-password)\/?$/i.test(
             req.url.split('?')[0] ?? '',
           ),
         exposedHeaders: ['X-Request-Id'],
@@ -51,7 +55,15 @@ export function createApp(
   app.use('/api/v1/health', healthRouter);
   app.use(
     '/api/v1/auth',
-    createAuthRouter(service, limits, loginService, loginLimits, logoutService),
+    createAuthRouter(
+      service,
+      limits,
+      loginService,
+      loginLimits,
+      logoutService,
+      recoveryService,
+      recoveryLimits,
+    ),
   );
   app.use(notFound);
   app.use(errorHandler);

@@ -384,7 +384,13 @@ Status: `APPROVED_COMPLETE`
 
 ### F010 — Forgot / Reset / Change Password
 **Dependencies:** F008  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Plan:** [Approved F010 backend plan and detailed evidence](features/F010-forgot-reset-change-password.md). Owner approved completion on 2026-10-03 within the agreed backend-only scope.
+
+**Verification:** Offline API 103/103 PASS; host-context isolated MongoDB integration 13/13 PASS, child/wrapper exits 0. Same-password reset and successful reset/change account-metadata preservation PASS. Build/lint/typecheck/formatting, security/scope review and owned-instance cleanup PASS. Final code review: no actionable P0-P3 findings. Earlier integration: 12/12 PASS; subsequent sandbox startup failed with ERR_SYSTEM_ERROR/ENOMEM/uv_os_get_passwd before tests. Minimal probes reproduced this inside the sandbox and passed in non-administrator host PowerShell, followed by the successful 13/13 run; an execution-context limitation, not an application defect. Historical font-download build issue and detailed test evidence remain in the feature record.
+
+**Limitations:** TTL deletion, real email delivery, deployed browser recovery, normal Atlas startup without overrides and unobserved race orderings remain NOT_VERIFIED. No perfect timing/failure-path enumeration indistinguishability; single-process rate limiting. No Atlas operations or real emails.
 
 ### F011 — Google Authentication + Account Linking
 **Dependencies:** F008  
@@ -969,11 +975,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** `F009 — Logout + Session Management`
+**Current Feature:** `F010 — Forgot / Reset / Change Password`
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** `F010 — Forgot / Reset / Change Password`
+**Next Feature:** `F011 — Google Authentication + Account Linking`
 
-**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 remains NOT_STARTED and requires separate approval.
+**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 remains NOT_STARTED.
 
 ---
 
