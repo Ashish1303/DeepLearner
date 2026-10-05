@@ -1,3 +1,5 @@
+import type { GoogleAuthService } from './modules/auth/google-auth.service.js';
+import type { GoogleLimits } from './modules/auth/google-auth-rate-limit.js';
 import type { PasswordRecoveryService } from './modules/auth/password-recovery.service.js';
 import type { RecoveryLimits } from './modules/auth/password-recovery-rate-limit.js';
 import type { LogoutService } from './modules/auth/logout.service.js';
@@ -25,6 +27,8 @@ export function createApp(
   logoutService?: LogoutService,
   recoveryService?: PasswordRecoveryService,
   recoveryLimits?: RecoveryLimits,
+  googleService?: GoogleAuthService,
+  googleLimits?: GoogleLimits,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -44,7 +48,7 @@ export function createApp(
           }
         },
         credentials:
-          /^\/api\/v1\/auth\/(login|refresh|logout|logout-all|reset-password)\/?$/i.test(
+          /^\/api\/v1\/auth\/(login|refresh|logout|logout-all|reset-password|google)\/?$/i.test(
             req.url.split('?')[0] ?? '',
           ),
         exposedHeaders: ['X-Request-Id'],
@@ -63,6 +67,8 @@ export function createApp(
       logoutService,
       recoveryService,
       recoveryLimits,
+      googleService,
+      googleLimits,
     ),
   );
   app.use(notFound);

@@ -1,4 +1,16 @@
 import {
+  createGoogleAuthService,
+  type GoogleAuthService,
+} from './google-auth.service.js';
+import { createGoogleIdentityVerifier } from './google-identity.service.js';
+import { googleAuthRepository } from './google-auth.repository.js';
+import { createGoogleAuthController } from './google-auth.controller.js';
+import {
+  createGoogleRateLimit,
+  type GoogleLimits,
+} from './google-auth-rate-limit.js';
+import { googleAuthRequest } from './google-auth.schema.js';
+import {
   createPasswordRecoveryService,
   type PasswordRecoveryService,
 } from './password-recovery.service.js';
@@ -64,6 +76,12 @@ export function createAuthRouter(
     log: logger,
   }),
   recoveryLimits: RecoveryLimits = env,
+  googleService: GoogleAuthService = createGoogleAuthService({
+    identity: createGoogleIdentityVerifier(env.GOOGLE_CLIENT_ID),
+    repository: googleAuthRepository,
+    tokens: createAccessTokens(env),
+  }),
+  googleLimits: GoogleLimits = env,
 ) {
   const router = Router();
   const controller = createAuthController(service);
@@ -171,6 +189,19 @@ export function createAuthRouter(
     validateRequest(changePasswordRequest, (req, res, input) => {
       req.routeLabel = '/api/v1/auth/change-password';
       return recovery.change(req, res, input.body);
+    }),
+  );
+  const google = createGoogleAuthController(
+    googleService,
+    env.AUTH_COOKIE_SECURE,
+  );
+  router.post(
+    '/google',
+    authOrigin(env),
+    createGoogleRateLimit(googleLimits),
+    validateRequest(googleAuthRequest, (req, res, input) => {
+      req.routeLabel = '/api/v1/auth/google';
+      return google(req, res, input.body.credential);
     }),
   );
   return router;

@@ -1,4 +1,5 @@
 export const authConfig = {
+  googleTimeoutMs: 3000,
   argon2: { memoryCost: 65536, timeCost: 3, parallelism: 1, hashLength: 32 },
   accessLifetimeSeconds: 900,
   sessionLifetimeMs: 30 * 24 * 60 * 60 * 1000,

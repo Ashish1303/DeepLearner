@@ -564,15 +564,18 @@ V1 uses the Google Identity Services credential flow because DeepLearner only ne
 3. Require `email_verified=true`.
 4. Normalize Google email.
 5. Find user by linked provider ID; otherwise by globally unique email.
-6. If matching email/password user exists, append Google provider identity; do not create a duplicate account.
-7. If no user exists, create `STUDENT`, `FREE`, `ACTIVE` account with `emailVerifiedAt=now` and no password hash.
+6. Auto-link a matching eligible existing email only when Google is authoritative: normalized `@gmail.com`, or verified email with a valid nonempty `hd` claim. Reject pending/unverified accounts, non-authoritative email matches and conflicting provider ownership; a future proof-based flow is outside F011. Never transfer identities or merge users.
+7. If no user exists, require valid first/last-name claims and create `STUDENT`, `FREE`, `ACTIVE` with `emailVerifiedAt=now` and no password hash. Reject incomplete names; never invent them.
 8. Create DeepLearner session and issue normal DeepLearner access/refresh tokens.
 9. Audit `AUTH_GOOGLE_LOGIN` and `AUTH_PROVIDER_LINKED` when linking occurs.
 
-Google tokens are not used as DeepLearner session tokens.
+Google tokens are not used as DeepLearner session tokens. F011 is backend-only JSON credential submission with strict Origin validation, scoped credentialed CORS and existing cookie safeguards; no nonce-challenge endpoint or single-use credential guarantee. Use GOOGLE_CLIENT_ID without a client secret; missing configuration disables only this endpoint with sanitized 503. Existing subjects win over changed Google emails; preserve stored email, password, names, profile, role and plan. Never reactivate DISABLED; expired suspension handling follows F008 exactly and requires existing email verification. Identity/session/audit mutations commit together; cookies follow commit. AUTH_PROVIDER_LINKED is emitted only when attaching to an existing account. Success uses the F008 safe user/access-token envelope.
 
 ### Errors
 
+- `400 AUTH_GOOGLE_PROFILE_INCOMPLETE`
+- `403 AUTH_GOOGLE_LINKING_NOT_ALLOWED`
+- `503 DEPENDENCY_UNAVAILABLE`
 - `401 AUTH_GOOGLE_CREDENTIAL_INVALID`
 - `403 AUTH_GOOGLE_EMAIL_NOT_VERIFIED`
 - `403 AUTH_ACCOUNT_DISABLED`
@@ -1167,7 +1170,7 @@ Registration may return `AUTH_EMAIL_ALREADY_EXISTS` because the user is explicit
 1. DeepLearner email uniqueness is global across providers.
 2. Google identity is accepted only when the Google credential is verified and `email_verified=true`.
 3. Existing provider ID match -> login existing user.
-4. No provider match but verified Google email matches existing DeepLearner user -> link Google to that user.
+4. No provider match but verified Google email matches an eligible existing user -> link only for Google-authoritative Gmail/hosted-domain identities. Reject pending/unverified, non-authoritative and conflicting linking.
 5. No existing email -> create new Google-backed student account.
 6. Never link accounts based on an unverified external email.
 7. Never overwrite an existing DeepLearner user's name/profile automatically during repeated Google logins.

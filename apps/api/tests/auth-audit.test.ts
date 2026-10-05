@@ -26,6 +26,7 @@ test('audit schema accepts only bounded F007 actions and metadata offline', asyn
     await assert.rejects(new Audit({ ...input, ...patch }).validate());
   assert.deepEqual(Object.keys(repository), [
     'appendAuthAudit',
+    'appendGoogleAudit',
     'appendLoginAudit',
     'appendLogoutAudit',
     'appendRecoveryAudit',
@@ -195,4 +196,56 @@ test('F010 audit metadata allows only action-specific source, subject, session a
         metadata,
       }).validate(),
     );
+});
+
+test('F011 Google audit actions restrict metadata and preserve older action boundaries', async () => {
+  const id = new Types.ObjectId();
+  const base = {
+    category: 'AUTH',
+    actorId: id,
+    resourceId: id,
+    resourceType: 'USER',
+    requestId: 'request',
+  };
+  for (const [action, metadata] of [
+    [
+      'AUTH_GOOGLE_LOGIN',
+      {
+        source: 'GOOGLE',
+        sessionId: id,
+        reactivatedFromExpiredSuspension: false,
+      },
+    ],
+    ['AUTH_PROVIDER_LINKED', { source: 'GOOGLE', provider: 'GOOGLE' }],
+  ] as const) {
+    await new Audit({ ...base, action, metadata }).validate();
+    for (const patch of [
+      { actorId: null },
+      { resourceId: new Types.ObjectId() },
+      { metadata: { ...metadata, email: 'private@example.com' } },
+      { metadata: { ...metadata, failureReason: 'TOKEN_REUSE' } },
+      { metadata: { ...metadata, source: 'EMAIL_PASSWORD' } },
+    ])
+      await assert.rejects(
+        new Audit({ ...base, action, metadata, ...patch }).validate(),
+      );
+  }
+  for (const [action, metadata] of [
+    ['AUTH_GOOGLE_LOGIN', { source: 'GOOGLE', sessionId: id }],
+    [
+      'AUTH_GOOGLE_LOGIN',
+      {
+        source: 'GOOGLE',
+        sessionId: id,
+        reactivatedFromExpiredSuspension: false,
+        provider: 'GOOGLE',
+      },
+    ],
+    [
+      'AUTH_PROVIDER_LINKED',
+      { source: 'GOOGLE', provider: 'GOOGLE', sessionId: id },
+    ],
+    ['AUTH_REGISTERED', { source: 'EMAIL_PASSWORD', provider: 'GOOGLE' }],
+  ] as const)
+    await assert.rejects(new Audit({ ...base, action, metadata }).validate());
 });

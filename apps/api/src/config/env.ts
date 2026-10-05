@@ -9,6 +9,20 @@ const origin = z.url().refine((value) => {
 
 const schema = z
   .object({
+    GOOGLE_CLIENT_ID: z
+      .string()
+      .trim()
+      .regex(/^[a-zA-Z0-9_-]+\.apps\.googleusercontent\.com$/)
+      .optional()
+      .or(z.literal(''))
+      .transform((value) => value || undefined),
+    AUTH_GOOGLE_LIMIT: z.coerce.number().int().min(1).max(1000).default(10),
+    AUTH_GOOGLE_WINDOW_MS: z.coerce
+      .number()
+      .int()
+      .min(1000)
+      .max(86400000)
+      .default(900000),
     ACCESS_TOKEN_SECRET: z.string().refine((value) => {
       const decoded = Buffer.from(value, 'base64');
       return (

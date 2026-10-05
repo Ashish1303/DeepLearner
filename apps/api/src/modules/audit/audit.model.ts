@@ -18,6 +18,8 @@ export const auditSchema = new Schema(
         'AUTH_PASSWORD_RESET_REQUESTED',
         'AUTH_PASSWORD_RESET',
         'AUTH_PASSWORD_CHANGED',
+        'AUTH_GOOGLE_LOGIN',
+        'AUTH_PROVIDER_LINKED',
       ],
       required: true,
       immutable: true,
@@ -61,9 +63,11 @@ export const auditSchema = new Schema(
               'ACCESS_TOKEN',
               'EMAIL_RECOVERY',
               'RESET_TOKEN',
+              'GOOGLE',
             ],
             required: true,
           },
+          provider: { type: String, enum: ['GOOGLE'] },
           sessionId: { type: Schema.Types.ObjectId },
           revokedSessions: {
             type: Number,
@@ -116,6 +120,29 @@ auditSchema.pre('validate', function () {
   )
     this.invalidate('actorId', 'Matching subject IDs required');
   if (!meta) return;
+  if (action === 'AUTH_GOOGLE_LOGIN' || action === 'AUTH_PROVIDER_LINKED') {
+    const linked = action === 'AUTH_PROVIDER_LINKED';
+    if (meta.source !== 'GOOGLE')
+      this.invalidate('metadata.source', 'Invalid Google source');
+    if (linked ? meta.provider !== 'GOOGLE' : meta.provider !== undefined)
+      this.invalidate('metadata.provider', 'Invalid provider metadata');
+    if (linked ? meta.sessionId !== undefined : !meta.sessionId)
+      this.invalidate('metadata.sessionId', 'Invalid Google session');
+    if (
+      linked
+        ? meta.reactivatedFromExpiredSuspension !== undefined
+        : typeof meta.reactivatedFromExpiredSuspension !== 'boolean'
+    )
+      this.invalidate(
+        'metadata.reactivatedFromExpiredSuspension',
+        'Invalid activation metadata',
+      );
+    if (meta.failureReason !== undefined || meta.revokedSessions !== undefined)
+      this.invalidate('metadata', 'Google metadata prohibited');
+    return;
+  }
+  if (meta.provider !== undefined)
+    this.invalidate('metadata.provider', 'Provider metadata prohibited');
   if (action?.startsWith('AUTH_PASSWORD_')) {
     const requested = action === 'AUTH_PASSWORD_RESET_REQUESTED';
     const changed = action === 'AUTH_PASSWORD_CHANGED';

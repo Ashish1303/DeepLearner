@@ -13,6 +13,7 @@ function check(values: NodeJS.ProcessEnv) {
     'EMAIL_FROM',
     'RESEND_API_KEY',
     'WEB_ORIGIN',
+    'GOOGLE_CLIENT_ID',
     ...Object.keys(environment).filter((key) => key.startsWith('AUTH_')),
   ])
     delete environment[key];
@@ -236,6 +237,31 @@ test('F010 recovery budgets accept bounded configuration and sanitize invalid fi
     'AUTH_RESET_WINDOW_MS',
     'AUTH_CHANGE_LIMIT',
     'AUTH_CHANGE_IP_WINDOW_MS',
+  ])
+    assert(result.stderr.includes(field));
+  assert(!result.stderr.includes('PRIVATE_SENTINEL'));
+});
+
+test('F011 optional audience and bounded Google limits preserve sanitized configuration errors', () => {
+  for (const values of [
+    { GOOGLE_CLIENT_ID: '' },
+    {
+      GOOGLE_CLIENT_ID: 'synthetic.apps.googleusercontent.com',
+      AUTH_GOOGLE_LIMIT: '10',
+      AUTH_GOOGLE_WINDOW_MS: '900000',
+    },
+  ])
+    assert.equal(check(values).status, 0);
+  const result = check({
+    GOOGLE_CLIENT_ID: 'PRIVATE_SENTINEL',
+    AUTH_GOOGLE_LIMIT: '0',
+    AUTH_GOOGLE_WINDOW_MS: '999',
+  });
+  assert.notEqual(result.status, 0);
+  for (const field of [
+    'GOOGLE_CLIENT_ID',
+    'AUTH_GOOGLE_LIMIT',
+    'AUTH_GOOGLE_WINDOW_MS',
   ])
     assert(result.stderr.includes(field));
   assert(!result.stderr.includes('PRIVATE_SENTINEL'));

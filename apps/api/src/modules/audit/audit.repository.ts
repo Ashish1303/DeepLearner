@@ -1,6 +1,42 @@
 import type { ClientSession, Types } from 'mongoose';
 import { Audit } from './audit.model.js';
 
+type GoogleAudit = { userId: Types.ObjectId; requestId: string } & (
+  | { action: 'AUTH_PROVIDER_LINKED' }
+  | {
+      action: 'AUTH_GOOGLE_LOGIN';
+      sessionId: Types.ObjectId;
+      reactivatedFromExpiredSuspension: boolean;
+    }
+);
+export async function appendGoogleAudit(
+  input: GoogleAudit,
+  session: ClientSession,
+) {
+  await Audit.create(
+    [
+      {
+        category: 'AUTH',
+        action: input.action,
+        actorId: input.userId,
+        resourceId: input.userId,
+        resourceType: 'USER',
+        requestId: input.requestId,
+        metadata:
+          input.action === 'AUTH_PROVIDER_LINKED'
+            ? { source: 'GOOGLE', provider: 'GOOGLE' }
+            : {
+                source: 'GOOGLE',
+                sessionId: input.sessionId,
+                reactivatedFromExpiredSuspension:
+                  input.reactivatedFromExpiredSuspension,
+              },
+      },
+    ],
+    { session },
+  );
+}
+
 type RecoveryAudit = { userId: Types.ObjectId; requestId: string } & (
   | { action: 'AUTH_PASSWORD_RESET_REQUESTED' }
   | { action: 'AUTH_PASSWORD_RESET'; revokedSessions: number }
