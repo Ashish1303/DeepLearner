@@ -844,6 +844,8 @@ This endpoint is required to support the approved behavior: a user who first joi
 
 Sensitive values such as `passwordHash`, provider subject IDs, token hashes, and audit internals are never returned.
 
+F012 requires a valid stateless access JWT and a currently verified ACTIVE user. Identity is derived only from JWT sub; no live-session lookup is added. DISABLED/SUSPENDED (including expired suspension) and pending/unverified accounts are rejected without reactivation. Both roles may access only their own profile. Auth methods are computed as a stable PASSWORD/GOOGLE subset without returning credential material. An absent profile is returned as null. Both GET and PATCH use Cache-Control: no-store. Missing users return USER_NOT_FOUND (404); authentication/account errors follow existing conventions; persistence failures are sanitized DEPENDENCY_UNAVAILABLE (503).
+
 ---
 
 ## 17.14 Update Current User
@@ -885,6 +887,12 @@ createdAt
 ```
 
 There is no email-change feature in V1.
+
+F012 PATCH semantics: omission preserves fields; profile leaves merge; supplied arrays replace, with [] clearing an array. Null, unknown/dotted/operator keys, empty requests and empty profile patches are rejected with VALIDATION_ERROR (400). Names trim to 1-80 characters. Existing profile enums apply; learning goals are unique (maximum 5), technology IDs are normalized unique ObjectId strings (maximum 50, syntax only), and dailyStudyGoalMinutes is an integer 5-240. No onboarding-completion state is inferred. PATCH returns the same safe DTO as GET.
+
+Profile update and USER_PROFILE_UPDATED audit commit together using explicit startSession/withTransaction/awaited endSession in finally. Category USER_ADMIN; actor/resource IDs match the authenticated user; metadata contains only allowlisted changedFields (supplied editable leaf names), never values. Unrelated User fields remain unchanged except normal updatedAt/version coordination. Concurrent disjoint edits merge; same-field edits use last committed value. No session/token/cookie changes.
+
+GET retains existing CORS behavior and accepts authenticated requests without Origin. PATCH requires the exact approved Origin and existing LOCAL safeguards; credentialed CORS is not expanded. Process-local rate limits are GET 120/user/15min, PATCH 30/user/15min and a combined IP ceiling 300/15min, with obscured keys and IPv6 grouping. No new environment variables.
 
 ---
 

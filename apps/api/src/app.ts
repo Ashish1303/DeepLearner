@@ -1,3 +1,6 @@
+import { createUserRouter } from './modules/users/user.routes.js';
+import type { UserService } from './modules/users/user.service.js';
+import type { UserLimits } from './modules/users/user-rate-limit.js';
 import type { GoogleAuthService } from './modules/auth/google-auth.service.js';
 import type { GoogleLimits } from './modules/auth/google-auth-rate-limit.js';
 import type { PasswordRecoveryService } from './modules/auth/password-recovery.service.js';
@@ -29,6 +32,8 @@ export function createApp(
   recoveryLimits?: RecoveryLimits,
   googleService?: GoogleAuthService,
   googleLimits?: GoogleLimits,
+  userService?: UserService,
+  userLimits?: UserLimits,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -71,6 +76,7 @@ export function createApp(
       googleLimits,
     ),
   );
+  app.use('/api/v1/users', createUserRouter(userService, userLimits));
   app.use(notFound);
   app.use(errorHandler);
   return app;

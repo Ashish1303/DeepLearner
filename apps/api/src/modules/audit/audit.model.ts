@@ -1,12 +1,19 @@
+import { profileFieldNames } from '../users/user.schema.js';
 import { Schema, type InferSchemaType } from 'mongoose';
 import { mongoose } from '../../config/database.js';
 
 export const auditSchema = new Schema(
   {
-    category: { type: String, enum: ['AUTH'], required: true, immutable: true },
+    category: {
+      type: String,
+      enum: ['AUTH', 'USER_ADMIN'],
+      required: true,
+      immutable: true,
+    },
     action: {
       type: String,
       enum: [
+        'USER_PROFILE_UPDATED',
         'AUTH_REGISTERED',
         'AUTH_EMAIL_VERIFIED',
         'AUTH_LOGIN_SUCCESS',
@@ -65,7 +72,15 @@ export const auditSchema = new Schema(
               'RESET_TOKEN',
               'GOOGLE',
             ],
-            required: true,
+            required: function (this: {
+              ownerDocument(): { action: string };
+            }): boolean {
+              return this.ownerDocument().action !== 'USER_PROFILE_UPDATED';
+            },
+          },
+          changedFields: {
+            type: [{ type: String, enum: profileFieldNames, required: true }],
+            default: undefined,
           },
           provider: { type: String, enum: ['GOOGLE'] },
           sessionId: { type: Schema.Types.ObjectId },
@@ -119,7 +134,35 @@ auditSchema.pre('validate', function () {
     (this.actorId && String(this.actorId) !== String(this.resourceId))
   )
     this.invalidate('actorId', 'Matching subject IDs required');
+  if (
+    this.category !==
+    (action === 'USER_PROFILE_UPDATED' ? 'USER_ADMIN' : 'AUTH')
+  )
+    this.invalidate('category', 'Category must match action');
   if (!meta) return;
+  if (action === 'USER_PROFILE_UPDATED') {
+    if (
+      !meta.changedFields?.length ||
+      meta.changedFields.length > profileFieldNames.length ||
+      new Set(meta.changedFields).size !== meta.changedFields.length
+    )
+      this.invalidate(
+        'metadata.changedFields',
+        'Unique profile field names required',
+      );
+    if (
+      meta.source !== undefined ||
+      meta.provider !== undefined ||
+      meta.sessionId !== undefined ||
+      meta.revokedSessions !== undefined ||
+      meta.failureReason !== undefined ||
+      meta.reactivatedFromExpiredSuspension !== undefined
+    )
+      this.invalidate('metadata', 'Profile audit contains prohibited metadata');
+    return;
+  }
+  if (meta.changedFields !== undefined)
+    this.invalidate('metadata.changedFields', 'Profile event only');
   if (action === 'AUTH_GOOGLE_LOGIN' || action === 'AUTH_PROVIDER_LINKED') {
     const linked = action === 'AUTH_PROVIDER_LINKED';
     if (meta.source !== 'GOOGLE')

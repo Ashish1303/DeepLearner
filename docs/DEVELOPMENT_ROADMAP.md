@@ -402,7 +402,11 @@ Status: `APPROVED_COMPLETE`
 
 ### F012 — `/users/me` + Student Profile
 **Dependencies:** F008  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Plan:** [F012 self-profile backend implementation and evidence](features/F012-current-user-student-profile.md). Owner approved completion within the backend-only scope on 2026-10-06.
+
+**Verification:** Offline API 116/116 PASS; isolated MongoDB 5/5 scenarios PASS, child/wrapper exits 0/0. Projections/authMethods, profile updates, field preservation, isolation, account safeguards, audit persistence/rollback, concurrency and session/instance cleanup PASS. Build/lint/typecheck/formatting PASS; final code review found no actionable P0-P3 findings. Audit-ordering test corrected using fixed requestIds; no production change. Normal Atlas startup/browser integration NOT_VERIFIED; technology existence checks deferred. Full evidence and runner-reporting clarification are in the feature document.
 
 ---
 
@@ -979,11 +983,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** `F011 — Google Authentication + Account Linking`
+**Current Feature:** F012 — `/users/me` + Student Profile
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F012 — `/users/me` + Student Profile
+**Next Feature:** F013 — Authenticated Student Shell
 
-**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 remains NOT_STARTED.
+**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 remains NOT_STARTED.
 
 ---
 

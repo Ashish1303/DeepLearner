@@ -1,3 +1,4 @@
+import type { ProfileField } from '../users/user.schema.js';
 import type { ClientSession, Types } from 'mongoose';
 import { Audit } from './audit.model.js';
 
@@ -178,5 +179,29 @@ export async function appendLoginAudit(
       },
     ],
     session ? { session } : {},
+  );
+}
+
+export async function appendProfileAudit(
+  input: {
+    userId: Types.ObjectId;
+    requestId: string;
+    changedFields: ProfileField[];
+  },
+  session: ClientSession,
+) {
+  await Audit.create(
+    [
+      {
+        category: 'USER_ADMIN',
+        action: 'USER_PROFILE_UPDATED',
+        actorId: input.userId,
+        resourceId: input.userId,
+        resourceType: 'USER',
+        requestId: input.requestId,
+        metadata: { changedFields: input.changedFields },
+      },
+    ],
+    { session },
   );
 }

@@ -29,6 +29,7 @@ test('audit schema accepts only bounded F007 actions and metadata offline', asyn
     'appendGoogleAudit',
     'appendLoginAudit',
     'appendLogoutAudit',
+    'appendProfileAudit',
     'appendRecoveryAudit',
   ]);
   assert.equal(Audit.db.readyState, 0);
@@ -248,4 +249,50 @@ test('F011 Google audit actions restrict metadata and preserve older action boun
     ['AUTH_REGISTERED', { source: 'EMAIL_PASSWORD', provider: 'GOOGLE' }],
   ] as const)
     await assert.rejects(new Audit({ ...base, action, metadata }).validate());
+});
+
+test('F012 profile audit permits only changed field names and preserves auth category/source requirements', async () => {
+  const id = new Types.ObjectId();
+  const input = {
+    category: 'USER_ADMIN',
+    action: 'USER_PROFILE_UPDATED',
+    actorId: id,
+    resourceId: id,
+    resourceType: 'USER',
+    requestId: 'profile',
+    metadata: { changedFields: ['firstName', 'profile.learningGoals'] },
+  };
+  await new Audit(input).validate();
+  for (const patch of [
+    { category: 'AUTH' },
+    { actorId: null },
+    { resourceId: new Types.ObjectId() },
+    { metadata: {} },
+    { metadata: { changedFields: [] } },
+    { metadata: { changedFields: ['firstName', 'firstName'] } },
+    { metadata: { changedFields: ['passwordHash'] } },
+    { metadata: { changedFields: [null] } },
+    { metadata: { ...input.metadata, source: 'ACCESS_TOKEN' } },
+    { metadata: { ...input.metadata, email: 'private@example.com' } },
+  ])
+    await assert.rejects(new Audit({ ...input, ...patch }).validate());
+  for (const metadata of [
+    {},
+    { source: 'EMAIL_PASSWORD', changedFields: ['firstName'] },
+  ])
+    await assert.rejects(
+      new Audit({
+        ...input,
+        category: 'AUTH',
+        action: 'AUTH_REGISTERED',
+        metadata,
+      }).validate(),
+    );
+  await assert.rejects(
+    new Audit({
+      ...input,
+      action: 'AUTH_REGISTERED',
+      metadata: { source: 'EMAIL_PASSWORD' },
+    }).validate(),
+  );
 });
