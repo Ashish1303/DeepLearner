@@ -1,6 +1,20 @@
-type IconName = 'arrow' | 'code' | 'layers' | 'book' | 'check' | 'repeat';
+type IconName =
+  | 'arrow'
+  | 'code'
+  | 'layers'
+  | 'book'
+  | 'check'
+  | 'repeat'
+  | 'dashboard'
+  | 'logout'
+  | 'menu'
+  | 'close';
 
 const paths: Record<IconName, string> = {
+  dashboard: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
+  logout: 'M10 4H4v16h6m-1-8h12m-5-5 5 5-5 5',
+  menu: 'M3 6h18M3 12h18M3 18h18',
+  close: 'm6 6 12 12M6 18 18 6',
   arrow: 'M4 12h16m-6-6 6 6-6 6',
   code: 'm8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18',
   layers: 'm12 3 10 5-10 5L2 8l10-5ZM2 12l10 5 10-5M2 16l10 5 10-5',

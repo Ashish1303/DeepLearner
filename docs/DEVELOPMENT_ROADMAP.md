@@ -414,7 +414,11 @@ Status: `APPROVED_COMPLETE`
 
 ### F013 — Authenticated Student Shell
 **Dependencies:** F008  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Plan:** [F013 approved backend-contract integration and student shell](features/F013-authenticated-student-shell.md). Owner approved offline implementation on 2026-10-06; live browser/session verification separately gated.
+
+**Offline verification (2026-10-07):** Web 21/21 (including focused mobile rendering 2/2) and API 116/116 PASS; root build/lint/typecheck/formatting, scope/diff and secrets/token-storage review PASS. Mobile dialog logout-feedback P2 resolved with retry/controller semantics preserved and rendering coverage added; final code review found no actionable P0–P3 findings. Owner approved completion within the approved scope on 2026-10-07, with browser/live-session checks deferred as NOT_VERIFIED due unavailable tooling before service startup, not an application defect. See feature document for exact limitations.
 
 ### F014 — Student Onboarding
 **Dependencies:** F012, F013  
@@ -983,11 +987,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F012 — `/users/me` + Student Profile
+**Current Feature:** F013 — Authenticated Student Shell
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F013 — Authenticated Student Shell
+**Next Feature:** F014 — Student Onboarding
 
-**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 remains NOT_STARTED.
+**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 remains NOT_STARTED.
 
 ---
 

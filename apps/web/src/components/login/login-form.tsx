@@ -1,22 +1,38 @@
 'use client';
 
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/use-auth';
+import { dashboardDestination } from '../../lib/auth/redirect';
 import buttons from '../ui/ui.module.css';
 import styles from './login.module.css';
 
 export function LoginForm() {
+  const { controller, state } = useAuth();
+  const router = useRouter();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const [visible, setVisible] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [notice, setNotice] = useState('');
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    void controller.restore();
+  }, [controller]);
+  useEffect(() => {
+    if (state.status === 'authenticated') {
+      const next = new URLSearchParams(window.location.search).get('next');
+      router.replace(dashboardDestination(next));
+    }
+  }, [state.status, router]);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const email = emailRef.current;
     const password = passwordRef.current;
     if (!email || !password) return;
+    if (state.pending || state.status === 'unsupported') return;
     const nextErrors = {
       email: !email.value.trim()
         ? 'Enter your email address.'
@@ -29,7 +45,12 @@ export function LoginForm() {
     setNotice('');
     if (nextErrors.email) email.focus();
     else if (nextErrors.password) password.focus();
-    else setNotice('UI preview only. Sign-in is not connected yet.');
+    else {
+      const value = password.value;
+      password.value = '';
+      setVisible(false);
+      await controller.login(email.value.trim().toLowerCase(), value);
+    }
   }
 
   return (
@@ -65,8 +86,9 @@ export function LoginForm() {
       <form
         noValidate
         onSubmit={submit}
-        aria-label="Login preview"
-        aria-describedby="login-preview-note"
+        aria-label="Log in"
+        aria-describedby="login-note"
+        aria-busy={state.pending}
       >
         <div className={styles.field}>
           <label htmlFor="login-email">Email address</label>
@@ -77,6 +99,7 @@ export function LoginForm() {
             autoComplete="email"
             placeholder="you@example.com"
             required
+            disabled={state.pending}
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? 'login-email-error' : undefined}
             onChange={() => {
@@ -100,6 +123,7 @@ export function LoginForm() {
               autoComplete="current-password"
               placeholder="Enter your password"
               required
+              disabled={state.pending}
               aria-invalid={Boolean(errors.password)}
               aria-describedby={
                 errors.password ? 'login-password-error' : undefined
@@ -142,24 +166,37 @@ export function LoginForm() {
             Forgot password? <span>Coming soon</span>
           </button>
         </div>
-        <button type="submit" className={`${buttons.button} ${styles.submit}`}>
-          Log in
+        <button
+          type="submit"
+          disabled={state.pending || state.status === 'unsupported'}
+          className={`${buttons.button} ${styles.submit}`}
+        >
+          {state.pending ? 'Please wait…' : 'Log in'}
         </button>
       </form>
       <p className={styles.signup}>
         New to DeepLearner? <Link href="/signup">Create an account</Link>
       </p>
-      <p id="login-preview-note" className={styles.previewNote}>
-        Try the form with example details. Authentication is not available in
-        this preview.
+      <p id="login-note" className={styles.previewNote}>
+        Sign in with an existing verified account. Signup, Google sign-in and
+        password recovery are not connected on this site yet.
       </p>
+      {state.status === 'error' && (
+        <button
+          type="button"
+          className={styles.retry}
+          onClick={() => void controller.restore(true)}
+        >
+          Retry session check
+        </button>
+      )}
       <div
-        className={notice ? styles.notice : undefined}
+        className={notice || state.message ? styles.notice : undefined}
         role="status"
         aria-live="polite"
         aria-atomic="true"
       >
-        {notice}
+        {notice || state.message}
       </div>
     </div>
   );

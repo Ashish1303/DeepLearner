@@ -7,8 +7,7 @@ import styles from '../../../components/login/login.module.css';
 
 export const metadata: Metadata = {
   title: 'Log in — DeepLearner',
-  description:
-    'Continue your visual learning journey with DeepLearner. Login UI preview.',
+  description: 'Sign in to your DeepLearner student workspace.',
 };
 
 export default function LoginPage() {
@@ -21,7 +20,7 @@ export default function LoginPage() {
         <Link href="/" className={styles.brand}>
           DeepLearner
         </Link>
-        <span className={styles.headerNote}>Learning experience preview</span>
+        <span className={styles.headerNote}>Your learning workspace</span>
       </header>
       <main id="login-main" tabIndex={-1} className={styles.main}>
         <div className={styles.card}>
@@ -43,7 +42,8 @@ export default function LoginPage() {
               <LoginForm />
             </div>
             <p className={styles.panelFootnote}>
-              UI preview only. Your details are not sent or saved by this page.
+              Email/password sign-in is available for existing verified
+              accounts.
             </p>
           </section>
           <LoginProductPreview />

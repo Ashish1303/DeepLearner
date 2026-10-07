@@ -5,6 +5,19 @@
   background: #faf8ff;
   color: var(--ink);
 }
+.page button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.retry {
+  font: inherit;
+  background: transparent;
+  color: var(--teal);
+  border: 1px solid var(--teal);
+  border-radius: 0.35rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+}
 .page a:focus-visible,
 .page button:focus-visible,
 .page input:focus-visible {
