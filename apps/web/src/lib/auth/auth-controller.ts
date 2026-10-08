@@ -1,5 +1,10 @@
 import { ApiError, type ApiClient } from '../api/client';
-import type { CurrentUser } from '../api/contracts';
+import {
+  onboardingProfileSchema,
+  type CurrentUser,
+  type OnboardingProfile,
+} from '../api/contracts';
+import { isOnboardingComplete } from '../onboarding/profile';
 import { CoordinationError, type Coordination } from './browser-coordination';
 
 export type AuthState = {
@@ -23,6 +28,12 @@ const initial: AuthState = {
   pending: false,
 };
 const interrupted = Symbol('obsolete operation');
+export type ProfileResult =
+  | { kind: 'success'; user: CurrentUser }
+  | {
+      kind: 'error' | 'reverify' | 'uncertain' | 'busy' | 'interrupted';
+      message: string;
+    };
 export function createAuthController(
   api: ApiClient,
   coordination: Coordination,
@@ -32,6 +43,7 @@ export function createAuthController(
   let generation = 0;
   let loggingOut = false;
   let flight: Promise<void> | undefined;
+  let profileCheckRequired = false;
   const listeners = new Set<() => void>();
   const update = (next: AuthState) => {
     state = next;
@@ -92,7 +104,11 @@ export function createAuthController(
       throw error;
     }
   }
-  async function loadUser(version: number, mayRefresh: boolean) {
+  async function loadUser(
+    version: number,
+    mayRefresh: boolean,
+    publish = true,
+  ) {
     valid(version);
     if (!token) throw interrupted;
     let user: CurrentUser;
@@ -116,7 +132,9 @@ export function createAuthController(
         403,
       );
     }
-    update({ status: 'authenticated', user, message: '', pending: false });
+    if (publish)
+      update({ status: 'authenticated', user, message: '', pending: false });
+    return user;
   }
   function single(work: () => Promise<void>) {
     if (flight) return flight;
@@ -126,7 +144,128 @@ export function createAuthController(
     flight = current;
     return current;
   }
+  async function profileOperation(
+    input?: OnboardingProfile,
+  ): Promise<ProfileResult> {
+    if (flight || state.pending || loggingOut)
+      return {
+        kind: 'busy',
+        message: 'Wait for the current request to finish.',
+      };
+    const owner = state.user;
+    if (
+      state.status !== 'authenticated' ||
+      !owner ||
+      owner.role !== 'STUDENT' ||
+      !token
+    )
+      return {
+        kind: 'error',
+        message: 'Sign in with an eligible student account.',
+      };
+    if (input && profileCheckRequired)
+      return {
+        kind: 'reverify',
+        message:
+          'Check your saved profile and session before submitting again.',
+      };
+    if (input && !onboardingProfileSchema.safeParse(input).success)
+      return {
+        kind: 'error',
+        message: 'Check the onboarding fields before saving.',
+      };
+    let result: ProfileResult = {
+      kind: 'interrupted',
+      message: 'The account changed. This result was discarded.',
+    };
+    await single(async () => {
+      const version = generation;
+      const previous = state;
+      let patchSent = false;
+      update({ ...state, pending: true, message: '' });
+      try {
+        await coordination.run(async () => {
+          const current = await loadUser(version, true, false);
+          valid(version);
+          if (!current || current.id !== owner.id)
+            throw new ApiError('AUTH_ACCESS_TOKEN_INVALID', 401);
+          if (current.role !== 'STUDENT') {
+            update({
+              status: 'authenticated',
+              user: current,
+              pending: false,
+              message: '',
+            });
+            result = {
+              kind: 'error',
+              message: 'This setup is for student accounts.',
+            };
+            return;
+          }
+          let user = current;
+          if (input) {
+            patchSent = true;
+            user = await api.patchProfile(token!, input);
+            valid(version);
+            if (
+              user.id !== owner.id ||
+              user.role !== 'STUDENT' ||
+              user.status !== 'ACTIVE' ||
+              !user.emailVerified ||
+              !isOnboardingComplete(user.profile)
+            )
+              throw new ApiError('INVALID_RESPONSE');
+          }
+          valid(version);
+          profileCheckRequired = false;
+          update({
+            status: 'authenticated',
+            user,
+            pending: false,
+            message: '',
+          });
+          result = { kind: 'success', user };
+        });
+      } catch (error) {
+        if (version !== generation || error === interrupted) return;
+        const apiError =
+          error instanceof ApiError ? error : new ApiError('REQUEST_FAILED');
+        const accountFailure = [
+          'AUTH_ACCOUNT_DISABLED',
+          'AUTH_ACCOUNT_SUSPENDED',
+          'AUTH_EMAIL_NOT_VERIFIED',
+          'USER_NOT_FOUND',
+        ].includes(apiError.code);
+        if (
+          accountFailure ||
+          (!patchSent && apiError.status === 401) ||
+          error instanceof CoordinationError
+        ) {
+          failure(error, version);
+          result = { kind: 'error', message: apiError.message };
+          return;
+        }
+        const ambiguous =
+          patchSent &&
+          ['NETWORK_ERROR', 'INVALID_RESPONSE'].includes(apiError.code);
+        const reverify = patchSent && apiError.status === 401;
+        profileCheckRequired ||= ambiguous || reverify;
+        result = {
+          kind: ambiguous ? 'uncertain' : reverify ? 'reverify' : 'error',
+          message: ambiguous
+            ? 'Saving could not be confirmed. Check the saved profile before retrying; your draft has been kept.'
+            : reverify
+              ? 'Your session must be checked before you explicitly submit again. Your draft has been kept.'
+              : apiError.message,
+        };
+        update({ ...previous, pending: false });
+      }
+    });
+    return result;
+  }
   return {
+    saveProfile: (profile: OnboardingProfile) => profileOperation(profile),
+    checkProfile: () => profileOperation(),
     getSnapshot: () => state,
     getServerSnapshot: () => initial,
     subscribe(fn: () => void) {
@@ -144,6 +283,7 @@ export function createAuthController(
         });
       const disconnect = coordination.listen((message) => {
         generation++;
+        profileCheckRequired = false;
         token = undefined;
         update({
           ...initial,
@@ -193,6 +333,7 @@ export function createAuthController(
       return single(async () => {
         const version = ++generation;
         token = undefined;
+        profileCheckRequired = false;
         update({ ...initial, status: 'loading', pending: true });
         try {
           await coordination.run(async () => {

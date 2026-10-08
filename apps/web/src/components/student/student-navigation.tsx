@@ -1,11 +1,13 @@
 'use client';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '../../hooks/use-auth';
 import { Icon } from '../ui/icon';
 import styles from './student-shell.module.css';
 export function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
   const { state, controller } = useAuth();
   const user = state.user;
+  const onboarding = usePathname() === '/onboarding';
   return (
     <div className={styles.navigation}>
       <Link href="/" className={styles.brand} onClick={() => onNavigate?.()}>
@@ -14,12 +16,12 @@ export function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
       <nav aria-label="Student navigation">
         <p className={styles.label}>Workspace</p>
         <Link
-          href="/dashboard"
+          href={onboarding ? '/onboarding' : '/dashboard'}
           aria-current="page"
           className={styles.active}
           onClick={() => onNavigate?.()}
         >
-          <Icon name="dashboard" /> Dashboard
+          <Icon name="dashboard" /> {onboarding ? 'Onboarding' : 'Dashboard'}
         </Link>
         <p className={styles.label}>Coming later</p>
         <ul className={styles.future}>

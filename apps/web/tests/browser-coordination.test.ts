@@ -36,6 +36,7 @@ test('blocked channel construction surfaces compatibility state without authenti
     refresh: unexpected,
     me: unexpected,
     logout: unexpected,
+    patchProfile: unexpected,
   };
   const controller = createAuthController(api, coordination);
   assert(coordination.supported());

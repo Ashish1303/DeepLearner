@@ -173,3 +173,39 @@ test('invalid API configuration cannot expose the raw URL parser error', () => {
     },
   );
 });
+
+test('profile PATCH sends only approved leaves with bearer auth, no cookies or manual Origin', async () => {
+  const profile = {
+    experienceLevel: 'BEGINNER' as const,
+    learningGoals: ['LEARN_FROM_SCRATCH' as const],
+    preferredDifficulty: 'BEGINNER' as const,
+    dailyStudyGoalMinutes: 30,
+  };
+  let requests = 0;
+  const api = createApiClient(
+    'https://api.example.com/api/v1',
+    async (url, init) => {
+      requests++;
+      assert.equal(String(url), 'https://api.example.com/api/v1/users/me');
+      assert.equal(init?.method, 'PATCH');
+      assert.equal(init.credentials, 'omit');
+      assert.equal(init.cache, 'no-store');
+      const headers = new Headers(init.headers);
+      assert.equal(headers.get('Authorization'), 'Bearer synthetic-access');
+      assert(!headers.has('Origin'));
+      assert(!headers.has('Cookie'));
+      assert.deepEqual(JSON.parse(String(init.body)), { profile });
+      return Response.json({
+        success: true,
+        data: {
+          ...user,
+          profile: { ...profile, interestedTechnologyIds: [] },
+          passwordHash: 'PRIVATE',
+        },
+      });
+    },
+  );
+  const saved = await api.patchProfile('synthetic-access', profile);
+  assert(!JSON.stringify(saved).includes('PRIVATE'));
+  assert.equal(requests, 1);
+});

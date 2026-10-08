@@ -32,6 +32,19 @@ export const currentUserSchema = z.object({
   createdAt: z.iso.datetime(),
 });
 export type CurrentUser = z.infer<typeof currentUserSchema>;
+export const onboardingProfileSchema = z.strictObject({
+  experienceLevel: profile.shape.experienceLevel.unwrap(),
+  learningGoals: profile.shape.learningGoals
+    .min(1)
+    .max(5)
+    .refine(
+      (values) => new Set(values).size === values.length,
+      'Choose unique learning goals',
+    ),
+  preferredDifficulty: profile.shape.preferredDifficulty.unwrap(),
+  dailyStudyGoalMinutes: profile.shape.dailyStudyGoalMinutes.unwrap(),
+});
+export type OnboardingProfile = z.infer<typeof onboardingProfileSchema>;
 export const accessSchema = z.object({
   accessToken: z.string().min(1),
   expiresInSeconds: z.literal(900),

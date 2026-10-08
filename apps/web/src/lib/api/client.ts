@@ -4,7 +4,9 @@ import {
   currentUserSchema,
   envelope,
   logoutSchema,
+  type OnboardingProfile,
 } from './contracts';
+import { profilePayload } from '../onboarding/profile';
 
 const messages = {
   AUTH_INVALID_CREDENTIALS: 'Invalid email or password.',
@@ -95,6 +97,16 @@ export function createApiClient(
     }
   }
   return {
+    patchProfile: (token: string, profile: OnboardingProfile) =>
+      request('/users/me', currentUserSchema, {
+        method: 'PATCH',
+        credentials: 'omit',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profilePayload(profile)),
+      }),
     login: (email: string, password: string) =>
       request('/auth/login', accessSchema, {
         method: 'POST',

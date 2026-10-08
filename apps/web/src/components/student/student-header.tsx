@@ -1,9 +1,11 @@
 'use client';
 import { useAuth } from '../../hooks/use-auth';
+import { usePathname } from 'next/navigation';
 import { Icon } from '../ui/icon';
 import styles from './student-shell.module.css';
 export function StudentHeader({ onMenu }: { onMenu: () => void }) {
   const { state } = useAuth();
+  const onboarding = usePathname() === '/onboarding';
   return (
     <header className={styles.header}>
       <button
@@ -18,7 +20,7 @@ export function StudentHeader({ onMenu }: { onMenu: () => void }) {
       </button>
       <div>
         <span className={styles.label}>Your workspace</span>
-        <p>Dashboard</p>
+        <p>{onboarding ? 'Student onboarding' : 'Dashboard'}</p>
       </div>
       <span className={styles.headerName}>{state.user?.firstName}</span>
     </header>

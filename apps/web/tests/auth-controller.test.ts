@@ -25,6 +25,12 @@ const access = {
   accessToken: 'synthetic-secret-access',
   expiresInSeconds: 900 as const,
 };
+const preferences = {
+  experienceLevel: 'BEGINNER' as const,
+  learningGoals: ['LEARN_FROM_SCRATCH' as const],
+  preferredDifficulty: 'BEGINNER' as const,
+  dailyStudyGoalMinutes: 30,
+};
 function deferred<T>() {
   let resolve!: (value: T) => void;
   const promise = new Promise<T>((r) => {
@@ -73,6 +79,10 @@ function fixture(overrides: Partial<ApiClient> = {}, supported = true) {
     async logout() {
       calls.push('logout');
       return null;
+    },
+    async patchProfile(_token, profile) {
+      calls.push('patch');
+      return { ...user, profile: { ...profile, interestedTechnologyIds: [] } };
     },
     ...overrides,
   };
@@ -254,4 +264,225 @@ test('ADMIN is identifiable for access state; malformed active eligibility is ne
   assert.equal(unsupported.controller.getSnapshot().status, 'unsupported');
   await unsupported.controller.restore();
   assert.deepEqual(unsupported.calls, []);
+});
+
+test('profile save checks authoritative user then adopts PATCH response without changing unrelated fields', async () => {
+  const saved = {
+    ...user,
+    profile: { ...preferences, interestedTechnologyIds: [] },
+  };
+  const f = fixture({
+    patchProfile: async (_token, input) => {
+      assert.deepEqual(input, preferences);
+      return saved;
+    },
+  });
+  await f.controller.login(user.email, 'password');
+  assert.equal((await f.controller.saveProfile(preferences)).kind, 'success');
+  assert.deepEqual(f.calls, ['login', 'me', 'me']);
+  assert.deepEqual(f.controller.getSnapshot().user, saved);
+  assert.deepEqual(f.messages, ['identity-changed']);
+});
+
+test('recoverable profile failures retain account and never replay mutations', async () => {
+  for (const error of [
+    new ApiError('VALIDATION_ERROR', 400),
+    new ApiError('RATE_LIMIT_EXCEEDED', 429),
+    new ApiError('DEPENDENCY_UNAVAILABLE', 503),
+  ]) {
+    let patches = 0;
+    const f = fixture({
+      patchProfile: async () => {
+        patches++;
+        throw error;
+      },
+    });
+    await f.controller.restore();
+    assert.equal((await f.controller.saveProfile(preferences)).kind, 'error');
+    assert.deepEqual(f.controller.getSnapshot().user, user);
+    assert.equal(f.controller.getSnapshot().pending, false);
+    assert.equal(patches, 1);
+  }
+});
+
+test('ambiguous PATCH and PATCH 401 require a read-only check and explicit resubmission', async () => {
+  for (const error of [
+    new ApiError('NETWORK_ERROR'),
+    new ApiError('INVALID_RESPONSE'),
+    new ApiError('AUTH_ACCESS_TOKEN_EXPIRED', 401),
+  ]) {
+    let patches = 0;
+    const f = fixture({
+      patchProfile: async () => {
+        patches++;
+        if (patches === 1) throw error;
+        return {
+          ...user,
+          profile: { ...preferences, interestedTechnologyIds: [] },
+        };
+      },
+    });
+    await f.controller.restore();
+    const result = await f.controller.saveProfile(preferences);
+    assert.equal(result.kind, error.status === 401 ? 'reverify' : 'uncertain');
+    assert.equal(
+      (await f.controller.saveProfile(preferences)).kind,
+      'reverify',
+    );
+    assert.equal(patches, 1);
+    assert.equal((await f.controller.checkProfile()).kind, 'success');
+    assert.equal(patches, 1);
+    assert.equal((await f.controller.saveProfile(preferences)).kind, 'success');
+    assert.equal(patches, 2);
+  }
+});
+
+test('read-only reconciliation adopts a committed profile without a second PATCH', async () => {
+  let committed = false;
+  const saved = {
+    ...user,
+    profile: { ...preferences, interestedTechnologyIds: [] },
+  };
+  let patches = 0;
+  const f = fixture({
+    me: async () => (committed ? saved : user),
+    patchProfile: async () => {
+      patches++;
+      committed = true;
+      throw new ApiError('NETWORK_ERROR');
+    },
+  });
+  await f.controller.restore();
+  await f.controller.saveProfile(preferences);
+  assert.equal((await f.controller.checkProfile()).kind, 'success');
+  assert.equal(patches, 1);
+  assert.deepEqual(f.controller.getSnapshot().user, saved);
+});
+
+test('preflight GET refreshes once before PATCH and rejects current account restrictions', async () => {
+  let reads = 0;
+  const f = fixture({
+    me: async () => {
+      if (++reads === 2) throw new ApiError('AUTH_ACCESS_TOKEN_EXPIRED', 401);
+      return user;
+    },
+  });
+  await f.controller.login(user.email, 'password');
+  await f.controller.saveProfile(preferences);
+  assert.deepEqual(f.calls, ['login', 'refresh', 'patch']);
+  for (const patch of [
+    { role: 'ADMIN' as const },
+    { status: 'DISABLED' as const },
+    { status: 'SUSPENDED' as const },
+    { emailVerified: false },
+  ]) {
+    let restricted = false;
+    let writes = 0;
+    const g = fixture({
+      me: async () => (restricted ? { ...user, ...patch } : user),
+      patchProfile: async () => {
+        writes++;
+        return user;
+      },
+    });
+    await g.controller.restore();
+    restricted = true;
+    assert.equal((await g.controller.saveProfile(preferences)).kind, 'error');
+    assert.equal(writes, 0);
+  }
+});
+
+test('late profile results after logout or cross-tab invalidation never restore identity', async () => {
+  for (const control of ['logout', 'identity-changed'] as const) {
+    const gate = deferred<CurrentUser>();
+    const started = deferred<void>();
+    const f = fixture({
+      patchProfile: async () => {
+        started.resolve();
+        return gate.promise;
+      },
+    });
+    await f.controller.restore();
+    const save = f.controller.saveProfile(preferences);
+    await started.promise;
+    const stop =
+      control === 'logout'
+        ? f.controller.logout()
+        : Promise.resolve(f.emit(control));
+    gate.resolve({
+      ...user,
+      profile: { ...preferences, interestedTechnologyIds: [] },
+    });
+    await stop;
+    assert.equal((await save).kind, 'interrupted');
+    assert.equal(f.controller.getSnapshot().status, 'anonymous');
+    assert.equal(f.controller.getSnapshot().user, null);
+  }
+});
+
+test('failed reconciliation does not permit another PATCH, and preflight network failure preserves identity', async () => {
+  let failReads = false;
+  let writes = 0;
+  const f = fixture({
+    me: async () => {
+      if (failReads) throw new ApiError('NETWORK_ERROR');
+      return user;
+    },
+    patchProfile: async () => {
+      writes++;
+      throw new ApiError('NETWORK_ERROR');
+    },
+  });
+  await f.controller.restore();
+  failReads = true;
+  assert.equal((await f.controller.saveProfile(preferences)).kind, 'error');
+  assert.equal(writes, 0);
+  assert.deepEqual(f.controller.getSnapshot().user, user);
+  failReads = false;
+  await f.controller.saveProfile(preferences);
+  failReads = true;
+  assert.equal((await f.controller.checkProfile()).kind, 'error');
+  assert.equal((await f.controller.saveProfile(preferences)).kind, 'reverify');
+  assert.equal(writes, 1);
+});
+
+test('profile preflight prevents cross-account writes and preserves the ADMIN access state', async () => {
+  for (const changed of [
+    { ...user, id: 'b'.repeat(24) },
+    { ...user, role: 'ADMIN' as const },
+  ]) {
+    let reads = 0;
+    const f = fixture({ me: async () => (++reads === 1 ? user : changed) });
+    await f.controller.restore();
+    assert.equal((await f.controller.saveProfile(preferences)).kind, 'error');
+    assert(!f.calls.includes('patch'));
+    if (changed.role === 'ADMIN')
+      assert.equal(f.controller.getSnapshot().user?.role, 'ADMIN');
+    else assert.equal(f.controller.getSnapshot().status, 'anonymous');
+  }
+});
+
+test('parallel submissions cannot duplicate PATCH and invalid saved DTO is never adopted', async () => {
+  const gate = deferred<CurrentUser>();
+  const started = deferred<void>();
+  let writes = 0;
+  const f = fixture({
+    patchProfile: async () => {
+      writes++;
+      started.resolve();
+      return gate.promise;
+    },
+  });
+  await f.controller.restore();
+  const first = f.controller.saveProfile(preferences);
+  await started.promise;
+  assert.equal((await f.controller.saveProfile(preferences)).kind, 'busy');
+  gate.resolve({
+    ...user,
+    id: 'b'.repeat(24),
+    profile: { ...preferences, interestedTechnologyIds: [] },
+  });
+  assert.equal((await first).kind, 'uncertain');
+  assert.equal(writes, 1);
+  assert.deepEqual(f.controller.getSnapshot().user, user);
 });

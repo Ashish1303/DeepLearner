@@ -1,0 +1,164 @@
+.card {
+  width: 100%;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: white;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.card h1 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.2;
+  margin: 0.75rem 0 1rem;
+}
+.card h2 {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+.card h2:focus {
+  outline: 2px solid var(--teal);
+  outline-offset: 4px;
+}
+.card p {
+  color: var(--ink-secondary);
+}
+.eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0;
+  list-style: none;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+.steps li {
+  padding: 0.7rem;
+  border-bottom: 3px solid var(--border);
+}
+.steps [aria-current] {
+  border-color: var(--teal);
+  font-weight: 700;
+  color: var(--teal);
+}
+.fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.choices {
+  border: 0;
+  margin: 1rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+  min-width: 0;
+}
+.choices legend {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+.choices label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+  padding: 0.8rem;
+  cursor: pointer;
+}
+.choices label:has(input:checked) {
+  background: #eef9f7;
+  border-color: var(--teal);
+}
+.choices input {
+  accent-color: var(--teal);
+  flex-shrink: 0;
+}
+.card input:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 4px;
+}
+.minutes {
+  display: block;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+}
+.card input[type='number'] {
+  width: min(100%, 14rem);
+  min-height: 44px;
+  padding: 0.6rem;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: 0.35rem;
+}
+.card .error {
+  color: #9f1239;
+}
+.catalog {
+  padding: 1rem;
+  background: var(--surface-subtle);
+  border-radius: 0.35rem;
+  font-size: 0.875rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.actions button,
+.check {
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--teal);
+  color: var(--teal);
+  background: white;
+  font: inherit;
+  border-radius: 0.35rem;
+  cursor: pointer;
+}
+.actions .primary {
+  background: var(--teal);
+  color: white;
+}
+.card button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.review {
+  display: grid;
+  gap: 1rem;
+}
+.review dt {
+  font-weight: 600;
+}
+.review dd {
+  margin: 0.25rem 0 0;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .actions button {
+    flex: 1;
+  }
+}

@@ -2,7 +2,8 @@
 
 import { useEffect, type ReactNode } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { onboardingRedirect } from '../../lib/onboarding/profile';
 import { useAuth } from '../../hooks/use-auth';
 import { loginDestination } from '../../lib/auth/redirect';
 import styles from './auth-state.module.css';
@@ -10,15 +11,29 @@ import styles from './auth-state.module.css';
 export function AuthBoundary({ children }: { children: ReactNode }) {
   const { controller, state } = useAuth();
   const router = useRouter();
+  const path = usePathname();
+  const destination =
+    state.status === 'authenticated'
+      ? onboardingRedirect(state.user, path)
+      : null;
   useEffect(() => {
     void controller.restore();
   }, [controller]);
   useEffect(() => {
     if (state.status === 'anonymous') router.replace(loginDestination);
   }, [state.status, router]);
-  if (state.status === 'authenticated' && state.user?.role === 'STUDENT')
+  useEffect(() => {
+    if (destination) router.replace(destination);
+  }, [destination, router]);
+  if (
+    state.status === 'authenticated' &&
+    state.user?.role === 'STUDENT' &&
+    !destination
+  )
     return children;
-  const loading = ['idle', 'loading', 'anonymous'].includes(state.status);
+  const loading =
+    Boolean(destination) ||
+    ['idle', 'loading', 'anonymous'].includes(state.status);
   return (
     <main className={styles.page} aria-busy={loading}>
       <section className={styles.card}>
