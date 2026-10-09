@@ -1,3 +1,6 @@
+import { createTechnologyRouter } from './modules/technologies/technology.routes.js';
+import type { TechnologyService } from './modules/technologies/technology.service.js';
+import type { technologyLimitDefaults } from './modules/technologies/technology-rate-limit.js';
 import { createUserRouter } from './modules/users/user.routes.js';
 import type { UserService } from './modules/users/user.service.js';
 import type { UserLimits } from './modules/users/user-rate-limit.js';
@@ -34,6 +37,8 @@ export function createApp(
   googleLimits?: GoogleLimits,
   userService?: UserService,
   userLimits?: UserLimits,
+  technologyService?: TechnologyService,
+  technologyLimits?: typeof technologyLimitDefaults,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -77,6 +82,10 @@ export function createApp(
     ),
   );
   app.use('/api/v1/users', createUserRouter(userService, userLimits));
+  app.use(
+    '/api/v1/technologies',
+    createTechnologyRouter(technologyService, technologyLimits),
+  );
   app.use(notFound);
   app.use(errorHandler);
   return app;

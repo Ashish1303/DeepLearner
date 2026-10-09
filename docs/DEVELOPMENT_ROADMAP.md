@@ -433,9 +433,16 @@ Status: `APPROVED_COMPLETE`
 ## Phase E — Technology & Learning Hierarchy
 
 ### F015 — Technology Catalog Backend
-**Initial Data:** JavaScript only  
-**Dependencies:** F005  
-**Status:** `NOT_STARTED`
+
+**Initial Data:** JavaScript definition only; not provisioned
+
+**Dependencies:** F005
+
+**Status:** `APPROVED_COMPLETE`
+
+**Plan:** [F015 Technology Catalog Backend](features/F015-technology-catalog-backend.md).
+
+**Verification:** Offline F015 10/10, API 126/126, web 38/38 PASS; root build/lint/typecheck/formatting and scope/secrets review PASS. Owner-approved isolated MongoDB integration 2/2 scenarios plus parent PASS; actual indexes/uniqueness, visibility/order/pagination, safe DTOs and non-mutating reads PASS. Child/wrapper/MongoDB exits 0/0/0; disconnect/shutdown/port/temp cleanup PASS. Final code review: no actionable P0-P3 findings. Owner approved completion as APPROVED_COMPLETE on 2026-10-09. Real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED; definition-only, no real Admin provenance, seed runner or automatic provisioning.
 
 ### F016 — Explore Technologies UI
 **Dependencies:** F015, F013  
@@ -991,11 +998,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F014 — Student Onboarding
+**Current Feature:** F015 — Technology Catalog Backend
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F015 — Technology Catalog Backend
+**Next Feature:** F016 — Explore Technologies UI
 
-**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 remains NOT_STARTED.
+**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 remains NOT_STARTED.
 
 ---
 

@@ -1522,3 +1522,13 @@ The exact physical folder placement may evolve, but domain ownership and depende
 **Authentication + Users contract: READY FOR IMPLEMENTATION**
 
 The next API-design discussion should cover **Technology -> Learning Path -> Module -> Topic**, because that hierarchy becomes the foundation for Concept, Practice, Visualization, Progress, Search, and Admin content-management APIs.
+
+# 33. Technology Catalog — F015
+
+Public GET /api/v1/technologies returns PUBLISHED records only; no JWT or cookie required. Query page defaults to 1; limit defaults to 20 and must be at most 100. Both must be positive decimal integers with safe numeric offset arithmetic. Reject unknown, repeated and nested query parameters. Ordering is fixed order ASC, slug ASC; no filters/search or detail endpoint.
+
+Return the standard list envelope with data as an array and meta containing requestId, page, limit, total and totalPages (0 for an empty catalog). Safe DTO fields: id, name, slug, description (null when absent), iconAssetId (null when absent), order. Never expose status, Admin provenance or __v. Empty/out-of-range pages return 200 with an empty array. List/count reads are not a snapshot transaction.
+
+Cache-Control: no-store. Existing CORS applies, including absent-Origin support; no credentialed CORS expansion. Rate limit: 120/IP/15 minutes using obscured IPv6-aware keys and the existing single-process store. Standard VALIDATION_ERROR (400), ORIGIN_NOT_ALLOWED (403), RATE_LIMIT_EXCEEDED (429) and sanitized DEPENDENCY_UNAVAILABLE (503) contracts apply.
+
+Canonical Technology fields/indexes remain in DATABASE_DESIGN.md. JavaScript initial data is a definition only; no automatic seeding, fabricated Admin provenance or production provisioning. No mutation/admin endpoint is included. F012 technology-ID syntax-only validation and F014 onboarding remain unchanged. The earlier deferred-module list now applies to remaining Technology management contracts beyond this F015 read endpoint.
