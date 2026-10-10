@@ -184,6 +184,18 @@ publication or provisioning workflow is included.
 | `status` | `DRAFT | PUBLISHED | ARCHIVED` | Yes | Publishing state. |
 | `createdAt / updatedAt` | `date` | Yes | Audit timestamps. |
 
+**F019 approved refinements:** title trimmed/nonblank, 1-120; strict lowercase ASCII
+kebab-case slug, 1-100; optional description maximum 2000. Status defaults to DRAFT;
+order defaults to 0 and is a nonnegative safe integer. Required Technology,
+Learning Path and Module ObjectId references; no Admin provenance or completion
+fields. Strict schema, timestamps and internal __v. Automatic collection/index
+creation and buffering disabled. Unique { moduleId: 1, slug: 1 } includes archived
+records; { moduleId: 1, status: 1, order: 1 } supports reads. Cross-module slug reuse
+is allowed; no global slug/title uniqueness or TTL. Public reads require all four
+levels published and all denormalized IDs consistent, with identical list/count
+predicates. References are not foreign keys; future authoring must derive ancestors
+from the validated Module. F019 adds no write, repair or provisioning workflow.
+
 ### `concepts`
 | Field | Type | Required | Purpose |
 |---|---|---:|---|

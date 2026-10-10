@@ -1567,3 +1567,34 @@ DTO: id, technologyId, learningPathId, title, slug, description (null when absen
 order. No status, timestamps, __v or other internal fields. Both routes use no-store
 and share 120/IP/15 minutes, with existing IPv6-aware single-process limiting.
 No writes, authoring, seeds, transactions, audit mutations or automatic provisioning.
+
+## F019 Topic Backend contract
+
+Public read-only GET /api/v1/topics?moduleId=<ObjectId>&page=1&limit=20 and
+GET /api/v1/topics/:id. No authentication required; incoming credentials are unused
+and never mutate authentication state. Existing CORS/Origin policy remains
+unchanged (absent Origin allowed); no credentialed-CORS expansion.
+
+List requires an exact 24-hex moduleId. Positive decimal integer page defaults to
+1; limit defaults to 20, maximum 100; offset must be safe. Unknown/repeated/nested
+parameters are rejected. Detail accepts an exact 24-hex ObjectId and no query.
+Order: order ASC, slug ASC. A visible empty parent or later page returns 200 with
+an empty data array and accurate page/limit/total/totalPages (0 for an empty catalog)
+in the F004 envelope.
+
+Technology, Learning Path, Module and Topic must all exist and be PUBLISHED.
+Topic moduleId must identify its Module; Topic learningPathId/technologyId must
+match that Module; Module learningPathId must identify its Learning Path, and
+Module/Topic technologyId must equal the Learning Path's published Technology.
+Orphans and inconsistencies are excluded. Identical predicates govern list items
+and totals before the common facet. Generic 404 MODULE_NOT_FOUND for an unavailable
+list parent chain; generic 404 TOPIC_NOT_FOUND for missing/hidden/inconsistent detail.
+Invalid input: 400 VALIDATION_ERROR. Disallowed Origin: 403 ORIGIN_NOT_ALLOWED.
+Shared budget: 429 RATE_LIMIT_EXCEEDED. Database failure: sanitized 503
+DEPENDENCY_UNAVAILABLE.
+
+DTO: id, technologyId, learningPathId, moduleId, title, slug, description (null when
+absent), order. No status, timestamps, __v, joins or nested content.
+Both routes use Cache-Control: no-store and one feature-local 120/IP/15-minute
+IPv6-aware single-process limiter. No writes, transactions, audit mutations,
+authoring, completion calculations, seeds or automatic provisioning.

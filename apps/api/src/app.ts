@@ -1,3 +1,6 @@
+import { createTopicRouter } from './modules/topics/topic.routes.js';
+import type { TopicService } from './modules/topics/topic.service.js';
+import type { topicLimitDefaults } from './modules/topics/topic-rate-limit.js';
 import { createModuleRouter } from './modules/modules/module.routes.js';
 import type { ModuleService } from './modules/modules/module.service.js';
 import type { moduleLimitDefaults } from './modules/modules/module-rate-limit.js';
@@ -49,6 +52,8 @@ export function createApp(
   learningPathLimits?: typeof learningPathLimitDefaults,
   moduleService?: ModuleService,
   moduleLimits?: typeof moduleLimitDefaults,
+  topicService?: TopicService,
+  topicLimits?: typeof topicLimitDefaults,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -101,6 +106,7 @@ export function createApp(
     createLearningPathRouter(learningPathService, learningPathLimits),
   );
   app.use('/api/v1/modules', createModuleRouter(moduleService, moduleLimits));
+  app.use('/api/v1/topics', createTopicRouter(topicService, topicLimits));
   app.use(notFound);
   app.use(errorHandler);
   return app;
