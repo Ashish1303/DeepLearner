@@ -5,7 +5,8 @@ import { Icon } from '../ui/icon';
 import styles from './student-shell.module.css';
 export function StudentHeader({ onMenu }: { onMenu: () => void }) {
   const { state } = useAuth();
-  const onboarding = usePathname() === '/onboarding';
+  const path = usePathname();
+  const onboarding = path === '/onboarding';
   return (
     <header className={styles.header}>
       <button
@@ -20,7 +21,13 @@ export function StudentHeader({ onMenu }: { onMenu: () => void }) {
       </button>
       <div>
         <span className={styles.label}>Your workspace</span>
-        <p>{onboarding ? 'Student onboarding' : 'Dashboard'}</p>
+        <p>
+          {onboarding
+            ? 'Student onboarding'
+            : path === '/explore-technologies'
+              ? 'Explore technologies'
+              : 'Dashboard'}
+        </p>
       </div>
       <span className={styles.headerName}>{state.user?.firstName}</span>
     </header>

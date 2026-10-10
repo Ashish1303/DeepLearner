@@ -7,7 +7,9 @@ import styles from './student-shell.module.css';
 export function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
   const { state, controller } = useAuth();
   const user = state.user;
-  const onboarding = usePathname() === '/onboarding';
+  const path = usePathname();
+  const onboarding = path === '/onboarding';
+  const explore = path === '/explore-technologies';
   return (
     <div className={styles.navigation}>
       <Link href="/" className={styles.brand} onClick={() => onNavigate?.()}>
@@ -17,17 +19,24 @@ export function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
         <p className={styles.label}>Workspace</p>
         <Link
           href={onboarding ? '/onboarding' : '/dashboard'}
-          aria-current="page"
-          className={styles.active}
+          aria-current={!explore ? 'page' : undefined}
+          className={!explore ? styles.active : styles.navLink}
           onClick={() => onNavigate?.()}
         >
           <Icon name="dashboard" /> {onboarding ? 'Onboarding' : 'Dashboard'}
+        </Link>
+        <Link
+          href="/explore-technologies"
+          aria-current={explore ? 'page' : undefined}
+          className={explore ? styles.active : styles.navLink}
+          onClick={() => onNavigate?.()}
+        >
+          <Icon name="layers" /> Explore Technologies
         </Link>
         <p className={styles.label}>Coming later</p>
         <ul className={styles.future}>
           {[
             'My Learning',
-            'Explore Technologies',
             'Practice',
             'Code Playground',
             'Interview Prep',

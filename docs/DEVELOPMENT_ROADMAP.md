@@ -446,7 +446,9 @@ Status: `APPROVED_COMPLETE`
 
 ### F016 — Explore Technologies UI
 **Dependencies:** F015, F013  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Plan:** [F016 approved Explore UI](features/F016-explore-technologies-ui.md). Owner approved completion on 2026-10-10. Focused tests 15/15, web 54/54, API 126/126; build/lint/typecheck/formatting and scope/secrets review PASS. Approved live checks and resolved empty-page P3 PASS; final review found no actionable P0-P3 findings. Final run 182.1s, exits 0/0/0/0/0, cleanup PASS. Delivered-late race variants, hosted cookies and normal Atlas startup remain NOT_VERIFIED; detailed evidence/limits in the feature document.
 
 ### F017 — Learning Path Backend
 **Dependencies:** F015  
@@ -998,11 +1000,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F015 — Technology Catalog Backend
+**Current Feature:** F016 - Explore Technologies UI
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F016 — Explore Technologies UI
+**Next Feature:** F017 - Learning Path Backend
 
-**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 remains NOT_STARTED.
+**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 remains NOT_STARTED.
 
 ---
 

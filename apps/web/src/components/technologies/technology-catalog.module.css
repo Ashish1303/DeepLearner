@@ -1,0 +1,92 @@
+.catalog {
+  min-width: 0;
+}
+.catalog h1 {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  line-height: 1.2;
+}
+.catalog h2 {
+  font-size: 1.25rem;
+}
+.catalog p {
+  color: var(--ink-secondary);
+  overflow-wrap: anywhere;
+}
+.catalog section {
+  margin-top: 2rem;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+.grid li {
+  min-width: 0;
+}
+.card {
+  height: 100%;
+  padding: 1.5rem;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  overflow-wrap: anywhere;
+}
+.card h3 {
+  font-size: 1.125rem;
+}
+.mark {
+  display: inline-flex;
+  padding: 0.75rem;
+  background: #e6f6f6;
+  color: var(--teal);
+  border-radius: 0.35rem;
+}
+.notice {
+  background: white;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.catalog button {
+  min-height: 44px;
+  padding: 0.6rem 1rem;
+  margin: 0.25rem;
+  border: 1px solid var(--teal);
+  border-radius: 0.35rem;
+  background: white;
+  color: var(--teal);
+  font: inherit;
+  cursor: pointer;
+}
+.catalog button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.catalog button:focus-visible,
+.catalog h2:focus {
+  outline: 3px solid var(--teal);
+  outline-offset: 4px;
+}
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .card {
+    padding: 1.25rem;
+  }
+}

@@ -266,3 +266,15 @@
     font-size: 0.8rem;
   }
 }
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem;
+  border-radius: 0.35rem;
+  text-decoration: none;
+}
+.navLink:hover {
+  background: var(--surface-subtle);
+}
