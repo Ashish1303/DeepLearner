@@ -1542,3 +1542,28 @@ Only PUBLISHED paths under PUBLISHED Technologies are visible; orphaned paths ar
 No authentication required; cookies may arrive but do not authorize requests or mutate authentication state. Existing CORS/absent-Origin behavior remains unchanged; no credentialed-CORS expansion. Both endpoints share a feature-local 120/IP/15-minute single-process limiter with obscured IPv6-aware keys. Cache-Control: no-store, request IDs, sanitized VALIDATION_ERROR/ORIGIN_NOT_ALLOWED/RATE_LIMIT_EXCEEDED/DEPENDENCY_UNAVAILABLE conventions remain unchanged.
 
 Read-only aggregation applies parent/path visibility and matching count predicates. No write transactions/audits or cross-request snapshot guarantee. No authoring, provisioning, completion calculation or learning action. See the [approved F017 plan](features/F017-learning-path-backend.md) for authorization and verification boundaries.
+
+## F018 Module Backend contract
+
+Public read-only GET /api/v1/modules?learningPathId=<ObjectId>&page=1&limit=20
+and GET /api/v1/modules/:id. No authentication required; incoming credentials
+are unused and do not alter authentication state. Existing Origin policy applies
+(absent Origin allowed), without credentialed-CORS expansion.
+
+List requires an exact 24-hex parent ID. Positive integer page defaults to 1;
+limit defaults to 20, maximum 100; offset must be safe. Unknown/repeated/nested
+query parameters are rejected. Detail accepts an exact 24-hex ID and no query.
+Order is order ASC, slug ASC. Visible empty parents/later pages return 200 with
+items and accurate page/limit/total/totalPages metadata in the F004 envelope.
+
+All three hierarchy levels must be PUBLISHED, with Module technologyId matching
+its Learning Path technologyId. Missing/unpublished ancestors, orphan modules
+and inconsistent references are excluded before the shared items/count facet.
+List unavailable hierarchy: generic 404 LEARNING_PATH_NOT_FOUND. Detail unavailable
+module/hierarchy: generic 404 MODULE_NOT_FOUND. Validation uses VALIDATION_ERROR;
+database errors use sanitized 503 DEPENDENCY_UNAVAILABLE.
+
+DTO: id, technologyId, learningPathId, title, slug, description (null when absent),
+order. No status, timestamps, __v or other internal fields. Both routes use no-store
+and share 120/IP/15 minutes, with existing IPv6-aware single-process limiting.
+No writes, authoring, seeds, transactions, audit mutations or automatic provisioning.

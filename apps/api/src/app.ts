@@ -1,3 +1,6 @@
+import { createModuleRouter } from './modules/modules/module.routes.js';
+import type { ModuleService } from './modules/modules/module.service.js';
+import type { moduleLimitDefaults } from './modules/modules/module-rate-limit.js';
 import { createTechnologyRouter } from './modules/technologies/technology.routes.js';
 import { createLearningPathRouter } from './modules/learning-paths/learning-path.routes.js';
 import type { LearningPathService } from './modules/learning-paths/learning-path.service.js';
@@ -44,6 +47,8 @@ export function createApp(
   technologyLimits?: typeof technologyLimitDefaults,
   learningPathService?: LearningPathService,
   learningPathLimits?: typeof learningPathLimitDefaults,
+  moduleService?: ModuleService,
+  moduleLimits?: typeof moduleLimitDefaults,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -95,6 +100,7 @@ export function createApp(
     '/api/v1/learning-paths',
     createLearningPathRouter(learningPathService, learningPathLimits),
   );
+  app.use('/api/v1/modules', createModuleRouter(moduleService, moduleLimits));
   app.use(notFound);
   app.use(errorHandler);
   return app;
