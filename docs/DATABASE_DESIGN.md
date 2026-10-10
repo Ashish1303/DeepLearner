@@ -145,6 +145,8 @@ For V1, store textual technical content as sanitized **Markdown** rather than ra
 | `createdBy / updatedBy` | `ObjectId` | Yes | Admin references. |
 | `createdAt / updatedAt` | `date` | Yes | Audit timestamps. |
 
+**F017 approved refinements:** title is trimmed/nonblank, 1–120 characters; slug is strict lowercase ASCII kebab-case, 1–100; description maximum 2000. targetLevel is optional BEGINNER/INTERMEDIATE/ADVANCED, default null. completionScore is an integer 0–100, default 70, representing the future minimum completion threshold; F017 performs no completion calculations. status defaults to DRAFT; order defaults to 0 and must be a nonnegative safe integer. Required createdBy/updatedBy references represent Admin provenance, not proof that an Admin exists. Mongoose references do not enforce parent existence or role. Strict schema, timestamps, internal __v; automatic collection/index creation and command buffering disabled. Archived paths retain their parent-scoped slug reservation; no global slug/title uniqueness or TTL. Public reads require a published path and published parent. No provisioning or authoring workflow is included.
+
 ### `modules`
 | Field | Type | Required | Purpose |
 |---|---|---:|---|

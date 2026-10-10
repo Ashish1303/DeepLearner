@@ -452,7 +452,11 @@ Status: `APPROVED_COMPLETE`
 
 ### F017 — Learning Path Backend
 **Dependencies:** F015  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Plan:** [F017 approved Learning Path Backend plan](features/F017-learning-path-backend.md). Owner approved completion on 2026-10-10 after implementation, separately approved isolated integration and final review. Public read-only list/detail APIs and persistence only; no provisioning, authoring, completion calculations or frontend work. All recorded verification limitations remain preserved.
+
+**Verification:** F017 offline 11/11, API 137/137, web 54/54 PASS; root build/lint/typecheck/formatting and diff/scope/secrets review PASS. Isolated MongoDB 4/4 PASS (three scenarios plus parent): indexes, parent-scoped uniqueness/concurrent duplicate rejection, published visibility, safe DTOs, ordering/pagination and non-mutating reads. Runtime 4.23s; initialization/test/shutdown-helper/MongoDB/wrapper exits 0/0/0/0/0; disconnect/graceful shutdown/port/temp cleanup PASS. Harness-only replSetName → replSet assertion and PowerShell spacing corrected; no application defect. Final review: no actionable P0–P3 findings. HTTP endpoints, invalid HTTP inputs/dependency failures and shared rate limiting against live MongoDB remain NOT_VERIFIED; normal Atlas startup also NOT_VERIFIED. See feature record for retained evidence and boundaries.
 
 ### F018 — Module Backend
 **Dependencies:** F017  
@@ -1000,11 +1004,11 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F016 - Explore Technologies UI
+**Current Feature:** F017 - Learning Path Backend
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F017 - Learning Path Backend
+**Next Feature:** F018 - Module Backend (not authorized)
 
-**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 remains NOT_STARTED.
+**Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 remains NOT_STARTED.
 
 ---
 
