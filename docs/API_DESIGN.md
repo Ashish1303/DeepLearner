@@ -1598,3 +1598,18 @@ absent), order. No status, timestamps, __v, joins or nested content.
 Both routes use Cache-Control: no-store and one feature-local 120/IP/15-minute
 IPv6-aware single-process limiter. No writes, transactions, audit mutations,
 authoring, completion calculations, seeds or automatic provisioning.
+
+## F021 implementation contract: Concept public reads
+
+See [the approved F021 plan](features/F021-concept-read-model-api.md) for complete bounds and acceptance gates.
+
+- GET /api/v1/concepts?topicId=ID&page=1&limit=20: exact 24-hex Topic ID; page defaults to 1, limit defaults to 20 and is at most 100. Positive decimal integers and safe offset arithmetic only. Unknown, repeated and nested parameters are rejected.
+- GET /api/v1/concepts/:id: exact ObjectId, no query parameters.
+- Both are public, credential-independent reads. Preserve existing Origin/CORS behavior; do not mutate auth state or set cookies. Cache-Control: no-store; shared feature-local 120/IP/15-minute budget.
+- Require published Technology -> Learning Path -> Module -> Topic -> Concept and consistent ancestor references. List validates its Topic first and applies identical filters before item/count facets. Order by order ASC, slug ASC. Empty/later pages return 200 with accurate pagination; an empty catalog has totalPages 0.
+- Summary DTO: id, technologyId, learningPathId, moduleId, topicId, title, slug, difficulty, summary and order. No body or source in lists.
+- Detail DTO: the same identity/title/slug/difficulty/order fields plus contentFormat, schemaVersion, read { summary, bodyMarkdown } and source { label, url, sourceType, isOfficial }; no top-level summary duplication.
+- Exclude lifecycle, Admin provenance, timestamps, __v and internal joins. Use existing success/error envelopes and request IDs.
+- 400 VALIDATION_ERROR; generic 404 TOPIC_NOT_FOUND for unavailable list ancestry or CONCEPT_NOT_FOUND for unavailable detail; 403 ORIGIN_NOT_ALLOWED; 429 RATE_LIMIT_EXCEEDED; sanitized 503 DEPENDENCY_UNAVAILABLE.
+
+Read bodies are untrusted Markdown data, not sanitized HTML. Source URLs are metadata only and never fetched. F022 must separately implement safe rendering, HTML/scheme protections and tests before displaying content. No authoring, completion, progress, source-management or rendering API is included.

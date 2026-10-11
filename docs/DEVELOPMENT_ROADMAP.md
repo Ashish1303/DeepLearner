@@ -490,7 +490,15 @@ Status: `APPROVED_COMPLETE`
 
 ### F021 — Concept Read Model + API
 **Dependencies:** F019  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Approved implementation:** [F021 Concept Read Model + API](features/F021-concept-read-model-api.md). Backend-only public list/detail reads, strict five-level published ancestry, topic-scoped uniqueness, safe summary/detail DTOs and untrusted Markdown/source metadata. Implementation and offline verification are authorized within the exact 17-file scope. One separately approved isolated MongoDB integration run is complete; further database execution requires separate approval. F022 and F020 browser acceptance remain outside this work.
+
+**Offline verification:** Focused F021 17/17, final API regressions 181/181 and web regressions 75/75 PASS; root build/lint/typecheck/formatting and diff/scope/secrets review PASS. An initial existing module-route test-worker failure did not reproduce in isolation or the full rerun; see the feature record. No browser tests, new dependencies, staging or commits were performed.
+
+**Isolated MongoDB verification:** 4/4 PASS (three scenarios plus parent). Actual indexes, scoped/archive uniqueness, cross-parent reuse, concurrent duplicate rejection, five-level published hierarchy/reference consistency, identical list/count filtering, safe DTOs, ordering/pagination, non-mutating reads and database-backed HTTP checks PASS. Cleanup PASS: disconnect, graceful shutdown, port release and owned temporary-directory removal; no forced termination. Wrapper runtime 20.18 seconds; initialization/test/shutdown/MongoDB/wrapper exits 0/0/0/0/0. All 17 approved files remained unchanged during verification.
+
+**Final review and limitations:** No actionable application defect, security issue, API-contract mismatch or unauthorized change. P3 stale integration documentation is corrected. Live database dependency-failure injection and normal Atlas startup remain NOT_VERIFIED. Owner approved F021 as APPROVED_COMPLETE for development closure. F020 remains APPROVED_COMPLETE and F022 remains NOT_STARTED.
 
 ### F022 — Concept Read UI
 **Dependencies:** F021  
@@ -1018,9 +1026,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F020 - Learning Path Student UI
+**Current Feature:** F021 - Concept Read Model + API
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F021 - Concept Read Model + API (not authorized)
+**Next Feature:** F022 - Concept Read UI (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

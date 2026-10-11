@@ -745,3 +745,19 @@ API input validation uses Zod; persistence constraints use Mongoose. Backend val
 
 ## 28. Database Design Status
 **Approved baseline:** ready for Mongoose schema implementation and REST API contract design. The next practical technical step is to define the Mongoose model interfaces/schemas and API request/response contracts collection-by-collection, starting with authentication and the learning catalog.
+
+## F021 approved implementation refinement: concepts
+
+[The F021 contract](features/F021-concept-read-model-api.md) is the approved bounded read-model implementation of the earlier Concept design.
+
+Required ObjectId references: technologyId, learningPathId, moduleId, topicId, createdBy and updatedBy (the latter two reference User for Admin provenance). There is no Admin creation or role lookup in this read-only feature. Publication and every ancestor/reference relationship are checked on public reads; ObjectId declarations alone are not foreign-key enforcement.
+
+Fields: trimmed title 1-120; lowercase ASCII kebab-case slug 1-100; required canonical difficulty with no default; MARKDOWN contentFormat default; required read.summary trimmed 1-2000 and nonblank read.bodyMarkdown 1-50000 preserving Markdown whitespace. Required source has trimmed label 1-120, absolute credential-free HTTPS url 1-2048, sourceType OFFICIAL_OR_TRUSTED only, and explicit Boolean isOfficial. These source bounds and the single sourceType are owner-approved F021 constraints, not pre-existing exhaustive canonical definitions. No source URL is fetched.
+
+Canonical lifecycle: DRAFT (default), AI_GENERATED, IN_REVIEW, CHANGES_REQUIRED, APPROVED, PUBLISHED, ARCHIVED. Only PUBLISHED is public; no lifecycle operations are implemented. Nonnegative safe integer order defaults to 0; schemaVersion is 1, default 1. Strict root/nested schemas, no nested IDs, Mongoose timestamps and internal __v. Collection/index auto-creation and buffering are disabled.
+
+Declared indexes: unique { topicId: 1, slug: 1 } including archived reservations; listing { topicId: 1, status: 1, order: 1, slug: 1 }; normal _id. Cross-Topic slug reuse is allowed. No TTL or other uniqueness. Real index enforcement remains separately gated MongoDB evidence.
+
+Explicit approved deviations: defer the entire completionRules field, including metadata/calculations, notwithstanding its earlier required designation; do not invent completion defaults. Also defer examples, revise, snapshots, publishedAt/publishedBy, unused filter/Admin indexes and all authoring/publication workflows. Future approved work must reconcile those canonical-design fields.
+
+The earlier sanitized-Markdown recommendation is refined to untrusted Markdown storage for F021. This is not XSS sanitization. F022 owns mandatory safe rendering and URL/HTML protections. Summary/detail projections exclude internal fields, and lists exclude the body/source. No real records or seed runner are supplied.

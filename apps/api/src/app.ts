@@ -1,3 +1,6 @@
+import { createConceptRouter } from './modules/concepts/concept.routes.js';
+import type { ConceptService } from './modules/concepts/concept.service.js';
+import type { conceptLimitDefaults } from './modules/concepts/concept-rate-limit.js';
 import { createTopicRouter } from './modules/topics/topic.routes.js';
 import type { TopicService } from './modules/topics/topic.service.js';
 import type { topicLimitDefaults } from './modules/topics/topic-rate-limit.js';
@@ -54,6 +57,8 @@ export function createApp(
   moduleLimits?: typeof moduleLimitDefaults,
   topicService?: TopicService,
   topicLimits?: typeof topicLimitDefaults,
+  conceptService?: ConceptService,
+  conceptLimits?: typeof conceptLimitDefaults,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -107,6 +112,10 @@ export function createApp(
   );
   app.use('/api/v1/modules', createModuleRouter(moduleService, moduleLimits));
   app.use('/api/v1/topics', createTopicRouter(topicService, topicLimits));
+  app.use(
+    '/api/v1/concepts',
+    createConceptRouter(conceptService, conceptLimits),
+  );
   app.use(notFound);
   app.use(errorHandler);
   return app;
