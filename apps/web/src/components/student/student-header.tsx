@@ -1,4 +1,8 @@
 'use client';
+import {
+  isLearningRoute,
+  learningHeader,
+} from '../../lib/learning-paths/routes';
 import { useAuth } from '../../hooks/use-auth';
 import { usePathname } from 'next/navigation';
 import { Icon } from '../ui/icon';
@@ -26,7 +30,9 @@ export function StudentHeader({ onMenu }: { onMenu: () => void }) {
             ? 'Student onboarding'
             : path === '/explore-technologies'
               ? 'Explore technologies'
-              : 'Dashboard'}
+              : isLearningRoute(path)
+                ? learningHeader(path)
+                : 'Dashboard'}
         </p>
       </div>
       <span className={styles.headerName}>{state.user?.firstName}</span>

@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { isLearningRoute } from '../../lib/learning-paths/routes';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../../hooks/use-auth';
 import { Icon } from '../ui/icon';
@@ -9,7 +10,7 @@ export function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
   const user = state.user;
   const path = usePathname();
   const onboarding = path === '/onboarding';
-  const explore = path === '/explore-technologies';
+  const explore = path === '/explore-technologies' || isLearningRoute(path);
   return (
     <div className={styles.navigation}>
       <Link href="/" className={styles.brand} onClick={() => onNavigate?.()}>
@@ -27,7 +28,13 @@ export function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
         </Link>
         <Link
           href="/explore-technologies"
-          aria-current={explore ? 'page' : undefined}
+          aria-current={
+            path === '/explore-technologies'
+              ? 'page'
+              : explore
+                ? 'location'
+                : undefined
+          }
           className={explore ? styles.active : styles.navLink}
           onClick={() => onNavigate?.()}
         >

@@ -5,6 +5,7 @@ import { test } from 'node:test';
 import { createElement, type ComponentType } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import ts from 'typescript';
+import * as learningRoutes from '../src/lib/learning-paths/routes';
 function render(file: string, symbol: string, path: string) {
   const require = createRequire(import.meta.url);
   const exports: Record<string, ComponentType> = {};
@@ -22,6 +23,7 @@ function render(file: string, symbol: string, path: string) {
     },
   ).outputText;
   const load = (id: string): unknown => {
+    if (id === '../../lib/learning-paths/routes') return learningRoutes;
     if (id === 'react/jsx-runtime') return require(id);
     if (id === 'next/link')
       return {
@@ -56,6 +58,26 @@ test('student navigation promotes Explore exactly once and marks only the actual
     assert.equal((html.match(/aria-current="page"/g) || []).length, 1);
     assert(html.includes('href="' + path + '" aria-current="page"'));
     assert(!html.match(/<li[^>]*>Explore Technologies/));
+  }
+});
+
+test('hierarchy routes keep Explore active without claiming it is the current page', () => {
+  for (const path of [
+    '/explore-technologies/' + 'a'.repeat(24) + '/learning-paths',
+    '/learning-paths/' + 'a'.repeat(24),
+    '/modules/' + 'a'.repeat(24),
+    '/topics/' + 'a'.repeat(24),
+  ]) {
+    const html = render('student-navigation.tsx', 'StudentNavigation', path);
+    assert(
+      html.includes('href="/explore-technologies" aria-current="location"'),
+    );
+    assert(!html.includes('aria-current="page"'));
+    assert(
+      render('student-header.tsx', 'StudentHeader', path).includes(
+        learningRoutes.learningHeader(path),
+      ),
+    );
   }
 });
 test('student header titles preserve dashboard/onboarding and label Explore', () => {

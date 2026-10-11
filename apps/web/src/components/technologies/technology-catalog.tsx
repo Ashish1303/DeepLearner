@@ -1,4 +1,6 @@
 'use client';
+import Link from 'next/link';
+import { learningRoute } from '../../lib/learning-paths/routes';
 import { useEffect, useRef } from 'react';
 import { useAuth } from '../../hooks/use-auth';
 import { useTechnologies } from '../../hooks/use-technologies';
@@ -27,8 +29,8 @@ export function CatalogContents() {
       <header>
         <h1>Explore technologies</h1>
         <p>
-          Browse the published technology catalog. Learning paths and learning
-          actions are not available here yet.
+          Browse the published technology catalog and explore its learning
+          paths.
         </p>
       </header>
       <section aria-labelledby="catalog-results" aria-busy={loading}>
@@ -88,6 +90,13 @@ export function CatalogContents() {
                     <Icon name="layers" />
                   </span>
                   <h3>{item.name}</h3>
+                  <Link
+                    className={styles.pathLink}
+                    href={learningRoute('technology', item.id)}
+                  >
+                    View learning paths
+                    <span className={styles.srOnly}> for {item.name}</span>
+                  </Link>
                   <p>
                     {item.description?.trim()
                       ? item.description

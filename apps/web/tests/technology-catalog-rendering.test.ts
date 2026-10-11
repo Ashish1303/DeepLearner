@@ -6,6 +6,7 @@ import { createElement, type ComponentType, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import ts from 'typescript';
 import type { CatalogState } from '../src/lib/technologies/catalog-controller';
+import * as learningRoutes from '../src/lib/learning-paths/routes';
 const initial: CatalogState = {
   status: 'ready',
   page: 1,
@@ -39,6 +40,12 @@ function fixture(state: CatalogState, owner = 'owner-a') {
   ).outputText;
   const calls: unknown[] = [];
   const load = (id: string): unknown => {
+    if (id === '../../lib/learning-paths/routes') return learningRoutes;
+    if (id === 'next/link')
+      return {
+        __esModule: true,
+        default: (props: Record<string, unknown>) => createElement('a', props),
+      };
     if (id === 'react')
       return { useRef: () => ({ current: null }), useEffect() {} };
     if (id === 'react/jsx-runtime') return require(id);
@@ -73,7 +80,7 @@ function fixture(state: CatalogState, owner = 'owner-a') {
     ownerKey: exports.TechnologyCatalog().key,
   };
 }
-test('catalog renders informational semantic cards with generic fallback and no internal data/actions', () => {
+test('catalog renders safe semantic cards with learning-path navigation only', () => {
   const { html } = fixture({
     ...initial,
     items: [
@@ -92,7 +99,12 @@ test('catalog renders informational semantic cards with generic fallback and no 
   assert(html.includes('<article'));
   assert(html.includes('Future &lt;technology&gt;'));
   assert(html.includes('Description not available yet.'));
-  assert(!html.includes('<a '));
+  assert(
+    html.includes(
+      'href="/explore-technologies/' + 'a'.repeat(24) + '/learning-paths"',
+    ),
+  );
+  assert(html.includes('View learning paths'));
   assert(!html.includes('<img'));
   assert(!html.includes('b'.repeat(24)));
   assert(!html.includes('Start learning'));

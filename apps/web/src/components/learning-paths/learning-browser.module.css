@@ -1,0 +1,100 @@
+.browser {
+  display: grid;
+  gap: 1.5rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #173b37;
+}
+.browser h1 {
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
+  margin: 0 0 0.75rem;
+}
+.browser h2 {
+  font-size: 1.2rem;
+}
+.browser p {
+  line-height: 1.65;
+}
+.browser a {
+  color: #086b60;
+  text-underline-offset: 0.2em;
+}
+.browser :is(a, button, h2):focus-visible {
+  outline: 3px solid #087f72;
+  outline-offset: 4px;
+}
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  list-style: none;
+  padding: 0;
+  font-size: 0.9rem;
+}
+.breadcrumbs li:not(:last-child)::after {
+  content: '/';
+  margin-left: 1rem;
+  color: #526e69;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+}
+.list {
+  display: grid;
+  gap: 1rem;
+  padding-left: 1.5rem;
+}
+.card,
+.notice {
+  padding: 1.25rem;
+  border: 1px solid #d5e5e1;
+  border-radius: 1rem;
+  background: #fff;
+  min-width: 0;
+}
+.card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.level {
+  font-size: 0.9rem;
+  color: #45635e;
+}
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.browser button {
+  border: 1px solid #8dada5;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #075d54;
+  padding: 0.7rem 1rem;
+  font: inherit;
+  cursor: pointer;
+  margin: 0.25rem;
+}
+.browser button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 650px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .card,
+  .notice {
+    padding: 1rem;
+  }
+}
