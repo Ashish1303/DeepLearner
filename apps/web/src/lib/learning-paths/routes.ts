@@ -19,12 +19,13 @@ export function learningRoute(resource: Resource, id: string): string {
 export function isLearningRoute(path: string): boolean {
   return (
     path.startsWith('/explore-technologies/') ||
-    ['/learning-paths/', '/modules/', '/topics/'].some((prefix) =>
+    ['/learning-paths/', '/modules/', '/topics/', '/concepts/'].some((prefix) =>
       path.startsWith(prefix),
     )
   );
 }
 export function learningHeader(path: string): string {
+  if (path.startsWith('/concepts/')) return 'Concept Read';
   if (path.startsWith('/modules/')) return 'Module overview';
   if (path.startsWith('/topics/')) return 'Topic overview';
   return 'Learning paths';

@@ -4,6 +4,7 @@ import {
   learningRoute,
   validId,
   isLearningRoute,
+  learningHeader,
 } from '../src/lib/learning-paths/routes';
 import { onboardingRedirect } from '../src/lib/onboarding/profile';
 import type { CurrentUser } from '../src/lib/api/contracts';
@@ -29,5 +30,20 @@ test('hierarchy browsing leaves existing incomplete-student dashboard gate uncha
       onboardingRedirect(user, learningRoute(resource, 'a'.repeat(24))),
       null,
     );
+  assert.equal(onboardingRedirect(user, '/dashboard'), '/onboarding');
+});
+
+test('Concept Read extends Explore recognition without changing onboarding or other headers', () => {
+  const path = '/concepts/' + 'a'.repeat(24);
+  assert(isLearningRoute(path));
+  assert.equal(learningHeader(path), 'Concept Read');
+  assert.equal(learningHeader('/topics/' + 'a'.repeat(24)), 'Topic overview');
+  const user = {
+    role: 'STUDENT',
+    status: 'ACTIVE',
+    emailVerified: true,
+    profile: null,
+  } as CurrentUser;
+  assert.equal(onboardingRedirect(user, path), null);
   assert.equal(onboardingRedirect(user, '/dashboard'), '/onboarding');
 });

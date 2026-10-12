@@ -1,0 +1,123 @@
+.browser {
+  display: grid;
+  gap: 1.5rem;
+  min-width: 0;
+  color: #173b37;
+  overflow-wrap: anywhere;
+}
+.browser h1 {
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
+  margin: 0 0 0.75rem;
+}
+.browser h2 {
+  font-size: 1.3rem;
+}
+.browser p,
+.read li {
+  line-height: 1.7;
+}
+.browser a {
+  color: #086b60;
+  text-underline-offset: 0.2em;
+}
+.browser :is(a, button, h1, h2, pre):focus-visible {
+  outline: 3px solid #087f72;
+  outline-offset: 4px;
+}
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  list-style: none;
+  padding: 0;
+  font-size: 0.9rem;
+}
+.breadcrumbs li:not(:last-child)::after {
+  content: '/';
+  margin-left: 1rem;
+  color: #526e69;
+}
+.list {
+  display: grid;
+  gap: 1rem;
+  padding-left: 1.5rem;
+}
+.card,
+.notice,
+.read {
+  padding: 1.5rem;
+  border: 1px solid #d5e5e1;
+  border-radius: 1rem;
+  background: #fff;
+  min-width: 0;
+}
+.card h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.level {
+  color: #45635e;
+  font-size: 0.9rem;
+}
+.read {
+  max-width: 56rem;
+  margin: 0 auto 1.5rem;
+}
+.read :is(h3, h4, h5, h6) {
+  margin-top: 1.75rem;
+  line-height: 1.4;
+}
+.read > :first-child {
+  margin-top: 0;
+}
+.read pre {
+  overflow: auto;
+  max-width: 100%;
+  padding: 1rem;
+  background: #eff6f4;
+  border-radius: 0.5rem;
+  line-height: 1.65;
+}
+.read code {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.9em;
+}
+.read :not(pre) > code {
+  overflow-wrap: anywhere;
+}
+.read blockquote {
+  margin-inline: 0;
+  border-left: 3px solid #087f72;
+  padding: 0.5rem 1rem;
+  background: #eff6f4;
+}
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.browser button {
+  border: 1px solid #8dada5;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #075d54;
+  padding: 0.7rem 1rem;
+  font: inherit;
+  cursor: pointer;
+  margin: 0.25rem;
+}
+.browser button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+@media (max-width: 650px) {
+  .card,
+  .notice,
+  .read {
+    padding: 1rem;
+  }
+  .read {
+    width: 100%;
+  }
+}
