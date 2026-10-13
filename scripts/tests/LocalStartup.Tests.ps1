@@ -1,8 +1,9 @@
 #Requires -Version 7.0
 # Offline only: parser/compiler checks and harmless Node children. No application/DB calls.
-[CmdletBinding()] param([switch]$OwnerCrashFixture,[string]$FixtureRoot)
+[CmdletBinding()] param([switch]$OwnerCrashFixture,[string]$FixtureRoot,[switch]$MockOnly)
 $ErrorActionPreference='Stop'
 . "$PSScriptRoot/../Start-DeepLearner.ps1"
+if ($MockOnly -and $OwnerCrashFixture) { throw 'Mock-only mode cannot launch a fixture.' }
 if ($OwnerCrashFixture) {
     $prefix=[IO.Path]::GetFullPath((Join-Path $script:LocalRepo '.cache/local-startup-tests'))+[IO.Path]::DirectorySeparatorChar
     if (-not $FixtureRoot -or -not [IO.Path]::GetFullPath($FixtureRoot).StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)) { throw 'Harmless fixture path rejected.' }
@@ -62,6 +63,95 @@ Check 'current-user DPAPI secret protection round-trips without plaintext output
     try{Assert ([Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer) -ceq 'Harmless offline secret only') 'DPAPI failure'}
     finally{[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer);$secret.Dispose();$restored.Dispose()}
 }
+# Run the actual stop preflight AST only: never evaluate its stop.request write or wait loop.
+$stopTokens=$null;$stopErrors=$null
+$stopAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $script:LocalScripts 'Stop-DeepLearner.ps1'),[ref]$stopTokens,[ref]$stopErrors)
+Assert ($stopErrors.Count -eq 0) 'Stop parser failure'
+$statements=@($stopAst.EndBlock.Statements)
+$boundary=@($statements | Where-Object { $_.Extent.Text -eq 'Assert-NoLink $active.run' })
+Assert ($boundary.Count -eq 1) 'Stop preflight boundary changed'
+$preflight=[scriptblock]::Create((($statements | Where-Object {
+    $_.Extent.StartOffset -gt $statements[0].Extent.StartOffset -and $_.Extent.EndOffset -le $boundary[0].Extent.EndOffset
+}).Extent.Text -join "`n"))
+$instant=[datetime]::ParseExact('2026-10-13T07:08:51.3777996Z','o',[Globalization.CultureInfo]::InvariantCulture,[Globalization.DateTimeStyles]::RoundtripKind)
+function Test-StopIdentity([hashtable]$Change=@{},[string]$Representation='Json',[string]$OwnerState='Running',[bool]$Reject=$false,[string]$ReceiptChange='') {
+    $fixtureRoot=Join-Path $evidence 'mock-only';$id='11111111111111111111111111111111'
+    $record=@{active=$true;root=$fixtureRoot;repo=$script:LocalRepo;runId=$id;run=(Join-Path $fixtureRoot "runs/$id");ownerPid=12345;ownerPath='C:\mock\pwsh.exe';ownerStart=$instant.ToString('o')}
+    foreach($key in $Change.Keys){$record[$key]=$Change[$key]}
+    $receipt=@{ownerSid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value;root=$fixtureRoot;repo=$script:LocalRepo}
+    if($ReceiptChange){$receipt[$ReceiptChange]='invalid'}
+    $identityRecord=[pscustomobject]$record
+    function Get-LocalRoot { $fixtureRoot }
+    function Assert-NoLink { param($Path) }
+    function Get-Content { param([switch]$Raw,[string]$LiteralPath)
+        if($LiteralPath -eq (Join-Path $fixtureRoot 'active.json')){return ($record | ConvertTo-Json)}
+        if($LiteralPath -eq (Join-Path $fixtureRoot 'ownership.json')){return ($receipt | ConvertTo-Json)}
+        throw 'Unexpected fixture read'
+    }
+    function ConvertFrom-Json { param([Parameter(ValueFromPipeline)]$InputObject)
+        process {
+            $value=Microsoft.PowerShell.Utility\ConvertFrom-Json -InputObject $InputObject
+            if($value.PSObject.Properties.Name -contains 'ownerPid') {
+                if($Representation -eq 'String'){$value.ownerStart=$identityRecord.ownerStart}
+                if($Representation -eq 'DateTime'){$value.ownerStart=$instant}
+                if($Representation -eq 'Local'){$value.ownerStart=$instant.ToLocalTime()}
+                if($Representation -eq 'Unspecified'){$value.ownerStart=[datetime]::SpecifyKind($instant,[DateTimeKind]::Unspecified)}
+            }
+            $value
+        }
+    }
+    function Get-Process { param($Id,$ErrorAction)
+        Assert ($Id -eq 12345) 'Unexpected process lookup'
+        if($OwnerState -eq 'Missing'){throw 'Mock owner exited'}
+        if($OwnerState -eq 'Null'){return $null}
+        [pscustomobject]@{HasExited=($OwnerState -eq 'Exited');Path=if($OwnerState -eq 'WrongPath'){'C:\other\pwsh.exe'}else{'C:\mock\pwsh.exe'};StartTime=if($OwnerState -eq 'Reused'){$instant.AddTicks(1)}else{$instant}}
+    }
+    $failure=$null
+    try { & $preflight } catch { $failure=$_ }
+    if($Reject){
+        Assert ($null -ne $failure) 'Invalid stop identity accepted'
+        Assert ($failure.Exception.Message -match '^(Owner exited or PID reused;|Malformed owner|Ambiguous owner|Run identity mismatch\.|Ownership mismatch\.|Mock owner exited$)') "Unexpected failure instead of identity rejection: $($failure.Exception.Message)"
+    }
+    elseif($failure){throw $failure}
+}
+Check 'stop owner identity: actual JSON round-trip preserves exact UTC ticks' { Test-StopIdentity }
+Check 'stop owner identity: ISO string, UTC and local DateTime representations' {
+    foreach($representation in @('String','DateTime','Local')){Test-StopIdentity -Representation $representation}
+    Test-StopIdentity -Representation String -Change @{ownerStart='2026-10-13T12:38:51.3777996+05:30'}
+}
+Check 'stop owner identity: invariant parsing despite current culture' {
+    $culture=[Globalization.CultureInfo]::CurrentCulture
+    try{[Globalization.CultureInfo]::CurrentCulture=[Globalization.CultureInfo]::GetCultureInfo('fr-FR');Test-StopIdentity -Representation String}
+    finally{[Globalization.CultureInfo]::CurrentCulture=$culture}
+}
+Check 'stop owner identity: seventh fractional digit and PID reuse mismatch reject' {
+    Test-StopIdentity -Representation String -Change @{ownerStart='2026-10-13T07:08:51.3777997Z'} -Reject $true
+    Test-StopIdentity -OwnerState Reused -Reject $true
+}
+Check 'stop owner identity: mismatched and absent executable paths reject' {
+    Test-StopIdentity -OwnerState WrongPath -Reject $true
+    foreach($path in @($null,'',' ')){Test-StopIdentity -Change @{ownerPath=$path} -Reject $true}
+}
+Check 'stop owner identity: malformed or ambiguous timestamps reject' {
+    foreach($stamp in @($null,'','invalid','2026-10-13T07:08:51.3777996','2026-10-13T07:08:51.377799Z','2026-02-30T07:08:51.3777996Z','10/13/2026 07:08:51',42)) {
+        Test-StopIdentity -Representation String -Change @{ownerStart=$stamp} -Reject $true
+    }
+    Test-StopIdentity -Representation Unspecified -Reject $true
+}
+Check 'stop owner identity: malformed PID, run and ownership records reject' {
+    foreach($id in @($null,0,-1,'12345',1.5,2147483648)){Test-StopIdentity -Change @{ownerPid=$id} -Reject $true}
+    foreach($field in @('root','repo','runId','run')){Test-StopIdentity -Change @{$field='invalid'} -Reject $true}
+    foreach($field in @('ownerSid','root','repo')){Test-StopIdentity -ReceiptChange $field -Reject $true}
+}
+Check 'stop owner identity: missing, null and exited owners reject' {
+    foreach($state in @('Missing','Null','Exited')){Test-StopIdentity -OwnerState $state -Reject $true}
+}
+
+if ($MockOnly) {
+    Write-Host "$passed/$passed PASS; native child/process-termination tests NOT_RUN; fixture evidence: $evidence"
+    return
+}
+
 Check 'native handle observation and private stdin completion' {
     $owner=[DeepLearnerLocal.Owner]::new()
     try {
