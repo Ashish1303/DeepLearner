@@ -147,3 +147,12 @@
 .examples > li {
   min-width: 0;
 }
+
+.revise section {
+  min-width: 0;
+}
+.revise > p,
+.revise section > p,
+.revise li {
+  white-space: pre-wrap;
+}

@@ -6,6 +6,22 @@ import { ConceptMarkdown } from '../src/components/concepts/concept-markdown';
 import { safeHttpsUrl } from '../src/lib/concepts/contracts';
 const render = (body: string) =>
   renderToStaticMarkup(createElement(ConceptMarkdown, { body }));
+
+test('Revise important code uses h4 beneath its section and preserves safe non-executable code', () => {
+  const html = renderToStaticMarkup(
+    createElement(ConceptMarkdown, {
+      headingBase: 4,
+      body: '## Reference\n\n#### Nested\n\n~~~js\n  const text = "<script>";\n~~~\n\n<script>alert(1)</script>\n\n![alt](https://bad.invalid/a)\n\n[unsafe](https://user:pass@bad.invalid)\n\n[safe](https://example.invalid/docs)',
+    }),
+  );
+  assert(html.includes('<h4>Reference</h4>'));
+  assert(html.includes('<h5>Nested</h5>'));
+  assert(!/<(?:h1|h2|h3|script|img|iframe)\b/.test(html));
+  assert(html.includes('  const text = &quot;&lt;script&gt;&quot;;'));
+  assert(html.includes('tabindex="0"'));
+  assert(html.includes('rel="noopener noreferrer"'));
+  assert(!html.includes('href="https://user'));
+});
 test('Markdown renders supported structure below page h1 and Read h2', () => {
   const html = render(
     '# Definition\n\n## Detail\n\n- First\n- **Second**\n\n> Note\n\n```js\nconst a = "<script>";\n```',

@@ -45,7 +45,7 @@ function fixture(
   resource: contracts.ConceptResource = 'topic',
   owner = 'one',
   role = 'STUDENT',
-  mode: 'read' | 'example' = 'read',
+  mode: 'read' | 'example' | 'revise' = 'read',
 ) {
   const require = createRequire(import.meta.url);
   const calls: unknown[] = [];
@@ -109,11 +109,11 @@ function fixture(
       };
     if (name === '../../lib/concepts/contracts') return contracts;
     if (name === '../../lib/learning-paths/routes') return routes;
-    if (name === './concept-examples') {
+    if (name === './concept-examples' || name === './concept-revise') {
       const nested = {};
       const source = readFileSync(
         new URL(
-          '../src/components/concepts/concept-examples.tsx',
+          '../src/components/concepts/' + name.slice(2) + '.tsx',
           import.meta.url,
         ),
         'utf8',
@@ -138,6 +138,7 @@ function fixture(
   const buttons: {
     children?: ReactNode;
     onClick(): void;
+    onKeyDown?: (event: { key: string; preventDefault(): void }) => void;
     disabled?: boolean;
   }[] = [];
   function visit(node: ReactNode) {
@@ -226,6 +227,7 @@ test('detail renders one page title, escaped summary, Read and source without pr
     difficulty: 'BEGINNER',
     order: 0,
     examples: [],
+    revise: null,
     contentFormat: 'MARKDOWN',
     schemaVersion: 1,
     read: {
@@ -264,6 +266,7 @@ test('Read/Example static semantics, no-fetch selection wiring and ordered safe 
     slug: 'concept',
     difficulty: 'BEGINNER',
     order: 0,
+    revise: null,
     contentFormat: 'MARKDOWN',
     schemaVersion: 1,
     read: { summary: 'Summary', bodyMarkdown: '# Read body' },
@@ -314,4 +317,92 @@ test('Read/Example static semantics, no-fetch selection wiring and ordered safe 
     'example',
   ).html;
   assert(empty.includes('No examples are available for this Concept yet.'));
+});
+
+test('Revise renders escaped plain text, ordered optional sections and safe nested Markdown', () => {
+  const concept: contracts.Concept = contracts.conceptSchema.parse({
+    id: 'e'.repeat(24),
+    technologyId: 'a'.repeat(24),
+    learningPathId: 'b'.repeat(24),
+    moduleId: 'c'.repeat(24),
+    topicId: id,
+    title: 'Concept',
+    slug: 'concept',
+    difficulty: 'BEGINNER',
+    order: 0,
+    contentFormat: 'MARKDOWN',
+    schemaVersion: 1,
+    read: { summary: 'Read summary', bodyMarkdown: 'Read content' },
+    source: {
+      label: 'Source',
+      url: 'https://example.invalid',
+      sourceType: 'OFFICIAL_OR_TRUSTED',
+      isOfficial: false,
+    },
+    revise: {
+      summary: '<script>text</script> **plain**',
+      keyPoints: ['Second <img>', 'First'],
+      memoryTrick: '[plain](https://example.invalid)',
+      importantCodeMarkdown: '## Code\n\n~~~js\nconst x = "<script>";\n~~~',
+    },
+  });
+  const state = { ...ready, data: { ...ready.data!, concept } };
+  const result = fixture(state, 'concept', 'one', 'STUDENT', 'revise');
+  assert(result.html.includes('<h2>Revise</h2>'));
+  assert(result.html.includes('&lt;script&gt;text&lt;/script&gt; **plain**'));
+  assert(result.html.includes('[plain](https://example.invalid)'));
+  assert(!result.html.includes('<script>'));
+  assert(
+    result.html.indexOf('Second &lt;img&gt;') <
+      result.html.indexOf('<li>First</li>'),
+  );
+  assert(result.html.includes('<h3>Important code</h3>'));
+  assert(result.html.includes('<h4>Code</h4>'));
+  assert(!result.html.includes('Read content'));
+  assert.equal((result.html.match(/<h1/g) ?? []).length, 1);
+  for (const revise of [
+    null,
+    {
+      summary: 'Summary',
+      keyPoints: [],
+      memoryTrick: null,
+      importantCodeMarkdown: null,
+    },
+  ]) {
+    const html = fixture(
+      { ...state, data: { ...state.data, concept: { ...concept, revise } } },
+      'concept',
+      'one',
+      'STUDENT',
+      'revise',
+    ).html;
+    assert.equal(
+      html.includes('No revision content is available for this Concept yet.'),
+      revise === null,
+    );
+    for (const heading of ['Key points', 'Memory trick', 'Important code'])
+      assert(!html.includes('<h3>' + heading));
+  }
+  const read = fixture(state, 'concept');
+  read.buttons.find((button) => button.children === 'Revise')!.onClick();
+  assert.deepEqual(read.selections, ['revise']);
+  assert.deepEqual(read.calls, []);
+  const names = ['Read', 'Example', 'Revise'];
+  for (let index = 0; index < names.length; index++) {
+    const wired = fixture(state, 'concept');
+    const tab = wired.buttons.find(
+      (button) => button.children === names[index],
+    )!;
+    let prevented = 0;
+    for (const key of ['ArrowRight', 'ArrowLeft', 'Home', 'End', 'Tab'])
+      tab.onKeyDown!({ key, preventDefault: () => prevented++ });
+    assert.deepEqual(wired.selections, [
+      names[(index + 1) % 3]!.toLowerCase(),
+      names[(index + 2) % 3]!.toLowerCase(),
+      'read',
+      'revise',
+    ]);
+    assert.equal(prevented, 4);
+    assert.deepEqual(wired.calls, []);
+  }
 });

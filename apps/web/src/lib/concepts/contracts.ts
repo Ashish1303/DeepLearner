@@ -54,6 +54,21 @@ const identity = {
 export const summarySchema = z.object({ ...identity, summary: text(2000) });
 export const conceptSchema = z.object({
   ...identity,
+  revise: z
+    .strictObject({
+      summary: text(2000),
+      keyPoints: z.array(text(500)).max(10).default([]),
+      memoryTrick: text(2000).nullable().default(null),
+      importantCodeMarkdown: z
+        .string()
+        .min(1)
+        .max(10000)
+        .refine((value) => value.trim().length > 0)
+        .nullable()
+        .default(null),
+    })
+    .nullable()
+    .default(null),
   examples: z
     .array(
       z.strictObject({

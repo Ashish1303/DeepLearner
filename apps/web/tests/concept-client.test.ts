@@ -107,6 +107,95 @@ function fixture(overrides: Record<string, unknown> = {}) {
   return { client, calls };
 }
 const signal = () => new AbortController().signal;
+
+test('Revise normalizes absent/nullable detail and optional fields without leaking into summaries', async () => {
+  assert.equal(conceptSchema.parse(concept).revise, null);
+  assert.equal(conceptSchema.parse({ ...concept, revise: null }).revise, null);
+  const partial = { summary: 'Revision' };
+  const normalized = {
+    ...partial,
+    keyPoints: [],
+    memoryTrick: null,
+    importantCodeMarkdown: null,
+  };
+  assert.deepEqual(
+    conceptSchema.parse({ ...concept, revise: partial }).revise,
+    normalized,
+  );
+  const revise = {
+    ...normalized,
+    keyPoints: ['Second', 'First'],
+    importantCodeMarkdown: '  # Code\n',
+  };
+  const loaded = await fixture({
+    ['/concepts/' + id]: detail({ ...concept, revise }),
+  }).client.load('concept', id, 1, signal());
+  assert.deepEqual(loaded.concept?.revise, revise);
+  assert.deepEqual(summarySchema.parse({ ...summary, revise }), summary);
+});
+
+test('Revise frontend accepts exact boundaries and rejects independent invalid present values', async () => {
+  for (const revise of [
+    { summary: 'x' },
+    { summary: 'x'.repeat(2000) },
+    { summary: 'x', keyPoints: [] },
+    { summary: 'x', keyPoints: ['x'.repeat(500)] },
+    { summary: 'x', keyPoints: Array.from({ length: 10 }, () => 'x') },
+    { summary: 'x', memoryTrick: 'x'.repeat(2000) },
+    { summary: 'x', importantCodeMarkdown: 'x'.repeat(10000) },
+  ])
+    assert(conceptSchema.safeParse({ ...concept, revise }).success);
+  for (const [field, values] of Object.entries({
+    summary: [
+      undefined,
+      null,
+      '',
+      ' ',
+      ' padded ',
+      3,
+      true,
+      {},
+      [],
+      'x'.repeat(2001),
+    ],
+    keyPoints: [
+      null,
+      'point',
+      3,
+      {},
+      [null],
+      [3],
+      [''],
+      [' '],
+      [' padded '],
+      ['x'.repeat(501)],
+      Array.from({ length: 11 }, () => 'x'),
+    ],
+    memoryTrick: ['', ' ', ' padded ', 3, true, {}, [], 'x'.repeat(2001)],
+    importantCodeMarkdown: ['', ' \n', 3, true, {}, [], 'x'.repeat(10001)],
+  }))
+    for (const value of values) {
+      const result = conceptSchema.safeParse({
+        ...concept,
+        revise: { summary: 'Summary', [field]: value },
+      });
+      assert(!result.success, field);
+      assert(
+        result.error.issues.some(
+          (issue) => issue.path.slice(0, 2).join('.') === 'revise.' + field,
+        ),
+      );
+    }
+  for (const revise of [[], 'text', 3, {}, { summary: 'x', hidden: true }]) {
+    assert(!conceptSchema.safeParse({ ...concept, revise }).success);
+    await assert.rejects(
+      fixture({
+        ['/concepts/' + id]: detail({ ...concept, revise }),
+      }).client.load('concept', id, 1, signal()),
+      kind('malformed'),
+    );
+  }
+});
 const kind = (name: ConceptError['kind']) => (error: unknown) =>
   error instanceof ConceptError && error.kind === name;
 test('Concept list/detail use credential-free GETs and validated real ancestry', async () => {
@@ -116,7 +205,7 @@ test('Concept list/detail use credential-free GETs and validated real ancestry',
   assert.equal(result.concept, null);
   assert.equal(calls.length, 4);
   const read = await client.load('concept', id, 1, signal());
-  assert.deepEqual(read.concept, { ...concept, examples: [] });
+  assert.deepEqual(read.concept, { ...concept, examples: [], revise: null });
   assert.equal(read.crumbs.at(-1)?.href, '/topics/' + topicId);
 });
 test('list preserves ordering and accepts empty out-of-range pages', async () => {
@@ -165,7 +254,7 @@ test('schemas enforce exact Concept bounds, Markdown/source contract and strip i
       status: 'PUBLISHED',
       secret: 'not-for-ui',
     }),
-    { ...concept, examples: [] },
+    { ...concept, examples: [], revise: null },
   );
   assert(
     conceptSchema.safeParse({

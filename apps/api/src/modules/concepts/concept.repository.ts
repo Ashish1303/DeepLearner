@@ -38,6 +38,10 @@ const detailProjection = {
   'source.isOfficial': 1,
   'examples.title': 1,
   'examples.bodyMarkdown': 1,
+  'revise.summary': 1,
+  'revise.keyPoints': 1,
+  'revise.memoryTrick': 1,
+  'revise.importantCodeMarkdown': 1,
 };
 interface Page {
   items: ProjectedConceptSummary[];

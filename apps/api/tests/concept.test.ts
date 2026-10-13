@@ -45,6 +45,35 @@ const raw = {
   createdAt: new Date(),
 };
 const query = { topicId: raw.topicId.toHexString(), page: 2, limit: 20 };
+
+test('revise is detail-only, legacy-null, explicitly projected and independently normalized', () => {
+  assert.equal(conceptDetailDto(raw).revise, null);
+  const partial = { ...raw, revise: { summary: 'Summary' } };
+  assert.deepEqual(conceptDetailDto(partial).revise, {
+    summary: 'Summary',
+    keyPoints: [],
+    memoryTrick: null,
+    importantCodeMarkdown: null,
+  });
+  const revise = {
+    summary: '<script>text</script>',
+    keyPoints: ['Second', 'First'],
+    memoryTrick: 'Remember',
+    importantCodeMarkdown: '  # Code\n',
+    _id: 'hidden',
+    createdBy: 'private',
+  };
+  const record = { ...raw, revise };
+  const dto = conceptDetailDto(record);
+  assert.deepEqual(dto.revise, {
+    summary: revise.summary,
+    keyPoints: ['Second', 'First'],
+    memoryTrick: 'Remember',
+    importantCodeMarkdown: revise.importantCodeMarkdown,
+  });
+  assert.notEqual(dto.revise?.keyPoints, revise.keyPoints);
+  assert.deepEqual(conceptSummaryDto(record), conceptSummaryDto(raw));
+});
 test('concept query validates strict IDs, pagination and safe offsets', () => {
   assert.deepEqual(conceptQuery.parse({ topicId: query.topicId }), {
     ...query,
@@ -148,6 +177,7 @@ test('concept DTOs separate summary and detail and explicitly exclude nested/int
   assert.deepEqual(conceptDetailDto(raw), {
     ...identity,
     examples: [],
+    revise: null,
     contentFormat: 'MARKDOWN',
     schemaVersion: 1,
     read: { summary: raw.read.summary, bodyMarkdown: raw.read.bodyMarkdown },
@@ -359,6 +389,10 @@ test('concept detail checks five publication levels, every denormalized referenc
           'source.isOfficial': 1,
           'examples.title': 1,
           'examples.bodyMarkdown': 1,
+          'revise.summary': 1,
+          'revise.keyPoints': 1,
+          'revise.memoryTrick': 1,
+          'revise.importantCodeMarkdown': 1,
         },
       },
     ]);

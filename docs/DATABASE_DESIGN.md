@@ -775,3 +775,17 @@ provenance and five-level public visibility remain unchanged. Content is untrust
 Markdown; no stored sanitization or executable rendering is claimed. Existing demo
 records are not updated. All other F021 deferrals remain in force.
 See [F023](features/F023-concept-example-mode.md).
+
+
+## F024 optional embedded Concept revise
+
+F024 resolves only the earlier revise deferral through an optional strict embedded object with no _id or storage defaults. Legacy documents remain unchanged; no migration/backfill, new index, collection, lifecycle or schemaVersion is introduced.
+
+- summary: required within revise; string, trimmed, 1-2,000 characters.
+- keyPoints: optional ordered array, maximum 10; each string trimmed, 1-500 characters. Empty array is valid.
+- memoryTrick: optional string, trimmed, 1-2,000 characters.
+- importantCodeMarkdown: optional string, 1-10,000 characters, nonblank; authored whitespace is preserved.
+
+Missing optional fields remain absent in storage. Explicit nulls, invalid types/coercion, blank present strings, unknown fields and missing summary are invalid. Plain text is data, escaped when rendered; Markdown is untrusted data, not sanitized storage or executable code. Existing Concept provenance and publication ancestry apply. Detail DTO normalization to null/[] does not write defaults back to MongoDB. The entire completionRules field and all other deferred workflows remain deferred.
+
+Interactive flashcards and PDF export are expressly deferred for F024 despite the broader PRD/design references; the canonical PRD remains unchanged. See [F024 approved plan](features/F024-concept-revise-mode.md).

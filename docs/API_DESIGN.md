@@ -1625,3 +1625,12 @@ publication/reference checks, rate limits, CORS and credential independence are
 unchanged. Markdown is untrusted data; the frontend uses the existing restricted
 renderer. There is no authoring, execution, progress or new endpoint.
 See [F023](features/F023-concept-example-mode.md).
+
+
+## F024 Concept Revise detail extension
+
+The owner-approved F024 contract extends only GET /api/v1/concepts/:id with revise: null | { summary: string; keyPoints: string[]; memoryTrick: string | null; importantCodeMarkdown: string | null }. Legacy absence returns null. For authored revise, missing nested options normalize to []/null. The explicit projection exposes only these four fields; summary/list responses remain unchanged. No endpoints, pagination, visibility predicates, indexes, authentication or error contracts change.
+
+Summary is trimmed plain text (1-2,000); keyPoints is an ordered array of at most 10 trimmed plain-text items (1-500 each); optional memoryTrick is trimmed plain text (1-2,000). Optional importantCodeMarkdown preserves whitespace (1-10,000, nonblank) and remains untrusted Markdown. Reject unknown properties, malformed present values and coercion. Plain text is escaped in the UI; important code reuses the restricted F022 renderer. Existing credential-free public-read behavior remains mandatory.
+
+Flashcards, PDF export, authoring, personalized revision and demo updates remain deferred. See [F024 approved plan](features/F024-concept-revise-mode.md) for scope, security and separately gated acceptance.

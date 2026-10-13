@@ -13,6 +13,12 @@ export interface ProjectedConceptSummary {
   read: { summary: string };
 }
 export interface ProjectedConceptDetail extends ProjectedConceptSummary {
+  revise?: {
+    summary: string;
+    keyPoints?: string[];
+    memoryTrick?: string;
+    importantCodeMarkdown?: string;
+  };
   examples?: { title: string; bodyMarkdown: string }[];
   contentFormat: ConceptRecord['contentFormat'];
   schemaVersion: number;
@@ -43,6 +49,14 @@ export function conceptSummaryDto(record: ProjectedConceptSummary) {
 export function conceptDetailDto(record: ProjectedConceptDetail) {
   return {
     ...identity(record),
+    revise: record.revise
+      ? {
+          summary: record.revise.summary,
+          keyPoints: [...(record.revise.keyPoints ?? [])],
+          memoryTrick: record.revise.memoryTrick ?? null,
+          importantCodeMarkdown: record.revise.importantCodeMarkdown ?? null,
+        }
+      : null,
     examples: (record.examples ?? []).map((example) => ({
       title: example.title,
       bodyMarkdown: example.bodyMarkdown,

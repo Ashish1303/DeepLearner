@@ -28,6 +28,104 @@ function valid() {
     updatedBy: new Types.ObjectId(),
   };
 }
+
+test('revise preserves legacy absence, optional absence, ordered trim and exact Markdown without IDs', () => {
+  const legacy = new Concept(valid());
+  assert.equal(legacy.revise, undefined);
+  assert(!Object.hasOwn(legacy.toObject(), 'revise'));
+  const partial = new Concept({ ...valid(), revise: { summary: ' Summary ' } });
+  assert.equal(partial.validateSync(), undefined);
+  assert.deepEqual(partial.toObject().revise, { summary: 'Summary' });
+  const revise = {
+    summary: ' Summary ',
+    keyPoints: [' Second ', ' First '],
+    memoryTrick: ' Remember ',
+    importantCodeMarkdown: '  ~~~js\nconst x = 1;\n~~~\n',
+  };
+  const doc = new Concept({ ...valid(), revise });
+  assert.equal(doc.validateSync(), undefined);
+  assert.deepEqual(doc.toObject().revise, {
+    ...revise,
+    summary: 'Summary',
+    keyPoints: ['Second', 'First'],
+    memoryTrick: 'Remember',
+  });
+});
+
+test('revise accepts independent minimum and exact maximum field/count boundaries', () => {
+  for (const revise of [
+    { summary: 'x' },
+    { summary: 'x'.repeat(2000) },
+    { summary: 'x', keyPoints: [] },
+    { summary: 'x', keyPoints: ['x'] },
+    { summary: 'x', keyPoints: ['x'.repeat(500)] },
+    { summary: 'x', keyPoints: Array.from({ length: 10 }, () => 'x') },
+    { summary: 'x', memoryTrick: 'x' },
+    { summary: 'x', memoryTrick: 'x'.repeat(2000) },
+    { summary: 'x', importantCodeMarkdown: 'x' },
+    { summary: 'x', importantCodeMarkdown: 'x'.repeat(10000) },
+  ])
+    assert.equal(new Concept({ ...valid(), revise }).validateSync(), undefined);
+});
+
+test('revise rejects independent malformed, null, coerced and over-limit fields', () => {
+  for (const [field, values] of Object.entries({
+    summary: [undefined, null, '', ' \n', 3, true, {}, [], 'x'.repeat(2001)],
+    keyPoints: [
+      null,
+      'point',
+      {},
+      3,
+      [null],
+      [3],
+      [true],
+      [{}],
+      [[]],
+      [''],
+      [' '],
+      ['x'.repeat(501)],
+      Array.from({ length: 11 }, () => 'x'),
+    ],
+    memoryTrick: [null, '', ' \n', 3, true, {}, [], 'x'.repeat(2001)],
+    importantCodeMarkdown: [
+      null,
+      '',
+      ' \n',
+      3,
+      true,
+      {},
+      [],
+      'x'.repeat(10001),
+    ],
+  }))
+    for (const value of values) {
+      const error = new Concept({
+        ...valid(),
+        revise: { summary: 'Summary', [field]: value },
+      }).validateSync();
+      assert(
+        error &&
+          Object.keys(error.errors).some(
+            (path) =>
+              path === 'revise.' + field ||
+              path.startsWith('revise.' + field + '.'),
+          ),
+        field + ': ' + String(JSON.stringify(value)).slice(0, 40),
+      );
+    }
+});
+
+test('revise rejects invalid containers and unknown nested fields', () => {
+  for (const revise of [null, '', 3, true, [], [{ summary: 'x' }], {}])
+    assert(new Concept({ ...valid(), revise }).validateSync());
+  for (const field of ['_id', 'status', 'flashcards', 'unexpected'])
+    assert(
+      new Concept({
+        ...valid(),
+        revise: { summary: 'x', [field]: 'hidden' },
+      }).validateSync()?.errors.revise,
+    );
+});
 test('concept defaults, exact Markdown preservation, lifecycle and difficulty contracts', () => {
   const input = valid();
   const doc = new Concept(input);
@@ -169,7 +267,6 @@ test('concept source requires explicit metadata and HTTPS without credentials', 
 test('concept strict schemas exclude deferred fields and nested internal fields', () => {
   for (const field of [
     'completionRules',
-    'revise',
     'previousPublishedSnapshot',
     'publishedAt',
     'publishedBy',

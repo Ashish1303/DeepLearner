@@ -222,6 +222,53 @@ test(
               (error: unknown) =>
                 error instanceof Error && error.name === 'ValidationError',
             );
+          for (const revise of [
+            null,
+            {},
+            [],
+            { summary: 1 },
+            { summary: ' ' },
+            { summary: 'x'.repeat(2001) },
+            { summary: 'x', keyPoints: 'x' },
+            { summary: 'x', keyPoints: [null] },
+            { summary: 'x', keyPoints: ['x'.repeat(501)] },
+            { summary: 'x', keyPoints: Array.from({ length: 11 }, () => 'x') },
+            { summary: 'x', memoryTrick: null },
+            { summary: 'x', memoryTrick: 'x'.repeat(2001) },
+            { summary: 'x', importantCodeMarkdown: ' ' },
+            { summary: 'x', importantCodeMarkdown: 'x'.repeat(10001) },
+            { summary: 'x', unexpected: true },
+          ])
+            await assert.rejects(
+              new Concept({ ...record('invalid-revise'), revise }).save(),
+              (error: unknown) =>
+                error instanceof Error && error.name === 'ValidationError',
+            );
+          assert.equal(
+            await Concept.countDocuments({ slug: 'invalid-revise' }),
+            0,
+          );
+          const maximumRevise = {
+            summary: 's'.repeat(2000),
+            keyPoints: Array.from(
+              { length: 10 },
+              (_, index) => String(index) + 'p'.repeat(499),
+            ),
+            memoryTrick: 'm'.repeat(2000),
+            importantCodeMarkdown: 'c'.repeat(10000),
+          };
+          const bounded = await Concept.create({
+            ...record('revise-boundaries', 'DRAFT'),
+            revise: maximumRevise,
+          });
+          assert.deepEqual(
+            (await Concept.collection.findOne({ _id: bounded._id }))?.revise,
+            maximumRevise,
+          );
+          await assert.rejects(
+            service.detail(bounded._id.toHexString()),
+            missing,
+          );
           const reserved = await Concept.create(record('reserved', 'ARCHIVED'));
           assert.equal(reserved.contentFormat, 'MARKDOWN');
           assert.equal(reserved.schemaVersion, 1);
@@ -257,6 +304,12 @@ test(
             record('beta'),
             {
               ...record('alpha'),
+              revise: {
+                summary: ' Revision ',
+                keyPoints: [' Second ', ' First '],
+                memoryTrick: ' Remember ',
+                importantCodeMarkdown: '  ~~~js\nconst x = 1;\n~~~\n',
+              },
               examples: [
                 {
                   title: 'First example',
@@ -268,7 +321,10 @@ test(
                 },
               ],
             },
-            record('last', 'PUBLISHED', 1),
+            {
+              ...record('last', 'PUBLISHED', 1),
+              revise: { summary: 'Summary only' },
+            },
           ]);
           const hidden = await Concept.create([
             ...(
@@ -340,6 +396,7 @@ test(
                 ...common,
                 'read',
                 'examples',
+                'revise',
                 'source',
                 'contentFormat',
                 'schemaVersion',
@@ -358,6 +415,26 @@ test(
             assert.equal(dto.read.bodyMarkdown, item.read.bodyMarkdown);
             const stored = await Concept.collection.findOne({ _id: item._id });
             assert(stored);
+            if (item.slug === 'alpha') {
+              assert.deepEqual(dto.revise, {
+                summary: 'Revision',
+                keyPoints: ['Second', 'First'],
+                memoryTrick: 'Remember',
+                importantCodeMarkdown: '  ~~~js\nconst x = 1;\n~~~\n',
+              });
+              assert.deepEqual(stored.revise, dto.revise);
+            } else if (item.slug === 'last') {
+              assert.deepEqual(stored.revise, { summary: 'Summary only' });
+              assert.deepEqual(dto.revise, {
+                summary: 'Summary only',
+                keyPoints: [],
+                memoryTrick: null,
+                importantCodeMarkdown: null,
+              });
+            } else {
+              assert(!Object.hasOwn(stored, 'revise'));
+              assert.equal(dto.revise, null);
+            }
             if (item.slug === 'alpha') {
               assert.deepEqual(dto.examples, [
                 {
@@ -445,7 +522,7 @@ test(
             undefined,
             undefined,
             service,
-            { max: 5, windowMs: 900000 },
+            { max: 7, windowMs: 900000 },
           ).listen(0, '127.0.0.1');
           await once(server, 'listening');
           try {
@@ -467,15 +544,30 @@ test(
               null,
             );
             const body = (await list.json()) as {
-              data: { id: string }[];
+              data: { id: string; slug: string }[];
               meta: { total: number };
             };
             assert.equal(body.meta.total, 3);
             const detailResponse = await fetch(url + '/' + body.data[0]!.id);
             assert.equal(detailResponse.status, 200);
             const detailBody = (await detailResponse.json()) as {
-              data: { examples: { title: string; bodyMarkdown: string }[] };
+              data: {
+                examples: { title: string; bodyMarkdown: string }[];
+                revise: {
+                  summary: string;
+                  keyPoints: string[];
+                  memoryTrick: string | null;
+                  importantCodeMarkdown: string | null;
+                } | null;
+              };
             };
+            assert.deepEqual(detailBody.data.revise, {
+              summary: 'Revision',
+              keyPoints: ['Second', 'First'],
+              memoryTrick: 'Remember',
+              importantCodeMarkdown: '  ~~~js\nconst x = 1;\n~~~\n',
+            });
+            assert(body.data.every((item) => !Object.hasOwn(item, 'revise')));
             assert.deepEqual(detailBody.data.examples, [
               {
                 title: 'First example',
@@ -487,6 +579,24 @@ test(
               },
             ]);
             assert(body.data.every((item) => !Object.hasOwn(item, 'examples')));
+            for (const item of body.data.slice(1)) {
+              const response = await fetch(url + '/' + item.id);
+              assert.equal(response.status, 200);
+              const json = (await response.json()) as {
+                data: { revise: unknown };
+              };
+              assert.deepEqual(
+                json.data.revise,
+                item.slug === 'beta'
+                  ? null
+                  : {
+                      summary: 'Summary only',
+                      keyPoints: [],
+                      memoryTrick: null,
+                      importantCodeMarkdown: null,
+                    },
+              );
+            }
             assert.equal((await fetch(url + '?topicId=bad')).status, 400);
             const notFound = await fetch(
               url + '/' + new Types.ObjectId().toHexString(),

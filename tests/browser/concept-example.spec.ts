@@ -601,21 +601,24 @@ test('Example tabs keyboard, responsive code overflow, safe Markdown and heading
     await read.focus();
     for (const [key, name] of [
       ['ArrowRight', 'Example'],
+      ['ArrowRight', 'Revise'],
       ['ArrowRight', 'Read'],
+      ['ArrowLeft', 'Revise'],
       ['ArrowLeft', 'Example'],
       ['Home', 'Read'],
-      ['End', 'Example'],
+      ['End', 'Revise'],
+      ['ArrowLeft', 'Example'],
     ] as const) {
       await page.keyboard.press(key);
       const active = page.getByRole('tab', { name, exact: true });
       await expect(active).toBeFocused();
       await expect(active).toHaveAttribute('aria-selected', 'true');
-      await expect(
-        page.getByRole('tab', {
-          name: name === 'Read' ? 'Example' : 'Read',
-          exact: true,
-        }),
-      ).toHaveAttribute('tabindex', '-1');
+      for (const inactive of ['Read', 'Example', 'Revise'].filter(
+        (item) => item !== name,
+      ))
+        await expect(
+          page.getByRole('tab', { name: inactive, exact: true }),
+        ).toHaveAttribute('tabindex', '-1');
     }
     await page.keyboard.press('Tab');
     const panel = page.getByRole('tabpanel', { name: 'Example', exact: true });
@@ -752,6 +755,54 @@ for (const role of ['ADMIN', 'INVALID'] as const)
     expect(state.counters.catalog).toBe(0);
     await expect(page.getByRole('tab')).toHaveCount(0);
   });
+// Keep route transport inside the existing navigation budget, then let each
+// destination's unchanged five-second assertion verify its rendered content.
+async function navigateTransition(
+  page: Page,
+  pathname: string,
+  click: () => Promise<unknown>,
+) {
+  const matches = (request: Request) => {
+    const url = new URL(request.url());
+    return (
+      url.origin === 'http://127.0.0.1:3000' &&
+      url.pathname === pathname &&
+      url.searchParams.has('_rsc') &&
+      request.method() === 'GET'
+    );
+  };
+  let requested = false;
+  const onRequest = (request: Request) => {
+    if (matches(request)) requested = true;
+  };
+  page.on('request', onRequest);
+  // A cached client navigation need not fetch RSC. Handle the unused waiter's
+  // eventual timeout/teardown rejection without masking an observed request.
+  const response = page
+    .waitForResponse((value) => matches(value.request()), { timeout: 10_000 })
+    .then(
+      (value) => ({ value }),
+      (error: unknown) => ({ error }),
+    );
+  try {
+    await Promise.all([
+      page.waitForURL(
+        (url) =>
+          url.origin === 'http://127.0.0.1:3000' && url.pathname === pathname,
+        { timeout: 10_000 },
+      ),
+      click(),
+    ]);
+    if (requested) {
+      const result = await response;
+      if ('error' in result) throw result.error;
+      expect(result.value.status()).toBe(200);
+    }
+  } finally {
+    page.off('request', onRequest);
+  }
+}
+
 for (const lateFailure of [false, true]) {
   test(`same-document cancellation and account transition reject old ${lateFailure ? 'failure' : 'success'}`, async ({
     page,
@@ -817,11 +868,15 @@ for (const lateFailure of [false, true]) {
       `/modules/${moduleId}`,
       topicUrl,
     ])
-      await page.locator(`#student-main a[href="${href}"]`).click();
+      await navigateTransition(page, href, () =>
+        page.locator(`#student-main a[href="${href}"]`).click(),
+      );
     await expect(
       page.getByRole('link', { name: 'Concept 2', exact: true }),
     ).toBeVisible();
-    await page.getByRole('link', { name: 'Concept 2', exact: true }).click();
+    await navigateTransition(page, '/concepts/' + cid(2), () =>
+      page.getByRole('link', { name: 'Concept 2', exact: true }).click(),
+    );
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'Concept 2',
     );
@@ -941,23 +996,29 @@ for (const lateFailure of [false, true]) {
       .click();
     await expect(page).toHaveURL(/\/dashboard$/);
     // Use actual Next links throughout; a document reload would invalidate this test.
-    await page.locator('aside a[href="/explore-technologies"]').click();
+    await navigateTransition(page, '/explore-technologies', () =>
+      page.locator('aside a[href="/explore-technologies"]').click(),
+    );
     for (const href of [
       `/explore-technologies/${tech}/learning-paths`,
       `/learning-paths/${pathId}`,
       `/modules/${moduleId}`,
       topicUrl,
     ])
-      await page.locator(`#student-main a[href="${href}"]`).click();
+      await navigateTransition(page, href, () =>
+        page.locator(`#student-main a[href="${href}"]`).click(),
+      );
     await expect(
       page.getByRole('link', { name: 'Student B Concept 1', exact: true }),
     ).toBeVisible();
     await expect(
       page.getByText('Student A Summary 1', { exact: true }),
     ).toHaveCount(0);
-    await page
-      .getByRole('link', { name: 'Student B Concept 1', exact: true })
-      .click();
+    await navigateTransition(page, '/concepts/' + cid(1), () =>
+      page
+        .getByRole('link', { name: 'Student B Concept 1', exact: true })
+        .click(),
+    );
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'Student B Concept 1',
     );

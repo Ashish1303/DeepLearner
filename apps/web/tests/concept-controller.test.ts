@@ -113,7 +113,7 @@ test('subscription cleanup, unsafe pages and safe error fallback', async () => {
   assert.equal(notifications, 2);
 });
 
-test('Example payloads cannot survive cancellation or replace a new owner after delayed success/failure', async () => {
+test('Example and Revise payloads cannot survive cancellation or replace a new owner after delayed success/failure', async () => {
   const withExamples = (title: string): ConceptData => ({
     ...data(title),
     concept: {
@@ -136,6 +136,12 @@ test('Example payloads cannot survive cancellation or replace a new owner after 
         isOfficial: false,
       },
       examples: [{ title, bodyMarkdown: title }],
+      revise: {
+        summary: title,
+        keyPoints: [title],
+        memoryTrick: null,
+        importantCodeMarkdown: null,
+      },
     },
   });
   for (const failure of [false, true]) {
@@ -153,6 +159,10 @@ test('Example payloads cannot survive cancellation or replace a new owner after 
     assert.equal(old.controller.getSnapshot().data, null);
     assert.equal(
       next.controller.getSnapshot().data?.concept?.examples[0]?.title,
+      'Current example',
+    );
+    assert.equal(
+      next.controller.getSnapshot().data?.concept?.revise?.summary,
       'Current example',
     );
     assert.equal(next.controller.getSnapshot().message, '');

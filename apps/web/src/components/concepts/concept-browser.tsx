@@ -12,6 +12,7 @@ import {
 import { learningRoute } from '../../lib/learning-paths/routes';
 import { ConceptMarkdown } from './concept-markdown';
 import { ConceptExamples } from './concept-examples';
+import { ConceptRevise } from './concept-revise';
 import styles from './concept-browser.module.css';
 
 export function ConceptBrowser({
@@ -38,10 +39,10 @@ export function ConceptContents({
   id: string;
 }) {
   const { state, controller } = useConceptBrowser(resource, id);
-  const [mode, setMode] = useState<'read' | 'example'>('read');
+  const [mode, setMode] = useState<'read' | 'example' | 'revise'>('read');
   const tabId = useId();
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
-  const modes = ['read', 'example'] as const;
+  const modes = ['read', 'example', 'revise'] as const;
   const title = useRef<HTMLHeadingElement>(null);
   const results = useRef<HTMLHeadingElement>(null);
   const focused = useRef(0);
@@ -168,10 +169,13 @@ export function ConceptContents({
                         event.key === 'Home'
                           ? 0
                           : event.key === 'End'
-                            ? 1
+                            ? modes.length - 1
                             : event.key === 'ArrowLeft' ||
                                 event.key === 'ArrowRight'
-                              ? 1 - index
+                              ? (index +
+                                  (event.key === 'ArrowRight' ? 1 : -1) +
+                                  modes.length) %
+                                modes.length
                               : null;
                       if (next !== null) {
                         event.preventDefault();
@@ -180,7 +184,11 @@ export function ConceptContents({
                       }
                     }}
                   >
-                    {item === 'read' ? 'Read' : 'Example'}
+                    {item === 'read'
+                      ? 'Read'
+                      : item === 'example'
+                        ? 'Example'
+                        : 'Revise'}
                   </button>
                 ))}
               </div>
@@ -213,6 +221,15 @@ export function ConceptContents({
                 {mode === 'example' && (
                   <ConceptExamples examples={concept.examples} />
                 )}
+              </div>
+              <div
+                role="tabpanel"
+                id={tabId + '-revise-panel'}
+                aria-labelledby={tabId + '-revise-tab'}
+                hidden={mode !== 'revise'}
+                tabIndex={0}
+              >
+                {mode === 'revise' && <ConceptRevise revise={concept.revise} />}
               </div>
               <footer className={styles.notice}>
                 <h2>Reference</h2>

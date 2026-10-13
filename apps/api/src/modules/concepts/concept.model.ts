@@ -39,6 +39,57 @@ const exampleSchema = new Schema(
   },
   { _id: false, strict: 'throw' },
 );
+const reviseSchema = new Schema(
+  {
+    summary: {
+      type: String,
+      cast: false,
+      required: true,
+      trim: true,
+      minlength: 1,
+      maxlength: 2000,
+    },
+    keyPoints: {
+      type: [
+        {
+          type: String,
+          cast: false,
+          required: true,
+          trim: true,
+          minlength: 1,
+          maxlength: 500,
+        },
+      ],
+      default: undefined,
+      set: (value: unknown) => {
+        if (value !== undefined && !Array.isArray(value))
+          throw new mongoose.Error.CastError('Array', value, 'keyPoints');
+        return value;
+      },
+      validate: (value: string[] | undefined) =>
+        value === undefined || (Array.isArray(value) && value.length <= 10),
+    },
+    memoryTrick: {
+      type: String,
+      cast: false,
+      trim: true,
+      minlength: 1,
+      maxlength: 2000,
+      validate: (value: string | null | undefined) =>
+        value === undefined || (typeof value === 'string' && value.length > 0),
+    },
+    importantCodeMarkdown: {
+      type: String,
+      cast: false,
+      minlength: 1,
+      maxlength: 10000,
+      validate: (value: string | null | undefined) =>
+        value === undefined ||
+        (typeof value === 'string' && value.trim().length > 0),
+    },
+  },
+  { _id: false, strict: 'throw' },
+);
 const sourceSchema = new Schema(
   {
     label: {
@@ -113,6 +164,18 @@ export const conceptSchema = new Schema(
     },
     read: { type: readSchema, required: true },
     source: { type: sourceSchema, required: true },
+    revise: {
+      type: reviseSchema,
+      default: undefined,
+      set: (value: unknown) => {
+        if (
+          value !== undefined &&
+          (value === null || typeof value !== 'object' || Array.isArray(value))
+        )
+          throw new mongoose.Error.CastError('Embedded', value, 'revise');
+        return value;
+      },
+    },
     examples: {
       type: [exampleSchema],
       default: undefined,
