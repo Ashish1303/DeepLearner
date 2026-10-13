@@ -18,6 +18,27 @@ const readSchema = new Schema(
   },
   { _id: false, strict: 'throw' },
 );
+const exampleSchema = new Schema(
+  {
+    title: {
+      type: String,
+      cast: false,
+      required: true,
+      trim: true,
+      minlength: 1,
+      maxlength: 120,
+    },
+    bodyMarkdown: {
+      type: String,
+      cast: false,
+      required: true,
+      minlength: 1,
+      maxlength: 10000,
+      validate: (value: string) => value.trim().length > 0,
+    },
+  },
+  { _id: false, strict: 'throw' },
+);
 const sourceSchema = new Schema(
   {
     label: {
@@ -92,6 +113,26 @@ export const conceptSchema = new Schema(
     },
     read: { type: readSchema, required: true },
     source: { type: sourceSchema, required: true },
+    examples: {
+      type: [exampleSchema],
+      default: undefined,
+      set: (value: unknown) => {
+        if (value !== undefined && !Array.isArray(value))
+          throw new mongoose.Error.CastError('Array', value, 'examples');
+        return value;
+      },
+      validate: (
+        value: { title: string; bodyMarkdown: string }[] | null | undefined,
+      ) =>
+        value === undefined ||
+        (Array.isArray(value) &&
+          value.length <= 10 &&
+          value.every((entry) => entry != null) &&
+          value.reduce(
+            (total, entry) => total + (entry.bodyMarkdown?.length ?? 0),
+            0,
+          ) <= 50000),
+    },
     status: {
       type: String,
       required: true,

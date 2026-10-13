@@ -54,6 +54,26 @@ const identity = {
 export const summarySchema = z.object({ ...identity, summary: text(2000) });
 export const conceptSchema = z.object({
   ...identity,
+  examples: z
+    .array(
+      z.strictObject({
+        title: text(120),
+        bodyMarkdown: z
+          .string()
+          .min(1)
+          .max(10000)
+          .refine((value) => value.trim().length > 0),
+      }),
+    )
+    .max(10)
+    .refine(
+      (entries) =>
+        entries.reduce(
+          (total, entry) => total + entry.bodyMarkdown.length,
+          0,
+        ) <= 50000,
+    )
+    .default([]),
   contentFormat: z.literal('MARKDOWN'),
   schemaVersion: z.literal(1),
   read: z.object({

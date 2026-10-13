@@ -1,0 +1,20 @@
+import { defineConfig } from '@playwright/test';
+import foundation from './playwright.config';
+
+// Execution requires the separate F023 browser gate; this does not change the smoke suite.
+export default defineConfig(foundation, {
+  testMatch: 'concept-example.spec.ts',
+  globalTimeout: 600_000,
+  timeout: 45_000,
+  maxFailures: 1,
+  use: { ...foundation.use, baseURL: 'http://127.0.0.1:3000' },
+  webServer: {
+    command: 'npm run dev --workspace=@deeplearner/web -- --hostname 127.0.0.1',
+    url: 'http://127.0.0.1:3000/login',
+    reuseExistingServer: false,
+    timeout: 120_000,
+    env: { NEXT_PUBLIC_API_BASE_URL: 'http://127.0.0.1:4000/api/v1' },
+    stdout: 'ignore',
+    stderr: 'pipe',
+  },
+});

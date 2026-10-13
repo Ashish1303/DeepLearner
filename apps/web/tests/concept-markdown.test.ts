@@ -106,3 +106,36 @@ test('entity-obfuscated schemes, blank images and maximum-size body remain safe 
   assert(render('![](https://example.invalid/a)').includes('Image omitted'));
   assert.equal(render('x'.repeat(50000)), '<p>' + 'x'.repeat(50000) + '</p>');
 });
+
+test('Example heading base nests below h3 titles, compresses jumps and caps at h6', () => {
+  for (let depth = 1; depth <= 6; depth++)
+    assert.equal(
+      renderToStaticMarkup(
+        createElement(ConceptMarkdown, {
+          body: '#'.repeat(depth) + ' First',
+          headingBase: 4,
+        }),
+      ),
+      '<h4>First</h4>',
+    );
+  const html = renderToStaticMarkup(
+    createElement(ConceptMarkdown, {
+      body: '## First\n\n#### Child\n\n##### Deep\n\n###### Deeper\n\n## Sibling',
+      headingBase: 4,
+    }),
+  );
+  assert.deepEqual(
+    [...html.matchAll(/<h([1-6])>/g)].map((m) => m[1]),
+    ['4', '5', '6', '6', '4'],
+  );
+  const hostile = renderToStaticMarkup(
+    createElement(ConceptMarkdown, {
+      body: '<script>alert(1)</script>\n\n![alt](https://bad.invalid/img)\n\n[bad](javascript:alert%281%29)\n\n[good](https://example.invalid/docs)\n\n~~~js\n<script>text</script>\n~~~',
+      headingBase: 4,
+    }),
+  );
+  assert(!/<(?:script|img|iframe)\b/.test(hostile));
+  assert(!hostile.includes('href="javascript:'));
+  assert(hostile.includes('rel="noopener noreferrer"'));
+  assert(hostile.includes('&lt;script&gt;'));
+});

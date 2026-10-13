@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { useAuth } from '../../hooks/use-auth';
 import { useConceptBrowser } from '../../hooks/use-concept-browser';
 import {
@@ -11,6 +11,7 @@ import {
 } from '../../lib/concepts/contracts';
 import { learningRoute } from '../../lib/learning-paths/routes';
 import { ConceptMarkdown } from './concept-markdown';
+import { ConceptExamples } from './concept-examples';
 import styles from './concept-browser.module.css';
 
 export function ConceptBrowser({
@@ -37,6 +38,10 @@ export function ConceptContents({
   id: string;
 }) {
   const { state, controller } = useConceptBrowser(resource, id);
+  const [mode, setMode] = useState<'read' | 'example'>('read');
+  const tabId = useId();
+  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
+  const modes = ['read', 'example'] as const;
   const title = useRef<HTMLHeadingElement>(null);
   const results = useRef<HTMLHeadingElement>(null);
   const focused = useRef(0);
@@ -100,7 +105,7 @@ export function ConceptContents({
       </header>
       <section aria-labelledby="concept-results" aria-busy={loading}>
         <h2 id="concept-results" ref={results} tabIndex={-1}>
-          {resource === 'concept' ? 'Read' : 'Concepts'}
+          {resource === 'concept' ? 'Concept content' : 'Concepts'}
         </h2>
         <p role="status" aria-live="polite">
           {loading
@@ -140,9 +145,75 @@ export function ConceptContents({
           data &&
           (concept ? (
             <>
-              <article className={styles.read} aria-label="Concept explanation">
-                <ConceptMarkdown body={concept.read.bodyMarkdown} />
-              </article>
+              <div
+                role="tablist"
+                aria-label="Concept modes"
+                className={styles.tabs}
+              >
+                {modes.map((item, index) => (
+                  <button
+                    key={item}
+                    type="button"
+                    role="tab"
+                    id={tabId + '-' + item + '-tab'}
+                    aria-controls={tabId + '-' + item + '-panel'}
+                    aria-selected={mode === item}
+                    tabIndex={mode === item ? 0 : -1}
+                    ref={(element) => {
+                      tabs.current[index] = element;
+                    }}
+                    onClick={() => setMode(item)}
+                    onKeyDown={(event) => {
+                      const next =
+                        event.key === 'Home'
+                          ? 0
+                          : event.key === 'End'
+                            ? 1
+                            : event.key === 'ArrowLeft' ||
+                                event.key === 'ArrowRight'
+                              ? 1 - index
+                              : null;
+                      if (next !== null) {
+                        event.preventDefault();
+                        setMode(modes[next]!);
+                        tabs.current[next]?.focus();
+                      }
+                    }}
+                  >
+                    {item === 'read' ? 'Read' : 'Example'}
+                  </button>
+                ))}
+              </div>
+              <div
+                role="tabpanel"
+                id={tabId + '-read-panel'}
+                aria-labelledby={tabId + '-read-tab'}
+                hidden={mode !== 'read'}
+                tabIndex={0}
+              >
+                {mode === 'read' && (
+                  <>
+                    <h2>Read</h2>
+                    <article
+                      className={styles.read}
+                      aria-label="Concept explanation"
+                    >
+                      <ConceptMarkdown body={concept.read.bodyMarkdown} />
+                    </article>
+                  </>
+                )}
+              </div>
+              <div
+                role="tabpanel"
+                id={tabId + '-example-panel'}
+                aria-labelledby={tabId + '-example-tab'}
+                hidden={mode !== 'example'}
+                tabIndex={0}
+              >
+                {mode === 'example' && (
+                  <ConceptExamples examples={concept.examples} />
+                )}
+              </div>
               <footer className={styles.notice}>
                 <h2>Reference</h2>
                 <p>

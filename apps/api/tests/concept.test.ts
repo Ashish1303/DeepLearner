@@ -147,6 +147,7 @@ test('concept DTOs separate summary and detail and explicitly exclude nested/int
   });
   assert.deepEqual(conceptDetailDto(raw), {
     ...identity,
+    examples: [],
     contentFormat: 'MARKDOWN',
     schemaVersion: 1,
     read: { summary: raw.read.summary, bodyMarkdown: raw.read.bodyMarkdown },
@@ -356,6 +357,8 @@ test('concept detail checks five publication levels, every denormalized referenc
           'source.url': 1,
           'source.sourceType': 1,
           'source.isOfficial': 1,
+          'examples.title': 1,
+          'examples.bodyMarkdown': 1,
         },
       },
     ]);
@@ -422,4 +425,23 @@ test('unsafe page integer reports numeric bounds and offset issues precisely', (
       { path: ['page'], code: 'custom' },
     ],
   );
+});
+
+test('examples appear only in detail, ordered and explicitly projected without nested metadata', () => {
+  const examples = [
+    {
+      title: 'Second authored first',
+      bodyMarkdown: '# Two',
+      _id: 'hidden',
+      status: 'DRAFT',
+    },
+    { title: 'First authored second', bodyMarkdown: '# One' },
+  ];
+  const record = { ...raw, examples };
+  assert.deepEqual(
+    conceptDetailDto(record).examples,
+    examples.map(({ title, bodyMarkdown }) => ({ title, bodyMarkdown })),
+  );
+  assert.deepEqual(conceptSummaryDto(record), conceptSummaryDto(raw));
+  assert.deepEqual(conceptDetailDto(raw).examples, []);
 });

@@ -761,3 +761,17 @@ Declared indexes: unique { topicId: 1, slug: 1 } including archived reservations
 Explicit approved deviations: defer the entire completionRules field, including metadata/calculations, notwithstanding its earlier required designation; do not invent completion defaults. Also defer examples, revise, snapshots, publishedAt/publishedBy, unused filter/Admin indexes and all authoring/publication workflows. Future approved work must reconcile those canonical-design fields.
 
 The earlier sanitized-Markdown recommendation is refined to untrusted Markdown storage for F021. This is not XSS sanitization. F022 owns mandatory safe rendering and URL/HTML protections. Summary/detail projections exclude internal fields, and lists exclude the body/source. No real records or seed runner are supplied.
+
+## F023 approved extension: optional embedded Concept examples
+
+F023 resolves only the earlier examples deferral. Optional examples is an ordered
+array with default undefined (no migration or implicit materialization on legacy
+records). Each strict embedded object has only title (trimmed string 1-120) and
+bodyMarkdown (nonblank string 1-10,000, whitespace preserved). Maximum 10 entries
+and 50,000 combined Markdown characters; reject null, nonarrays, null entries,
+unknown fields and string coercion. No subdocument IDs, lifecycle or new indexes.
+The existing topic/slug unique and published listing indexes, schemaVersion,
+provenance and five-level public visibility remain unchanged. Content is untrusted
+Markdown; no stored sanitization or executable rendering is claimed. Existing demo
+records are not updated. All other F021 deferrals remain in force.
+See [F023](features/F023-concept-example-mode.md).

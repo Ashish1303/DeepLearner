@@ -116,7 +116,7 @@ test('Concept list/detail use credential-free GETs and validated real ancestry',
   assert.equal(result.concept, null);
   assert.equal(calls.length, 4);
   const read = await client.load('concept', id, 1, signal());
-  assert.deepEqual(read.concept, concept);
+  assert.deepEqual(read.concept, { ...concept, examples: [] });
   assert.equal(read.crumbs.at(-1)?.href, '/topics/' + topicId);
 });
 test('list preserves ordering and accepts empty out-of-range pages', async () => {
@@ -165,7 +165,7 @@ test('schemas enforce exact Concept bounds, Markdown/source contract and strip i
       status: 'PUBLISHED',
       secret: 'not-for-ui',
     }),
-    concept,
+    { ...concept, examples: [] },
   );
   assert(
     conceptSchema.safeParse({
@@ -317,4 +317,85 @@ test('external abort differs from bounded timeout and no late payload is adopted
     { name: 'AbortError' },
   );
   assert.equal(calls, 0);
+});
+
+test('Example DTOs enforce independent bounds, type and unknown-field rules', async () => {
+  const example = { title: 'Example', bodyMarkdown: '  # Preserved\n' };
+  assert.deepEqual(conceptSchema.parse(concept).examples, []);
+  assert.deepEqual(
+    conceptSchema.parse({ ...concept, examples: [example] }).examples,
+    [example],
+  );
+  for (const examples of [
+    [],
+    Array.from({ length: 10 }, () => ({
+      title: 'x'.repeat(120),
+      bodyMarkdown: 'x'.repeat(5000),
+    })),
+    Array.from({ length: 5 }, () => ({
+      title: 'x',
+      bodyMarkdown: 'x'.repeat(10000),
+    })),
+  ])
+    assert(conceptSchema.safeParse({ ...concept, examples }).success);
+  const cases: [unknown, (string | number)[], string][] = [
+    [null, ['examples'], 'invalid_type'],
+    [{}, ['examples'], 'invalid_type'],
+    [[null], ['examples', 0], 'invalid_type'],
+    [
+      [{ ...example, title: undefined }],
+      ['examples', 0, 'title'],
+      'invalid_type',
+    ],
+    [[{ ...example, title: ' ' }], ['examples', 0, 'title'], 'custom'],
+    [
+      [{ ...example, title: 'x'.repeat(121) }],
+      ['examples', 0, 'title'],
+      'too_big',
+    ],
+    [[{ ...example, title: 3 }], ['examples', 0, 'title'], 'invalid_type'],
+    [
+      [{ ...example, bodyMarkdown: ' ' }],
+      ['examples', 0, 'bodyMarkdown'],
+      'custom',
+    ],
+    [
+      [{ ...example, bodyMarkdown: undefined }],
+      ['examples', 0, 'bodyMarkdown'],
+      'invalid_type',
+    ],
+    [
+      [{ ...example, bodyMarkdown: 'x'.repeat(10001) }],
+      ['examples', 0, 'bodyMarkdown'],
+      'too_big',
+    ],
+    [[{ ...example, _id: 'hidden' }], ['examples', 0], 'unrecognized_keys'],
+    [Array.from({ length: 11 }, () => example), ['examples'], 'too_big'],
+    [
+      Array.from({ length: 6 }, () => ({
+        ...example,
+        bodyMarkdown: 'x'.repeat(9000),
+      })),
+      ['examples'],
+      'custom',
+    ],
+  ];
+  for (const [examples, path, code] of cases) {
+    const parsed = conceptSchema.safeParse({ ...concept, examples });
+    assert(!parsed.success);
+    assert.deepEqual(
+      parsed.error.issues.map(({ path, code }) => ({ path, code })),
+      [{ path, code }],
+    );
+  }
+  const result = await fixture({
+    ['/concepts/' + id]: detail({ ...concept, examples: [example] }),
+  }).client.load('concept', id, 1, signal());
+  assert.deepEqual(result.concept?.examples, [example]);
+  await assert.rejects(
+    fixture({
+      ['/concepts/' + id]: detail({ ...concept, examples: null }),
+    }).client.load('concept', id, 1, signal()),
+    kind('malformed'),
+  );
 });

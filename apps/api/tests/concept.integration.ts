@@ -203,6 +203,25 @@ test(
             e !== null &&
             'code' in e &&
             e.code === 11000;
+          for (const examples of [
+            null,
+            [null],
+            Array.from({ length: 11 }, () => ({
+              title: 'x',
+              bodyMarkdown: 'x',
+            })),
+            [{ title: 'x', bodyMarkdown: ' ' }],
+            [{ title: 'x', bodyMarkdown: 'x'.repeat(10001) }],
+            Array.from({ length: 6 }, () => ({
+              title: 'x',
+              bodyMarkdown: 'x'.repeat(9000),
+            })),
+          ])
+            await assert.rejects(
+              Concept.create({ ...record('invalid-example'), examples }),
+              (error: unknown) =>
+                error instanceof Error && error.name === 'ValidationError',
+            );
           const reserved = await Concept.create(record('reserved', 'ARCHIVED'));
           assert.equal(reserved.contentFormat, 'MARKDOWN');
           assert.equal(reserved.schemaVersion, 1);
@@ -236,7 +255,19 @@ test(
         async () => {
           const visible = await Concept.create([
             record('beta'),
-            record('alpha'),
+            {
+              ...record('alpha'),
+              examples: [
+                {
+                  title: 'First example',
+                  bodyMarkdown: '  ## Preserved example\n',
+                },
+                {
+                  title: 'Second example',
+                  bodyMarkdown: '~~~js\nconst x = 1;\n~~~',
+                },
+              ],
+            },
             record('last', 'PUBLISHED', 1),
           ]);
           const hidden = await Concept.create([
@@ -308,6 +339,7 @@ test(
               [
                 ...common,
                 'read',
+                'examples',
                 'source',
                 'contentFormat',
                 'schemaVersion',
@@ -324,6 +356,24 @@ test(
               'url',
             ]);
             assert.equal(dto.read.bodyMarkdown, item.read.bodyMarkdown);
+            const stored = await Concept.collection.findOne({ _id: item._id });
+            assert(stored);
+            if (item.slug === 'alpha') {
+              assert.deepEqual(dto.examples, [
+                {
+                  title: 'First example',
+                  bodyMarkdown: '  ## Preserved example\n',
+                },
+                {
+                  title: 'Second example',
+                  bodyMarkdown: '~~~js\nconst x = 1;\n~~~',
+                },
+              ]);
+              assert.deepEqual(stored.examples, dto.examples);
+            } else {
+              assert(!Object.hasOwn(stored, 'examples'));
+              assert.deepEqual(dto.examples, []);
+            }
           }
           for (const item of hidden)
             await assert.rejects(
@@ -421,10 +471,22 @@ test(
               meta: { total: number };
             };
             assert.equal(body.meta.total, 3);
-            assert.equal(
-              (await fetch(url + '/' + body.data[0]!.id)).status,
-              200,
-            );
+            const detailResponse = await fetch(url + '/' + body.data[0]!.id);
+            assert.equal(detailResponse.status, 200);
+            const detailBody = (await detailResponse.json()) as {
+              data: { examples: { title: string; bodyMarkdown: string }[] };
+            };
+            assert.deepEqual(detailBody.data.examples, [
+              {
+                title: 'First example',
+                bodyMarkdown: '  ## Preserved example\n',
+              },
+              {
+                title: 'Second example',
+                bodyMarkdown: '~~~js\nconst x = 1;\n~~~',
+              },
+            ]);
+            assert(body.data.every((item) => !Object.hasOwn(item, 'examples')));
             assert.equal((await fetch(url + '?topicId=bad')).status, 400);
             const notFound = await fetch(
               url + '/' + new Types.ObjectId().toHexString(),

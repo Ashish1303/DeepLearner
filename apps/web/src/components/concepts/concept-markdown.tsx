@@ -3,7 +3,13 @@ import Markdown, { type ExtraProps } from 'react-markdown';
 import { safeHttpsUrl } from '../../lib/concepts/contracts';
 
 // Render untrusted Markdown as restricted React elements, never HTML strings.
-export function ConceptMarkdown({ body }: { body: string }) {
+export function ConceptMarkdown({
+  body,
+  headingBase = 3,
+}: {
+  body: string;
+  headingBase?: 3 | 4;
+}) {
   // Collect levels from parsed headings, not Markdown-looking text in code blocks.
   // The synchronous Markdown API completes traversal before React renders the
   // returned elements; no bookkeeping escapes into a later render. All state is local
@@ -11,7 +17,11 @@ export function ConceptMarkdown({ body }: { body: string }) {
   const ancestors: number[] = [];
   const levels = new WeakMap<object, number>();
   const heading = ({ node, children }: ExtraProps & { children?: ReactNode }) =>
-    createElement(`h${node ? (levels.get(node) ?? 3) : 3}`, null, children);
+    createElement(
+      `h${node ? (levels.get(node) ?? headingBase) : headingBase}`,
+      null,
+      children,
+    );
   return Markdown({
     skipHtml: true,
     allowedElements: [
@@ -41,13 +51,13 @@ export function ConceptMarkdown({ body }: { body: string }) {
         while (ancestors.length && ancestors[ancestors.length - 1]! >= depth)
           ancestors.pop();
         ancestors.push(depth);
-        levels.set(node, Math.min(ancestors.length + 2, 6));
+        levels.set(node, Math.min(ancestors.length + headingBase - 1, 6));
       }
       return true;
     },
     urlTransform: (value) => safeHttpsUrl(value),
     components: {
-      // The page title is h1 and the Read section is h2.
+      // Read starts at h3; Example Markdown nests below its h3 title.
       h1: heading,
       h2: heading,
       h3: heading,

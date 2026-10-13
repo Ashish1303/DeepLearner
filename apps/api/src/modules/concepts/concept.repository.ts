@@ -36,6 +36,8 @@ const detailProjection = {
   'source.url': 1,
   'source.sourceType': 1,
   'source.isOfficial': 1,
+  'examples.title': 1,
+  'examples.bodyMarkdown': 1,
 };
 interface Page {
   items: ProjectedConceptSummary[];

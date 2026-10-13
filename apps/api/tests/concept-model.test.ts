@@ -169,7 +169,6 @@ test('concept source requires explicit metadata and HTTPS without credentials', 
 test('concept strict schemas exclude deferred fields and nested internal fields', () => {
   for (const field of [
     'completionRules',
-    'examples',
     'revise',
     'previousPublishedSnapshot',
     'publishedAt',
@@ -208,4 +207,75 @@ test('concept indexes, ownership references and offline-safe model settings matc
     updatedBy: 'User',
   }))
     assert.equal(conceptSchema.path(field).options.ref, ref);
+});
+
+test('examples stay absent for legacy records and preserve bounded ordered Markdown without IDs', () => {
+  const legacy = new Concept(valid());
+  assert.equal(legacy.examples, undefined);
+  assert(!Object.hasOwn(legacy.toObject(), 'examples'));
+  const examples = [
+    { title: ' First ', bodyMarkdown: '  # Body\n' },
+    { title: 'Second', bodyMarkdown: 'Code' },
+  ];
+  const doc = new Concept({ ...valid(), examples });
+  assert.equal(doc.validateSync(), undefined);
+  assert.deepEqual(doc.toObject().examples, [
+    { title: 'First', bodyMarkdown: '  # Body\n' },
+    examples[1],
+  ]);
+  for (const accepted of [
+    [],
+    Array.from({ length: 10 }, () => ({
+      title: 'x'.repeat(120),
+      bodyMarkdown: 'x'.repeat(5000),
+    })),
+    Array.from({ length: 5 }, () => ({
+      title: 'x',
+      bodyMarkdown: 'x'.repeat(10000),
+    })),
+  ])
+    assert.equal(
+      new Concept({ ...valid(), examples: accepted }).validateSync(),
+      undefined,
+    );
+});
+test('examples reject independent field bounds, casts and missing values', () => {
+  for (const [field, values] of Object.entries({
+    title: [undefined, null, '', ' ', 123, 'x'.repeat(121)],
+    bodyMarkdown: [undefined, null, '', ' \n', 123, 'x'.repeat(10001)],
+  }))
+    for (const value of values) {
+      const error = new Concept({
+        ...valid(),
+        examples: [{ title: 'Example', bodyMarkdown: 'Body', [field]: value }],
+      }).validateSync();
+      assert(
+        error?.errors['examples.0.' + field],
+        field + ': ' + String(value).slice(0, 20),
+      );
+    }
+});
+test('examples reject nonarrays, null entries, extra fields, count and aggregate overflow', () => {
+  for (const examples of [
+    null,
+    {},
+    'bad',
+    { title: 'Example', bodyMarkdown: 'Body' },
+    [null],
+    Array.from({ length: 11 }, () => ({ title: 'x', bodyMarkdown: 'b' })),
+    Array.from({ length: 6 }, () => ({
+      title: 'x',
+      bodyMarkdown: 'x'.repeat(9000),
+    })),
+  ])
+    assert(
+      new Concept({ ...valid(), examples }).validateSync()?.errors.examples,
+    );
+  for (const field of ['_id', 'status', 'order', 'unexpected']) {
+    const error = new Concept({
+      ...valid(),
+      examples: [{ title: 'x', bodyMarkdown: 'b', [field]: 'hidden' }],
+    }).validateSync();
+    assert(error?.errors.examples, field);
+  }
 });

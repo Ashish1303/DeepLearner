@@ -45,9 +45,11 @@ function fixture(
   resource: contracts.ConceptResource = 'topic',
   owner = 'one',
   role = 'STUDENT',
+  mode: 'read' | 'example' = 'read',
 ) {
   const require = createRequire(import.meta.url);
   const calls: unknown[] = [];
+  const selections: unknown[] = [];
   const exports: {
     ConceptContents?: (props: {
       resource: contracts.ConceptResource;
@@ -76,7 +78,12 @@ function fixture(
   ).outputText;
   const load = (name: string): unknown => {
     if (name === 'react')
-      return { useEffect() {}, useRef: () => ({ current: null }) };
+      return {
+        useEffect() {},
+        useRef: (value: unknown) => ({ current: value }),
+        useId: () => 'test-tabs',
+        useState: () => [mode, (value: unknown) => selections.push(value)],
+      };
     if (name === 'react/jsx-runtime') return require(name);
     if (name === 'next/link')
       return {
@@ -102,6 +109,25 @@ function fixture(
       };
     if (name === '../../lib/concepts/contracts') return contracts;
     if (name === '../../lib/learning-paths/routes') return routes;
+    if (name === './concept-examples') {
+      const nested = {};
+      const source = readFileSync(
+        new URL(
+          '../src/components/concepts/concept-examples.tsx',
+          import.meta.url,
+        ),
+        'utf8',
+      );
+      const output = ts.transpileModule(source, {
+        compilerOptions: {
+          module: ts.ModuleKind.CommonJS,
+          jsx: ts.JsxEmit.ReactJSX,
+          esModuleInterop: true,
+        },
+      }).outputText;
+      new Function('require', 'exports', output)(load, nested);
+      return nested;
+    }
     if (name === './concept-markdown') return { ConceptMarkdown };
     if (name === './concept-browser.module.css') return {};
     throw Error('Unexpected fixture import');
@@ -133,6 +159,7 @@ function fixture(
     html: renderToStaticMarkup(element),
     buttons,
     calls,
+    selections,
     owner: exports.ConceptBrowser({ resource, id }),
   };
 }
@@ -198,6 +225,7 @@ test('detail renders one page title, escaped summary, Read and source without pr
     slug: 'concept',
     difficulty: 'BEGINNER',
     order: 0,
+    examples: [],
     contentFormat: 'MARKDOWN',
     schemaVersion: 1,
     read: {
@@ -223,4 +251,67 @@ test('detail renders one page title, escaped summary, Read and source without pr
   assert(html.includes('Back to Topic'));
   for (const text of ['Mark complete', 'Start learning', 'Practice', 'XP'])
     assert(!html.includes(text));
+});
+
+test('Read/Example static semantics, no-fetch selection wiring and ordered safe empty/content panels', () => {
+  const concept: contracts.Concept = {
+    id: 'e'.repeat(24),
+    technologyId: 'a'.repeat(24),
+    learningPathId: 'b'.repeat(24),
+    moduleId: 'c'.repeat(24),
+    topicId: id,
+    title: 'Concept',
+    slug: 'concept',
+    difficulty: 'BEGINNER',
+    order: 0,
+    contentFormat: 'MARKDOWN',
+    schemaVersion: 1,
+    read: { summary: 'Summary', bodyMarkdown: '# Read body' },
+    source: {
+      label: 'Source',
+      url: 'https://example.invalid',
+      sourceType: 'OFFICIAL_OR_TRUSTED',
+      isOfficial: false,
+    },
+    examples: [
+      { title: 'First <script>', bodyMarkdown: '## Body one' },
+      { title: 'Second', bodyMarkdown: '# Body two' },
+    ],
+  };
+  const state = { ...ready, data: { ...ready.data!, concept } };
+  const read = fixture(state, 'concept');
+  assert(read.html.includes('role="tablist"'));
+  assert(
+    read.html.includes(
+      'id="test-tabs-read-tab" aria-controls="test-tabs-read-panel" aria-selected="true" tabindex="0"',
+    ),
+  );
+  assert(
+    read.html.includes(
+      'id="test-tabs-example-panel" aria-labelledby="test-tabs-example-tab" hidden=""',
+    ),
+  );
+  read.buttons.find((button) => button.children === 'Example')!.onClick();
+  assert.deepEqual(read.selections, ['example']);
+  assert.deepEqual(read.calls, []);
+  const example = fixture(state, 'concept', 'one', 'STUDENT', 'example').html;
+  assert(example.includes('<h2>Example</h2>'));
+  assert(example.includes('<h3>First &lt;script&gt;</h3>'));
+  assert(example.includes('<h4>Body one</h4>'));
+  assert(
+    example.indexOf('First &lt;script&gt;') <
+      example.indexOf('<h3>Second</h3>'),
+  );
+  assert(!example.includes('<h3>Read body</h3>'));
+  const empty = fixture(
+    {
+      ...state,
+      data: { ...state.data, concept: { ...concept, examples: [] } },
+    },
+    'concept',
+    'one',
+    'STUDENT',
+    'example',
+  ).html;
+  assert(empty.includes('No examples are available for this Concept yet.'));
 });

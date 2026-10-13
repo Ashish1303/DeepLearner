@@ -1613,3 +1613,15 @@ See [the approved F021 plan](features/F021-concept-read-model-api.md) for comple
 - 400 VALIDATION_ERROR; generic 404 TOPIC_NOT_FOUND for unavailable list ancestry or CONCEPT_NOT_FOUND for unavailable detail; 403 ORIGIN_NOT_ALLOWED; 429 RATE_LIMIT_EXCEEDED; sanitized 503 DEPENDENCY_UNAVAILABLE.
 
 Read bodies are untrusted Markdown data, not sanitized HTML. Source URLs are metadata only and never fetched. F022 must separately implement safe rendering, HTML/scheme protections and tests before displaying content. No authoring, completion, progress, source-management or rendering API is included.
+
+## F023 approved extension: Concept Example mode
+
+GET /api/v1/concepts/:id additionally returns examples: an ordered array of
+objects containing only title and bodyMarkdown. Legacy absence returns [].
+At most 10 entries; trimmed title 1-120 characters, nonblank Markdown 1-10,000
+characters per entry and at most 50,000 combined Markdown characters. Examples
+are excluded from list DTOs/projections. Endpoints, filters, envelopes, errors,
+publication/reference checks, rate limits, CORS and credential independence are
+unchanged. Markdown is untrusted data; the frontend uses the existing restricted
+renderer. There is no authoring, execution, progress or new endpoint.
+See [F023](features/F023-concept-example-mode.md).

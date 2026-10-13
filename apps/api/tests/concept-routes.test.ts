@@ -59,6 +59,7 @@ const dto = {
   slug: 'synthetic',
   moduleId: id,
   difficulty: 'BEGINNER' as const,
+  examples: [{ title: 'Synthetic example', bodyMarkdown: '# Data only' }],
   contentFormat: 'MARKDOWN' as const,
   schemaVersion: 1,
   read: { summary: 'Synthetic summary', bodyMarkdown: '# Untrusted data' },

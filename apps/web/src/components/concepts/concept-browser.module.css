@@ -1,5 +1,6 @@
 .browser {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
   min-width: 0;
   color: #173b37;
@@ -120,4 +121,29 @@
   .read {
     width: 100%;
   }
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.tabs button[aria-selected='true'] {
+  background: #075d54;
+  color: #fff;
+  border-color: #075d54;
+}
+.browser [role='tabpanel']:focus-visible {
+  outline: 3px solid #087f72;
+  outline-offset: 4px;
+}
+.examples {
+  list-style: decimal;
+  margin: 0;
+  padding-left: 1.5rem;
+  min-width: 0;
+}
+.examples > li {
+  min-width: 0;
 }

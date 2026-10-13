@@ -13,6 +13,7 @@ export interface ProjectedConceptSummary {
   read: { summary: string };
 }
 export interface ProjectedConceptDetail extends ProjectedConceptSummary {
+  examples?: { title: string; bodyMarkdown: string }[];
   contentFormat: ConceptRecord['contentFormat'];
   schemaVersion: number;
   read: { summary: string; bodyMarkdown: string };
@@ -42,6 +43,10 @@ export function conceptSummaryDto(record: ProjectedConceptSummary) {
 export function conceptDetailDto(record: ProjectedConceptDetail) {
   return {
     ...identity(record),
+    examples: (record.examples ?? []).map((example) => ({
+      title: example.title,
+      bodyMarkdown: example.bodyMarkdown,
+    })),
     contentFormat: record.contentFormat,
     schemaVersion: record.schemaVersion,
     read: {
