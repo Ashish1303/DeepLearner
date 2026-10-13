@@ -16,14 +16,18 @@ const lifecycle = createLifecycle({
         reject(new Error('HTTP startup failed'));
       }
       server.once('error', onError);
-      server.listen(env.PORT, () => {
-        server.off('error', onError);
-        logger.info(
-          { port: env.PORT, environment: env.APP_ENV },
-          'API listening',
-        );
-        resolve();
-      });
+      server.listen(
+        env.PORT,
+        env.APP_ENV === 'LOCAL' ? '127.0.0.1' : undefined,
+        () => {
+          server.off('error', onError);
+          logger.info(
+            { port: env.PORT, environment: env.APP_ENV },
+            'API listening',
+          );
+          resolve();
+        },
+      );
     }),
   closeHTTP: () =>
     new Promise<void>((resolve, reject) => {
