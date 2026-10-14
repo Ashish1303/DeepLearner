@@ -1614,6 +1614,23 @@ See [the approved F021 plan](features/F021-concept-read-model-api.md) for comple
 
 Read bodies are untrusted Markdown data, not sanitized HTML. Source URLs are metadata only and never fetched. F022 must separately implement safe rendering, HTML/scheme protections and tests before displaying content. No authoring, completion, progress, source-management or rendering API is included.
 
+## F025 source validation refinement
+
+The existing Concept detail source shape remains label, url, sourceType and
+isOfficial; lists remain source-free. Require correctly typed metadata without
+coercion: trimmed label 1-120, absolute credential-free HTTPS URL 1-2048,
+OFFICIAL_OR_TRUSTED and explicit Boolean (including false). Align source DTO URL
+validation with the existing renderer: reject raw whitespace, backslashes, ASCII
+controls/DEL and malformed URLs; preserve valid case, Unicode hosts, ports,
+encoded paths, queries and fragments without rewriting DTO values.
+
+No source is fetched or independently verified. Valid legacy metadata remains
+compatible; missing/malformed source is not given invented defaults or repaired.
+Existing endpoints, list projections, hierarchy, public credential-free reads and
+errors are unchanged. PRD section 37 approval/publishing integration is explicitly
+deferred to F047-F051; metadata validation is not full editorial enforcement.
+See [F025](features/F025-source-link-requirement.md) for verification gates.
+
 ## F023 approved extension: Concept Example mode
 
 GET /api/v1/concepts/:id additionally returns examples: an ordered array of

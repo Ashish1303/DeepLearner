@@ -29,6 +29,95 @@ function valid() {
   };
 }
 
+test('F025 source preserves approved URL spellings, exact bounds and legacy metadata', () => {
+  const prefix = 'https://example.invalid/';
+  for (const url of [
+    'https://example.invalid',
+    'HTTPS://EXAMPLE.invalid/Guide?q=one%20two&lang=ts#part',
+    'https://example.invalid:8443/a%2Fb?next=%2Fdocs#intro',
+    'https://bücher.example/über',
+    'https://127.0.0.1:8443/docs',
+    'https://[::1]/docs',
+    prefix + 'x'.repeat(2048 - prefix.length),
+  ])
+    for (const isOfficial of [false, true]) {
+      const input = valid();
+      const doc = new Concept({
+        ...input,
+        source: { ...input.source, url, isOfficial },
+      });
+      assert.equal(doc.validateSync(), undefined);
+      assert.deepEqual(doc.toObject().source, {
+        ...input.source,
+        label: 'Source',
+        url,
+        isOfficial,
+      });
+      assert.equal(doc.examples, undefined);
+      assert.equal(doc.revise, undefined);
+    }
+  for (const label of [' x ', ' ' + 'x'.repeat(120) + ' ']) {
+    const doc = new Concept({
+      ...valid(),
+      source: { ...valid().source, label },
+    });
+    assert.equal(doc.validateSync(), undefined);
+    assert.equal(doc.source.label, label.trim());
+  }
+});
+
+test('F025 source rejects coercion, malformed containers and unknown fields', () => {
+  for (const source of [undefined, null, '', 1, true, [], [valid().source]])
+    assert(new Concept({ ...valid(), source }).validateSync()?.errors.source);
+  for (const field of ['label', 'url', 'sourceType', 'isOfficial']) {
+    const values: unknown[] = [undefined, null, 1, 0, {}, []];
+    if (field === 'isOfficial') values.push('true', 'false', 'yes', 'no');
+    else values.push(true, false, { toString: () => valid().source.label });
+    for (const value of values) {
+      const error = new Concept({
+        ...valid(),
+        source: { ...valid().source, [field]: value },
+      }).validateSync();
+      assert(error?.errors['source.' + field], field);
+    }
+  }
+  for (const extra of ['_id', 'verified', 'unexpected'])
+    assert(
+      new Concept({
+        ...valid(),
+        source: { ...valid().source, [extra]: true },
+      }).validateSync()?.errors.source,
+    );
+});
+
+test('F025 source rejects unsafe raw URL spellings without URL repair', () => {
+  const prefix = 'https://example.invalid/';
+  for (const url of [
+    'https://',
+    'https://[bad',
+    '//example.invalid',
+    'https:example.invalid',
+    'http://example.invalid',
+    'javascript:alert(1)',
+    'data:text/plain,test',
+    'https://user:pass@example.invalid',
+    'https://:pass@example.invalid',
+    ' https://example.invalid',
+    'https://example.invalid ',
+    'https://example.invalid/\\path',
+    'https://example.invalid/\u0000x',
+    'https://example.invalid/\u001fx',
+    'https://example.invalid/\u007fx',
+    prefix + 'x'.repeat(2049 - prefix.length),
+  ])
+    assert(
+      new Concept({
+        ...valid(),
+        source: { ...valid().source, url },
+      }).validateSync()?.errors['source.url'],
+    );
+});
+
 test('revise preserves legacy absence, optional absence, ordered trim and exact Markdown without IDs', () => {
   const legacy = new Concept(valid());
   assert.equal(legacy.revise, undefined);

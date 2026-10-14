@@ -255,6 +255,80 @@ test('detail renders one page title, escaped summary, Read and source without pr
     assert(!html.includes(text));
 });
 
+test('F025 source footer remains escaped, safe and below all three modes without fetches', () => {
+  const concept: contracts.Concept = {
+    id: 'e'.repeat(24),
+    technologyId: 'a'.repeat(24),
+    learningPathId: 'b'.repeat(24),
+    moduleId: 'c'.repeat(24),
+    topicId: id,
+    title: 'Concept',
+    slug: 'concept',
+    difficulty: 'BEGINNER',
+    order: 0,
+    examples: [],
+    revise: null,
+    contentFormat: 'MARKDOWN',
+    schemaVersion: 1,
+    read: { summary: 'Summary', bodyMarkdown: '# Read body' },
+    source: {
+      label: '<script>source</script>',
+      url: 'https://example.invalid/docs?q=x#part',
+      sourceType: 'OFFICIAL_OR_TRUSTED',
+      isOfficial: false,
+    },
+  };
+  for (const mode of ['read', 'example', 'revise'] as const)
+    for (const isOfficial of [false, true]) {
+      const result = fixture(
+        {
+          ...ready,
+          data: {
+            ...ready.data!,
+            concept: {
+              ...concept,
+              source: { ...concept.source, isOfficial },
+            },
+          },
+        },
+        'concept',
+        'one',
+        'STUDENT',
+        mode,
+      );
+      const footer = result.html.slice(result.html.indexOf('<footer'));
+      assert(footer.includes('<h2>Reference</h2>'));
+      assert(
+        footer.includes(isOfficial ? 'Official source' : 'Reference source'),
+      );
+      assert(footer.includes('&lt;script&gt;source&lt;/script&gt;'));
+      assert(!footer.includes('<script>'));
+      assert(footer.includes('href="https://example.invalid/docs?q=x#part"'));
+      assert(footer.includes('target="_blank" rel="noopener noreferrer"'));
+      assert(footer.includes('(opens in a new tab)'));
+      assert(
+        result.html.lastIndexOf('role="tabpanel"') <
+          result.html.indexOf('<footer'),
+      );
+      assert.deepEqual(result.calls, []);
+    }
+  const unsafe = fixture(
+    {
+      ...ready,
+      data: {
+        ...ready.data!,
+        concept: {
+          ...concept,
+          source: { ...concept.source, url: 'javascript:alert(1)' },
+        },
+      },
+    },
+    'concept',
+  ).html;
+  assert(!unsafe.includes('href="javascript:'));
+  assert(unsafe.includes('&lt;script&gt;source&lt;/script&gt;'));
+});
+
 test('Read/Example static semantics, no-fetch selection wiring and ordered safe empty/content panels', () => {
   const concept: contracts.Concept = {
     id: 'e'.repeat(24),

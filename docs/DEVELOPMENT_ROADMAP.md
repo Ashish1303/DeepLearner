@@ -536,7 +536,42 @@ Status: `APPROVED_COMPLETE`
 
 ### F025 — Source Link Requirement
 **Dependencies:** F021  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Approved scope:** [F025 source requirement](features/F025-source-link-requirement.md),
+11 files; source-local validation/coercion hardening and existing safe footer reuse.
+No API shape/index changes, source fetching or trust certification. PRD section 37
+Admin approval/publishing integration is explicitly deferred to F047-F051.
+Implementation, separately authorized browser/database verification and final
+review passed. Existing release/tooling limitations remain.
+
+**Offline verification:** Implementation complete within the approved eleven files.
+Concept API plus mocked local-tooling checks 51/51 PASS; Concept web checks 36/36
+PASS, including six new F025 tests. Build/lint/workspace typecheck/format and
+browser-spec static checks PASS; retained results reused without reruns.
+
+**Browser/database verification:** Targeted F025 Chrome 3/3 PASS. Full sequential
+regressions: F022 27/27 (including three F025), F023 16/16, F024 19/19 and root
+smoke 1/1; total 63/63 PASS, zero retries/failures/skips, all runner exits 0.
+Combined startup/execution/cleanup-check wall time: 507.743s (8m 28s).
+Mounted accessibility, responsiveness, safe links/Markdown, request security,
+authentication boundaries, cancellation and account isolation passed.
+Isolated MongoDB 4/4 PASS; corrected procedure confirmed PRIMARY before emptiness
+checks and fixtures. Initialization/test/shutdown/MongoDB/wrapper exits all 0;
+owned collection cleanup, graceful MongoDB exit, port release and disposable
+storage removal PASS. Persistent demo storage and unrelated MongoDB preserved.
+
+**Final review:** PASS; exact approved eleven-file scope, no actionable acceptance
+defects or unauthorized dependencies/endpoints/indexes/migrations. Chrome exited
+gracefully; Windows Next.js teardown was forced. Process/port cleanup and file
+preservation PASS. Source trust/reachability and Admin publishing enforcement are
+not established; F047-F051 retain the editorial gate. Mocked browser/live-backend,
+canceled-response generation checks, graceful Windows web shutdown and prior
+release/tooling limitations remain as documented in the feature plan, which lists
+retained evidence paths. F025 is APPROVED_COMPLETE following explicit owner
+approval on 2026-10-14, with feature-only commit/push authorized. All verification
+evidence and release limitations remain retained; production deployment is not
+authorized.
 
 ---
 
@@ -1048,9 +1083,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F024 - Concept Revise Mode
+**Current Feature:** F025 - Source Link Requirement
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F025 - Source Link Requirement (not authorized)
+**Next Feature:** F026 - Visualization Data Model (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

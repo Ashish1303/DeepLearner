@@ -203,6 +203,62 @@ test(
             e !== null &&
             'code' in e &&
             e.code === 11000;
+          for (const source of [
+            undefined,
+            null,
+            [],
+            {},
+            { ...record('invalid-source').source, label: 1 },
+            { ...record('invalid-source').source, label: 'x'.repeat(121) },
+            { ...record('invalid-source').source, isOfficial: 'true' },
+            {
+              ...record('invalid-source').source,
+              url: 'https://user:pass@example.invalid',
+            },
+            {
+              ...record('invalid-source').source,
+              url: 'https://example.invalid/\\x',
+            },
+            {
+              ...record('invalid-source').source,
+              url: 'https://example.invalid/\u007f',
+            },
+            { ...record('invalid-source').source, sourceType: 'OTHER' },
+            { ...record('invalid-source').source, unexpected: true },
+          ])
+            await assert.rejects(
+              new Concept({ ...record('invalid-source'), source }).save(),
+              (error: unknown) =>
+                error instanceof Error && error.name === 'ValidationError',
+            );
+          assert.equal(
+            await Concept.countDocuments({ slug: 'invalid-source' }),
+            0,
+          );
+          const prefix = 'https://example.invalid/';
+          const maximumSource = {
+            label: 's'.repeat(120),
+            url: prefix + 'x'.repeat(2048 - prefix.length),
+            sourceType: 'OFFICIAL_OR_TRUSTED' as const,
+            isOfficial: true,
+          };
+          const sourceBounded = await Concept.create({
+            ...record('source-boundaries', 'DRAFT'),
+            source: maximumSource,
+          });
+          assert.deepEqual(
+            (await Concept.collection.findOne({ _id: sourceBounded._id }))
+              ?.source,
+            maximumSource,
+          );
+          await assert.rejects(
+            new Concept({
+              ...record('invalid-source'),
+              source: { ...maximumSource, url: maximumSource.url + 'x' },
+            }).save(),
+            (error: unknown) =>
+              error instanceof Error && error.name === 'ValidationError',
+          );
           for (const examples of [
             null,
             [null],
@@ -304,6 +360,12 @@ test(
             record('beta'),
             {
               ...record('alpha'),
+              source: {
+                ...record('alpha').source,
+                label: ' Official reference ',
+                url: 'HTTPS://EXAMPLE.invalid:8443/a%2Fb?q=one%20two#part',
+                isOfficial: true,
+              },
               revise: {
                 summary: ' Revision ',
                 keyPoints: [' Second ', ' First '],
@@ -415,6 +477,9 @@ test(
             assert.equal(dto.read.bodyMarkdown, item.read.bodyMarkdown);
             const stored = await Concept.collection.findOne({ _id: item._id });
             assert(stored);
+            assert.deepEqual(dto.source, stored.source);
+            assert.equal(dto.source.label, item.source.label);
+            assert.equal(dto.source.url, item.source.url);
             if (item.slug === 'alpha') {
               assert.deepEqual(dto.revise, {
                 summary: 'Revision',
@@ -552,6 +617,12 @@ test(
             assert.equal(detailResponse.status, 200);
             const detailBody = (await detailResponse.json()) as {
               data: {
+                source: {
+                  label: string;
+                  url: string;
+                  sourceType: string;
+                  isOfficial: boolean;
+                };
                 examples: { title: string; bodyMarkdown: string }[];
                 revise: {
                   summary: string;
@@ -561,6 +632,13 @@ test(
                 } | null;
               };
             };
+            assert.deepEqual(detailBody.data.source, {
+              label: 'Official reference',
+              url: 'HTTPS://EXAMPLE.invalid:8443/a%2Fb?q=one%20two#part',
+              sourceType: 'OFFICIAL_OR_TRUSTED',
+              isOfficial: true,
+            });
+            assert(body.data.every((item) => !Object.hasOwn(item, 'source')));
             assert.deepEqual(detailBody.data.revise, {
               summary: 'Revision',
               keyPoints: ['Second', 'First'],

@@ -108,6 +108,104 @@ function fixture(overrides: Record<string, unknown> = {}) {
 }
 const signal = () => new AbortController().signal;
 
+test('F025 valid legacy source URLs and bounds survive credential-free detail reads', async () => {
+  const prefix = 'https://example.invalid/';
+  for (const url of [
+    'https://example.invalid',
+    'HTTPS://EXAMPLE.invalid/Guide?q=one%20two&lang=ts#part',
+    'https://example.invalid:8443/a%2Fb?next=%2Fdocs#intro',
+    'https://bücher.example/über',
+    'https://127.0.0.1:8443/docs',
+    'https://[::1]/docs',
+    prefix + 'x'.repeat(2048 - prefix.length),
+  ])
+    for (const isOfficial of [false, true]) {
+      const source = { ...concept.source, url, isOfficial };
+      const { client, calls } = fixture({
+        ['/concepts/' + id]: detail({ ...concept, source }),
+      });
+      const result = await client.load('concept', id, 1, signal());
+      assert.deepEqual(result.concept?.source, source);
+      assert.deepEqual(result.concept?.examples, []);
+      assert.equal(result.concept?.revise, null);
+      assert.equal(calls.length, 4);
+      assert(calls.every((call) => call.startsWith('/')));
+      assert.deepEqual(summarySchema.parse({ ...summary, source }), summary);
+    }
+  for (const label of ['x', 'x'.repeat(120)])
+    assert(
+      conceptSchema.safeParse({
+        ...concept,
+        source: { ...concept.source, label },
+      }).success,
+    );
+});
+
+test('F025 malformed source DTO fields fail safely without coercion or fetching a source', async () => {
+  const prefix = 'https://example.invalid/';
+  for (const [field, values] of Object.entries({
+    label: [
+      undefined,
+      null,
+      '',
+      ' ',
+      ' padded ',
+      1,
+      true,
+      {},
+      [],
+      'x'.repeat(121),
+    ],
+    url: [
+      undefined,
+      null,
+      1,
+      true,
+      {},
+      [],
+      '',
+      'https://',
+      'https://[bad',
+      '//example.invalid',
+      'https:example.invalid',
+      'http://example.invalid',
+      'javascript:alert(1)',
+      'data:text/plain,test',
+      'https://user:pass@example.invalid',
+      'https://:pass@example.invalid',
+      ' https://example.invalid',
+      'https://example.invalid ',
+      'https://example.invalid/\\path',
+      'https://example.invalid/\u0000x',
+      'https://example.invalid/\u001fx',
+      'https://example.invalid/\u007fx',
+      prefix + 'x'.repeat(2049 - prefix.length),
+    ],
+    sourceType: [undefined, null, 1, true, {}, [], 'OTHER'],
+    isOfficial: [undefined, null, 0, 1, {}, [], 'true', 'false', 'yes', 'no'],
+  }))
+    for (const value of values) {
+      const source = { ...concept.source, [field]: value };
+      const parsed = conceptSchema.safeParse({ ...concept, source });
+      assert(!parsed.success, field);
+      assert(
+        parsed.error.issues.some(
+          (issue) => issue.path.join('.') === 'source.' + field,
+        ),
+      );
+      const { client, calls } = fixture({
+        ['/concepts/' + id]: detail({ ...concept, source }),
+      });
+      await assert.rejects(
+        client.load('concept', id, 1, signal()),
+        kind('malformed'),
+      );
+      assert.deepEqual(calls, ['/concepts/' + id]);
+    }
+  for (const source of [undefined, null, {}, [], 1, 'text'])
+    assert(!conceptSchema.safeParse({ ...concept, source }).success);
+});
+
 test('Revise normalizes absent/nullable detail and optional fields without leaking into summaries', async () => {
   assert.equal(conceptSchema.parse(concept).revise, null);
   assert.equal(conceptSchema.parse({ ...concept, revise: null }).revise, null);

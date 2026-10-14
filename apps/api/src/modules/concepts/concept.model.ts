@@ -94,6 +94,7 @@ const sourceSchema = new Schema(
   {
     label: {
       type: String,
+      cast: false,
       required: true,
       trim: true,
       minlength: 1,
@@ -101,6 +102,7 @@ const sourceSchema = new Schema(
     },
     url: {
       type: String,
+      cast: false,
       required: true,
       maxlength: 2048,
       validate: (value: string) => {
@@ -108,7 +110,11 @@ const sourceSchema = new Schema(
           const url = new URL(value);
           return (
             /^https:\/\//i.test(value) &&
-            !/\s/.test(value) &&
+            !/[\s\\]/.test(value) &&
+            ![...value].some(
+              (character) =>
+                character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127,
+            ) &&
             url.protocol === 'https:' &&
             !!url.hostname &&
             !url.username &&
@@ -119,8 +125,13 @@ const sourceSchema = new Schema(
         }
       },
     },
-    sourceType: { type: String, required: true, enum: ['OFFICIAL_OR_TRUSTED'] },
-    isOfficial: { type: Boolean, required: true },
+    sourceType: {
+      type: String,
+      cast: false,
+      required: true,
+      enum: ['OFFICIAL_OR_TRUSTED'],
+    },
+    isOfficial: { type: Boolean, cast: false, required: true },
   },
   { _id: false, strict: 'throw' },
 );
@@ -163,7 +174,18 @@ export const conceptSchema = new Schema(
       default: 'MARKDOWN',
     },
     read: { type: readSchema, required: true },
-    source: { type: sourceSchema, required: true },
+    source: {
+      type: sourceSchema,
+      required: true,
+      set: (value: unknown) => {
+        if (
+          value !== undefined &&
+          (value === null || typeof value !== 'object' || Array.isArray(value))
+        )
+          throw new mongoose.Error.CastError('Embedded', value, 'source');
+        return value;
+      },
+    },
     revise: {
       type: reviseSchema,
       default: undefined,

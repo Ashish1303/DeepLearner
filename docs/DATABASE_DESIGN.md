@@ -762,6 +762,23 @@ Explicit approved deviations: defer the entire completionRules field, including 
 
 The earlier sanitized-Markdown recommendation is refined to untrusted Markdown storage for F021. This is not XSS sanitization. F022 owns mandatory safe rendering and URL/HTML protections. Summary/detail projections exclude internal fields, and lists exclude the body/source. No real records or seed runner are supplied.
 
+## F025 source validation refinement
+
+Keep the required single embedded source and all existing bounds, DTO shapes,
+indexes, lifecycle and schemaVersion. Source-local casts are disabled for label,
+url, sourceType and isOfficial; reject malformed/null/array containers and unknown
+nested fields. Trim real label strings only. Boolean false is valid, not missing.
+URL validation matches the existing safe renderer: explicit HTTPS without parsed
+credentials, raw whitespace/backslashes or ASCII controls/DEL. Native URL parsing
+preserves approved valid URL variants; no domain allowlist or automatic URL rewrite.
+
+Existing correctly typed source records remain compatible. No migration, backfill,
+database validator or automatic legacy write is included. Model validation does
+not certify raw historical documents or guard direct database writes. Source trust
+and reachability are not inferred from metadata. F047-F051 must implement the
+explicitly deferred Admin approval/publication check required by PRD section 37.
+See [F025](features/F025-source-link-requirement.md); live verification is separately gated.
+
 ## F023 approved extension: optional embedded Concept examples
 
 F023 resolves only the earlier examples deferral. Optional examples is an ordered

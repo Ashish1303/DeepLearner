@@ -109,6 +109,7 @@ async function mock(context: BrowserContext) {
     total: 21,
     logoutFails: false,
     conceptAccount: '',
+    sourceOverride: undefined as unknown,
     browseHierarchy: false,
     counters: { refresh: 0, logout: 0, catalog: 0 },
     catalogCredentials: [] as { authorization: boolean; cookie: boolean }[],
@@ -267,10 +268,19 @@ async function mock(context: BrowserContext) {
           (_, i) => summary((page - 1) * 20 + i + 1, requestOwner.account),
         );
         body = list(rows, page, state.total);
-      } else
-        body = envelope(
-          detail(parseInt(path.split('/').at(-1)!, 16), requestOwner.account),
+      } else {
+        const record = detail(
+          parseInt(path.split('/').at(-1)!, 16),
+          requestOwner.account,
         );
+        body = envelope({
+          ...record,
+          source:
+            state.sourceOverride === undefined
+              ? record.source
+              : state.sourceOverride,
+        });
+      }
       if (
         transitionHold &&
         request.url() === transitionHold.url &&
@@ -515,6 +525,145 @@ test.afterAll(async ({ browser }) => {
     .toBe(0);
   // Playwright owns webServer teardown after the suite; verify its port/process release at the execution gate.
 });
+for (const isOfficial of [false, true])
+  test(`F025 source footer in every mode and viewport, official=${isOfficial}`, async ({
+    page,
+    context,
+  }) => {
+    const state = await mock(context);
+    const label = ('<script>source</script> ' + 'reference '.repeat(8)).trim();
+    state.sourceOverride = { ...detail(1).source, label, isOfficial };
+    await page.goto('/concepts/' + cid(1));
+    const main = page.locator('#student-main');
+    const source = main.getByRole('link', {
+      name: label + ' (opens in a new tab)',
+      exact: true,
+    });
+    await expect(source).toBeVisible();
+    const before = { ...state.counters };
+    for (const width of [1280, 768, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const mode of ['Read', 'Example', 'Revise']) {
+        const tab = main.getByRole('tab', { name: mode, exact: true });
+        await tab.click();
+        await expect(tab).toHaveAttribute('aria-selected', 'true');
+        await expect(source).toBeVisible();
+        await expect(source).toHaveAttribute(
+          'href',
+          'https://reference.invalid/docs',
+        );
+        await expect(source).toHaveAttribute('target', '_blank');
+        await expect(source).toHaveAttribute('rel', 'noopener noreferrer');
+        await expect(main.locator('footer')).toContainText(
+          isOfficial ? 'Official source' : 'Reference source',
+        );
+        await expect(main.locator('footer script, footer img')).toHaveCount(0);
+        for (let step = 0; step < 12; step++) {
+          await page.keyboard.press('Tab');
+          if (
+            await source.evaluate(
+              (element) => element === document.activeElement,
+            )
+          )
+            break;
+        }
+        await expect(source).toBeFocused();
+        expect(
+          await source.evaluate((element) => element.matches(':focus-visible')),
+        ).toBe(true);
+        expect(
+          await source.evaluate(
+            (element) => getComputedStyle(element).outlineStyle,
+          ),
+        ).not.toBe('none');
+        const widths = await page.evaluate(() => ({
+          scroll: document.documentElement.scrollWidth,
+          client: document.documentElement.clientWidth,
+        }));
+        expect(widths.scroll).toBeLessThanOrEqual(widths.client);
+      }
+    }
+    expect(state.counters).toEqual(before);
+    await assertSafe(state);
+  });
+
+test('F025 malformed source is observed before explicit Retry without auth side effects', async ({
+  page,
+  context,
+}) => {
+  const state = await mock(context);
+  await page.goto(topicUrl);
+  await expect(
+    page.getByRole('link', { name: 'Concept 1', exact: true }),
+  ).toBeVisible();
+  const before = {
+    refresh: state.counters.refresh,
+    logout: state.counters.logout,
+  };
+  state.sourceOverride = { ...detail(1).source, isOfficial: 'true' };
+  const target = api + '/concepts/' + cid(1);
+  const requests: Request[] = [];
+  page.on('request', (request) => {
+    if (request.url() === target && request.method() === 'GET')
+      requests.push(request);
+  });
+  const failed = page.waitForResponse(
+    (response) =>
+      response.url() === target && response.request().method() === 'GET',
+    { timeout: 10_000 },
+  );
+  const navigation = page.waitForResponse(
+    (response) => {
+      const url = new URL(response.url());
+      return (
+        url.origin === 'http://127.0.0.1:3000' &&
+        url.pathname === '/concepts/' + cid(1) &&
+        url.searchParams.has('_rsc') &&
+        response.request().method() === 'GET'
+      );
+    },
+    { timeout: 10_000 },
+  );
+  const [navigationResponse, failedResponse] = await Promise.all([
+    navigation,
+    failed,
+    page.getByRole('link', { name: 'Concept 1', exact: true }).click(),
+  ]);
+  expect(navigationResponse.status()).toBe(200);
+  expect(failedResponse.status()).toBe(200);
+  expect((await failedResponse.json()).data.source.isOfficial).toBe('true');
+  const main = page.locator('#student-main');
+  await expect(main.getByRole('alert')).toBeVisible();
+  await expect(main.locator('footer')).toHaveCount(0);
+  expect({
+    refresh: state.counters.refresh,
+    logout: state.counters.logout,
+  }).toEqual(before);
+  const failedCount = requests.length;
+  expect(failedCount).toBeGreaterThan(0);
+  const retry = main.getByRole('button', { name: 'Retry', exact: true });
+  await expect(retry).toBeEnabled();
+  state.sourceOverride = undefined;
+  const recovered = page.waitForResponse(
+    (response) =>
+      response.url() === target && response.request().method() === 'GET',
+  );
+  const [recoveredResponse] = await Promise.all([recovered, retry.click()]);
+  expect(recoveredResponse.status()).toBe(200);
+  await expect(
+    main.locator('footer').getByRole('link', {
+      name: 'Synthetic reference (opens in a new tab)',
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(requests).toHaveLength(failedCount + 1);
+  expect({
+    refresh: state.counters.refresh,
+    logout: state.counters.logout,
+  }).toEqual(before);
+  await assertSafe(state);
+});
+
 test('Topic navigation, direct Read reload, breadcrumbs and restricted Markdown', async ({
   page,
   context,

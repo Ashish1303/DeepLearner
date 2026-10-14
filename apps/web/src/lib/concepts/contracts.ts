@@ -102,16 +102,10 @@ export const conceptSchema = z.object({
   source: z.object({
     label: text(120),
     url: z
-      .url()
+      .string()
+      .min(1)
       .max(2048)
-      .refine((value) => {
-        try {
-          const url = new URL(value);
-          return url.protocol === 'https:' && !url.username && !url.password;
-        } catch {
-          return false;
-        }
-      }),
+      .refine((value) => safeHttpsUrl(value) !== undefined),
     sourceType: z.literal('OFFICIAL_OR_TRUSTED'),
     isOfficial: z.boolean(),
   }),
