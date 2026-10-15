@@ -9,7 +9,8 @@ export default defineConfig(foundation, {
   maxFailures: 1,
   use: { ...foundation.use, baseURL: 'http://127.0.0.1:3000' },
   webServer: {
-    command: 'npm run dev --workspace=@deeplearner/web -- --hostname 127.0.0.1',
+    command:
+      'npm run build --workspace=@deeplearner/web && npm run start --workspace=@deeplearner/web -- --hostname 127.0.0.1',
     url: 'http://127.0.0.1:3000/login',
     reuseExistingServer: false,
     timeout: 120_000,
