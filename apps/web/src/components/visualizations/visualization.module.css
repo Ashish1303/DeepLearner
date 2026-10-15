@@ -1,0 +1,77 @@
+.renderer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  min-width: 0;
+  max-width: 100%;
+  color: #173b37;
+  background: #fff;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.renderer :is(h2, h3, h4, h5, p) {
+  margin: 0 0 0.5rem;
+}
+.renderer li {
+  padding: 0.25rem;
+}
+.notice {
+  padding: 1rem;
+  color: #173b37;
+  background: #f0f7f5;
+  border-radius: 0.75rem;
+}
+.scroll {
+  min-width: 0;
+  max-width: 100%;
+  max-height: 480px;
+  overflow: auto;
+  border: 1px solid #526e69;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+}
+.scroll:focus-visible {
+  outline: 3px solid #087f72;
+  outline-offset: 4px;
+}
+.diagram {
+  display: block;
+  max-width: none;
+  flex-shrink: 0;
+}
+.node,
+.badge {
+  fill: #fff;
+  stroke: #526e69;
+  stroke-width: 2;
+}
+.selectedNode {
+  fill: #eef2ff;
+  stroke: #3525cd;
+  stroke-width: 4;
+}
+.edge {
+  fill: none;
+  stroke: #526e69;
+  stroke-width: 2;
+}
+.selectedEdge {
+  fill: none;
+  stroke: #3525cd;
+  stroke-width: 4;
+  stroke-dasharray: 8 4;
+}
+.arrow {
+  fill: #173b37;
+}
+.label {
+  fill: #173b37;
+  font:
+    14px system-ui,
+    sans-serif;
+}
+.currentStep {
+  border-left: 4px solid #3525cd;
+  background: #eef2ff;
+}
+/* Static for every motion preference: no timers, animation or transitions. */

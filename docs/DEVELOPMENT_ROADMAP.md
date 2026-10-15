@@ -612,7 +612,25 @@ the feature document for exact evidence and validation/reference limitations.
 ### F027 — Visualization Renderer MVP
 **Recommended First Type:** Animated execution flow  
 **Dependencies:** F026  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Scope:** [Approved renderer-only plan](features/F027-visualization-renderer-mvp.md).
+Native React/SVG, strict F026-compatible authored projection, external selection,
+bounded deterministic layout and accessible persistent text; no API or route integration.
+**Offline verification (2026-10-15):** F027 23/23 and web 135/135 PASS;
+workspace build/lint/typecheck/format PASS. Exactly ten approved files.
+**Final regression/review (2026-10-15):** Playwright 63/63 PASS, zero retries:
+F022/F025 27, F023 16, F024 19, smoke 1. All runner exits 0; browser stage
+317.595 seconds including builds/cleanup. Owned jobs empty, no owned processes
+remaining, required ports released. Existing Windows forced server teardown is
+distinct from functional PASS; graceful Next.js shutdown remains unverified.
+Exact ten-file renderer-only acceptance review PASS; source preservation PASS.
+Evidence: `.cache/playwright/results/f027-final-2026-10-15-16-00-26-UTC/`.
+Existing suites do not mount F027; no end-to-end visualization acceptance claim.
+Mounted renderer geometry, focus/scrolling and assistive-technology acceptance
+remain NOT_VERIFIED. No MongoDB integration applies. Prior release/tooling
+limitations and F001-F026 approvals are preserved; F028 is not authorized.
+Owner approved F027 development closure and feature-only Git delivery; no deployment.
 
 ### F028 — Visualization Controls
 **Dependencies:** F027  
@@ -1111,9 +1129,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F026 - Visualization Data Model
+**Current Feature:** F027 - Visualization Renderer MVP
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F027 - Visualization Renderer MVP (not authorized)
+**Next Feature:** F028 - Visualization Controls (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---
