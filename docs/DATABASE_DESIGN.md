@@ -236,6 +236,42 @@ from the validated Module. F019 adds no write, repair or provisioning workflow.
 | `createdBy / updatedBy` | `ObjectId` | Yes | Admin references. |
 | `createdAt / updatedAt` | `date` | Yes | Audit timestamps. |
 
+### F026 approved visualization v1 refinement
+
+F026 implements the separate visualizations model only. ANIMATED_FLOW is the
+sole accepted v1 type; the PRD's execution-flow/animations example is illustrative.
+Use schemaVersion 1 and canonical animationConfig. Other types/assets remain
+deferred. No Concept record, API, migration or automatic index creation changes.
+See [the approved F026 contract](features/F026-visualization-data-model.md).
+
+Required title (1-120) and textAlternative (1-4000) are trimmed inert text.
+Required arrays contain 1-50 nodes, 0-100 edges and 1-100 ordered steps. Nodes
+have id, label (1-120) and optional description (1-1000); edges have id, source,
+target and label (1-120); steps have title (1-120), explanation (1-2000), nodeIds
+(1-50) and edgeIds (0-100). IDs fully match `[a-z][a-z0-9-]{0,63}`. Node and edge
+namespaces are independently unique within a document. Endpoints and step
+references must resolve locally; step reference arrays cannot contain duplicates.
+Cycles, self-loops, parallel edges and unused nodes are allowed. No nested _id.
+
+Optional animationConfig stays absent when omitted. When present it requires
+integer stepDurationMs 100-10000 and explicit Boolean autoplay=false. Missing,
+true, null or coerced autoplay fails; no default is inserted. All nested fields
+are strict and coercion is rejected. Exact 24-hex strings or genuine ObjectIds
+are accepted for Concept/Topic/Technology/User references, without lookups.
+
+The normalized authored JSON projection is capped at 262144 UTF-8 bytes. Graph
+integrity and aggregate checks run on async validate()/validated save();
+validateSync() alone does not run these middleware checks. Raw collection and
+query updates are not the approved validation boundary. This is not a database
+validator or foreign-key/role constraint. Future services own ancestry, Admin
+identity, visibility, authorization and lifecycle-transition enforcement.
+
+Existing seven-state lifecycle defaults to DRAFT, schemaVersion defaults to 1,
+Mongoose timestamps and __v remain internal. Preserve both nonunique indexes
+listed below and standard unique _id; multiple Concept/type records are allowed.
+Source code-like text is inert, never evaluated or fetched. Future renderers must
+escape it as text and enforce accessibility; F026 supplies no rendering behavior.
+
 ### `practiceQuestions`
 | Field | Type | Required | Purpose |
 |---|---|---:|---|

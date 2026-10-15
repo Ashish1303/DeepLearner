@@ -1470,6 +1470,20 @@ After this Authentication + Users contract is implemented, extend the same conve
 
 Each module should reuse the response envelope, validation approach, request IDs, REST versioning, Admin authorization pattern, and error-code conventions defined in this document.
 
+## F026 visualization persistence boundary
+
+F026 introduces no endpoint, request DTO or response DTO. Existing Concept list
+and detail APIs, visibility, source metadata, indexes and authentication/error
+contracts remain unchanged; they do not expose visualization documents.
+
+The ANIMATED_FLOW/schemaVersion 1 persistence contract is documented in
+[F026](features/F026-visualization-data-model.md). Its strict validation is not
+an Admin authorization, publishing or foreign-key boundary. Future authorized
+services must validate parent/reference consistency, Admin provenance and public
+visibility before exposure. No source/content fetching, executable payloads or
+implicit autoplay is introduced. API design for retrieval/authoring, rendering,
+controls and publication remains outside F026.
+
 # 33. Recommended Initial Route Layout
 
 ```text

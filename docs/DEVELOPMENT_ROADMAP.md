@@ -579,7 +579,35 @@ authorized.
 
 ### F026 — Visualization Data Model
 **Dependencies:** F021  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+**Scope:** [Approved F026 contract](features/F026-visualization-data-model.md),
+exactly seven files. Separate ANIMATED_FLOW/schemaVersion 1 visualization model,
+strict bounded graph/step data and accessible inert text; both canonical
+nonunique indexes retained. Optional animationConfig never receives an implicit
+default; present autoplay must be explicit false. ObjectIds or exact 24-hex
+reference strings only. No endpoint, renderer, dependency, migration or demo update.
+
+**Offline verification:** Focused visualization 12/12 and existing Concept API
+regressions 29/29 PASS (41/41 combined); build/lint/workspace typecheck/format and
+scope/security checks PASS. Isolated MongoDB four scenarios plus parent 5/5 PASS;
+graceful database cleanup, owned storage removal and isolation verified. Targeted
+Chrome 2/2 and full F022/F025 27/27, F023 16/16, F024 19/19, smoke 1/1 PASS
+(63/63, zero retries; 314.577s full stage). Final acceptance review PASS. Async validate()/validated save enforce whole-document
+graph/size rules; validateSync, query/raw writes, referenced identity and future
+authorization/publishing are not equivalent guarantees. All earlier feature
+approvals and release/tooling limitations remain preserved. F026 APPROVED_COMPLETE
+following explicit owner approval on 2026-10-15 for development closure and two
+scoped commits/Git delivery. Production deployment and F027 are not authorized.
+
+**Separate readiness maintenance:** Only the three existing feature Playwright
+configurations now build/start Next.js with the explicit loopback API environment;
+no assertions, timeouts, dependencies or root smoke configuration changed. These
+are outside the seven-file F026 scope. Owned jobs emptied and ports released;
+Chrome closed gracefully, Windows Next.js teardown was forced. Historical process
+continuity remains UNVERIFIED; a new unrelated baseline exit is an observation,
+not evidence of test-caused termination. Earlier failed runs remain retained. See
+the feature document for exact evidence and validation/reference limitations.
 
 ### F027 — Visualization Renderer MVP
 **Recommended First Type:** Animated execution flow  
@@ -1083,9 +1111,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F025 - Source Link Requirement
+**Current Feature:** F026 - Visualization Data Model
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F026 - Visualization Data Model (not authorized)
+**Next Feature:** F027 - Visualization Renderer MVP (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---
