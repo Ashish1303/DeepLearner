@@ -1470,6 +1470,20 @@ After this Authentication + Users contract is implemented, extend the same conve
 
 Each module should reuse the response envelope, validation approach, request IDs, REST versioning, Admin authorization pattern, and error-code conventions defined in this document.
 
+## F030 practice persistence boundary
+
+F030 adds the backend Practice Question model only; no routes, DTOs, public
+question responses or changes to existing APIs are introduced. The exact
+[F030 contract](features/F030-practice-question-base-model.md) defines strict
+canonical data, all-type inert context code and defensive default answer/explanation
+query exclusion. This exclusion is not student answer-unlock authorization:
+explicit selections, aggregation, raw reads and answer-bearing document serialization
+can include those fields. Future practice services must authenticate/authorize
+requests, enforce attempt-based answer access, construct allowlisted DTOs and
+verify published ancestry and Admin provenance. Model references do not provide
+those guarantees. Evaluation, submission, scoring, approval/publishing and Student/
+Admin interfaces remain deferred. No code execution or source fetching is added.
+
 ## F026 visualization persistence boundary
 
 F026 introduces no endpoint, request DTO or response DTO. Existing Concept list

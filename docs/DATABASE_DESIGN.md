@@ -289,6 +289,34 @@ escape it as text and enforce accessibility; F026 supplies no rendering behavior
 | `createdBy / updatedBy` | `ObjectId` | Yes | Admin references. |
 | `createdAt / updatedAt` | `date` | Yes | Audit timestamps. |
 
+### F030 approved practice question refinement
+
+F030 implements only the `practiceQuestions` model. See the
+[approved contract](features/F030-practice-question-base-model.md).
+Question types remain CODING, OUTPUT, DESCRIPTIVE and SCENARIO; difficulty reuses
+BEGINNER, INTERMEDIATE, ADVANCED and INTERVIEW_READY. Prompt/answer are required;
+explanation is optional. These strings are trimmed, nonblank and bounded at
+50,000 characters each. Optional `starterCode` is inert question context for
+**all four types**, superseding the coding-only description above. Preserve its
+whitespace; reject blank/non-string code and lengths over 50,000. Language remains
+JAVASCRIPT or TYPESCRIPT, required when code is non-null; it may exist without code.
+Code/language may be absent or explicitly null; explanation may be absent but not
+null. No implicit type coercion or unknown/evaluation fields are accepted.
+
+Canonical lifecycle defaults to DRAFT; schemaVersion is added as integer 1 only,
+default 1. Timestamps and required User provenance references follow existing
+conventions. Exact ObjectIds/24-hex strings validate identifier format only, not
+parent existence, ancestry or Admin authority. Both documented indexes remain
+nonunique; autoCreate/autoIndex/buffering are disabled. No migration or startup
+collection/index creation is introduced.
+
+Answer and explanation use default query exclusion (`select: false`), not answer
+authorization or universal redaction. Whole-document conditional validation requires
+async validate()/validated save with the needed fields loaded; query/raw writes
+are not this validation boundary. The unspecified `evaluation` object remains a
+future requirement and is explicitly unsupported/rejected in F030; no Mixed/Map
+or arbitrary JSON substitute. No grading, attempts, publishing or UI is implemented.
+
 ### `practiceAttempts`
 | Field | Type | Required | Purpose |
 |---|---|---:|---|

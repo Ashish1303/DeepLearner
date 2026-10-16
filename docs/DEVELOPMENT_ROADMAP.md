@@ -680,7 +680,26 @@ No database operations or production deployment authorized. F030 is not authoriz
 
 ### F030 — Practice Question Base Model
 **Dependencies:** F021  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+Owner approved the seven-file backend model scope in
+[F030](features/F030-practice-question-base-model.md), including canonical question
+types, all-type inert question-context code, strict validation and defensive answer
+projection. No API/UI, evaluation, submissions or publishing implementation.
+Implementation/offline verification PASS (2026-10-16): focused model tests 13/13,
+relevant Concept/Visualization API regressions 41/41, workspace build/lint/typecheck/
+format checks PASS. Exact seven-file scope preserved. Guarded integration coverage
+passed 5/5 including its parent test; isolated persistence/projection/index checks
+and disposable cleanup PASS. No answer-unlock or publishing authorization is implemented.
+Final acceptance review PASS (2026-10-16). Browser evidence: 83/83 DISTINCT
+SCENARIOS WITH PASSING EVIDENCE - SEGMENTED REGRESSION WITH ONE RECOVERED
+INTERMITTENT FAILURE (77 retained + 1 independent recovery + 5 newly passing).
+The historical F029 ArrowDown failure remains unresolved, root cause INCONCLUSIVE;
+no permanent fix or clean single-invocation PASS is claimed. F024 worker-browser,
+screen-reader/background-throttling and Windows shutdown limitations remain.
+See F030 for retained evidence and deferred reference/answer-authorization/API work.
+Owner completion and seven-file Git delivery approved (2026-10-16). All limitations
+remain retained. F031 remains NOT_STARTED; its planning requires separate approval.
 
 ### F031 — Output-Based Questions
 **Goal:** Implement one question type end-to-end first.  
@@ -1162,9 +1181,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F029 - First Real Visual Lesson
+**Current Feature:** F030 - Practice Question Base Model
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F030 - Practice Question Base Model (not authorized)
+**Next Feature:** F031 - Output-Based Questions (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---
