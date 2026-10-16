@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import { VisualizationPlayer } from '../../../../components/visualizations/visualization-player';
 import type { VisualizationData } from '../../../../lib/visualizations/contracts';
+import {
+  javascriptClosureCode,
+  javascriptClosureLesson,
+} from '../../../../lib/visualizations/lessons/javascript-closure';
 
 const graph: VisualizationData = {
   type: 'ANIMATED_FLOW',
@@ -129,7 +133,32 @@ export function VisualizationFixture() {
         <button type="button" onClick={() => setMounted((value) => !value)}>
           {mounted ? 'Unmount player' : 'Mount player'}
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setData(javascriptClosureLesson);
+            setVisualizationKey('synthetic-closure-lesson');
+          }}
+        >
+          Load closure lesson
+        </button>
       </div>
+      {data === javascriptClosureLesson && (
+        <section aria-label="Closure lesson example" style={{ minWidth: 0 }}>
+          <p>
+            This graph is an overview of six authored stages, not simultaneous
+            active stack frames. Highlighted results occur only at their stated
+            stages. The code below is displayed, never executed.
+          </p>
+          <pre
+            tabIndex={0}
+            aria-label="makeCounter example code"
+            style={{ maxWidth: '100%', overflow: 'auto', padding: 8 }}
+          >
+            <code>{javascriptClosureCode}</code>
+          </pre>
+        </section>
+      )}
       {mounted && (
         <VisualizationPlayer
           data={data}

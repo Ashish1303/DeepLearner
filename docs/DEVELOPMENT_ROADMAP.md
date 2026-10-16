@@ -654,7 +654,25 @@ all recorded limitations remain applicable. F029 is not authorized.
 ### F029 — First Real Visual Lesson
 **Recommended Concept:** JavaScript Event Loop or Closure  
 **Dependencies:** F028  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+Owner approved the seven-file JavaScript Closure lesson implementation and offline
+verification in [F029](features/F029-first-real-visual-lesson.md). Reuse F026-F028
+unchanged in the gated fixture; no production student/Admin integration or persistence.
+Offline implementation PASS: exact approved 6 nodes/7 edges/6 steps; focused 9/9
+and web regressions 165/165 PASS. Build, lint, typecheck, formatting and seven-file
+scope/security checks PASS. Owner-authorized final verification on 2026-10-16:
+same-build absent/enabled/absent HTML/RSC fixture isolation PASS; 83/83 SEGMENTED
+REGRESSION PASS (27 F022/F025, 16 F023, 19 F024, 13 F028, 7 F029, 1 smoke), zero
+retries, 367.33 seconds. Mounted closure highlights/playback, keyboard focus,
+reduced motion and 1280/768/390px containment PASS. Owned jobs empty and ports
+released; Playwright Windows server teardown remains forced. Final review PASS.
+Retain F024's worker-browser conflict, lack of clean combined-run evidence,
+screen-reader/background-throttling gaps and existing release limitations.
+Student Concept integration and Admin publishing remain deferred. Evidence and
+cleanup details are recorded in the feature document. Owner approved completion
+and the seven-file Git delivery on 2026-10-16, preserving all limitations.
+No database operations or production deployment authorized. F030 is not authorized.
 
 ---
 
@@ -1144,9 +1162,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F028 - Visualization Controls
+**Current Feature:** F029 - First Real Visual Lesson
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F029 - First Real Visual Lesson (not authorized)
+**Next Feature:** F030 - Practice Question Base Model (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

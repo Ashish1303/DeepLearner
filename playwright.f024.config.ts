@@ -3,7 +3,11 @@ import foundation from './playwright.config';
 
 // Execution requires the separate F024 browser gate; this does not change the smoke suite.
 export default defineConfig(foundation, {
-  testMatch: ['concept-revise.spec.ts', 'visualization-controls.spec.ts'],
+  testMatch: [
+    'concept-revise.spec.ts',
+    'visualization-controls.spec.ts',
+    'visualization-lesson.spec.ts',
+  ],
   globalTimeout: 600_000,
   timeout: 45_000,
   maxFailures: 1,
