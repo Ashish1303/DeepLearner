@@ -634,7 +634,22 @@ Owner approved F027 development closure and feature-only Git delivery; no deploy
 
 ### F028 — Visualization Controls
 **Dependencies:** F027  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+Final acceptance review PASS within the approved twelve-file playback/fixture scope.
+Retained focused 21/21 and web 156/156 PASS; build/lint/typecheck/format/scope PASS.
+Independent F028 13/13 and smoke 1/1 PASS, zero retries; retained F022/F025 27,
+F023 16 and F024 19 reconcile to **76/76 SEGMENTED REGRESSION PASS**.
+Current verification/cleanup took 80.780 seconds. Same-build disabled/enabled/disabled
+fixture isolation PASS: disabled HTML 404, disabled RSC not-found payload without
+fixture content. Mounted keyboard/focus, playback, responsive overflow and reduced
+motion PASS; owned jobs empty and ports released. F024's worker-browser cleanup
+conflict remains unresolved, so this is not a clean combined-run PASS.
+Exhaustive screen-reader behavior, real background throttling, graceful Windows
+application shutdown and end-to-end student integration remain NOT_VERIFIED.
+See the F028 feature document for evidence and retained release limitations.
+Owner approved F028 development closure and feature-only Git delivery on 2026-10-16;
+all recorded limitations remain applicable. F029 is not authorized.
 
 ### F029 — First Real Visual Lesson
 **Recommended Concept:** JavaScript Event Loop or Closure  
@@ -1129,9 +1144,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F027 - Visualization Renderer MVP
+**Current Feature:** F028 - Visualization Controls
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F028 - Visualization Controls (not authorized)
+**Next Feature:** F029 - First Real Visual Lesson (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

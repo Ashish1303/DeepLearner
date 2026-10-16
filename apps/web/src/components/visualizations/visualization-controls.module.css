@@ -1,0 +1,57 @@
+.player {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  min-width: 0;
+  max-width: 100%;
+  color: #173b37;
+}
+
+.controls {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid #9cb5b0;
+  border-radius: 0.75rem;
+  background: #f5faf8;
+  overflow-wrap: anywhere;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.buttons button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 2px solid #087f72;
+  border-radius: 0.4rem;
+  background: white;
+  color: #173b37;
+  font: inherit;
+  cursor: pointer;
+}
+
+.buttons button[aria-disabled='true'] {
+  border-style: dashed;
+  border-color: #657c77;
+  cursor: default;
+}
+
+.buttons button:focus-visible {
+  outline: 3px solid #3525cd;
+  outline-offset: 3px;
+}
+
+.announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
