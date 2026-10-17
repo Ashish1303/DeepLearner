@@ -264,6 +264,48 @@ export function createAuthController(
     return result;
   }
   return {
+    async runAuthenticatedRead<T>(
+      expectedAccountId: string,
+      signal: AbortSignal,
+      operation: (accessToken: string, signal: AbortSignal) => Promise<T>,
+    ): Promise<T> {
+      const version = generation;
+      const check = () => {
+        if (
+          signal.aborted ||
+          version !== generation ||
+          loggingOut ||
+          state.pending ||
+          state.status !== 'authenticated' ||
+          state.user?.id !== expectedAccountId ||
+          state.user.role !== 'STUDENT' ||
+          state.user.status !== 'ACTIVE' ||
+          !state.user.emailVerified ||
+          !token
+        )
+          throw new DOMException('Read canceled', 'AbortError');
+      };
+      check();
+      try {
+        const result = await operation(token!, signal);
+        check();
+        return result;
+      } catch (error) {
+        check();
+        if (
+          error instanceof ApiError &&
+          (error.status === 401 ||
+            [
+              'AUTH_ACCOUNT_DISABLED',
+              'AUTH_ACCOUNT_SUSPENDED',
+              'AUTH_EMAIL_NOT_VERIFIED',
+              'USER_NOT_FOUND',
+            ].includes(error.code))
+        )
+          failure(error, version);
+        throw error;
+      }
+    },
     saveProfile: (profile: OnboardingProfile) => profileOperation(profile),
     checkProfile: () => profileOperation(),
     getSnapshot: () => state,

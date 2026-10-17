@@ -141,6 +141,13 @@ function fixture(
     onKeyDown?: (event: { key: string; preventDefault(): void }) => void;
     disabled?: boolean;
   }[] = [];
+  const links: {
+    href: string;
+    children?: ReactNode;
+    tabIndex?: number;
+    onClick?: () => void;
+    onKeyDown?: (event: { key: string; preventDefault(): void }) => void;
+  }[] = [];
   function visit(node: ReactNode) {
     Children.forEach(node, (child) => {
       if (
@@ -148,10 +155,15 @@ function fixture(
           children?: ReactNode;
           onClick(): void;
           disabled?: boolean;
+          href?: string;
+          tabIndex?: number;
+          onKeyDown?: (event: { key: string; preventDefault(): void }) => void;
         }>(child)
       )
         return;
       if (child.type === 'button') buttons.push(child.props);
+      if (typeof child.props.href === 'string')
+        links.push({ ...child.props, href: child.props.href });
       visit(child.props.children);
     });
   }
@@ -159,6 +171,7 @@ function fixture(
   return {
     html: renderToStaticMarkup(element),
     buttons,
+    links,
     calls,
     selections,
     owner: exports.ConceptBrowser({ resource, id }),
@@ -251,8 +264,34 @@ test('detail renders one page title, escaped summary, Read and source without pr
   assert(html.includes('<h3>Definition</h3>'));
   assert(html.includes('noopener noreferrer'));
   assert(html.includes('Back to Topic'));
-  for (const text of ['Mark complete', 'Start learning', 'Practice', 'XP'])
+  // F031 adds a normal navigation link, not completion, scoring or progress.
+  for (const text of ['Mark complete', 'Start learning', 'XP'])
     assert(!html.includes(text));
+  for (const conceptId of [concept.id, 'f'.repeat(24)]) {
+    const result = fixture(
+      {
+        ...ready,
+        data: { ...ready.data!, concept: { ...concept, id: conceptId } },
+      },
+      'concept',
+    );
+    const links = result.links.filter(
+      (link) => link.children === 'Practice output questions',
+    );
+    assert.equal(links.length, 1);
+    assert.equal(links[0]!.href, `/concepts/${conceptId}/practice`);
+    // A named native anchor participates in tab order and Enter navigation.
+    // Mounted keyboard/focus behavior remains a separately gated browser check.
+    assert.equal(links[0]!.tabIndex, undefined);
+    assert.equal(links[0]!.onKeyDown, undefined);
+    assert.equal(links[0]!.onClick, undefined);
+    assert(
+      result.html.includes(
+        `<a href="/concepts/${conceptId}/practice">Practice output questions</a>`,
+      ),
+    );
+  }
+  assert(!fixture(ready, 'topic').html.includes('Practice output questions'));
 });
 
 test('F025 source footer remains escaped, safe and below all three modes without fetches', () => {

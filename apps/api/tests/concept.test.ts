@@ -12,7 +12,10 @@ import {
   conceptSummaryDto,
   conceptDetailDto,
 } from '../src/modules/concepts/concept.dto.js';
-import { conceptRepository } from '../src/modules/concepts/concept.repository.js';
+import {
+  conceptRepository,
+  publishedConceptStages,
+} from '../src/modules/concepts/concept.repository.js';
 import { createConceptService } from '../src/modules/concepts/concept.service.js';
 const raw = {
   _id: new Types.ObjectId(),
@@ -45,6 +48,38 @@ const raw = {
   createdAt: new Date(),
 };
 const query = { topicId: raw.topicId.toHexString(), page: 2, limit: 20 };
+
+test('shared published Concept stages preserve detail hierarchy and return fresh pipeline objects', async (t) => {
+  const id = raw._id.toHexString();
+  const stages = publishedConceptStages(id);
+  const call = t.mock.method(Concept, 'aggregate', () => ({
+    exec: async () => [],
+  }));
+  await conceptRepository.detail(id);
+  assert.deepEqual(
+    call.mock.calls[0]!.arguments[0]!.slice(0, stages.length),
+    stages,
+  );
+  assert.notEqual(publishedConceptStages(id)[0], stages[0]);
+  const lookups = stages.flatMap((stage) =>
+    '$lookup' in stage && stage.$lookup ? [stage.$lookup] : [],
+  );
+  assert.deepEqual(
+    lookups.map((stage) => stage.localField),
+    ['topicId', 'moduleId', 'learningPathId', 'technologyId'],
+  );
+  assert.deepEqual(
+    lookups.map((stage) => Object.keys(stage.let)),
+    [
+      ['technologyId', 'learningPathId', 'moduleId'],
+      ['technologyId', 'learningPathId'],
+      ['technologyId'],
+      [],
+    ],
+  );
+  for (const stage of lookups)
+    assert.equal(stage.pipeline[0]!.$match?.status, 'PUBLISHED');
+});
 
 test('revise is detail-only, legacy-null, explicitly projected and independently normalized', () => {
   assert.equal(conceptDetailDto(raw).revise, null);

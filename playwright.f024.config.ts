@@ -7,6 +7,7 @@ export default defineConfig(foundation, {
     'concept-revise.spec.ts',
     'visualization-controls.spec.ts',
     'visualization-lesson.spec.ts',
+    'practice-output.spec.ts',
   ],
   globalTimeout: 600_000,
   timeout: 45_000,

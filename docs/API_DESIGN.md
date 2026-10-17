@@ -1679,3 +1679,42 @@ The owner-approved F024 contract extends only GET /api/v1/concepts/:id with revi
 Summary is trimmed plain text (1-2,000); keyPoints is an ordered array of at most 10 trimmed plain-text items (1-500 each); optional memoryTrick is trimmed plain text (1-2,000). Optional importantCodeMarkdown preserves whitespace (1-10,000, nonblank) and remains untrusted Markdown. Reject unknown properties, malformed present values and coercion. Plain text is escaped in the UI; important code reuses the restricted F022 renderer. Existing credential-free public-read behavior remains mandatory.
 
 Flashcards, PDF export, authoring, personalized revision and demo updates remain deferred. See [F024 approved plan](features/F024-concept-revise-mode.md) for scope, security and separately gated acceptance.
+
+
+## F031 authenticated OUTPUT practice retrieval
+
+Owner-approved F031 adds `GET /api/v1/practice-questions?conceptId=<24-hex>&page=1&limit=10`.
+This is STUDENT-only bearer authentication, never a public catalog endpoint. Require
+both JWT and current user STUDENT, ACTIVE and email verified; FREE/PREMIUM parity.
+Existing auth/account errors, CORS, request IDs and no-store conventions apply.
+Limits: 300/IP and 120/subject per 15 minutes, with existing obscured limiter keys.
+
+Only PUBLISHED OUTPUT questions of schemaVersion 1 under F021's complete published
+Concept -> Topic -> Module -> LearningPath -> Technology chain are eligible. All
+existing denormalized parent checks and question Concept/Topic/Technology ancestry
+must agree. Hidden parents return generic 404 CONCEPT_NOT_FOUND; hidden or inconsistent
+questions are excluded from both items and counts. No writes or index changes.
+
+Strict single query values: required exact 24-hex conceptId normalized lowercase;
+positive decimal page default 1 and limit default 10, maximum 20; safe-integer skip.
+Reject unknown/repeated keys, arrays, coercion, unsupported filters/sort and GET bodies.
+Sort `_id ASC`. Offset pagination is stable for a fixed dataset, not a publication snapshot.
+
+Success uses `{success:true,data:[...],message:null,meta:{requestId,page,limit,total,totalPages}}`.
+Each item contains **exactly** `id`, `conceptId`, `type`, `difficulty`, `prompt`,
+`starterCode`, `language`. Type is OUTPUT; difficulty and JS/TS language reuse F030.
+Absent code/language normalize to null in the DTO only. Prompt/code bounds remain
+50,000 characters. Explicit aggregation projection and DTO reconstruction exclude
+answer, explanation, evaluation, provenance, timestamps and internal/version fields.
+Mongoose select is not the authorization boundary.
+
+Visible empty lists return 200, total/totalPages 0; out-of-range pages return 200
+with empty data and accurate totals. Validation is 400 VALIDATION_ERROR; existing
+401 token errors; 403 AUTH_FORBIDDEN for role mismatch and existing account errors;
+404 USER_NOT_FOUND for missing current user; 429 RATE_LIMIT_EXCEEDED; sanitized
+503 DEPENDENCY_UNAVAILABLE for database failure/malformed eligible projected data.
+No new answer, attempt, authoring or submission endpoint is included.
+
+Student drafts are memory-only, account/Concept/question scoped. They are not attempts
+and never enter this API. See [F031](features/F031-output-based-questions.md) for
+client cancellation, the guarded auth read contract and separately gated verification.

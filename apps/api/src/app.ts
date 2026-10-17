@@ -1,3 +1,6 @@
+import { createPracticeRouter } from './modules/practice/practice.routes.js';
+import type { PracticeService } from './modules/practice/practice.service.js';
+import type { PracticeLimits } from './modules/practice/practice-rate-limit.js';
 import { createConceptRouter } from './modules/concepts/concept.routes.js';
 import type { ConceptService } from './modules/concepts/concept.service.js';
 import type { conceptLimitDefaults } from './modules/concepts/concept-rate-limit.js';
@@ -59,6 +62,8 @@ export function createApp(
   topicLimits?: typeof topicLimitDefaults,
   conceptService?: ConceptService,
   conceptLimits?: typeof conceptLimitDefaults,
+  practiceService?: PracticeService,
+  practiceLimits?: PracticeLimits,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -115,6 +120,10 @@ export function createApp(
   app.use(
     '/api/v1/concepts',
     createConceptRouter(conceptService, conceptLimits),
+  );
+  app.use(
+    '/api/v1/practice-questions',
+    createPracticeRouter(practiceService, practiceLimits),
   );
   app.use(notFound);
   app.use(errorHandler);

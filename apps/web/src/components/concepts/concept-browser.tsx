@@ -93,6 +93,9 @@ export function ConceptContents({
               Difficulty: {difficultyLabels[concept.difficulty]}
             </p>
             <p>{concept.read.summary}</p>
+            <Link href={`/concepts/${concept.id}/practice`}>
+              Practice output questions
+            </Link>
           </>
         ) : (
           data && (

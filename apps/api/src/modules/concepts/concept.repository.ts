@@ -119,6 +119,18 @@ function publishedAncestors() {
     ),
   ];
 }
+export function publishedConceptStages(id: string) {
+  return [
+    { $match: { _id: new Types.ObjectId(id), status: 'PUBLISHED' } },
+    ...publishedParent(
+      Topic.collection.name,
+      'topicId',
+      ['technologyId', 'learningPathId', 'moduleId'],
+      'topic',
+    ),
+    ...publishedAncestors(),
+  ];
+}
 export const conceptRepository: ConceptRepository = {
   async list({ topicId, page, limit }) {
     try {
@@ -179,14 +191,7 @@ export const conceptRepository: ConceptRepository = {
   async detail(id) {
     try {
       const [record] = await Concept.aggregate<ProjectedConceptDetail>([
-        { $match: { _id: new Types.ObjectId(id), status: 'PUBLISHED' } },
-        ...publishedParent(
-          Topic.collection.name,
-          'topicId',
-          ['technologyId', 'learningPathId', 'moduleId'],
-          'topic',
-        ),
-        ...publishedAncestors(),
+        ...publishedConceptStages(id),
         { $project: detailProjection },
       ]).exec();
       return record ? conceptDetailDto(record) : null;

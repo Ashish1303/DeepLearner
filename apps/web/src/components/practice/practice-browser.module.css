@@ -1,0 +1,99 @@
+.browser {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  color: #0f172a;
+  overflow-wrap: anywhere;
+}
+.browser header,
+.browser section,
+.card,
+.markdown {
+  min-width: 0;
+  max-width: 100%;
+}
+.browser h1 {
+  font-size: clamp(1.6rem, 4vw, 2.3rem);
+  margin-block: 1rem;
+}
+.browser h2 {
+  margin-top: 0;
+}
+.card,
+.notice {
+  margin-block: 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid #cbd5e1;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+.level {
+  color: #475569;
+}
+.browser pre {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: auto;
+  white-space: pre;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: #0f172a;
+  color: #f8fafc;
+}
+.browser code {
+  font-family: monospace;
+}
+.browser label {
+  display: block;
+  margin-block: 1rem 0.5rem;
+  font-weight: 600;
+}
+.browser textarea {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-height: 8rem;
+  resize: vertical;
+  font: inherit;
+  padding: 0.75rem;
+  border: 1px solid #64748b;
+  border-radius: 0.5rem;
+  color: #0f172a;
+  background: #fff;
+}
+.browser button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.6rem 1rem;
+  border: 1px solid #64748b;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #312e81;
+  font: inherit;
+  cursor: pointer;
+}
+.browser button:disabled {
+  color: #64748b;
+  cursor: default;
+}
+.browser a {
+  color: #4338ca;
+}
+.browser :focus-visible {
+  outline: 3px solid #4338ca;
+  outline-offset: 3px;
+}
+.browser h1:focus {
+  outline: 3px solid #4338ca;
+  outline-offset: 3px;
+}
+.controls,
+.controls nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+.controls {
+  justify-content: space-between;
+}

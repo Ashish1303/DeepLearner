@@ -704,7 +704,34 @@ remain retained. F031 remains NOT_STARTED; its planning requires separate approv
 ### F031 — Output-Based Questions
 **Goal:** Implement one question type end-to-end first.  
 **Dependencies:** F030  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+Owner approved the [F031 plan](features/F031-output-based-questions.md), its refined
+contracts and the 32-file implementation scope (22 new, 10 modified). The added
+Concept rendering test replaces an obsolete Practice-text prohibition while
+preserving security and completion/XP restrictions. Offline API regressions:
+75/75 PASS; web regressions: 181/181 PASS; build, lint, TypeScript and formatting PASS.
+Live disposable MongoDB: 5/5 PASS including parent; F031 mounted browser: 14/14
+distinct scenarios with passing evidence, including an independently recovered
+locator failure. **FINAL REVIEW PASS WITH ONE-TIME REGRESSION EXCEPTION**
+(owner-approved 2026-10-17, local-development acceptance only).
+
+Actual browser regression: **40 PASS / 1 FAIL / 56 NOT_RUN, total 97**.
+F022 functional assertions passed, but afterAll signal-0 probing raised EPERM;
+the suite failed and the historical cause remains inconclusive. This is incomplete
+segmented evidence, never 97/97 PASS or a clean combined-run PASS. The 56 NOT_RUN
+cases leave shared-authentication and Concept-publication browser compatibility
+risk despite focused offline/live coverage. The exception does not authorize
+production or waive process safety. Primary-host diagnostics remain blocked.
+
+Separate owner-gated follow-ups: safe F022 Windows teardown/PID identity handling,
+F024 worker-browser cleanup conflict, completion of the 56 NOT_RUN cases, and F029
+intermittent ArrowDown investigation if it recurs. Retain screen-reader/background-
+throttling gaps, Windows graceful-shutdown/taskkill PID-reuse risk and historical
+failure/recovery evidence. See F031 Section 12 for the full matrix and exception
+boundaries. Owner approved F031 completion and feature-only Git delivery for
+local-development acceptance. Further remediation and F032 planning remain gated.
+No submissions, answer unlocking, scoring, persistence or F032 implementation.
 
 ### F032 — Descriptive Questions
 Status: `NOT_STARTED`
@@ -1181,9 +1208,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F030 - Practice Question Base Model
+**Current Feature:** F031 - Output-Based Questions
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F031 - Output-Based Questions (not authorized)
+**Next Feature:** F032 - Descriptive Questions (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

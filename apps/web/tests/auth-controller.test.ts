@@ -95,6 +95,97 @@ function fixture(overrides: Partial<ApiClient> = {}, supported = true) {
     emit: (message: Control) => listener?.(message),
   };
 }
+test('authenticated read keeps token private, guards account and preserves session on local failures', async () => {
+  const f = fixture();
+  const signal = new AbortController().signal;
+  await assert.rejects(
+    f.controller.runAuthenticatedRead(user.id, signal, async () => 1),
+    { name: 'AbortError' },
+  );
+  await f.controller.restore();
+  let calls = 0;
+  assert.equal(
+    await f.controller.runAuthenticatedRead(
+      user.id,
+      signal,
+      async (token, received) => {
+        calls++;
+        assert.equal(token, access.accessToken);
+        assert.equal(received, signal);
+        return 42;
+      },
+    ),
+    42,
+  );
+  await assert.rejects(
+    f.controller.runAuthenticatedRead('b'.repeat(24), signal, async () => {
+      calls++;
+      return 1;
+    }),
+    { name: 'AbortError' },
+  );
+  assert.equal(calls, 1);
+  assert.equal(
+    JSON.stringify(f.controller.getSnapshot()).includes(access.accessToken),
+    false,
+  );
+  for (const code of [
+    'NETWORK_ERROR',
+    'DEPENDENCY_UNAVAILABLE',
+    'RATE_LIMIT_EXCEEDED',
+  ] as const) {
+    await assert.rejects(
+      f.controller.runAuthenticatedRead(user.id, signal, async () => {
+        throw new ApiError(code, 503);
+      }),
+    );
+    assert.equal(f.controller.getSnapshot().status, 'authenticated');
+  }
+});
+test('obsolete read successes and 401s cannot cross an account generation', async () => {
+  for (const fail of [false, true]) {
+    const f = fixture();
+    await f.controller.restore();
+    const gate = deferred<void>();
+    const pending = f.controller.runAuthenticatedRead(
+      user.id,
+      new AbortController().signal,
+      async () => {
+        await gate.promise;
+        if (fail) throw new ApiError('AUTH_ACCESS_TOKEN_EXPIRED', 401);
+        return 'old';
+      },
+    );
+    f.emit('identity-changed');
+    await f.controller.restore(true);
+    gate.resolve();
+    await assert.rejects(pending, { name: 'AbortError' });
+    assert.equal(f.controller.getSnapshot().status, 'authenticated');
+  }
+});
+test('current expired reads invalidate auth without a refresh replay; cancellation does not', async () => {
+  const f = fixture();
+  await f.controller.restore();
+  const before = f.calls.filter((x) => x === 'refresh').length;
+  const abort = new AbortController();
+  abort.abort();
+  await assert.rejects(
+    f.controller.runAuthenticatedRead(user.id, abort.signal, async () => 1),
+    { name: 'AbortError' },
+  );
+  assert.equal(f.controller.getSnapshot().status, 'authenticated');
+  await assert.rejects(
+    f.controller.runAuthenticatedRead(
+      user.id,
+      new AbortController().signal,
+      async () => {
+        throw new ApiError('AUTH_ACCESS_TOKEN_EXPIRED', 401);
+      },
+    ),
+  );
+  assert.equal(f.controller.getSnapshot().status, 'anonymous');
+  assert.equal(f.calls.filter((x) => x === 'refresh').length, before);
+});
 test('bootstrap is single-flight and private account state follows authoritative me only', async () => {
   const gate = deferred<typeof access>();
   let refreshes = 0;
