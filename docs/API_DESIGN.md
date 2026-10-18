@@ -1739,3 +1739,27 @@ account/Concept across both types. Obsolete requests and confirmations are
 invalidated; identity changes/disposal discard both stores. No submissions or
 answer unlocking. See [F032](features/F032-descriptive-questions.md) for gated
 verification; F031's incomplete-browser-regression exception does not transfer.
+
+## F033 scenario practice retrieval
+
+F033 extends the same authenticated GET /api/v1/practice-questions type query
+to exactly OUTPUT, DESCRIPTIVE or SCENARIO. Omission still defaults to OUTPUT;
+CODING, aliases and malformed/repeated values remain invalid. All F031/F032
+pagination, ordering, errors, STUDENT eligibility, shared rate limits, five-level
+publication/ancestry and reference checks are unchanged. No new endpoint or
+model/index change. Every returned item's type must match the request.
+
+The DTO still contains only id, conceptId, type, difficulty, prompt, starterCode
+and language. Projection plus explicit construction exclude answer, explanation,
+evaluation, provenance and internal metadata; select is not authorization. Optional
+JS/TS starterCode remains inert question context for every supported type.
+
+The existing Practice page adds Scenario selection and a free-text draft. Default
+OUTPUT, local-only selection, page-1 reset, cancellation, stale-result suppression,
+focus and OUTPUT/DESCRIPTIVE behavior remain intact. Drafts are memory-only and
+account/Concept/type/question scoped: 100 nonempty drafts TOTAL across all three
+types, 10,000 UTF-16 code units each, with no silent eviction. Confirmed Clear all
+affects only the current account/Concept across all three stores; stale tickets
+cannot delete drafts. Identity disposal clears all types. No submissions,
+unlocking, scoring, persistence or code execution. F033 verification gates and
+any new browser exception require separate owner approval; none is inherited.

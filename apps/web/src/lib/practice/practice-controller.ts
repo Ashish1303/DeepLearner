@@ -46,6 +46,7 @@ export function createPracticeController(
   > = {
     OUTPUT: { drafts: {}, authored: new Map() },
     DESCRIPTIVE: { drafts: {}, authored: new Map() },
+    SCENARIO: { drafts: {}, authored: new Map() },
   };
   const listeners = new Set<() => void>();
   const emit = (next: PracticeState) => {
@@ -205,7 +206,7 @@ export function createPracticeController(
         drafts: {},
         clearConfirmation: null,
         notice:
-          'All drafts for this Concept, across both question types, cleared.',
+          'All drafts for this Concept, across all three question types, cleared.',
       });
     },
     cancel() {

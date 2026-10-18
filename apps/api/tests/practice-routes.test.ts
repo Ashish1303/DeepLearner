@@ -120,10 +120,12 @@ test('protected HTTP denies missing/invalid/expired/admin tokens before content 
       [expired, 401],
       [admin, 403],
     ] as const) {
-      const r = await fetch(f.url + '?conceptId=' + id, {
-        headers: token ? { Authorization: 'Bearer ' + token } : {},
-      });
-      assert.equal(r.status, status);
+      for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO']) {
+        const r = await fetch(f.url + '?conceptId=' + id + '&type=' + type, {
+          headers: token ? { Authorization: 'Bearer ' + token } : {},
+        });
+        assert.equal(r.status, status);
+      }
     }
     assert.equal(f.reads(), 0);
     const r = await fetch(f.url + '?conceptId=' + id, {
@@ -170,6 +172,8 @@ test('HTTP rejects duplicated/unknown query keys, disallowed origin and unsuppor
       `conceptId=${id}&type=OUTPUT&type=DESCRIPTIVE`,
       `conceptId=${id}&type[x]=OUTPUT`,
       `conceptId=${id}&type=CODING`,
+      `conceptId=${id}&type=SCENARIO_BASED`,
+      `conceptId=${id}&type=SCENARIO&type=OUTPUT`,
       `conceptId=${id}&type=`,
       `conceptId=${id}&limit=21`,
       `conceptId=${id}&page=01`,
@@ -226,6 +230,8 @@ test('subject and IP limiters return standard safe errors without subject leakag
         'RATE_LIMIT_EXCEEDED',
       );
       assert.equal(f.reads(), 1);
+      assert.equal((await request('SCENARIO')).status, 429);
+      assert.equal(f.reads(), 1);
     } finally {
       await f.close();
     }
@@ -239,13 +245,15 @@ test('HTTP preserves existing unavailable/hidden error contracts', async () => {
       [503, 'DEPENDENCY_UNAVAILABLE'],
     ] as const) {
       f.fail(new AppError(status, code, 'Safe message'));
-      const r = await fetch(f.url + '?conceptId=' + id, {
-        headers: { Authorization: 'Bearer ' + f.token },
-      });
-      assert.equal(r.status, status);
-      const body = (await r.json()) as Body;
-      assert.equal(body.error.code, code);
-      assert.equal(body.error.stack, undefined);
+      for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO']) {
+        const r = await fetch(f.url + '?conceptId=' + id + '&type=' + type, {
+          headers: { Authorization: 'Bearer ' + f.token },
+        });
+        assert.equal(r.status, status);
+        const body = (await r.json()) as Body;
+        assert.equal(body.error.code, code);
+        assert.equal(body.error.stack, undefined);
+      }
     }
   } finally {
     await f.close();
@@ -287,10 +295,10 @@ test('GET rejects non-JSON and chunked request bodies before content reads', asy
   }
 });
 
-test('F032 HTTP defaults OUTPUT and returns explicit descriptive seven-field data', async () => {
+test('F032/F033 HTTP defaults OUTPUT and returns each explicit type with seven safe fields', async () => {
   const f = await fixture();
   try {
-    for (const type of ['', 'OUTPUT', 'DESCRIPTIVE']) {
+    for (const type of ['', 'OUTPUT', 'DESCRIPTIVE', 'SCENARIO']) {
       const response = await fetch(
         f.url + '?conceptId=' + id + (type ? '&type=' + type : ''),
         { headers: { Authorization: 'Bearer ' + f.token } },
@@ -299,6 +307,18 @@ test('F032 HTTP defaults OUTPUT and returns explicit descriptive seven-field dat
       const body = (await response.json()) as Body;
       assert.equal(body.data[0]!.type, type || 'OUTPUT');
       assert.equal(Object.keys(body.data[0]!).length, 7);
+      assert.deepEqual(
+        Object.keys(body.data[0]!).sort(),
+        [
+          'id',
+          'conceptId',
+          'type',
+          'difficulty',
+          'prompt',
+          'starterCode',
+          'language',
+        ].sort(),
+      );
       assert.doesNotMatch(
         JSON.stringify(body),
         /answer|explanation|evaluation|createdBy/,

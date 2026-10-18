@@ -47,7 +47,7 @@ export function createPracticeClient(
       try {
         abort.signal.throwIfAborted();
         const response = await fetcher(
-          `${root}/practice-questions?conceptId=${conceptId}&page=${page}&limit=10${type === 'OUTPUT' ? '' : '&type=DESCRIPTIVE'}`,
+          `${root}/practice-questions?conceptId=${conceptId}&page=${page}&limit=10${type === 'OUTPUT' ? '' : '&type=' + type}`,
           {
             method: 'GET',
             credentials: 'omit',

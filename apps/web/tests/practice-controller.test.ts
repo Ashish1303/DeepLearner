@@ -149,6 +149,167 @@ const typedLoad: PracticeClient['load'] = async (
   _signal,
   type = 'OUTPUT',
 ) => ({ ...page(n), data: page(n).data.map((item) => ({ ...item, type })) });
+
+test('F033 three-type round trips retain drafts and only confirmed current-scope clearing deletes them', async () => {
+  let calls = 0;
+  const c = fixture(async (...args) => {
+    calls++;
+    return typedLoad(...args);
+  });
+  const otherAccount = fixture(typedLoad, 'other');
+  const otherConcept = fixture(typedLoad, 'one', 'b'.repeat(24));
+  const types = ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO'] as const;
+  const q = page().data[0]!.id;
+  for (const owner of [c, otherAccount, otherConcept]) {
+    await owner.load();
+    for (const type of types) {
+      await owner.selectType(type);
+      owner.setDraft(q, '  ' + type + '\n');
+    }
+  }
+  for (const type of types) {
+    await c.load(2);
+    const revision = c.getSnapshot().focusRevision;
+    await c.selectType(type);
+    assert.equal(c.getSnapshot().page, 1);
+    assert.equal(c.getSnapshot().focusRevision, revision);
+    assert.equal(c.getSnapshot().drafts[q], '  ' + type + '\n');
+    const before = calls;
+    await c.selectType(type);
+    await c.selectType('CODING' as 'OUTPUT');
+    assert.equal(calls, before);
+  }
+  c.clearDrafts();
+  const canceled = c.getSnapshot().clearConfirmation!;
+  c.cancelClearDrafts();
+  c.confirmClearDrafts(canceled);
+  assert.equal(c.getSnapshot().drafts[q], '  SCENARIO\n');
+  c.clearDrafts();
+  c.confirmClearDrafts(c.getSnapshot().clearConfirmation!);
+  for (const type of types) {
+    await c.selectType(type);
+    assert.deepEqual(c.getSnapshot().drafts, {});
+    for (const other of [otherAccount, otherConcept]) {
+      await other.selectType(type);
+      assert.equal(other.getSnapshot().drafts[q], '  ' + type + '\n');
+    }
+  }
+});
+
+test('F033 capacity and length are shared across three stores without eviction', async () => {
+  const c = fixture(typedLoad);
+  await c.load();
+  for (const [type, count] of [
+    ['OUTPUT', 34],
+    ['DESCRIPTIVE', 33],
+    ['SCENARIO', 33],
+  ] as const) {
+    await c.selectType(type);
+    for (let n = 1; n <= count; n++) {
+      await c.load(n);
+      c.setDraft(page(n).data[0]!.id, type);
+    }
+  }
+  await c.load(34);
+  c.setDraft(page(34).data[0]!.id, '101st');
+  assert.match(c.getSnapshot().notice, /capacity/);
+  assert.equal(Object.keys(c.getSnapshot().drafts).length, 33);
+  await c.load(1);
+  const q = page().data[0]!.id;
+  c.setDraft(q, 'x'.repeat(10000));
+  c.setDraft(q, 'x'.repeat(10001));
+  assert.equal(c.getSnapshot().drafts[q]?.length, 10000);
+  c.setDraft(q, 'old event', 'OUTPUT');
+  assert.equal(c.getSnapshot().drafts[q]?.length, 10000);
+  c.setDraft(q, '');
+  await c.load(34);
+  c.setDraft(page(34).data[0]!.id, 'slot freed');
+  assert.equal(c.getSnapshot().drafts[page(34).data[0]!.id], 'slot freed');
+  await c.selectType('OUTPUT');
+  assert.equal(Object.keys(c.getSnapshot().drafts).length, 34);
+  assert.equal(c.getSnapshot().drafts[q], 'OUTPUT');
+  await c.selectType('DESCRIPTIVE');
+  assert.equal(Object.keys(c.getSnapshot().drafts).length, 33);
+});
+
+test('F033 stale Scenario success/error, confirmation and disposed callbacks cannot cross identities', async () => {
+  for (const fail of [false, true]) {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let held = false;
+    let signal: AbortSignal | undefined;
+    const c = fixture(async (...args) => {
+      if (held && args[4] === 'SCENARIO') {
+        signal = args[3];
+        await gate;
+        if (fail) throw Error('obsolete');
+      }
+      return typedLoad(...args);
+    });
+    await c.load();
+    const q = page().data[0]!.id;
+    c.setDraft(q, 'output');
+    await c.selectType('SCENARIO');
+    c.setDraft(q, 'scenario');
+    c.clearDrafts();
+    const oldTicket = c.getSnapshot().clearConfirmation!;
+    await c.selectType('DESCRIPTIVE');
+    c.setDraft(q, 'description');
+    held = true;
+    const pending = c.selectType('SCENARIO');
+    assert.equal(c.getSnapshot().status, 'loading');
+    assert.equal(c.getSnapshot().data, null);
+    await c.selectType('OUTPUT');
+    c.confirmClearDrafts(oldTicket);
+    assert.equal(signal?.aborted, true);
+    release();
+    await pending;
+    assert.equal(c.getSnapshot().type, 'OUTPUT');
+    assert.equal(c.getSnapshot().drafts[q], 'output');
+    assert.equal(c.getSnapshot().status, 'ready');
+    c.clearDrafts();
+    const disposalTicket = c.getSnapshot().clearConfirmation!;
+    c.cancel();
+    c.confirmClearDrafts(disposalTicket);
+    held = false;
+    for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO'] as const) {
+      await c.selectType(type);
+      assert.deepEqual(c.getSnapshot().drafts, {});
+    }
+  }
+});
+
+test('F033 Scenario fingerprint changes clear only its draft and edits invalidate confirmation', async () => {
+  let prompt = 'Scenario';
+  const c = fixture(async (...args) => {
+    const data = await typedLoad(...args);
+    return args[4] === 'SCENARIO'
+      ? { ...data, data: data.data.map((item) => ({ ...item, prompt })) }
+      : data;
+  });
+  await c.load();
+  const q = page().data[0]!.id;
+  c.setDraft(q, 'output');
+  await c.selectType('DESCRIPTIVE');
+  c.setDraft(q, 'description');
+  await c.selectType('SCENARIO');
+  c.setDraft(q, 'scenario');
+  c.clearDrafts();
+  const ticket = c.getSnapshot().clearConfirmation!;
+  c.setDraft(q, 'changed draft');
+  c.confirmClearDrafts(ticket);
+  assert.equal(c.getSnapshot().drafts[q], 'changed draft');
+  prompt = 'Changed context';
+  await c.retry();
+  assert.deepEqual(c.getSnapshot().drafts, {});
+  assert.match(c.getSnapshot().notice, /content changed/);
+  await c.selectType('OUTPUT');
+  assert.equal(c.getSnapshot().drafts[q], 'output');
+  await c.selectType('DESCRIPTIVE');
+  assert.equal(c.getSnapshot().drafts[q], 'description');
+});
 test('F032 type round trips retain separate drafts for identical IDs and reset pages', async () => {
   let calls = 0;
   const c = fixture(async (...args) => {

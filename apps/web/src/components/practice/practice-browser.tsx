@@ -56,7 +56,12 @@ export function PracticeView({
   const heading = useRef<HTMLHeadingElement>(null);
   const focused = useRef(-1);
   const clearButton = useRef<HTMLButtonElement>(null);
-  const typeLabel = state.type === 'OUTPUT' ? 'Output' : 'Descriptive';
+  const typeLabels = {
+    OUTPUT: 'Output',
+    DESCRIPTIVE: 'Descriptive',
+    SCENARIO: 'Scenario',
+  };
+  const typeLabel = typeLabels[state.type];
   useEffect(() => {
     if (
       (state.status === 'ready' || state.status === 'error') &&
@@ -83,7 +88,7 @@ export function PracticeView({
         </p>
       </header>
       <div className={styles.controls} role="group" aria-label="Question type">
-        {(['OUTPUT', 'DESCRIPTIVE'] as const).map((type) => (
+        {(['OUTPUT', 'DESCRIPTIVE', 'SCENARIO'] as const).map((type) => (
           <button
             key={type}
             type="button"
@@ -93,7 +98,7 @@ export function PracticeView({
               void controller.selectType(type);
             }}
           >
-            {type === 'OUTPUT' ? 'Output' : 'Descriptive'}
+            {typeLabels[type]}
           </button>
         ))}
         <span>Selected: {typeLabel}</span>
@@ -163,7 +168,7 @@ export function PracticeView({
                     Your{' '}
                     {state.type === 'OUTPUT'
                       ? 'output prediction'
-                      : 'descriptive answer'}{' '}
+                      : `${typeLabel.toLowerCase()} answer`}{' '}
                     for Question {number}
                   </label>
                   <textarea
@@ -222,8 +227,8 @@ export function PracticeView({
             aria-describedby={prefix + '-clear'}
           >
             <p id={prefix + '-clear'}>
-              Clear all drafts for this Concept across Output and Descriptive?
-              This cannot be undone.
+              Clear all drafts for this Concept across Output, Descriptive and
+              Scenario? This cannot be undone.
             </p>
             <button
               type="button"

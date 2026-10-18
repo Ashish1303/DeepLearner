@@ -771,7 +771,50 @@ require separate approvals. Owner completion approval retains the browser except
 See F032 Sections 10-11 for the evidence matrix, scope review and completion approval.
 
 ### F033 — Scenario-Based Questions
-Status: `NOT_STARTED`
+Status: `APPROVED_COMPLETE`
+
+Owner approved implementation and offline verification (2026-10-18) within the
+exact 17-file [F033 plan](features/F033-scenario-based-questions.md). Extend the
+existing authenticated Practice flow with SCENARIO while preserving default
+OUTPUT, DESCRIPTIVE compatibility, publication/DTO secrecy and three-type
+memory-only drafts. Final review: **FINAL REVIEW PASS WITH F033 BROWSER EXCEPTION**
+following explicit owner approval (2026-10-18) for LOCAL DEVELOPMENT ONLY.
+Owner subsequently approved completion and the exact 17-file feature-only commit
+and safe push to origin/dev (2026-10-18), retaining this local-only exception.
+The one-time F033-specific exception is permitted by AGENTS.md; it is not inherited
+from F032 and does not transfer to F034 or future features. No production approval,
+infrastructure investigation or F034 work is authorized.
+
+Offline implementation PASS: focused API 16/16 and relevant API regressions 44/44
+(60 distinct); focused web 28/28 and remaining web regressions 168/168 (196 distinct).
+Build, lint, TypeScript, formatting, browser-spec compile-only and scope/security
+checks PASS. A test-only mock return annotation resolved an initial API typecheck
+error; runtime assertions were unchanged, and only affected static checks reran.
+Exact 17-file scope; no new dependencies, model/index or shared-auth/publication
+changes. Owner-authorized disposable MongoDB integration: 7/7 PASS including parent,
+with publication/ancestry, three-type compatibility, DTO secrecy and immutable reads.
+Its initial wrapper exited nonzero after a cleanup port-query typo; the historical
+error remains recorded. Authorized separate cleanup completed without test/server
+reruns: graceful Mongo exit, owned Job empty, port released, owned storage removed
+and protected MongoDB/development identities/demo metadata unchanged. No forced kill.
+
+F033 mounted acceptance: **7 NOT_RUN**. Seven cases are prepared; runtime behavior
+remains NOT_VERIFIED. The owner explicitly accepts local-development risks for
+responsive/mobile layout, real keyboard/focus/accessibility, three-type draft
+retention/account isolation during navigation, cancellation/stale-response races
+and shared authentication/Concept-publication compatibility. No browser PASS or
+complete regression acceptance is claimed. No security/API/database check is waived.
+Expected complete regression: 111 NOT_RUN including the previous 104; no discovery
+or browser execution. This total INCLUDES the seven F033 cases. Historical F031
+40 PASS / 1 FAIL / 56 NOT_RUN and F032's 7/104 NOT_RUN remain unchanged.
+Existing F022 EPERM/taskkill PID-reuse, F024 worker lifecycle, F029 intermittent
+scrolling/recovery, screen-reader/background-throttling and Windows shutdown gaps
+persist. Primary-host Playwright remains prohibited pending separate ownership-safe
+approval; the closed prototype and its evidence are untouched. Manual checks are
+supplemental only. Future browser regression and production release-readiness need
+separate approval. F033 completion is owner-approved for local development only;
+the scoped Git delivery is authorized. No browser PASS or production readiness.
+See F033 Sections 8-11 for retained evidence, cleanup history and exception boundaries.
 
 ### F034 — Coding Questions
 Status: `NOT_STARTED`
@@ -1242,9 +1285,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F032 - Descriptive Questions
+**Current Feature:** F033 - Scenario-Based Questions
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F033 - Scenario-Based Questions (not authorized)
+**Next Feature:** F034 - Coding Questions (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

@@ -200,41 +200,88 @@ test('F032 native pressed controls and descriptive textarea preserve safe render
   assert.match(confirmation, /aria-label="Confirm clearing drafts"/);
   assert.match(confirmation, /Confirm clear all drafts/);
   assert.match(confirmation, /Keep drafts/);
-  assert.match(confirmation, /across Output and Descriptive/);
+  assert.match(confirmation, /across Output, Descriptive and Scenario/);
 });
 
-test('F032 selecting a type suppresses heading focus, including during initial readiness', () => {
-  const f = fixture();
-  let headingFocus = 0,
-    chosen = '';
-  f.refs[0]!.current = { focus: () => headingFocus++ };
-  f.controller.selectType = (type: string) => {
-    chosen = type;
-  };
-  function find(node: unknown): { onClick: () => void } | undefined {
-    if (Array.isArray(node)) {
-      for (const child of node) {
-        const result = find(child);
-        if (result) return result;
+test('F032/F033 selecting either added type suppresses heading focus, including initial readiness', () => {
+  for (const label of ['Descriptive', 'Scenario']) {
+    const f = fixture();
+    let headingFocus = 0,
+      chosen = '';
+    f.refs[0]!.current = { focus: () => headingFocus++ };
+    f.controller.selectType = (type: string) => {
+      chosen = type;
+    };
+    function find(node: unknown): { onClick: () => void } | undefined {
+      if (Array.isArray(node)) {
+        for (const child of node) {
+          const result = find(child);
+          if (result) return result;
+        }
+        return;
       }
-      return;
+      if (!node || typeof node !== 'object' || !('props' in node)) return;
+      const props = (
+        node as { props: { children?: unknown; onClick?: () => void } }
+      ).props;
+      if (props.children === label && props.onClick)
+        return { onClick: props.onClick };
+      return find(props.children);
     }
-    if (!node || typeof node !== 'object' || !('props' in node)) return;
-    const props = (
-      node as { props: { children?: unknown; onClick?: () => void } }
-    ).props;
-    if (props.children === 'Descriptive' && props.onClick)
-      return { onClick: props.onClick };
-    return find(props.children);
+    const button = find(f.tree);
+    assert(button);
+    button.onClick();
+    assert.equal(chosen, label.toUpperCase());
+    f.effects.forEach((effect) => effect());
+    assert.equal(headingFocus, 0);
+    const initial = fixture();
+    initial.refs[0]!.current = { focus: () => headingFocus++ };
+    initial.effects.forEach((effect) => effect());
+    assert.equal(headingFocus, 1);
   }
-  const button = find(f.tree);
-  assert(button);
-  button.onClick();
-  assert.equal(chosen, 'DESCRIPTIVE');
-  f.effects.forEach((effect) => effect());
-  assert.equal(headingFocus, 0);
-  const initial = fixture();
-  initial.refs[0]!.current = { focus: () => headingFocus++ };
-  initial.effects.forEach((effect) => effect());
-  assert.equal(headingFocus, 1);
+});
+
+test('F033 Scenario has three native selectors, a safe labelled textarea and truthful states', () => {
+  const current: PracticeState = {
+    ...state,
+    type: 'SCENARIO',
+    data: {
+      ...state.data!,
+      data: state.data!.data.map((item) => ({ ...item, type: 'SCENARIO' })),
+    },
+  };
+  const html = fixture(current).html;
+  assert.equal((html.match(/aria-pressed=/g) ?? []).length, 3);
+  assert.equal((html.match(/aria-pressed="true"/g) ?? []).length, 1);
+  assert.match(html, /aria-pressed="true">Scenario/);
+  assert.match(html, /Selected: Scenario/);
+  assert.match(html, /Scenario practice/);
+  assert.match(html, /aria-label="Scenario questions"/);
+  assert.match(html, /Your scenario answer for Question 1/);
+  assert.match(html, /&lt;script&gt;inert/);
+  assert.match(html, /&lt;script&gt;draft/);
+  assert.doesNotMatch(
+    html,
+    /<script|<img|href="javascript|>Submit<|>Score<|>Unlock</,
+  );
+  assert.match(
+    fixture({ ...current, status: 'loading', data: null }).html,
+    /Loading scenario questions/,
+  );
+  assert.match(
+    fixture({ ...current, status: 'error', data: null, message: 'Safe error' })
+      .html,
+    /role="alert">Safe error/,
+  );
+  assert.match(
+    fixture({
+      ...current,
+      data: {
+        ...current.data!,
+        data: [],
+        meta: { ...current.data!.meta, total: 0, totalPages: 0 },
+      },
+    }).html,
+    /No published SCENARIO/,
+  );
 });

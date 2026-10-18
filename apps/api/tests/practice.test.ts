@@ -265,8 +265,8 @@ test('repository handles absent parents, legacy optional values and sanitized in
   );
 });
 
-test('F032 canonical type defaults, strict inputs, descriptive projection and shared ancestry', () => {
-  for (const type of ['OUTPUT', 'DESCRIPTIVE'] as const) {
+test('F032/F033 canonical types, strict inputs, safe projection and shared ancestry', () => {
+  for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO'] as const) {
     const q = practiceQuery.parse({ conceptId: id, type });
     assert.equal(q.type, type);
     const stages = practiceStages(q);
@@ -294,7 +294,10 @@ test('F032 canonical type defaults, strict inputs, descriptive projection and sh
     ' DESCRIPTIVE',
     'DESCRIPTIVE\n',
     'CODING',
-    'SCENARIO',
+    'SCENARIO_BASED',
+    'scenario',
+    ' SCENARIO',
+    'SCENARIO\n',
     'OUTPUT_BASED',
     null,
     1,
@@ -317,4 +320,47 @@ test('F032 repository rejects a valid DTO of the wrong requested type', async (t
     practiceRepository.list({ ...query, type: 'DESCRIPTIVE' }),
     { code: 'DEPENDENCY_UNAVAILABLE' },
   );
+});
+
+test('F033 Scenario repository returns only safe matching data and rejects wrong-type records', async (t) => {
+  const aggregate = t.mock.method(Concept, 'aggregate', () => ({
+    exec: async (): Promise<unknown[]> => [
+      {
+        questions: [
+          {
+            items: [{ ...raw, type: 'SCENARIO', createdBy: id }],
+            count: [{ total: 1 }],
+          },
+        ],
+      },
+    ],
+  }));
+  const requested = { ...query, type: 'SCENARIO' as const };
+  const result = await practiceRepository.list(requested);
+  assert.equal(result?.total, 1);
+  assert.deepEqual(
+    Object.keys(result!.items[0]!).sort(),
+    [
+      'id',
+      'conceptId',
+      'type',
+      'difficulty',
+      'prompt',
+      'starterCode',
+      'language',
+    ].sort(),
+  );
+  assert.equal(result?.items[0]!.type, 'SCENARIO');
+  assert.doesNotMatch(
+    JSON.stringify(result),
+    /SECRET|answer|explanation|evaluation|createdBy/,
+  );
+  aggregate.mock.mockImplementation(() => ({
+    exec: async () => [
+      { questions: [{ items: [raw], count: [{ total: 1 }] }] },
+    ],
+  }));
+  await assert.rejects(practiceRepository.list(requested), {
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
 });
