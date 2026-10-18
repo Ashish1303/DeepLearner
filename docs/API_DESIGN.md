@@ -1763,3 +1763,32 @@ affects only the current account/Concept across all three stores; stale tickets
 cannot delete drafts. Identity disposal clears all types. No submissions,
 unlocking, scoring, persistence or code execution. F033 verification gates and
 any new browser exception require separate owner approval; none is inherited.
+
+## F034 coding practice retrieval
+
+F034 extends the same authenticated GET /api/v1/practice-questions optional type
+query to exactly OUTPUT, DESCRIPTIVE, SCENARIO or CODING. Missing type still
+defaults to OUTPUT. This supersedes the earlier CODING rejection, preserving
+strict identifiers/query/GET-body validation, STUDENT/current-account eligibility,
+shared rate limits, pagination, `_id ASC` ordering and safe error contracts.
+Requested-type PUBLISHED schemaVersion-1 questions must satisfy F021's complete
+five-level published ancestry and consistent Concept/Topic/Technology references.
+No endpoint, persistence, model or index change is introduced.
+
+The DTO remains exactly id, conceptId, type, difficulty, prompt, starterCode and
+language. Explicit projection and field-by-field construction exclude answer,
+explanation, evaluation, provenance and internal metadata; select is not access
+authorization. Optional nullable JS/TS starterCode stays inert question context,
+preserving whitespace. CODING does not require starterCode or a language default.
+
+The existing Student Practice page adds Coding selection with an initially empty
+native code-draft textarea, separate from read-only starterCode. No code is run,
+evaluated, submitted or prefilled from starterCode. Type changes reset page 1,
+abort superseded work, reject stale results and retain selector focus and drafts.
+Memory-only account/Concept/type/question stores share 100 nonempty drafts TOTAL
+across all four types, each at most 10,000 UTF-16 code units, with no silent
+eviction. Confirmed Clear all covers only the current account/Concept across all
+four stores; stale confirmations are rejected. Identity disposal clears memory.
+No editor dependency, draft persistence, answer unlocking, scoring or progress.
+See [F034](features/F034-coding-questions.md) for separately gated MongoDB/browser
+verification and formal final code review. No historical browser exception transfers.

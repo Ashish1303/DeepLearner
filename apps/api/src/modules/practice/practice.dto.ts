@@ -10,7 +10,7 @@ const dto = z
   .strictObject({
     id,
     conceptId: id,
-    type: z.enum(['OUTPUT', 'DESCRIPTIVE', 'SCENARIO']),
+    type: z.enum(['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING']),
     difficulty: z.enum([
       'BEGINNER',
       'INTERMEDIATE',

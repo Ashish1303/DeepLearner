@@ -150,6 +150,142 @@ const typedLoad: PracticeClient['load'] = async (
   type = 'OUTPUT',
 ) => ({ ...page(n), data: page(n).data.map((item) => ({ ...item, type })) });
 
+test('F034 empty code drafts preserve whitespace and four-type scoped confirmation', async () => {
+  const load: PracticeClient['load'] = async (...args) => {
+    const result = await typedLoad(...args);
+    return {
+      ...result,
+      data: result.data.map((item) => ({
+        ...item,
+        starterCode: '\tconst starter = 1;\n',
+        language: 'JAVASCRIPT' as const,
+      })),
+    };
+  };
+  const c = fixture(load),
+    other = fixture(load, 'other'),
+    concept = fixture(load, 'one', 'b'.repeat(24));
+  const types = ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'] as const;
+  const q = page().data[0]!.id;
+  for (const owner of [c, other, concept]) {
+    await owner.load();
+    for (const type of types) {
+      await owner.selectType(type);
+      assert.equal(owner.getSnapshot().drafts[q], undefined);
+      owner.setDraft(q, '\t  ' + type + '\n\n  ');
+    }
+  }
+  for (const type of types) {
+    await c.selectType(type);
+    assert.equal(c.getSnapshot().drafts[q], '\t  ' + type + '\n\n  ');
+  }
+  c.clearDrafts();
+  const canceled = c.getSnapshot().clearConfirmation!;
+  c.cancelClearDrafts();
+  c.confirmClearDrafts(canceled);
+  assert.equal(c.getSnapshot().drafts[q], '\t  CODING\n\n  ');
+  c.clearDrafts();
+  const stale = c.getSnapshot().clearConfirmation!;
+  c.setDraft(q, ' \t\n');
+  c.confirmClearDrafts(stale);
+  assert.equal(c.getSnapshot().drafts[q], ' \t\n');
+  c.clearDrafts();
+  c.confirmClearDrafts(c.getSnapshot().clearConfirmation!);
+  for (const type of types) {
+    await c.selectType(type);
+    assert.deepEqual(c.getSnapshot().drafts, {});
+    for (const owner of [other, concept]) {
+      await owner.selectType(type);
+      assert.equal(owner.getSnapshot().drafts[q], '\t  ' + type + '\n\n  ');
+    }
+  }
+});
+
+test('F034 shared four-type capacity and code length never evict or trim', async () => {
+  const c = fixture(typedLoad);
+  await c.load();
+  for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'] as const) {
+    await c.selectType(type);
+    for (let n = 1; n <= 25; n++) {
+      await c.load(n);
+      c.setDraft(page(n).data[0]!.id, type);
+    }
+  }
+  await c.load(26);
+  const next = page(26).data[0]!.id;
+  c.setDraft(next, '101st');
+  assert.equal(c.getSnapshot().drafts[next], undefined);
+  assert.match(c.getSnapshot().notice, /capacity/);
+  await c.load(1);
+  const q = page().data[0]!.id;
+  const code = '\t' + ' '.repeat(9998) + '\n';
+  c.setDraft(q, code);
+  c.setDraft(q, code + 'x');
+  assert.equal(c.getSnapshot().drafts[q], code);
+  c.setDraft(q, 'wrong type', 'OUTPUT');
+  assert.equal(c.getSnapshot().drafts[q], code);
+  c.setDraft(q, '');
+  await c.load(26);
+  c.setDraft(next, 'freed slot');
+  assert.equal(c.getSnapshot().drafts[next], 'freed slot');
+  for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO'] as const) {
+    await c.selectType(type);
+    assert.equal(Object.keys(c.getSnapshot().drafts).length, 25);
+    assert.equal(c.getSnapshot().drafts[q], type);
+  }
+});
+
+test('F034 stale Coding success/error and old confirmations cannot replace current identity', async () => {
+  for (const fail of [false, true]) {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let hold = false,
+      oldSignal: AbortSignal | undefined;
+    const c = fixture(async (...args) => {
+      if (hold && args[4] === 'CODING') {
+        oldSignal = args[3];
+        await gate;
+        if (fail) throw Error('obsolete');
+      }
+      return typedLoad(...args);
+    });
+    await c.load();
+    const q = page().data[0]!.id;
+    c.setDraft(q, 'output');
+    await c.selectType('CODING');
+    c.setDraft(q, 'coding');
+    c.clearDrafts();
+    const oldTicket = c.getSnapshot().clearConfirmation!;
+    await c.load(2);
+    hold = true;
+    const pending = c.load(1);
+    const revision = c.getSnapshot().focusRevision;
+    await c.selectType('OUTPUT');
+    assert.equal(c.getSnapshot().page, 1);
+    assert.equal(c.getSnapshot().focusRevision, revision);
+    assert.equal(oldSignal?.aborted, true);
+    c.confirmClearDrafts(oldTicket);
+    release();
+    await pending;
+    assert.equal(c.getSnapshot().type, 'OUTPUT');
+    assert.equal(c.getSnapshot().status, 'ready');
+    assert.equal(c.getSnapshot().drafts[q], 'output');
+    hold = false;
+    await c.selectType('CODING');
+    assert.equal(c.getSnapshot().drafts[q], 'coding');
+    c.clearDrafts();
+    const disposed = c.getSnapshot().clearConfirmation!;
+    c.cancel();
+    await c.selectType('CODING');
+    assert.deepEqual(c.getSnapshot().drafts, {});
+    c.setDraft(q, 'new lifetime');
+    c.confirmClearDrafts(disposed);
+    assert.equal(c.getSnapshot().drafts[q], 'new lifetime');
+  }
+});
+
 test('F033 three-type round trips retain drafts and only confirmed current-scope clearing deletes them', async () => {
   let calls = 0;
   const c = fixture(async (...args) => {
@@ -176,7 +312,7 @@ test('F033 three-type round trips retain drafts and only confirmed current-scope
     assert.equal(c.getSnapshot().drafts[q], '  ' + type + '\n');
     const before = calls;
     await c.selectType(type);
-    await c.selectType('CODING' as 'OUTPUT');
+    await c.selectType('CODING_BASED' as 'OUTPUT');
     assert.equal(calls, before);
   }
   c.clearDrafts();

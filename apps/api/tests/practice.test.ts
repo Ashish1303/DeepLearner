@@ -109,7 +109,7 @@ test('malformed projected values fail closed at exact text/type boundaries', () 
     { prompt: ' trim ' },
     { prompt: 1 },
     { conceptId: id + '\n' },
-    { type: 'CODING' },
+    { type: 'CODING_BASED' },
     { starterCode: 'code' },
     { starterCode: false },
     { language: 'PYTHON' },
@@ -265,8 +265,8 @@ test('repository handles absent parents, legacy optional values and sanitized in
   );
 });
 
-test('F032/F033 canonical types, strict inputs, safe projection and shared ancestry', () => {
-  for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO'] as const) {
+test('F032-F034 canonical types, strict inputs, safe projection and shared ancestry', () => {
+  for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'] as const) {
     const q = practiceQuery.parse({ conceptId: id, type });
     assert.equal(q.type, type);
     const stages = practiceStages(q);
@@ -293,7 +293,7 @@ test('F032/F033 canonical types, strict inputs, safe projection and shared ances
     'output',
     ' DESCRIPTIVE',
     'DESCRIPTIVE\n',
-    'CODING',
+    'CODING_BASED',
     'SCENARIO_BASED',
     'scenario',
     ' SCENARIO',
@@ -309,6 +309,49 @@ test('F032/F033 canonical types, strict inputs, safe projection and shared ances
       practiceQuery.safeParse({ conceptId: id, type }).success,
       false,
     );
+});
+
+test('F034 Coding repository preserves context, strips secrets and rejects wrong types', async (t) => {
+  const code =
+    '\tfunction example() {\n  return "<script>inert</script>";\n}\n';
+  const aggregate = t.mock.method(Concept, 'aggregate', () => ({
+    exec: async (): Promise<unknown[]> => [
+      {
+        questions: [
+          {
+            items: [
+              {
+                ...raw,
+                type: 'CODING',
+                starterCode: code,
+                language: 'TYPESCRIPT',
+                updatedBy: id,
+              },
+            ],
+            count: [{ total: 1 }],
+          },
+        ],
+      },
+    ],
+  }));
+  const requested = { ...query, type: 'CODING' as const };
+  const result = await practiceRepository.list(requested);
+  assert.equal(result?.items[0]?.starterCode, code);
+  assert.equal(result?.items[0]?.type, 'CODING');
+  assert.equal(Object.keys(result!.items[0]!).length, 7);
+  assert.doesNotMatch(
+    JSON.stringify(result),
+    /SECRET|answer|explanation|evaluation|updatedBy/,
+  );
+  assert.equal(practiceDto({ ...raw, type: 'CODING' }).language, null);
+  aggregate.mock.mockImplementation(() => ({
+    exec: async () => [
+      { questions: [{ items: [raw], count: [{ total: 1 }] }] },
+    ],
+  }));
+  await assert.rejects(practiceRepository.list(requested), {
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
 });
 test('F032 repository rejects a valid DTO of the wrong requested type', async (t) => {
   t.mock.method(Concept, 'aggregate', () => ({

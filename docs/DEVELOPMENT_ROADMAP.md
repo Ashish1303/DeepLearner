@@ -817,7 +817,47 @@ the scoped Git delivery is authorized. No browser PASS or production readiness.
 See F033 Sections 8-11 for retained evidence, cleanup history and exception boundaries.
 
 ### F034 — Coding Questions
-Status: `NOT_STARTED`
+Status: `APPROVED_COMPLETE`
+
+Owner approved the exact 16-file F034 implementation/offline scope (2026-10-18).
+Extend existing Practice retrieval and memory-only drafts to CODING, preserving
+OUTPUT default and all F031-F033 security/publication contracts. No execution,
+submissions, model/index changes or new dependencies. MongoDB integration was
+separately authorized and passed; browser execution remains prohibited. Seven F034
+mounted cases and expected full 118 remain NOT_RUN. No prior exception transfers.
+See [F034 plan](features/F034-coding-questions.md).
+
+Offline implementation PASS: focused API 17/17 plus relevant regressions 44/44
+(61 distinct); focused web 33 distinct plus remaining regressions 168/168
+(201 distinct). Build, TypeScript, formatting, browser-spec compile-only and
+scope/security checks PASS. Root lint found one new test-regex spacing issue;
+equivalent assertion correction and targeted lint/reverification PASS. Separate
+formal code review: no Critical/High/Medium/Low findings. Exact sixteen-path scope
+preserved. MongoDB integration subsequently passed 8/8 including the parent,
+with graceful cleanup, no force, empty Job, free port and removed disposable
+storage; protected MongoDB/development identities and demo metadata unchanged.
+Preserve the initial blocked MongoDB enumeration attempt, forced owned-Job cleanup
+and UNKNOWN retained exit, separately from the successful authorized fresh run.
+
+FINAL REVIEW PASS WITH F034 BROWSER EXCEPTION (2026-10-18): owner explicitly accepts
+one-time F034 LOCAL DEVELOPMENT ONLY browser deferral under AGENTS.md. Seven mounted
+scenarios and expected full regression 118, including those seven, remain NOT_RUN;
+no browser PASS, full-regression acceptance or production readiness. Unverified
+Coding layout/responsiveness, real textarea whitespace, keyboard/focus/accessibility,
+navigation/draft isolation, cancellation/stale races and shared authentication/
+Concept-publication compatibility are owner-accepted local risks. Exception does
+not transfer to another feature. Separate final code review found no Critical,
+High, Medium or Low defects. Retain initial sandbox/JSX/lint history, F022 EPERM/
+PID/taskkill safety, F024 worker-browser conflict, F029 intermittent scrolling and
+screen-reader/background-throttling/Windows shutdown gaps. Primary-host Playwright
+remains prohibited; do not reopen the closed prototype. Future ownership-safe
+browser verification and preproduction browser-regression/release-readiness review
+require separate approval. Manual checks are supplemental. See F034 Sections 9-12.
+Owner explicitly approved APPROVED_COMPLETE for LOCAL DEVELOPMENT ONLY and scoped
+sixteen-file commit/safe push to origin/dev (2026-10-18). The named browser exception
+and all historical evidence remain unchanged; no browser PASS or production
+readiness is claimed. See F034 Section 13. F035 remains NOT_STARTED and its
+implementation is not authorized.
 
 ### F035 — Answer Unlock Flow
 **Dependencies:** F031  
@@ -1285,9 +1325,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F033 - Scenario-Based Questions
+**Current Feature:** F034 - Coding Questions
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F034 - Coding Questions (not authorized)
+**Next Feature:** F035 - Answer Unlock Flow (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

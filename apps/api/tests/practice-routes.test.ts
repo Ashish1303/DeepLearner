@@ -120,7 +120,7 @@ test('protected HTTP denies missing/invalid/expired/admin tokens before content 
       [expired, 401],
       [admin, 403],
     ] as const) {
-      for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO']) {
+      for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING']) {
         const r = await fetch(f.url + '?conceptId=' + id + '&type=' + type, {
           headers: token ? { Authorization: 'Bearer ' + token } : {},
         });
@@ -171,7 +171,7 @@ test('HTTP rejects duplicated/unknown query keys, disallowed origin and unsuppor
       `conceptId=${id}&answer=1`,
       `conceptId=${id}&type=OUTPUT&type=DESCRIPTIVE`,
       `conceptId=${id}&type[x]=OUTPUT`,
-      `conceptId=${id}&type=CODING`,
+      `conceptId=${id}&type=CODING_BASED`,
       `conceptId=${id}&type=SCENARIO_BASED`,
       `conceptId=${id}&type=SCENARIO&type=OUTPUT`,
       `conceptId=${id}&type=`,
@@ -231,6 +231,7 @@ test('subject and IP limiters return standard safe errors without subject leakag
       );
       assert.equal(f.reads(), 1);
       assert.equal((await request('SCENARIO')).status, 429);
+      assert.equal((await request('CODING')).status, 429);
       assert.equal(f.reads(), 1);
     } finally {
       await f.close();
@@ -245,7 +246,7 @@ test('HTTP preserves existing unavailable/hidden error contracts', async () => {
       [503, 'DEPENDENCY_UNAVAILABLE'],
     ] as const) {
       f.fail(new AppError(status, code, 'Safe message'));
-      for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO']) {
+      for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING']) {
         const r = await fetch(f.url + '?conceptId=' + id + '&type=' + type, {
           headers: { Authorization: 'Bearer ' + f.token },
         });
@@ -298,7 +299,7 @@ test('GET rejects non-JSON and chunked request bodies before content reads', asy
 test('F032/F033 HTTP defaults OUTPUT and returns each explicit type with seven safe fields', async () => {
   const f = await fixture();
   try {
-    for (const type of ['', 'OUTPUT', 'DESCRIPTIVE', 'SCENARIO']) {
+    for (const type of ['', 'OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING']) {
       const response = await fetch(
         f.url + '?conceptId=' + id + (type ? '&type=' + type : ''),
         { headers: { Authorization: 'Bearer ' + f.token } },

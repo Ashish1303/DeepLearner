@@ -200,11 +200,11 @@ test('F032 native pressed controls and descriptive textarea preserve safe render
   assert.match(confirmation, /aria-label="Confirm clearing drafts"/);
   assert.match(confirmation, /Confirm clear all drafts/);
   assert.match(confirmation, /Keep drafts/);
-  assert.match(confirmation, /across Output, Descriptive and Scenario/);
+  assert.match(confirmation, /across Output, Descriptive, Scenario and Coding/);
 });
 
-test('F032/F033 selecting either added type suppresses heading focus, including initial readiness', () => {
-  for (const label of ['Descriptive', 'Scenario']) {
+test('F032-F034 selecting added types suppresses heading focus, including initial readiness', () => {
+  for (const label of ['Descriptive', 'Scenario', 'Coding']) {
     const f = fixture();
     let headingFocus = 0,
       chosen = '';
@@ -241,7 +241,81 @@ test('F032/F033 selecting either added type suppresses heading focus, including 
   }
 });
 
-test('F033 Scenario has three native selectors, a safe labelled textarea and truthful states', () => {
+test('F034 Coding renders inert context separately from an initially empty code draft', () => {
+  const current: PracticeState = {
+    ...state,
+    type: 'CODING',
+    drafts: {},
+    data: {
+      ...state.data!,
+      data: state.data!.data.map((item) => ({ ...item, type: 'CODING' })),
+    },
+  };
+  const html = fixture(current).html;
+  assert.match(html, /aria-pressed="true">Coding/);
+  assert.equal((html.match(/aria-pressed="true"/g) ?? []).length, 1);
+  assert.match(html, /Coding practice/);
+  assert.match(html, /aria-label="Coding questions"/);
+  assert.match(html, /Your code draft for Question 1/);
+  assert.match(html, /<textarea[^>]*><\/textarea>/);
+  assert.match(html, /&lt;script&gt;inert/);
+  assert.doesNotMatch(
+    html,
+    /<script|<img|href="javascript|>Run<|>Submit<|>Unlock<|>Score</,
+  );
+  const code = '\t  const value = "<script>draft</script>";\n\n  ';
+  const authored = fixture({ ...current, drafts: { [id]: code } }).html;
+  assert(
+    authored.includes(
+      '\t  const value = &quot;&lt;script&gt;draft&lt;/script&gt;&quot;;\n\n  </textarea>',
+    ),
+  );
+  const optional = fixture({
+    ...current,
+    data: {
+      ...current.data!,
+      data: current.data!.data.map((item) => ({
+        ...item,
+        starterCode: null,
+        language: null,
+      })),
+    },
+  }).html;
+  assert.doesNotMatch(
+    optional,
+    /Question 1 code|question code \(not executed\)/,
+  );
+  assert.match(optional, /<textarea[^>]*><\/textarea>/);
+  const confirmation = fixture({ ...current, clearConfirmation: 1 }).html;
+  assert.match(confirmation, /across Output, Descriptive, Scenario and Coding/);
+  for (const status of ['loading', 'error'] as const) {
+    const rendered = fixture({
+      ...current,
+      status,
+      data: null,
+      message: 'Safe failure',
+    }).html;
+    assert.match(
+      rendered,
+      status === 'loading'
+        ? /Loading coding questions/
+        : /role="alert">Safe failure/,
+    );
+  }
+  assert.match(
+    fixture({
+      ...current,
+      data: {
+        ...current.data!,
+        data: [],
+        meta: { ...current.data!.meta, total: 0, totalPages: 0 },
+      },
+    }).html,
+    /No published CODING/,
+  );
+});
+
+test('F033 Scenario retains safe rendering alongside four native selectors', () => {
   const current: PracticeState = {
     ...state,
     type: 'SCENARIO',
@@ -251,7 +325,7 @@ test('F033 Scenario has three native selectors, a safe labelled textarea and tru
     },
   };
   const html = fixture(current).html;
-  assert.equal((html.match(/aria-pressed=/g) ?? []).length, 3);
+  assert.equal((html.match(/aria-pressed=/g) ?? []).length, 4);
   assert.equal((html.match(/aria-pressed="true"/g) ?? []).length, 1);
   assert.match(html, /aria-pressed="true">Scenario/);
   assert.match(html, /Selected: Scenario/);

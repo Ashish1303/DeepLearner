@@ -13,7 +13,7 @@ import { User } from '../src/modules/users/user.model.js';
 import { PracticeQuestion } from '../src/modules/practice/practice-question.model.js';
 import { practiceRepository } from '../src/modules/practice/practice.repository.js';
 test(
-  'F031/F032/F033 disposable publication, projection and authenticated HTTP',
+  'F031-F034 disposable publication, projection and authenticated HTTP',
   { timeout: 90000 },
   async (t) => {
     assert.equal(process.env.APP_ENV, 'LOCAL');
@@ -189,6 +189,36 @@ test(
           ...patch,
         }).save();
       const firstId = new Types.ObjectId('1'.padStart(24, '0'));
+      for (let n = 301; n <= 312; n++)
+        await new PracticeQuestion({
+          ...base,
+          type: 'CODING',
+          _id: new Types.ObjectId(n.toString(16).padStart(24, '0')),
+          prompt: 'Write a function as an inert local draft',
+          starterCode:
+            n === 301 ? '\tfunction example() {\n  // context only\n}\n' : null,
+          language: n === 301 ? 'TYPESCRIPT' : null,
+        }).save();
+      for (const patch of [
+        { status: 'DRAFT' },
+        { topicId: new Types.ObjectId() },
+        { technologyId: new Types.ObjectId() },
+        { conceptId: new Types.ObjectId() },
+      ])
+        await new PracticeQuestion({
+          ...base,
+          type: 'CODING',
+          ...patch,
+        }).save();
+      await db
+        .collection('practiceQuestions')
+        .insertOne({ ...base, type: 'CODING', schemaVersion: 2 });
+      await db
+        .collection('practiceQuestions')
+        .updateOne(
+          { _id: new Types.ObjectId((301).toString(16).padStart(24, '0')) },
+          { $set: { evaluation: { secret: 'EVALUATION_SENTINEL' } } },
+        );
       for (let n = 201; n <= 212; n++)
         await new PracticeQuestion({
           ...base,
@@ -376,6 +406,65 @@ test(
         },
       );
       await t.test(
+        'F034 Coding pagination, nullable inert context and exact DTO preserve reads',
+        async () => {
+          const before = await db
+            .collection('practiceQuestions')
+            .find()
+            .sort({ _id: 1 })
+            .toArray();
+          const q = { ...query, type: 'CODING' as const };
+          const first = (await practiceRepository.list(q))!;
+          assert.equal(first.total, 13);
+          assert.deepEqual(
+            first.items.map((item) => item.id),
+            Array.from({ length: 10 }, (_, n) =>
+              (301 + n).toString(16).padStart(24, '0'),
+            ),
+          );
+          assert.equal(
+            first.items[0]!.starterCode,
+            '\tfunction example() {\n  // context only\n}\n',
+          );
+          assert.equal(first.items[0]!.language, 'TYPESCRIPT');
+          assert.equal(first.items[1]!.starterCode, null);
+          const last = (await practiceRepository.list({ ...q, page: 2 }))!;
+          assert.equal(last.items.length, 3);
+          assert(first.items.at(-1)!.id < last.items[0]!.id);
+          assert.equal(
+            (await practiceRepository.list({ ...q, page: 3 }))!.items.length,
+            0,
+          );
+          for (const item of [...first.items, ...last.items]) {
+            assert.equal(item.type, 'CODING');
+            assert.deepEqual(
+              Object.keys(item).sort(),
+              [
+                'id',
+                'conceptId',
+                'type',
+                'difficulty',
+                'prompt',
+                'starterCode',
+                'language',
+              ].sort(),
+            );
+          }
+          assert.doesNotMatch(
+            JSON.stringify([first, last]),
+            /SENTINEL|answer|explanation|evaluation|createdBy/,
+          );
+          assert.deepEqual(
+            await db
+              .collection('practiceQuestions')
+              .find()
+              .sort({ _id: 1 })
+              .toArray(),
+            before,
+          );
+        },
+      );
+      await t.test(
         'every ancestor status, absence and denormalized mismatch fail closed',
         async () => {
           for (const [name, key] of [
@@ -389,7 +478,12 @@ test(
               await db
                 .collection(name)
                 .updateOne({ _id: key }, { $set: { status } });
-              for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO'] as const)
+              for (const type of [
+                'OUTPUT',
+                'DESCRIPTIVE',
+                'SCENARIO',
+                'CODING',
+              ] as const)
                 assert.equal(
                   await practiceRepository.list({ ...query, type }),
                   null,
@@ -417,7 +511,12 @@ test(
                 { _id: key },
                 { $set: { [field]: new Types.ObjectId() } },
               );
-            for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO'] as const)
+            for (const type of [
+              'OUTPUT',
+              'DESCRIPTIVE',
+              'SCENARIO',
+              'CODING',
+            ] as const)
               assert.equal(
                 await practiceRepository.list({ ...query, type }),
                 null,
@@ -519,13 +618,13 @@ test(
             );
             assert.equal(
               (
-                await fetch(url + '&type=CODING', {
+                await fetch(url + '&type=CODING_BASED', {
                   headers: { Authorization: 'Bearer ' + token },
                 })
               ).status,
               400,
             );
-            for (const type of ['OUTPUT', 'SCENARIO']) {
+            for (const type of ['OUTPUT', 'SCENARIO', 'CODING']) {
               const selected = await fetch(url + '&type=' + type, {
                 headers: { Authorization: 'Bearer ' + token },
               });
@@ -573,7 +672,12 @@ test(
               await db
                 .collection('users')
                 .updateOne({ _id: student._id }, { $set: patch });
-              for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO'])
+              for (const type of [
+                'OUTPUT',
+                'DESCRIPTIVE',
+                'SCENARIO',
+                'CODING',
+              ])
                 assert.equal(
                   (
                     await fetch(url + '&type=' + type, {

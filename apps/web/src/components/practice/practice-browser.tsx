@@ -60,6 +60,7 @@ export function PracticeView({
     OUTPUT: 'Output',
     DESCRIPTIVE: 'Descriptive',
     SCENARIO: 'Scenario',
+    CODING: 'Coding',
   };
   const typeLabel = typeLabels[state.type];
   useEffect(() => {
@@ -88,19 +89,21 @@ export function PracticeView({
         </p>
       </header>
       <div className={styles.controls} role="group" aria-label="Question type">
-        {(['OUTPUT', 'DESCRIPTIVE', 'SCENARIO'] as const).map((type) => (
-          <button
-            key={type}
-            type="button"
-            aria-pressed={state.type === type}
-            onClick={() => {
-              focused.current = state.focusRevision;
-              void controller.selectType(type);
-            }}
-          >
-            {typeLabels[type]}
-          </button>
-        ))}
+        {(['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'] as const).map(
+          (type) => (
+            <button
+              key={type}
+              type="button"
+              aria-pressed={state.type === type}
+              onClick={() => {
+                focused.current = state.focusRevision;
+                void controller.selectType(type);
+              }}
+            >
+              {typeLabels[type]}
+            </button>
+          ),
+        )}
         <span>Selected: {typeLabel}</span>
       </div>
       <section aria-label={typeLabel + ' questions'} aria-busy={loading}>
@@ -168,7 +171,9 @@ export function PracticeView({
                     Your{' '}
                     {state.type === 'OUTPUT'
                       ? 'output prediction'
-                      : `${typeLabel.toLowerCase()} answer`}{' '}
+                      : state.type === 'CODING'
+                        ? 'code draft'
+                        : `${typeLabel.toLowerCase()} answer`}{' '}
                     for Question {number}
                   </label>
                   <textarea
@@ -227,8 +232,8 @@ export function PracticeView({
             aria-describedby={prefix + '-clear'}
           >
             <p id={prefix + '-clear'}>
-              Clear all drafts for this Concept across Output, Descriptive and
-              Scenario? This cannot be undone.
+              Clear all drafts for this Concept across Output, Descriptive,
+              Scenario and Coding? This cannot be undone.
             </p>
             <button
               type="button"
