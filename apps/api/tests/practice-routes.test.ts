@@ -48,7 +48,7 @@ async function fixture(max = 120, ip = 300) {
   let failure: AppError | undefined;
   const service = createPracticeService(
     {
-      async list() {
+      async list(query) {
         reads++;
         if (failure) throw failure;
         return {
@@ -56,7 +56,7 @@ async function fixture(max = 120, ip = 300) {
             {
               id,
               conceptId: id,
-              type: 'OUTPUT',
+              type: query.type,
               difficulty: 'BEGINNER',
               prompt: 'Predict',
               starterCode: null,
@@ -167,6 +167,10 @@ test('HTTP rejects duplicated/unknown query keys, disallowed origin and unsuppor
       '',
       `conceptId=${id}&conceptId=${id}`,
       `conceptId=${id}&answer=1`,
+      `conceptId=${id}&type=OUTPUT&type=DESCRIPTIVE`,
+      `conceptId=${id}&type[x]=OUTPUT`,
+      `conceptId=${id}&type=CODING`,
+      `conceptId=${id}&type=`,
       `conceptId=${id}&limit=21`,
       `conceptId=${id}&page=01`,
       `conceptId=${id}&conceptId[x]=1`,
@@ -209,12 +213,12 @@ test('subject and IP limiters return standard safe errors without subject leakag
   ]) {
     const f = await fixture(max, ip);
     try {
-      const request = () =>
-        fetch(f.url + '?conceptId=' + id, {
+      const request = (type = 'OUTPUT') =>
+        fetch(f.url + '?conceptId=' + id + '&type=' + type, {
           headers: { Authorization: 'Bearer ' + f.token },
         });
       assert.equal((await request()).status, 200);
-      const r = await request();
+      const r = await request('DESCRIPTIVE');
       assert.equal(r.status, 429);
       assert(r.headers.get('ratelimit'));
       assert.equal(
@@ -278,6 +282,28 @@ test('GET rejects non-JSON and chunked request bodies before content reads', asy
       assert.equal(status, 400);
     }
     assert.equal(f.reads(), 0);
+  } finally {
+    await f.close();
+  }
+});
+
+test('F032 HTTP defaults OUTPUT and returns explicit descriptive seven-field data', async () => {
+  const f = await fixture();
+  try {
+    for (const type of ['', 'OUTPUT', 'DESCRIPTIVE']) {
+      const response = await fetch(
+        f.url + '?conceptId=' + id + (type ? '&type=' + type : ''),
+        { headers: { Authorization: 'Bearer ' + f.token } },
+      );
+      assert.equal(response.status, 200);
+      const body = (await response.json()) as Body;
+      assert.equal(body.data[0]!.type, type || 'OUTPUT');
+      assert.equal(Object.keys(body.data[0]!).length, 7);
+      assert.doesNotMatch(
+        JSON.stringify(body),
+        /answer|explanation|evaluation|createdBy/,
+      );
+    }
   } finally {
     await f.close();
   }

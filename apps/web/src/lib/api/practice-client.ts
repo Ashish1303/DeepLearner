@@ -3,6 +3,8 @@ import { errorEnvelope } from '../learning-paths/contracts';
 import {
   practiceEnvelope,
   practiceId,
+  practiceType,
+  type PracticeType,
   type PracticePage,
 } from '../practice/contracts';
 export function createPracticeClient(
@@ -27,8 +29,10 @@ export function createPracticeClient(
       page: number,
       token: string,
       external: AbortSignal,
+      type: PracticeType = 'OUTPUT',
     ): Promise<PracticePage> {
       if (
+        !practiceType.safeParse(type).success ||
         !practiceId.safeParse(conceptId).success ||
         !Number.isSafeInteger(page) ||
         page < 1 ||
@@ -43,7 +47,7 @@ export function createPracticeClient(
       try {
         abort.signal.throwIfAborted();
         const response = await fetcher(
-          `${root}/practice-questions?conceptId=${conceptId}&page=${page}&limit=10`,
+          `${root}/practice-questions?conceptId=${conceptId}&page=${page}&limit=10${type === 'OUTPUT' ? '' : '&type=DESCRIPTIVE'}`,
           {
             method: 'GET',
             credentials: 'omit',
@@ -85,7 +89,9 @@ export function createPracticeClient(
           !parsed.success ||
           parsed.data.meta.page !== page ||
           parsed.data.meta.limit !== 10 ||
-          parsed.data.data.some((item) => item.conceptId !== conceptId)
+          parsed.data.data.some(
+            (item) => item.conceptId !== conceptId || item.type !== type,
+          )
         )
           throw new ApiError('INVALID_RESPONSE');
         return parsed.data;

@@ -1,4 +1,6 @@
 import { z } from 'zod';
+export const practiceType = z.enum(['OUTPUT', 'DESCRIPTIVE']);
+export type PracticeType = z.output<typeof practiceType>;
 export const practiceId = z.string().regex(/^[a-f0-9]{24}(?![\s\S])/);
 const text = z
   .string()
@@ -9,7 +11,7 @@ export const practiceItem = z
   .strictObject({
     id: practiceId,
     conceptId: practiceId,
-    type: z.literal('OUTPUT'),
+    type: practiceType,
     difficulty: z.enum([
       'BEGINNER',
       'INTERMEDIATE',

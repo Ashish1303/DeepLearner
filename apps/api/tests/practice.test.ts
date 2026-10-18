@@ -16,7 +16,7 @@ import { publishedConceptStages } from '../src/modules/concepts/concept.reposito
 import type { UserDto } from '../src/modules/users/user.dto.js';
 import { AppError } from '../src/common/errors/app-error.js';
 const id = 'a'.repeat(24);
-const query = { conceptId: id, page: 1, limit: 10 };
+const query = { conceptId: id, page: 1, limit: 10, type: 'OUTPUT' as const };
 const raw = {
   _id: new Types.ObjectId(),
   conceptId: new Types.ObjectId(id),
@@ -121,7 +121,9 @@ test('question pipeline reuses all F021 stages and filters before safe projectio
   const stages = practiceStages({ ...query, page: 3, limit: 20 });
   const prefix = publishedConceptStages(id);
   assert.deepEqual(stages.slice(0, prefix.length), prefix);
-  const lookup = stages[prefix.length] as { $lookup: { pipeline: unknown[] } };
+  const lookup = stages[prefix.length] as unknown as {
+    $lookup: { pipeline: unknown[] };
+  };
   assert.deepEqual(lookup.$lookup.pipeline, [
     {
       $match: {
@@ -260,5 +262,59 @@ test('repository handles absent parents, legacy optional values and sanitized in
       error instanceof AppError &&
       error.code === 'DEPENDENCY_UNAVAILABLE' &&
       !error.message.includes('SECRET'),
+  );
+});
+
+test('F032 canonical type defaults, strict inputs, descriptive projection and shared ancestry', () => {
+  for (const type of ['OUTPUT', 'DESCRIPTIVE'] as const) {
+    const q = practiceQuery.parse({ conceptId: id, type });
+    assert.equal(q.type, type);
+    const stages = practiceStages(q);
+    const prefix = publishedConceptStages(id);
+    assert.deepEqual(stages.slice(0, prefix.length), prefix);
+    assert.equal(
+      (
+        stages[prefix.length] as unknown as {
+          $lookup: { pipeline: { $match: { type: string } }[] };
+        }
+      ).$lookup.pipeline[0]!.$match.type,
+      type,
+    );
+    const value = practiceDto({ ...raw, type });
+    assert.equal(value.type, type);
+    assert.equal(Object.keys(value).length, 7);
+    assert.doesNotMatch(
+      JSON.stringify(value),
+      /SECRET|answer|explanation|evaluation/,
+    );
+  }
+  for (const type of [
+    '',
+    'output',
+    ' DESCRIPTIVE',
+    'DESCRIPTIVE\n',
+    'CODING',
+    'SCENARIO',
+    'OUTPUT_BASED',
+    null,
+    1,
+    {},
+    ['OUTPUT'],
+    ['OUTPUT', 'DESCRIPTIVE'],
+  ])
+    assert.equal(
+      practiceQuery.safeParse({ conceptId: id, type }).success,
+      false,
+    );
+});
+test('F032 repository rejects a valid DTO of the wrong requested type', async (t) => {
+  t.mock.method(Concept, 'aggregate', () => ({
+    exec: async () => [
+      { questions: [{ items: [raw], count: [{ total: 1 }] }] },
+    ],
+  }));
+  await assert.rejects(
+    practiceRepository.list({ ...query, type: 'DESCRIPTIVE' }),
+    { code: 'DEPENDENCY_UNAVAILABLE' },
   );
 });

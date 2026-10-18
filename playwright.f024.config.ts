@@ -8,6 +8,7 @@ export default defineConfig(foundation, {
     'visualization-controls.spec.ts',
     'visualization-lesson.spec.ts',
     'practice-output.spec.ts',
+    'practice-descriptive.spec.ts',
   ],
   globalTimeout: 600_000,
   timeout: 45_000,

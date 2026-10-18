@@ -734,7 +734,41 @@ local-development acceptance. Further remediation and F032 planning remain gated
 No submissions, answer unlocking, scoring, persistence or F032 implementation.
 
 ### F032 — Descriptive Questions
-Status: `NOT_STARTED`
+Status: `APPROVED_COMPLETE`
+
+**FINAL REVIEW PASS WITH F032 BROWSER EXCEPTION** (owner approval 2026-10-18),
+for local development only; not production approval or full browser acceptance.
+Owner completion approval (2026-10-18) is for LOCAL DEVELOPMENT ONLY and authorizes
+the scoped 20-file Git delivery, including the separately approved AGENTS.md policy.
+The approved [F032 plan](features/F032-descriptive-questions.md) retains its
+19-file implementation boundary. AGENTS.md is a separately approved policy change.
+Retained evidence: focused API 15/15, 63 distinct API PASS; focused web 21/21,
+189 distinct web PASS (reconciled evidence); disposable MongoDB 6/6 PASS including
+parent; build, lint, TypeScript, formatting, security and cleanup PASS.
+
+F032 mounted acceptance: **7 NOT_RUN**. Expected complete F032 browser regression:
+**104 NOT_RUN**, including those seven and the existing 97; no new discovery/run.
+Responsive behavior, keyboard/focus/accessibility, real-browser account-switch/
+draft-isolation races and shared authentication/Concept-publication compatibility
+remain unverified and explicitly owner-accepted for local development only.
+This new F032-specific exception does not inherit F031's exception and does not
+transfer to F033 or any other feature. Manual browser inspection was not performed
+in this gate and cannot replace automated evidence. No browser PASS is claimed.
+
+Infrastructure investigation is closed. Retain Gate 1 synthetic 10/10 and Gate 2
+synthetic 10/10 PASS; the prototype is not a verified Playwright execution solution.
+Positive /T cleanup remains unsupported, browser/worker/server fallbacks unverified,
+and native/internal bypasses uncontrolled. Primary-host Playwright remains
+prohibited pending separate ownership-safe approval. The temporary package and
+all evidence are preserved without modification, execution or deletion.
+
+Retain historical F022 EPERM/ownership and taskkill PID-reuse risks, F024 shared-worker
+cleanup conflict, F029 intermittent scrolling/recovery, and screen-reader,
+background-throttling and Windows shutdown gaps. F031's historical 40 PASS /
+1 FAIL / 56 NOT_RUN is unchanged; the outstanding cases still need future coverage.
+Future ownership-safe mounted/segmented regression and release-readiness review
+require separate approvals. Owner completion approval retains the browser exception.
+See F032 Sections 10-11 for the evidence matrix, scope review and completion approval.
 
 ### F033 — Scenario-Based Questions
 Status: `NOT_STARTED`
@@ -1208,14 +1242,30 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F031 - Output-Based Questions
+**Current Feature:** F032 - Descriptive Questions
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F032 - Descriptive Questions (not authorized)
+**Next Feature:** F033 - Scenario-Based Questions (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---
 
 # 16. Definition of Done for Every Feature
+
+## Local-development testing policy (owner-approved 2026-10-18)
+
+Apply AGENTS.md's local-development verification policy to this checklist.
+Focused unit tests, relevant API/frontend regressions, build/lint/TypeScript/
+formatting, security/scope review and applicable disposable MongoDB integration
+remain mandatory. Only browser-dependent verification may be deferred for a
+documented infrastructure safety concern with explicit feature-specific owner
+approval. Record exact NOT_RUN coverage, obtained evidence, accepted risks,
+future verification and non-transferability; never tick unexecuted checks as PASS.
+Manual browser inspection is supplemental. No earlier result is rewritten.
+Production requires a separate approved browser-regression/release-readiness gate.
+
+F032 alone has the explicitly approved exception below; neither the general
+policy nor F031's previous exception grants any future feature a deferral.
+
 
 A feature is ready for owner approval only when:
 

@@ -134,3 +134,38 @@ test('client preserves auth and safe local error categories without server-messa
     );
   }
 });
+
+test('F032 descriptive request validates type and rejects mixed/wrong-type responses', async () => {
+  let calls = 0;
+  const client = createPracticeClient('http://localhost/api', async (url) => {
+    calls++;
+    assert.equal(new URL(String(url)).searchParams.get('type'), 'DESCRIPTIVE');
+    return Response.json({
+      ...body(),
+      data: [{ ...item, type: 'DESCRIPTIVE' }],
+    });
+  });
+  const signal = new AbortController().signal;
+  assert.equal(
+    (await client.load(id, 1, 'test', signal, 'DESCRIPTIVE')).data[0]!.type,
+    'DESCRIPTIVE',
+  );
+  await assert.rejects(
+    client.load(id, 1, 'test', signal, 'CODING' as 'OUTPUT'),
+    { code: 'VALIDATION_ERROR' },
+  );
+  assert.equal(calls, 1);
+  for (const requested of ['OUTPUT', 'DESCRIPTIVE'] as const) {
+    const wrong = createPracticeClient('http://localhost/api', async () =>
+      Response.json({
+        ...body(),
+        data: [
+          { ...item, type: requested === 'OUTPUT' ? 'DESCRIPTIVE' : 'OUTPUT' },
+        ],
+      }),
+    );
+    await assert.rejects(wrong.load(id, 1, 'test', signal, requested), {
+      code: 'INVALID_RESPONSE',
+    });
+  }
+});

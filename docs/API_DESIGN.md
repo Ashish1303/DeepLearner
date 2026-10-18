@@ -1718,3 +1718,24 @@ No new answer, attempt, authoring or submission endpoint is included.
 Student drafts are memory-only, account/Concept/question scoped. They are not attempts
 and never enter this API. See [F031](features/F031-output-based-questions.md) for
 client cancellation, the guarded auth read contract and separately gated verification.
+
+## F032 descriptive practice retrieval
+
+F032 extends the same authenticated GET /api/v1/practice-questions with optional
+single-valued `type=OUTPUT|DESCRIPTIVE`. Missing type defaults to OUTPUT; invalid,
+empty, repeated, coerced or unsupported values are 400 VALIDATION_ERROR. This
+supersedes F031's OUTPUT-only filter without changing its seven-field envelope,
+pagination, ordering, errors, authentication, rate limits or GET-body validation.
+Only the requested PUBLISHED schemaVersion-1 type under the complete F021
+published ancestry and consistent references is counted/returned. DTO type must
+match the request; answers, explanations, evaluation and internal metadata remain
+excluded through explicit projection and construction. No schema/index changes.
+
+The existing Student Practice page starts in OUTPUT and selects DESCRIPTIVE locally.
+Drafts are memory-only, account/Concept/type/question scoped, retained across type
+switches (page resets to 1), with 100 nonempty drafts TOTAL and 10,000 code units
+each. Clear all requires explicit confirmation and affects only the current
+account/Concept across both types. Obsolete requests and confirmations are
+invalidated; identity changes/disposal discard both stores. No submissions or
+answer unlocking. See [F032](features/F032-descriptive-questions.md) for gated
+verification; F031's incomplete-browser-regression exception does not transfer.

@@ -55,6 +55,8 @@ export function PracticeView({
   const prefix = useId();
   const heading = useRef<HTMLHeadingElement>(null);
   const focused = useRef(-1);
+  const clearButton = useRef<HTMLButtonElement>(null);
+  const typeLabel = state.type === 'OUTPUT' ? 'Output' : 'Descriptive';
   useEffect(() => {
     if (
       (state.status === 'ready' || state.status === 'error') &&
@@ -73,17 +75,33 @@ export function PracticeView({
           <Link href={`/concepts/${conceptId}`}>Back to Concept</Link>
         )}
         <h1 ref={heading} tabIndex={-1}>
-          Output practice
+          {typeLabel} practice
         </h1>
         <p id={prefix + '-instructions'}>
           Draft only. Nothing is submitted or saved. Answers and explanations
           are not available in this increment.
         </p>
       </header>
-      <section aria-label="Output questions" aria-busy={loading}>
+      <div className={styles.controls} role="group" aria-label="Question type">
+        {(['OUTPUT', 'DESCRIPTIVE'] as const).map((type) => (
+          <button
+            key={type}
+            type="button"
+            aria-pressed={state.type === type}
+            onClick={() => {
+              focused.current = state.focusRevision;
+              void controller.selectType(type);
+            }}
+          >
+            {type === 'OUTPUT' ? 'Output' : 'Descriptive'}
+          </button>
+        ))}
+        <span>Selected: {typeLabel}</span>
+      </div>
+      <section aria-label={typeLabel + ' questions'} aria-busy={loading}>
         <p role="status">
           {loading
-            ? 'Loading output questions...'
+            ? `Loading ${typeLabel.toLowerCase()} questions...`
             : state.status === 'ready'
               ? data?.meta.totalPages
                 ? `Page ${state.page} of ${data.meta.totalPages}.`
@@ -104,7 +122,7 @@ export function PracticeView({
             {data.data.length === 0 && (
               <p>
                 {state.page === 1
-                  ? 'No published OUTPUT questions are available yet.'
+                  ? `No published ${state.type} questions are available yet.`
                   : 'No questions are available on this page.'}
               </p>
             )}
@@ -142,7 +160,11 @@ export function PracticeView({
                     </>
                   )}
                   <label htmlFor={label}>
-                    Your output prediction for Question {number}
+                    Your{' '}
+                    {state.type === 'OUTPUT'
+                      ? 'output prediction'
+                      : 'descriptive answer'}{' '}
+                    for Question {number}
                   </label>
                   <textarea
                     id={label}
@@ -153,7 +175,11 @@ export function PracticeView({
                       prefix + '-instructions ' + label + '-limit'
                     }
                     onChange={(event) =>
-                      controller.setDraft(item.id, event.target.value)
+                      controller.setDraft(
+                        item.id,
+                        event.target.value,
+                        state.type,
+                      )
                     }
                   />
                   <p id={label + '-limit'}>
@@ -163,7 +189,7 @@ export function PracticeView({
                   </p>
                   <button
                     type="button"
-                    onClick={() => controller.setDraft(item.id, '')}
+                    onClick={() => controller.setDraft(item.id, '', state.type)}
                   >
                     Clear draft for Question {number}
                   </button>
@@ -182,9 +208,43 @@ export function PracticeView({
         )}
       </section>
       <div className={styles.controls}>
-        <button type="button" onClick={() => controller.clearDrafts()}>
+        <button
+          ref={clearButton}
+          type="button"
+          onClick={() => controller.clearDrafts()}
+        >
           Clear all drafts
         </button>
+        {state.clearConfirmation !== null && (
+          <div
+            role="group"
+            aria-label="Confirm clearing drafts"
+            aria-describedby={prefix + '-clear'}
+          >
+            <p id={prefix + '-clear'}>
+              Clear all drafts for this Concept across Output and Descriptive?
+              This cannot be undone.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                controller.confirmClearDrafts(state.clearConfirmation!);
+                clearButton.current?.focus();
+              }}
+            >
+              Confirm clear all drafts
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                controller.cancelClearDrafts();
+                clearButton.current?.focus();
+              }}
+            >
+              Keep drafts
+            </button>
+          </div>
+        )}
         <nav aria-label="Practice pagination">
           <button
             type="button"

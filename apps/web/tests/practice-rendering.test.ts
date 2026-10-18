@@ -11,6 +11,8 @@ import { ConceptMarkdown } from '../src/components/concepts/concept-markdown';
 import type { PracticeState } from '../src/lib/practice/practice-controller';
 const id = 'a'.repeat(24);
 const state: PracticeState = {
+  type: 'OUTPUT',
+  clearConfirmation: null,
   status: 'ready',
   page: 1,
   message: '',
@@ -37,6 +39,8 @@ const state: PracticeState = {
 };
 function fixture(current = state, pending = false, role = 'STUDENT') {
   const require = createRequire(import.meta.url);
+  const effects: (() => void)[] = [];
+  const refs: { current: unknown }[] = [];
   const exports: {
     PracticeView?: (props: unknown) => ReactElement;
     PracticeBrowser?: (props: { conceptId: string }) => ReactElement | null;
@@ -55,8 +59,14 @@ function fixture(current = state, pending = false, role = 'STUDENT') {
   const load = (name: string): unknown => {
     if (name === 'react')
       return {
-        useEffect() {},
-        useRef: (value: unknown) => ({ current: value }),
+        useEffect(effect: () => void) {
+          effects.push(effect);
+        },
+        useRef: (value: unknown) => {
+          const ref = { current: value };
+          refs.push(ref);
+          return ref;
+        },
         useId: () => 'practice-test',
       };
     if (name === 'react/jsx-runtime') return require(name);
@@ -83,11 +93,26 @@ function fixture(current = state, pending = false, role = 'STUDENT') {
     throw new Error('Unexpected import ' + name);
   };
   new Function('require', 'exports', output)(load, exports);
-  const controller = { retry() {}, load() {}, setDraft() {}, clearDrafts() {} };
+  const controller = {
+    retry() {},
+    load() {},
+    setDraft() {},
+    clearDrafts() {},
+    selectType(type: string) {
+      void type;
+    },
+  };
+  const tree = exports.PracticeView!({
+    conceptId: id,
+    state: current,
+    controller,
+  });
   return {
-    html: renderToStaticMarkup(
-      exports.PracticeView!({ conceptId: id, state: current, controller }),
-    ),
+    tree,
+    effects,
+    refs,
+    controller,
+    html: renderToStaticMarkup(tree),
     owner: exports.PracticeBrowser!({ conceptId: id }),
   };
 }
@@ -152,4 +177,64 @@ test('responsive code containment and visible focus are declared without hiding 
   assert.match(css, /:focus-visible/);
   assert.match(css, /min-height:\s*44px/);
   assert.doesNotMatch(css, /overflow[^;]*hidden/);
+});
+
+test('F032 native pressed controls and descriptive textarea preserve safe rendering', () => {
+  const html = fixture({
+    ...state,
+    type: 'DESCRIPTIVE',
+    data: {
+      ...state.data!,
+      data: state.data!.data.map((item) => ({ ...item, type: 'DESCRIPTIVE' })),
+    },
+  }).html;
+  assert.match(html, /aria-label="Question type"/);
+  assert.match(html, /aria-pressed="true">Descriptive/);
+  assert.match(html, /Selected: Descriptive/);
+  assert.match(html, /aria-label="Descriptive questions"/);
+  assert.match(html, /Your descriptive answer for Question/);
+  assert.match(html, /&lt;script&gt;draft/);
+  assert.doesNotMatch(html, /<script|<img|>Submit<|>Unlock</);
+  assert.doesNotMatch(html, /Confirm clear all drafts/);
+  const confirmation = fixture({ ...state, clearConfirmation: 1 }).html;
+  assert.match(confirmation, /aria-label="Confirm clearing drafts"/);
+  assert.match(confirmation, /Confirm clear all drafts/);
+  assert.match(confirmation, /Keep drafts/);
+  assert.match(confirmation, /across Output and Descriptive/);
+});
+
+test('F032 selecting a type suppresses heading focus, including during initial readiness', () => {
+  const f = fixture();
+  let headingFocus = 0,
+    chosen = '';
+  f.refs[0]!.current = { focus: () => headingFocus++ };
+  f.controller.selectType = (type: string) => {
+    chosen = type;
+  };
+  function find(node: unknown): { onClick: () => void } | undefined {
+    if (Array.isArray(node)) {
+      for (const child of node) {
+        const result = find(child);
+        if (result) return result;
+      }
+      return;
+    }
+    if (!node || typeof node !== 'object' || !('props' in node)) return;
+    const props = (
+      node as { props: { children?: unknown; onClick?: () => void } }
+    ).props;
+    if (props.children === 'Descriptive' && props.onClick)
+      return { onClick: props.onClick };
+    return find(props.children);
+  }
+  const button = find(f.tree);
+  assert(button);
+  button.onClick();
+  assert.equal(chosen, 'DESCRIPTIVE');
+  f.effects.forEach((effect) => effect());
+  assert.equal(headingFocus, 0);
+  const initial = fixture();
+  initial.refs[0]!.current = { focus: () => headingFocus++ };
+  initial.effects.forEach((effect) => effect());
+  assert.equal(headingFocus, 1);
 });

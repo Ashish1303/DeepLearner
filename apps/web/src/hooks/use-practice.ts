@@ -5,6 +5,7 @@ import { env } from '../lib/env';
 import { createPracticeClient } from '../lib/api/practice-client';
 import { createPracticeController } from '../lib/practice/practice-controller';
 // The parent mounts a fresh instance for each eligible account/Concept identity.
+// Type switching stays inside this controller: cancel() disposes ALL type drafts.
 export function usePractice(accountId: string, conceptId: string) {
   const { controller: auth } = useAuth();
   const [controller] = useState(() =>

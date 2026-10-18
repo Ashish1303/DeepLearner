@@ -16,6 +16,7 @@ export interface PracticeRepository {
 }
 export function practiceStages({
   conceptId,
+  type,
   page,
   limit,
 }: PracticeQuery): PipelineStage[] {
@@ -30,7 +31,7 @@ export function practiceStages({
         pipeline: [
           {
             $match: {
-              type: 'OUTPUT',
+              type,
               status: 'PUBLISHED',
               schemaVersion: 1,
               $expr: {
@@ -81,7 +82,12 @@ export const practiceRepository: PracticeRepository = {
       if (!Number.isSafeInteger(total) || total < 0)
         throw new Error('Invalid count');
       const items = (result?.items ?? []).map(practiceDto);
-      if (items.some((item) => item.conceptId !== query.conceptId))
+      if (
+        items.some(
+          (item) =>
+            item.conceptId !== query.conceptId || item.type !== query.type,
+        )
+      )
         throw new Error('Invalid parent');
       return { items, total };
     } catch {

@@ -76,6 +76,7 @@ test('draft capacity and length never silently evict existing work', async () =>
   c.setDraft(q, 'new');
   assert.equal(c.getSnapshot().drafts[q], 'new');
   c.clearDrafts();
+  c.confirmClearDrafts(c.getSnapshot().clearConfirmation!);
   assert.deepEqual(c.getSnapshot().drafts, {});
 });
 test('separate account/Concept instances and unmount erase drafts and cancel work', async () => {
@@ -139,4 +140,141 @@ test('loading/error clear items, retry retains drafts, unknown question edits ar
   await c.retry();
   assert.equal(c.getSnapshot().status, 'ready');
   assert.deepEqual(c.getSnapshot().drafts, { [q]: 'draft' });
+});
+
+const typedLoad: PracticeClient['load'] = async (
+  _id,
+  n,
+  _token,
+  _signal,
+  type = 'OUTPUT',
+) => ({ ...page(n), data: page(n).data.map((item) => ({ ...item, type })) });
+test('F032 type round trips retain separate drafts for identical IDs and reset pages', async () => {
+  let calls = 0;
+  const c = fixture(async (...args) => {
+    calls++;
+    return typedLoad(...args);
+  });
+  await c.load();
+  const q = page().data[0]!.id;
+  c.setDraft(q, 'output');
+  await c.load(2);
+  await c.selectType('DESCRIPTIVE');
+  assert.equal(c.getSnapshot().page, 1);
+  assert.deepEqual(c.getSnapshot().drafts, {});
+  c.setDraft(q, 'descriptive');
+  await c.selectType('OUTPUT');
+  assert.equal(c.getSnapshot().drafts[q], 'output');
+  await c.selectType('DESCRIPTIVE');
+  assert.equal(c.getSnapshot().drafts[q], 'descriptive');
+  const before = calls;
+  await c.selectType('DESCRIPTIVE');
+  assert.equal(calls, before);
+  c.clearDrafts();
+  const ticket = c.getSnapshot().clearConfirmation!;
+  assert.equal(c.getSnapshot().drafts[q], 'descriptive');
+  c.cancelClearDrafts();
+  c.confirmClearDrafts(ticket);
+  assert.equal(c.getSnapshot().drafts[q], 'descriptive');
+  c.clearDrafts();
+  c.confirmClearDrafts(c.getSnapshot().clearConfirmation!);
+  assert.deepEqual(c.getSnapshot().drafts, {});
+  await c.selectType('OUTPUT');
+  assert.deepEqual(c.getSnapshot().drafts, {});
+});
+test('F032 capacity is shared across types, with no eviction or partial clearing', async () => {
+  const c = fixture(typedLoad);
+  for (const type of ['OUTPUT', 'DESCRIPTIVE'] as const) {
+    await c.selectType(type);
+    for (let n = 1; n <= 50; n++) {
+      await c.load(n);
+      c.setDraft(page(n).data[0]!.id, type);
+    }
+  }
+  await c.load(51);
+  c.setDraft(page(51).data[0]!.id, 'overflow');
+  assert.match(c.getSnapshot().notice, /capacity/);
+  assert.equal(Object.keys(c.getSnapshot().drafts).length, 50);
+  await c.selectType('OUTPUT');
+  assert.equal(Object.keys(c.getSnapshot().drafts).length, 50);
+  c.setDraft(page().data[0]!.id, '');
+  await c.selectType('DESCRIPTIVE');
+  await c.load(51);
+  c.setDraft(page(51).data[0]!.id, 'x'.repeat(10000));
+  assert.equal(c.getSnapshot().drafts[page(51).data[0]!.id]?.length, 10000);
+});
+test('F032 type races suppress stale success/error and invalidate pending clear confirmation', async () => {
+  for (const fail of [false, true]) {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let held = false;
+    let oldSignal: AbortSignal | undefined;
+    const c = fixture(async (...args) => {
+      if (held && args[4] === 'DESCRIPTIVE') {
+        oldSignal = args[3];
+        await gate;
+        if (fail) throw Error('obsolete');
+      }
+      return typedLoad(...args);
+    });
+    await c.load();
+    const q = page().data[0]!.id;
+    c.setDraft(q, 'keep');
+    c.clearDrafts();
+    const ticket = c.getSnapshot().clearConfirmation!;
+    held = true;
+    const pending = c.selectType('DESCRIPTIVE');
+    await c.selectType('OUTPUT');
+    c.confirmClearDrafts(ticket);
+    assert.equal(oldSignal?.aborted, true);
+    release();
+    await pending;
+    assert.equal(c.getSnapshot().type, 'OUTPUT');
+    assert.equal(c.getSnapshot().status, 'ready');
+    assert.equal(c.getSnapshot().drafts[q], 'keep');
+    c.clearDrafts();
+    const discarded = c.getSnapshot().clearConfirmation!;
+    c.cancel();
+    await c.load();
+    c.setDraft(q, 'new lifetime');
+    c.confirmClearDrafts(discarded);
+    assert.equal(c.getSnapshot().drafts[q], 'new lifetime');
+  }
+});
+test('F032 disposal clears both types and pending confirmation cannot affect another identity', async () => {
+  const a = fixture(typedLoad),
+    b = fixture(typedLoad, 'other');
+  for (const c of [a, b]) {
+    await c.load();
+    c.setDraft(page().data[0]!.id, 'output');
+    await c.selectType('DESCRIPTIVE');
+    c.setDraft(page().data[0]!.id, 'description');
+  }
+  a.clearDrafts();
+  const ticket = a.getSnapshot().clearConfirmation!;
+  a.cancel();
+  a.confirmClearDrafts(ticket);
+  await a.selectType('DESCRIPTIVE');
+  assert.deepEqual(a.getSnapshot().drafts, {});
+  assert.equal(b.getSnapshot().drafts[page().data[0]!.id], 'description');
+});
+
+test('F032 confirmation cannot be bypassed and stale typed edit cannot change current draft', async () => {
+  const c = fixture(typedLoad);
+  await c.load();
+  const q = page().data[0]!.id;
+  c.setDraft(q, 'keep');
+  c.confirmClearDrafts(null as unknown as number);
+  assert.equal(c.getSnapshot().drafts[q], 'keep');
+  await c.selectType('DESCRIPTIVE');
+  c.setDraft(q, 'description');
+  c.setDraft(q, 'old event', 'OUTPUT');
+  assert.equal(c.getSnapshot().drafts[q], 'description');
+  c.clearDrafts();
+  const ticket = c.getSnapshot().clearConfirmation!;
+  await c.retry();
+  c.confirmClearDrafts(ticket);
+  assert.equal(c.getSnapshot().drafts[q], 'description');
 });

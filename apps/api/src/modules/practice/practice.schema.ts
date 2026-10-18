@@ -10,6 +10,7 @@ export const practiceQuery = z
       .string()
       .regex(/^[a-fA-F0-9]{24}(?![\s\S])/)
       .transform((value) => value.toLowerCase()),
+    type: z.enum(['OUTPUT', 'DESCRIPTIVE']).default('OUTPUT'),
     page: integer.default(1),
     limit: integer.pipe(z.number().max(20)).default(10),
   })

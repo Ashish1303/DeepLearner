@@ -13,7 +13,7 @@ import { User } from '../src/modules/users/user.model.js';
 import { PracticeQuestion } from '../src/modules/practice/practice-question.model.js';
 import { practiceRepository } from '../src/modules/practice/practice.repository.js';
 test(
-  'F031 disposable publication, projection and authenticated HTTP',
+  'F031/F032 disposable publication, projection and authenticated HTTP',
   { timeout: 90000 },
   async (t) => {
     assert.equal(process.env.APP_ENV, 'LOCAL');
@@ -122,7 +122,12 @@ test(
           isOfficial: false,
         },
       });
-      const query = { conceptId: concept.id, page: 1, limit: 10 };
+      const query = {
+        conceptId: concept.id,
+        page: 1,
+        limit: 10,
+        type: 'OUTPUT' as const,
+      };
       const base = {
         ...audit,
         technologyId: tech._id,
@@ -163,6 +168,26 @@ test(
         .collection('practiceQuestions')
         .insertOne({ ...base, schemaVersion: 2 });
       await db.collection('practiceQuestions').insertOne({ ...base });
+      for (let n = 101; n <= 112; n++) {
+        await new PracticeQuestion({
+          ...base,
+          type: 'DESCRIPTIVE',
+          _id: new Types.ObjectId(n.toString(16).padStart(24, '0')),
+          prompt: 'Explain the binding',
+          starterCode: n === 101 ? '  let value = 1;\n' : null,
+          language: n === 101 ? 'JAVASCRIPT' : null,
+        }).save();
+      }
+      for (const patch of [
+        { status: 'DRAFT' },
+        { topicId: new Types.ObjectId() },
+        { technologyId: new Types.ObjectId() },
+      ])
+        await new PracticeQuestion({
+          ...base,
+          type: 'DESCRIPTIVE',
+          ...patch,
+        }).save();
       const firstId = new Types.ObjectId('1'.padStart(24, '0'));
       await db
         .collection('practiceQuestions')
@@ -227,6 +252,42 @@ test(
         },
       );
       await t.test(
+        'F032 descriptive pagination and read-only projection use the same ancestry',
+        async () => {
+          const before = await db
+            .collection('practiceQuestions')
+            .find()
+            .sort({ _id: 1 })
+            .toArray();
+          const q = { ...query, type: 'DESCRIPTIVE' as const };
+          const first = (await practiceRepository.list(q))!;
+          assert.equal(first.total, 13); // Twelve ordered fixtures plus the original valid descriptive fixture.
+          assert.equal(first.items.length, 10);
+          assert(
+            first.items.every(
+              (item) =>
+                item.type === 'DESCRIPTIVE' && Object.keys(item).length === 7,
+            ),
+          );
+          assert.equal(first.items[0]!.starterCode, '  let value = 1;\n');
+          const last = (await practiceRepository.list({ ...q, page: 2 }))!;
+          assert.equal(last.items.length, 3);
+          assert(first.items.at(-1)!.id < last.items[0]!.id);
+          assert.doesNotMatch(
+            JSON.stringify([first, last]),
+            /SENTINEL|answer|explanation|evaluation|createdBy/,
+          );
+          assert.deepEqual(
+            await db
+              .collection('practiceQuestions')
+              .find()
+              .sort({ _id: 1 })
+              .toArray(),
+            before,
+          );
+        },
+      );
+      await t.test(
         'every ancestor status, absence and denormalized mismatch fail closed',
         async () => {
           for (const [name, key] of [
@@ -240,7 +301,11 @@ test(
               await db
                 .collection(name)
                 .updateOne({ _id: key }, { $set: { status } });
-              assert.equal(await practiceRepository.list(query), null);
+              for (const type of ['OUTPUT', 'DESCRIPTIVE'] as const)
+                assert.equal(
+                  await practiceRepository.list({ ...query, type }),
+                  null,
+                );
             }
             await db
               .collection(name)
@@ -334,6 +399,33 @@ test(
             assert.doesNotMatch(
               body,
               /SENTINEL|answer|explanation|evaluation|createdBy/,
+            );
+            const descriptive = await fetch(url + '&type=DESCRIPTIVE', {
+              headers: { Authorization: 'Bearer ' + token },
+            });
+            assert.equal(descriptive.status, 200);
+            const descriptiveBody = (await descriptive.json()) as {
+              data: { type: string }[];
+              meta: { total: number };
+            };
+            assert.equal(descriptiveBody.meta.total, 13);
+            assert(
+              descriptiveBody.data.every(
+                (item) =>
+                  item.type === 'DESCRIPTIVE' && Object.keys(item).length === 7,
+              ),
+            );
+            assert.doesNotMatch(
+              JSON.stringify(descriptiveBody),
+              /SENTINEL|answer|explanation|evaluation|createdBy/,
+            );
+            assert.equal(
+              (
+                await fetch(url + '&type=SCENARIO', {
+                  headers: { Authorization: 'Bearer ' + token },
+                })
+              ).status,
+              400,
             );
             assert.deepEqual(
               await db
