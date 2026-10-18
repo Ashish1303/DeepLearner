@@ -18,6 +18,7 @@ import {
 import {
   practiceListRequest,
   practiceUnlockRequest,
+  readIdempotencyKey,
 } from './practice.schema.js';
 import { routeLabel } from '../../middleware/request-logger.js';
 export function createPracticeRouter(
@@ -54,7 +55,11 @@ export function createPracticeRouter(
         next();
       },
       validateRequest(practiceUnlockRequest, (req, res, input) =>
-        controller.unlock(req, res, { ...input.params, ...input.body }),
+        controller.unlock(req, res, {
+          ...input.params,
+          ...input.body,
+          idempotencyKey: readIdempotencyKey(req.rawHeaders),
+        }),
       ),
     );
   router.get(

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AppError } from '../../common/errors/app-error.js';
 const integer = z
   .string()
   .regex(/^[1-9][0-9]*(?![\s\S])/)
@@ -39,10 +40,41 @@ const unlockId = z
 export const practiceUnlockRequest = z.strictObject({
   params: z.strictObject({ questionId: unlockId }),
   query: z.strictObject({}),
-  body: z.strictObject({ conceptId: unlockId, studentAnswer: submittedAnswer }),
+  body: z.strictObject({
+    conceptId: unlockId,
+    studentAnswer: submittedAnswer,
+    questionRevision: z.string().regex(/^[a-f0-9]{64}(?![\s\S])/),
+  }),
 });
+export const idempotencyKey = z
+  .string()
+  .length(36)
+  .regex(
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(?![\s\S])/,
+  );
+export function readIdempotencyKey(headers: string[]): string {
+  const values = headers.filter(
+    (_value, index) =>
+      index % 2 === 0 && headers[index]!.toLowerCase() === 'idempotency-key',
+  ).length;
+  const index = headers.findIndex(
+    (value, i) => i % 2 === 0 && value.toLowerCase() === 'idempotency-key',
+  );
+  const parsed = idempotencyKey.safeParse(
+    index < 0 ? undefined : headers[index + 1],
+  );
+  if (values !== 1 || !parsed.success)
+    throw new AppError(
+      400,
+      'VALIDATION_ERROR',
+      'One valid Idempotency-Key is required',
+    );
+  return parsed.data;
+}
 export type PracticeUnlockInput = {
   questionId: string;
   conceptId: string;
   studentAnswer: string;
+  questionRevision: string;
+  idempotencyKey: string;
 };

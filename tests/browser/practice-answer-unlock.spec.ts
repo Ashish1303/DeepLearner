@@ -18,10 +18,16 @@ const envelope = (data: unknown) => ({
 const headers = {
   'Access-Control-Allow-Origin': 'http://127.0.0.1:3000',
   'Access-Control-Allow-Credentials': 'true',
-  'Access-Control-Allow-Headers': 'authorization,content-type',
+  'Access-Control-Allow-Headers': 'authorization,content-type,idempotency-key',
   'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
   'Cache-Control': 'no-store',
 };
+const receipt = (number: number) => ({
+  id: number.toString(16).padStart(24, '0'),
+  attemptNumber: number,
+  result: 'SUBMITTED',
+  submittedAt: '2026-10-18T00:00:00.000Z',
+});
 const initialUser = {
   id: uid,
   firstName: 'Synthetic',
@@ -59,6 +65,9 @@ function item(index: number, conceptId = cid) {
 async function mock(context: BrowserContext) {
   const state = {
     user: { ...initialUser },
+    saved: new Map<string, { body: string; result: unknown }>(),
+    savedCount: 0,
+    loseAfterSave: false,
     total: 11,
     unlockCalls: [] as {
       questionId: string;
@@ -66,6 +75,7 @@ async function mock(context: BrowserContext) {
       studentAnswer: string;
       bearer: boolean;
       cookie: boolean;
+      key: string;
     }[],
     unlockFault: 0,
     unlockHold: false,
@@ -124,6 +134,7 @@ async function mock(context: BrowserContext) {
       const body = request.postDataJSON() as {
         conceptId: string;
         studentAnswer: string;
+        questionRevision: string;
       };
       const h = await request.allHeaders(),
         questionId = path.split('/')[2]!;
@@ -132,7 +143,24 @@ async function mock(context: BrowserContext) {
         ...body,
         bearer: h.authorization === 'Bearer synthetic-test-token',
         cookie: 'cookie' in h,
+        key: h['idempotency-key'] ?? '',
       });
+      const identity = state.user.id + ':' + h['idempotency-key'];
+      const previous = state.saved.get(identity);
+      if (previous && previous.body !== JSON.stringify(body)) {
+        await send(
+          {
+            success: false,
+            error: {
+              code: 'PRACTICE_IDEMPOTENCY_CONFLICT',
+              message: 'PRIVATE',
+            },
+            meta: { requestId: 'test' },
+          },
+          409,
+        );
+        return;
+      }
       if (state.unlockFault) {
         await send(
           {
@@ -152,7 +180,7 @@ async function mock(context: BrowserContext) {
         );
         return;
       }
-      const result = envelope({
+      const data = envelope({
         id: questionId,
         conceptId: body.conceptId,
         type: state.requestedTypes.at(-1) ?? 'OUTPUT',
@@ -161,6 +189,20 @@ async function mock(context: BrowserContext) {
         explanation:
           'Explanation EXPLANATION_SENTINEL\n\n![bad](https://image.invalid)',
       });
+      const result = previous?.result ?? {
+        ...data,
+        meta: {
+          requestId: 'f035-browser',
+          attempt: receipt(++state.savedCount),
+        },
+      };
+      if (!previous)
+        state.saved.set(identity, { body: JSON.stringify(body), result });
+      if (state.loseAfterSave) {
+        state.loseAfterSave = false;
+        await route.abort();
+        return;
+      }
       if (state.unlockHold) {
         state.unlockHeld.push({ route, body: result });
         return;
@@ -250,7 +292,9 @@ const question = (page: Page, number = 1) =>
 const submit = (page: Page, number = 1) =>
   question(page, number).getByRole('button', {
     name: new RegExp(
-      '^(Submit Answer|Retry answer submission) for Question ' + number + '$',
+      '^(Submit Answer|Submit another attempt|Retry answer submission) for Question ' +
+        number +
+        '$',
     ),
   });
 const revealed = (page: Page, number = 1) =>
@@ -259,7 +303,7 @@ const revealed = (page: Page, number = 1) =>
     exact: true,
   });
 const disclaimer =
-  'Answer revealed. This attempt has not been saved or graded.';
+  'Answer revealed. This attempt has been saved but has not been graded.';
 
 test('F035 desktop all four types require submission before transient five-field reveal', async ({
   page,

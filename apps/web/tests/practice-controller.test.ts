@@ -1,10 +1,27 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createPracticeController } from '../src/lib/practice/practice-controller';
-import type { PracticePage } from '../src/lib/practice/contracts';
+import type {
+  PracticeUnlockResult,
+  PracticePage,
+} from '../src/lib/practice/contracts';
 import type { AuthController } from '../src/lib/auth/auth-controller';
 import type { PracticeClient } from '../src/lib/api/practice-client';
+import { PracticeSubmissionError } from '../src/lib/api/practice-client';
 const id = 'a'.repeat(24);
+const receipt = {
+  id: 'f'.repeat(24),
+  attemptNumber: 1,
+  result: 'SUBMITTED' as const,
+  submittedAt: '2026-10-18T00:00:00.000Z',
+};
+async function waitForSubmission(c: ReturnType<typeof fixture>, q: string) {
+  const end = Date.now() + 2000;
+  while (c.getSnapshot().submissions?.[q] !== 'uncertain') {
+    if (Date.now() > end) throw Error('submission did not start');
+    await new Promise<void>(setImmediate);
+  }
+}
 const page = (number = 1, prompt = 'Predict'): PracticePage => ({
   success: true,
   message: null,
@@ -35,7 +52,9 @@ function fixture(
   load: PracticeClient['load'] = async (_id, n) => page(n),
   account = 'one',
   concept = id,
-  unlock: PracticeClient['unlock'] = async (
+  unlock: (
+    ...args: Parameters<PracticeClient['unlock']>
+  ) => Promise<Omit<PracticeUnlockResult, 'attempt'>> = async (
     conceptId,
     questionId,
     _answer,
@@ -50,7 +69,18 @@ function fixture(
     explanation: null,
   }),
 ) {
-  return createPracticeController({ load, unlock }, auth, account, concept);
+  return createPracticeController(
+    {
+      load,
+      unlock: async (...args) => ({
+        ...(await unlock(...args)),
+        attempt: receipt,
+      }),
+    },
+    auth,
+    account,
+    concept,
+  );
 }
 test('F035 four-type reveal is single-question memory and clearing reveals preserves unrelated drafts', async () => {
   let calls = 0;
@@ -138,6 +168,7 @@ test('F035 stale unlock success/error cannot survive edits, navigation, type cha
       await c.load();
       c.setDraft(q, 'draft');
       const pending = c.submitAnswer(q);
+      await waitForSubmission(c, q);
       await c.submitAnswer(q);
       assert.equal(calls, 1);
       if (action === 'edit') c.setDraft(q, 'edited');
@@ -185,6 +216,7 @@ test('F035 superseded question submission and stale confirmation cannot replace 
   c.setDraft(q, 'first');
   c.setDraft(second, 'second');
   const pending = c.submitAnswer(q);
+  await waitForSubmission(c, q);
   c.clearDrafts();
   const stale = c.getSnapshot().clearConfirmation!;
   c.setDraft(second, 'changed');
@@ -235,6 +267,154 @@ test('F035 retry is explicit and malformed identities never reveal official cont
   assert.equal(calls, 3);
   await c.submitAnswer(q, 'CODING');
   assert.equal(calls, 3);
+});
+test('F036 uncertain retries retain a key across navigation, success requires an explicit new key', async () => {
+  const keys: string[] = [];
+  let mode = 'uncertain';
+  const c = fixture(
+    typedLoad,
+    'one',
+    id,
+    async (
+      conceptId,
+      questionId,
+      _answer,
+      _token,
+      _signal,
+      type,
+      submission,
+    ) => {
+      keys.push(submission.key);
+      if (mode === 'uncertain') throw Error('network');
+      return {
+        id: questionId,
+        conceptId,
+        type,
+        answer: 'Official',
+        explanation: null,
+      };
+    },
+  );
+  const q = page().data[0]!.id;
+  await c.load();
+  c.setDraft(q, 'unchanged');
+  await c.submitAnswer(q);
+  assert.equal(c.getSnapshot().reveal?.status, 'error');
+  await c.load(2);
+  await c.load(1);
+  await c.submitAnswer(q);
+  assert.equal(keys.length, 2);
+  assert.equal(keys[0], keys[1]);
+  mode = 'saved';
+  await c.submitAnswer(q);
+  assert.equal(keys[1], keys[2]);
+  assert.equal(c.getSnapshot().submissions?.[q], 'saved');
+  await c.submitAnswer(q);
+  assert.notEqual(keys[2], keys[3]);
+  c.setDraft(q, 'edited');
+  await c.submitAnswer(q);
+  assert.notEqual(keys[3], keys[4]);
+  c.clearDrafts();
+  c.confirmClearDrafts(c.getSnapshot().clearConfirmation!);
+  assert.deepEqual(c.getSnapshot().submissions, {});
+  assert.equal(c.getSnapshot().reveal, null);
+});
+test('F036 cancellation while hashing cannot send or retain a submission for a disposed identity', async () => {
+  let calls = 0;
+  const c = fixture(
+    typedLoad,
+    'one',
+    id,
+    async (conceptId, questionId, _a, _t, _s, type) => {
+      calls++;
+      return {
+        id: questionId,
+        conceptId,
+        type,
+        answer: 'Official',
+        explanation: null,
+      };
+    },
+  );
+  await c.load();
+  const q = page().data[0]!.id;
+  c.setDraft(q, 'answer');
+  const pending = c.submitAnswer(q);
+  c.cancel();
+  await pending;
+  assert.equal(calls, 0);
+  assert.deepEqual(c.getSnapshot().submissions, {});
+});
+test('F036 refused keys never silently rotate and a new submission requires an explicit action', async () => {
+  const keys: string[] = [];
+  let refuse = true;
+  let loads = 0;
+  const load: PracticeClient['load'] = async (...args) => {
+    loads++;
+    return typedLoad(...args);
+  };
+  const c = fixture(
+    load,
+    'one',
+    id,
+    async (conceptId, questionId, _a, _t, _s, type, submission) => {
+      keys.push(submission.key);
+      if (refuse)
+        throw new PracticeSubmissionError('PRACTICE_IDEMPOTENCY_CONFLICT', 409);
+      return {
+        id: questionId,
+        conceptId,
+        type,
+        answer: 'Official',
+        explanation: null,
+      };
+    },
+  );
+  await c.load();
+  const q = page().data[0]!.id;
+  c.setDraft(q, 'answer');
+  await c.submitAnswer(q);
+  assert.equal(c.getSnapshot().submissions?.[q], 'refused');
+  await c.submitAnswer(q);
+  assert.equal(keys.length, 1);
+  await c.startNewSubmission(q);
+  assert.equal(loads, 2);
+  assert.equal(c.getSnapshot().status, 'ready');
+  assert.equal(c.getSnapshot().focusRevision, 1);
+  refuse = false;
+  await c.submitAnswer(q);
+  assert.notEqual(keys[0], keys[1]);
+});
+test('F036 retry memos share the 100-draft capacity across all four types and clear with their scope', async () => {
+  const c = fixture(typedLoad),
+    types = ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'] as const;
+  for (const type of types) {
+    await c.selectType(type);
+    for (let n = 1; n <= 25; n++) {
+      await c.load(n);
+      const q = c.getSnapshot().data!.data[0]!.id;
+      c.setDraft(q, 'answer');
+      await c.submitAnswer(q);
+    }
+    assert.equal(Object.keys(c.getSnapshot().submissions!).length, 25);
+  }
+  await c.load(26);
+  const q = c.getSnapshot().data!.data[0]!.id;
+  c.setDraft(q, 'blocked');
+  assert.match(c.getSnapshot().notice, /capacity/);
+  await c.submitAnswer(q);
+  assert.equal(Object.keys(c.getSnapshot().submissions!).length, 25);
+  c.clearDrafts();
+  const ticket = c.getSnapshot().clearConfirmation!;
+  c.cancelClearDrafts();
+  c.confirmClearDrafts(ticket);
+  assert.equal(Object.keys(c.getSnapshot().submissions!).length, 25);
+  c.clearDrafts();
+  c.confirmClearDrafts(c.getSnapshot().clearConfirmation!);
+  for (const type of types) {
+    await c.selectType(type);
+    assert.deepEqual(c.getSnapshot().submissions, {});
+  }
 });
 test('drafts retain exact whitespace across pages/retry and clear on changed question content', async () => {
   let prompt = 'Predict';

@@ -10,6 +10,12 @@ import { difficultyLabels } from '../src/lib/concepts/contracts';
 import { ConceptMarkdown } from '../src/components/concepts/concept-markdown';
 import type { PracticeState } from '../src/lib/practice/practice-controller';
 const id = 'a'.repeat(24);
+const receipt = {
+  id: 'f'.repeat(24),
+  attemptNumber: 1,
+  result: 'SUBMITTED' as const,
+  submittedAt: '2026-10-18T00:00:00.000Z',
+};
 const state: PracticeState = {
   reveal: null,
   type: 'OUTPUT',
@@ -96,6 +102,7 @@ function fixture(current = state, pending = false, role = 'STUDENT') {
   new Function('require', 'exports', output)(load, exports);
   const controller = {
     submitAnswer() {},
+    startNewSubmission() {},
     retry() {},
     load() {},
     setDraft() {},
@@ -131,7 +138,7 @@ test('practice safely renders restricted Markdown, inert code and escaped drafts
   assert.match(html, /<label for="practice-test-/);
   assert.match(html, /maxLength="10000"/);
   assert.match(html, /aria-describedby=/);
-  assert.match(html, /Answers are sent only when you choose Submit Answer/);
+  assert.match(html, /Submit Answer saves your answer but does not grade it/);
   assert.doesNotMatch(html, />Submit</);
   assert.match(html, /aria-label="Practice pagination"/);
 });
@@ -424,6 +431,7 @@ test('F035 pending/error/success are accessible and revealed Markdown and studen
       ...base,
       status: 'ready',
       result: {
+        attempt: receipt,
         id,
         conceptId: id,
         type: 'OUTPUT',
@@ -437,7 +445,7 @@ test('F035 pending/error/success are accessible and revealed Markdown and studen
   assert.match(html, /aria-label="Revealed answer for Question 1"/);
   assert.match(
     html,
-    /Answer revealed\. This attempt has not been saved or graded\./,
+    /Answer revealed\. This attempt has been saved but has not been graded\./,
   );
   assert.match(html, /Your submitted answer for Question 1/);
   assert.match(html, /\t&lt;script&gt;student/);
@@ -449,6 +457,7 @@ test('F035 pending/error/success are accessible and revealed Markdown and studen
       questionId: 'b'.repeat(24),
       status: 'ready',
       result: {
+        attempt: receipt,
         id,
         conceptId: id,
         type: 'OUTPUT',

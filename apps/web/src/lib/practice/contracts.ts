@@ -64,6 +64,42 @@ export const submittedAnswer = z
 const answerText = text.refine(
   (value) => value === value.trim() && value.length <= 50000,
 );
+export const attemptReceipt = z.strictObject({
+  id: practiceId,
+  attemptNumber: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  result: z.literal('SUBMITTED'),
+  submittedAt: z.iso.datetime({ precision: 3 }),
+});
+export const submissionIdentity = z.strictObject({
+  key: z
+    .string()
+    .length(36)
+    .regex(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(?![\s\S])/,
+    ),
+  questionRevision: z.string().regex(/^[a-f0-9]{64}(?![\s\S])/),
+});
+export function publicQuestionText(item: PracticeItem) {
+  return JSON.stringify([
+    'F036-public-v1',
+    item.id,
+    item.conceptId,
+    item.type,
+    item.difficulty,
+    item.prompt,
+    item.starterCode,
+    item.language,
+  ]);
+}
+export async function questionRevision(item: PracticeItem) {
+  const bytes = await globalThis.crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(publicQuestionText(item)),
+  );
+  return Array.from(new Uint8Array(bytes), (byte) =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('');
+}
 export const practiceUnlockEnvelope = z.strictObject({
   success: z.literal(true),
   message: z.null(),
@@ -74,8 +110,11 @@ export const practiceUnlockEnvelope = z.strictObject({
     answer: answerText,
     explanation: answerText.nullable(),
   }),
-  meta: z.strictObject({ requestId: z.string().min(1) }),
+  meta: z.strictObject({
+    requestId: z.string().min(1),
+    attempt: attemptReceipt,
+  }),
 });
 export type PracticeUnlockResult = z.output<
   typeof practiceUnlockEnvelope
->['data'];
+>['data'] & { attempt: z.output<typeof attemptReceipt> };

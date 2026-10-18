@@ -1845,3 +1845,48 @@ progress, transaction or stored answer. Nonblank input is not proof of effort.
 Content is current at read, not version-locked. F036 must establish durable attempt
 persistence and the final unlock policy before deployment, with no transient
 fallback on persistence failure. No F035 memory is retroactively a recorded attempt.
+
+## F036 durable LOCAL-only submit-to-reveal
+
+This explicitly supersedes only F035's transient POST contract. The same server-
+registered LOCAL-only POST /api/v1/practice-questions/:questionId/unlock now requires
+one canonical lowercase UUID-v4 Idempotency-Key header and exact JSON body
+{conceptId, studentAnswer, questionRevision}; query is empty. IDs retain strict
+24-hex normalization; studentAnswer is verbatim nonblank, at most 10,000 UTF-16
+units. questionRevision is lowercase SHA-256 of the ordered public safe-question
+array specified in F036. GET stays exactly seven answer-free fields and unchanged
+pagination/order/default OUTPUT/four-type behavior. No legacy transient fallback.
+
+An eligible authenticated current STUDENT must qualify every original/replay
+request. The server checks transaction/index readiness, fresh published five-level
+ancestry/references, displayed public revision and private solution/reference
+fingerprint, persists an immutable owned SUBMITTED/null-score attempt with unique
+account/key and account/question/sequence identities, then confirms majority commit
+and rereads exact committed ownership/request identity. Fresh disclosure eligibility
+and content binding must still pass. Commit uncertainty never permits disclosure.
+
+Success remains 200 with exactly the five existing answer fields in data. meta
+is exactly requestId plus attempt:{id,attemptNumber,result:SUBMITTED,submittedAt},
+where submittedAt is canonical UTC milliseconds. No submitted answer, userId,
+key/hash, internal revision, solution fingerprint, score or other private data is
+returned. Receipts/keys are informational identity, not unlock credentials.
+Same key/exact request replays the same receipt only after fresh authorization;
+changed request is 409 PRACTICE_IDEMPOTENCY_CONFLICT, changed content is 409
+PRACTICE_QUESTION_CHANGED. Unconfirmed outcome is sanitized 503
+PRACTICE_COMMIT_UNCONFIRMED. Missing indexes/topology or exhausted known-aborted
+conflicts use DEPENDENCY_UNAVAILABLE. Existing auth/validation/hidden/media/rate
+errors and exact-route early-parser/CORS no-store remain. No sensitive logging.
+
+The shared 300/IP and dedicated 30/subject unlock limits per 15 minutes also apply
+to replays. Conflict handling permits at most three transaction-body executions
+within a 10-second persistence budget, reserving two seconds for verification;
+the existing 15-second client timeout does not undo a committed attempt. Retry
+is explicit with the same in-memory key/frozen body; a deliberate new attempt
+uses a new key. Keys/reveals do not persist in browser storage. Saved/ungraded
+feedback replaces the unsaved disclaimer. Clear drafts never deletes saved data.
+
+Matching local API/web versions must be used: old bodies fail validation, old
+strict clients reject the new receipt metadata. No attempt history/Admin/deletion
+API, score/grade, execution, progress or production approval. Current-at-final-
+validation content is not instantaneous publisher revocation or monotonic edit
+history. See F036 for exact digest/replay/privacy rules and gated verification.

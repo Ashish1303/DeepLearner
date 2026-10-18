@@ -1,8 +1,88 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createPracticeClient } from '../src/lib/api/practice-client';
-import { practiceEnvelope } from '../src/lib/practice/contracts';
+import {
+  practiceEnvelope,
+  questionRevision,
+  publicQuestionText,
+  practiceItem,
+} from '../src/lib/practice/contracts';
+import { createHash } from 'node:crypto';
+import { PracticeSubmissionError } from '../src/lib/api/practice-client';
 const id = 'a'.repeat(24);
+const receipt = {
+  id: 'f'.repeat(24),
+  attemptNumber: 1,
+  result: 'SUBMITTED' as const,
+  submittedAt: '2026-10-18T00:00:00.000Z',
+};
+const submission = {
+  key: '11111111-1111-4111-8111-111111111111',
+  questionRevision: 'a'.repeat(64),
+};
+test('F036 canonical public revision handles exact Unicode and does not contain private solutions', async () => {
+  for (const prompt of ['Predict', 'Unicode 😀 é \ud800']) {
+    const value = practiceItem.parse({ ...item, prompt });
+    const canonical = JSON.stringify([
+      'F036-public-v1',
+      id,
+      id,
+      'OUTPUT',
+      'BEGINNER',
+      prompt,
+      item.starterCode,
+      'JAVASCRIPT',
+    ]);
+    assert.equal(publicQuestionText(value), canonical);
+    assert.equal(
+      await questionRevision(value),
+      createHash('sha256').update(canonical).digest('hex'),
+    );
+  }
+});
+test('F036 missing receipt, bad keys and unsafe error messages fail closed without automatic retry', async () => {
+  let calls = 0;
+  const signal = new AbortController().signal;
+  const client = createPracticeClient('http://localhost', async () => {
+    calls++;
+    return Response.json({ ...unlockBody(), meta: { requestId: 'test' } });
+  });
+  await assert.rejects(
+    client.unlock(id, id, 'x', 'test', signal, 'OUTPUT', {
+      ...submission,
+      key: 'bad',
+    }),
+    { code: 'VALIDATION_ERROR' },
+  );
+  assert.equal(calls, 0);
+  await assert.rejects(
+    client.unlock(id, id, 'x', 'test', signal, 'OUTPUT', submission),
+    { code: 'INVALID_RESPONSE' },
+  );
+  for (const code of [
+    'PRACTICE_IDEMPOTENCY_CONFLICT',
+    'PRACTICE_QUESTION_CHANGED',
+    'PRACTICE_COMMIT_UNCONFIRMED',
+  ] as const) {
+    const denied = createPracticeClient('http://localhost', async () =>
+      Response.json(
+        {
+          success: false,
+          error: { code, message: 'PRIVATE_ANSWER' },
+          meta: { requestId: 'test' },
+        },
+        { status: code.endsWith('UNCONFIRMED') ? 503 : 409 },
+      ),
+    );
+    await assert.rejects(
+      denied.unlock(id, id, 'x', 'test', signal, 'OUTPUT', submission),
+      (error) =>
+        error instanceof PracticeSubmissionError &&
+        error.reason === code &&
+        !error.message.includes('PRIVATE_ANSWER'),
+    );
+  }
+});
 const item = {
   id,
   conceptId: id,
@@ -24,7 +104,7 @@ const unlockBody = (
   success: true,
   message: null,
   data: { id, conceptId: id, type, answer: 'Official', explanation: null },
-  meta: { requestId: 'test' },
+  meta: { requestId: 'test', attempt: receipt },
 });
 test('F035 POST preserves student formatting, private bearer and no-store for all four types', async () => {
   for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'] as const) {
@@ -44,11 +124,13 @@ test('F035 POST preserves student formatting, private bearer and no-store for al
         assert.equal(init?.redirect, 'error');
         assert.deepEqual(init?.headers, {
           'Content-Type': 'application/json',
+          'Idempotency-Key': submission.key,
           Authorization: 'Bearer synthetic',
         });
         assert.deepEqual(JSON.parse(String(init?.body)), {
           conceptId: id,
           studentAnswer: answer,
+          questionRevision: submission.questionRevision,
         });
         return Response.json(unlockBody(type));
       },
@@ -61,8 +143,9 @@ test('F035 POST preserves student formatting, private bearer and no-store for al
         'synthetic',
         new AbortController().signal,
         type,
+        submission,
       ),
-      unlockBody(type).data,
+      { ...unlockBody(type).data, attempt: receipt },
     );
     assert.equal(calls, 1);
   }
@@ -76,15 +159,15 @@ test('F035 unlock rejects bad inputs before fetch and strict response identity/a
   const signal = new AbortController().signal;
   for (const answer of ['', ' \t\n', 'x'.repeat(10001), '😀'.repeat(5001)])
     await assert.rejects(
-      client.unlock(id, id, answer, 'test', signal, 'OUTPUT'),
+      client.unlock(id, id, answer, 'test', signal, 'OUTPUT', submission),
       { code: 'VALIDATION_ERROR' },
     );
   await assert.rejects(
-    client.unlock(id, 'invalid', 'x', 'test', signal, 'OUTPUT'),
+    client.unlock(id, 'invalid', 'x', 'test', signal, 'OUTPUT', submission),
     { code: 'VALIDATION_ERROR' },
   );
   await assert.rejects(
-    client.unlock('invalid', id, 'x', 'test', signal, 'OUTPUT'),
+    client.unlock('invalid', id, 'x', 'test', signal, 'OUTPUT', submission),
     { code: 'VALIDATION_ERROR' },
   );
   assert.equal(calls, 0);
@@ -104,9 +187,12 @@ test('F035 unlock rejects bad inputs before fetch and strict response identity/a
     const unsafe = createPracticeClient('http://localhost', async () =>
       Response.json(raw),
     );
-    await assert.rejects(unsafe.unlock(id, id, 'x', 'test', signal, 'OUTPUT'), {
-      code: 'INVALID_RESPONSE',
-    });
+    await assert.rejects(
+      unsafe.unlock(id, id, 'x', 'test', signal, 'OUTPUT', submission),
+      {
+        code: 'INVALID_RESPONSE',
+      },
+    );
   }
 });
 test('F035 unlock cancellation, deadline and safe errors do not retry or leak response messages', async () => {
@@ -120,7 +206,7 @@ test('F035 unlock cancellation, deadline and safe errors do not retry or leak re
       return Response.json(unlockBody());
     });
     await assert.rejects(
-      client.unlock(id, id, 'x', 'test', cancel.signal, 'OUTPUT'),
+      client.unlock(id, id, 'x', 'test', cancel.signal, 'OUTPUT', submission),
       { name: 'AbortError' },
     );
     assert.equal(calls, before ? 0 : 1);
@@ -147,7 +233,7 @@ test('F035 unlock cancellation, deadline and safe errors do not retry or leak re
       );
     });
     await assert.rejects(
-      client.unlock(id, id, 'x', 'test', signal, 'OUTPUT'),
+      client.unlock(id, id, 'x', 'test', signal, 'OUTPUT', submission),
       (e) => e instanceof Error && !e.message.includes('SECRET'),
     );
     assert.equal(calls, 1);
@@ -160,9 +246,12 @@ test('F035 unlock cancellation, deadline and safe errors do not retry or leak re
       ),
     1,
   );
-  await assert.rejects(timeout.unlock(id, id, 'x', 'test', signal, 'OUTPUT'), {
-    code: 'NETWORK_ERROR',
-  });
+  await assert.rejects(
+    timeout.unlock(id, id, 'x', 'test', signal, 'OUTPUT', submission),
+    {
+      code: 'NETWORK_ERROR',
+    },
+  );
 });
 
 test('F033 each requested type uses its own URL and rejects wrong-type or secret-bearing DTOs', async () => {

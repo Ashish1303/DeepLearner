@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { z } from 'zod';
+import { createHash } from 'node:crypto';
 const id = z.string().regex(/^[a-f0-9]{24}(?![\s\S])/);
 const text = z
   .string()
@@ -64,5 +65,77 @@ export function practiceAnswerDto(
       record.explanation === undefined
         ? null
         : authoredAnswer.parse(record.explanation),
+  });
+}
+export const sha256 = (value: string) =>
+  createHash('sha256').update(value, 'utf8').digest('hex');
+export function questionRevision(item: PracticeDto) {
+  return sha256(
+    JSON.stringify([
+      'F036-public-v1',
+      item.id,
+      item.conceptId,
+      item.type,
+      item.difficulty,
+      item.prompt,
+      item.starterCode,
+      item.language,
+    ]),
+  );
+}
+export type QualifiedPractice = {
+  data: PracticeAnswerDto;
+  questionRevision: string;
+  contentFingerprint: string;
+};
+export function qualifiedPractice(
+  record: ProjectedPractice,
+  parent: ProjectedPractice,
+): QualifiedPractice {
+  const hex = (value: unknown) =>
+    id.parse(value instanceof Types.ObjectId ? value.toHexString() : value);
+  const data = practiceAnswerDto(record),
+    revision = questionRevision(practiceDto(record));
+  if (record.schemaVersion !== 1) throw new Error('Invalid question version');
+  return {
+    data,
+    questionRevision: revision,
+    contentFingerprint: sha256(
+      JSON.stringify([
+        'F036-content-v1',
+        revision,
+        hex(record.topicId),
+        hex(parent.moduleId),
+        hex(parent.learningPathId),
+        hex(record.technologyId),
+        1,
+        data.answer,
+        data.explanation,
+      ]),
+    ),
+  };
+}
+const receipt = z.strictObject({
+  id,
+  attemptNumber: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  result: z.literal('SUBMITTED'),
+  submittedAt: z.iso.datetime({ precision: 3 }),
+});
+export type AttemptReceipt = z.output<typeof receipt>;
+export type PracticeUnlockOutcome = {
+  data: PracticeAnswerDto;
+  attempt: AttemptReceipt;
+};
+export function attemptReceipt(record: {
+  _id: Types.ObjectId;
+  attemptNumber: number;
+  result: string;
+  submittedAt: Date;
+}): AttemptReceipt {
+  return receipt.parse({
+    id: record._id.toHexString(),
+    attemptNumber: record.attemptNumber,
+    result: record.result,
+    submittedAt: record.submittedAt.toISOString(),
   });
 }

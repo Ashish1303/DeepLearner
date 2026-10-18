@@ -84,8 +84,9 @@ export function PracticeView({
           {typeLabel} practice
         </h1>
         <p id={prefix + '-instructions'}>
-          Answers are sent only when you choose Submit Answer. Nothing is saved
-          or graded. Revealed answers are kept only on this page.
+          Submit Answer saves your answer but does not grade it. Cancelling a
+          request or clearing drafts does not delete a saved attempt. Revealed
+          answers are kept only on this page.
         </p>
       </header>
       <div className={styles.controls} role="group" aria-label="Question type">
@@ -215,12 +216,19 @@ export function PracticeView({
                       disabled={!state.drafts[item.id]?.trim()}
                       aria-disabled={reveal?.status === 'pending'}
                       onClick={() =>
-                        void controller.submitAnswer(item.id, state.type)
+                        state.submissions?.[item.id] === 'refused'
+                          ? controller.startNewSubmission(item.id, state.type)
+                          : void controller.submitAnswer(item.id, state.type)
                       }
                     >
-                      {reveal?.status === 'error'
-                        ? `Retry answer submission for Question ${number}`
-                        : `Submit Answer for Question ${number}`}
+                      {state.submissions?.[item.id] === 'refused'
+                        ? `Start a new submission for Question ${number}`
+                        : state.submissions?.[item.id] === 'saved'
+                          ? `Submit another attempt for Question ${number}`
+                          : reveal?.status === 'error' ||
+                              state.submissions?.[item.id] === 'uncertain'
+                            ? `Retry answer submission for Question ${number}`
+                            : `Submit Answer for Question ${number}`}
                     </button>
                     {reveal?.status === 'pending' && (
                       <p role="status">
@@ -235,8 +243,15 @@ export function PracticeView({
                         aria-label={`Revealed answer for Question ${number}`}
                       >
                         <p role="status">
-                          Answer revealed. This attempt has not been saved or
-                          graded.
+                          Answer revealed. This attempt has been saved but has
+                          not been graded.
+                        </p>
+                        <p>
+                          Saved attempt {reveal.result.attempt.attemptNumber} at{' '}
+                          <time dateTime={reveal.result.attempt.submittedAt}>
+                            {reveal.result.attempt.submittedAt}
+                          </time>
+                          .
                         </p>
                         <h3>Your Answer</h3>
                         <pre

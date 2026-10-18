@@ -6,9 +6,27 @@ import {
   practiceType,
   practiceUnlockEnvelope,
   submittedAnswer,
+  submissionIdentity,
   type PracticeType,
   type PracticePage,
 } from '../practice/contracts';
+const submissionMessages = {
+  PRACTICE_IDEMPOTENCY_CONFLICT:
+    'This submission key conflicts. Start a new submission explicitly.',
+  PRACTICE_QUESTION_CHANGED:
+    'The question changed. Refresh it before starting a new submission.',
+  PRACTICE_COMMIT_UNCONFIRMED:
+    'This attempt may have been saved. Retry the unchanged answer to confirm it.',
+} as const;
+export class PracticeSubmissionError extends ApiError {
+  constructor(
+    public readonly reason: keyof typeof submissionMessages,
+    status: number,
+  ) {
+    super('REQUEST_FAILED', status);
+    this.message = submissionMessages[reason];
+  }
+}
 export function createPracticeClient(
   base: string,
   fetcher: typeof fetch = fetch,
@@ -66,6 +84,11 @@ export function createPracticeClient(
           'VALIDATION_ERROR',
         ];
         const code = parsed.data.error.code;
+        if (Object.hasOwn(submissionMessages, code))
+          throw new PracticeSubmissionError(
+            code as keyof typeof submissionMessages,
+            response.status,
+          );
         throw new ApiError(
           allowed.includes(code as ErrorCode)
             ? (code as ErrorCode)
@@ -132,12 +155,14 @@ export function createPracticeClient(
       token: string,
       external: AbortSignal,
       type: PracticeType,
+      submission: { key: string; questionRevision: string },
     ) {
       if (
         !practiceId.safeParse(conceptId).success ||
         !practiceId.safeParse(questionId).success ||
         !practiceType.safeParse(type).success ||
-        !submittedAnswer.safeParse(studentAnswer).success
+        !submittedAnswer.safeParse(studentAnswer).success ||
+        !submissionIdentity.safeParse(submission).success
       )
         throw new ApiError('VALIDATION_ERROR', 400);
       return request(
@@ -146,8 +171,15 @@ export function createPracticeClient(
         external,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ conceptId, studentAnswer }),
+          headers: {
+            'Content-Type': 'application/json',
+            'Idempotency-Key': submission.key,
+          },
+          body: JSON.stringify({
+            conceptId,
+            studentAnswer,
+            questionRevision: submission.questionRevision,
+          }),
         },
         (raw) => {
           const parsed = practiceUnlockEnvelope.safeParse(raw);
@@ -158,7 +190,7 @@ export function createPracticeClient(
             parsed.data.data.type !== type
           )
             throw new ApiError('INVALID_RESPONSE');
-          return parsed.data.data;
+          return { ...parsed.data.data, attempt: parsed.data.meta.attempt };
         },
       );
     },

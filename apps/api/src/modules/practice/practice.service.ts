@@ -2,6 +2,10 @@ import { AppError } from '../../common/errors/app-error.js';
 import type { UserRepository } from '../users/user.repository.js';
 import type { PracticeRepository } from './practice.repository.js';
 import {
+  practiceAttemptRepository,
+  type PracticeAttemptRepository,
+} from './practice-attempt.repository.js';
+import {
   submittedAnswer,
   type PracticeQuery,
   type PracticeUnlockInput,
@@ -9,6 +13,7 @@ import {
 export function createPracticeService(
   repository: PracticeRepository,
   users: Pick<UserRepository, 'get'>,
+  attempts: PracticeAttemptRepository = practiceAttemptRepository,
 ) {
   async function eligible(subject: { sub: string; role: string }) {
     const forbidden = () =>
@@ -38,9 +43,8 @@ export function createPracticeService(
           'VALIDATION_ERROR',
           'A nonblank answer of at most 10,000 characters is required',
         );
-      const result = await repository.unlock(input.questionId, input.conceptId);
-      if (!result)
-        throw new AppError(404, 'CONCEPT_NOT_FOUND', 'Concept not found');
+      const result = await attempts.submit(subject.sub, input);
+      await eligible(subject);
       return result;
     },
     async list(subject: { sub: string; role: string }, query: PracticeQuery) {

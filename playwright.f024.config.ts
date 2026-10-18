@@ -12,6 +12,7 @@ export default defineConfig(foundation, {
     'practice-scenario.spec.ts',
     'practice-coding.spec.ts',
     'practice-answer-unlock.spec.ts',
+    'practice-attempts.spec.ts',
   ],
   globalTimeout: 600_000,
   timeout: 45_000,

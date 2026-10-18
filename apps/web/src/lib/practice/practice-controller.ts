@@ -1,4 +1,5 @@
 import { ApiError } from '../api/client';
+import { PracticeSubmissionError } from '../api/practice-client';
 import type { AuthController } from '../auth/auth-controller';
 import type { PracticeClient } from '../api/practice-client';
 import {
@@ -7,9 +8,11 @@ import {
   type PracticeType,
   DRAFT_LENGTH,
   type PracticePage,
-  type PracticeItem,
   submittedAnswer,
   type PracticeUnlockResult,
+  questionRevision,
+  publicQuestionText,
+  attemptReceipt,
 } from './contracts';
 export type PracticeReveal = {
   questionId: string;
@@ -20,6 +23,7 @@ export type PracticeReveal = {
   message: string;
 };
 export type PracticeState = {
+  submissions?: Readonly<Record<string, 'uncertain' | 'saved' | 'refused'>>;
   reveal: PracticeReveal | null;
   type: PracticeType;
   clearConfirmation: number | null;
@@ -54,6 +58,14 @@ export function createPracticeController(
   let confirmationSequence = 0;
   let unlockGeneration = 0;
   let unlockAbort: AbortController | undefined;
+  type Memo = {
+    key: string;
+    value: string;
+    context: string;
+    status: 'uncertain' | 'saved' | 'refused';
+  };
+  const memos = new Map<string, Memo>();
+  const memoId = (type: PracticeType, id: string) => type + ':' + id;
   const invalidateReveal = () => {
     unlockGeneration++;
     unlockAbort?.abort();
@@ -70,11 +82,17 @@ export function createPracticeController(
   };
   const listeners = new Set<() => void>();
   const emit = (next: PracticeState) => {
-    state = next;
+    state = {
+      ...next,
+      submissions: Object.fromEntries(
+        Array.from(memos)
+          .filter(([key]) => key.startsWith(next.type + ':'))
+          .map(([key, memo]) => [key.slice(next.type.length + 1), memo.status]),
+      ),
+    };
     listeners.forEach((fn) => fn());
   };
-  const fingerprint = (item: PracticeItem) =>
-    JSON.stringify([item.prompt, item.starterCode, item.language]);
+  const fingerprint = publicQuestionText;
   async function load(page = state.page, focus = false) {
     invalidateReveal();
     abort?.abort();
@@ -109,6 +127,7 @@ export function createPracticeController(
         ) {
           delete drafts[item.id];
           store.authored.delete(item.id);
+          memos.delete(memoId(type, item.id));
           changed = true;
         }
       }
@@ -155,6 +174,14 @@ export function createPracticeController(
         });
         return;
       }
+      const memoKey = memoId(state.type, id);
+      if (memos.get(memoKey)?.status === 'refused') {
+        emit({
+          ...state,
+          notice: 'Refresh the question and start a new submission explicitly.',
+        });
+        return;
+      }
       invalidateReveal();
       const version = unlockGeneration,
         type = state.type,
@@ -183,11 +210,38 @@ export function createPracticeController(
         },
       });
       try {
+        const revision = await questionRevision(item);
+        if (!current()) return;
+        let memo = memos.get(memoKey);
+        if (
+          !memo ||
+          memo.context !== context ||
+          memo.value !== value ||
+          memo.status === 'saved'
+        ) {
+          memo = {
+            key: globalThis.crypto.randomUUID(),
+            value,
+            context,
+            status: 'uncertain',
+          };
+          memos.set(memoKey, memo);
+        }
+        const submission = { key: memo.key, questionRevision: revision };
+        emit({ ...state });
         const result = await auth.runAuthenticatedRead(
           accountId,
           request.signal,
           (token, signal) =>
-            client.unlock(conceptId, id, value, token, signal, type),
+            client.unlock(
+              conceptId,
+              id,
+              value,
+              token,
+              signal,
+              type,
+              submission,
+            ),
         );
         if (!current()) return;
         if (
@@ -196,6 +250,8 @@ export function createPracticeController(
           result.type !== type
         )
           throw new ApiError('INVALID_RESPONSE');
+        attemptReceipt.parse(result.attempt);
+        memo.status = 'saved';
         emit({
           ...state,
           reveal: {
@@ -209,8 +265,19 @@ export function createPracticeController(
         });
       } catch (error) {
         if (!current()) return;
+        const memo = memos.get(memoKey);
+        if (
+          memo &&
+          error instanceof PracticeSubmissionError &&
+          error.reason !== 'PRACTICE_COMMIT_UNCONFIRMED'
+        )
+          memo.status = 'refused';
         emit({
           ...state,
+          notice:
+            memo?.status === 'uncertain'
+              ? 'This attempt may have been saved. Retry the unchanged answer to confirm it.'
+              : state.notice,
           reveal: {
             questionId: id,
             type,
@@ -220,10 +287,30 @@ export function createPracticeController(
             message:
               error instanceof ApiError
                 ? error.message
-                : 'Answer could not be revealed. Please retry.',
+                : 'This attempt may have been saved. Retry the unchanged answer to confirm it.',
           },
         });
       }
+    },
+    async startNewSubmission(
+      id: string,
+      expectedType: PracticeType = state.type,
+    ) {
+      if (
+        state.status !== 'ready' ||
+        expectedType !== state.type ||
+        !state.data?.data.some((item) => item.id === id)
+      )
+        return;
+      invalidateReveal();
+      memos.delete(memoId(state.type, id));
+      emit({
+        ...state,
+        reveal: null,
+        notice:
+          'A previous attempt may already have been saved. Submit explicitly to save another attempt.',
+      });
+      await load(state.page, true);
     },
     load,
     selectType(type: PracticeType) {
@@ -294,12 +381,18 @@ export function createPracticeController(
         store.authored.delete(id);
       }
       store.drafts = drafts;
+      const previous = memos.get(memoId(state.type, id));
+      if (previous && previous.value !== value)
+        memos.delete(memoId(state.type, id));
       const clearReveal = state.reveal?.questionId === id;
       if (clearReveal) invalidateReveal();
       emit({
         ...state,
         drafts,
-        notice: '',
+        notice:
+          previous && previous.value !== value
+            ? 'A previous attempt may already have been saved. Editing does not delete it.'
+            : '',
         clearConfirmation: null,
         reveal: clearReveal ? null : state.reveal,
       });
@@ -317,6 +410,7 @@ export function createPracticeController(
       )
         return;
       invalidateReveal();
+      memos.clear();
       for (const store of Object.values(stores)) {
         store.authored.clear();
         store.drafts = {};
@@ -332,6 +426,7 @@ export function createPracticeController(
     },
     cancel() {
       invalidateReveal();
+      memos.clear();
       generation++;
       abort?.abort();
       for (const store of Object.values(stores)) {

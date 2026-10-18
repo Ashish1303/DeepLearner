@@ -1,21 +1,24 @@
-import { Types, type PipelineStage } from 'mongoose';
+import { Types, type PipelineStage, type ClientSession } from 'mongoose';
 import { AppError } from '../../common/errors/app-error.js';
 import { Concept } from '../concepts/concept.model.js';
 import { publishedConceptStages } from '../concepts/concept.repository.js';
 import { PracticeQuestion } from './practice-question.model.js';
 import {
   practiceDto,
-  practiceAnswerDto,
-  type PracticeAnswerDto,
+  qualifiedPractice,
+  type QualifiedPractice,
   type PracticeDto,
   type ProjectedPractice,
 } from './practice.dto.js';
 import type { PracticeQuery } from './practice.schema.js';
 export interface PracticeRepository {
-  unlock(
+  qualified(
     questionId: string,
     conceptId: string,
-  ): Promise<PracticeAnswerDto | null>;
+    session?: ClientSession,
+    timeoutMS?: number,
+    majority?: boolean,
+  ): Promise<QualifiedPractice | null>;
   list(
     query: PracticeQuery,
   ): Promise<{ items: PracticeDto[]; total: number } | null>;
@@ -109,25 +112,41 @@ export function practiceUnlockStages(
               type: 1,
               answer: 1,
               explanation: 1,
+              difficulty: 1,
+              prompt: 1,
+              starterCode: 1,
+              language: 1,
+              topicId: 1,
+              technologyId: 1,
+              schemaVersion: 1,
             },
           },
         ],
         as: 'unlock',
       },
     },
-    { $project: { _id: 0, unlock: 1 } },
+    { $project: { _id: 0, unlock: 1, moduleId: 1, learningPathId: 1 } },
   ];
 }
 export const practiceRepository: PracticeRepository = {
-  async unlock(questionId, conceptId) {
+  async qualified(questionId, conceptId, session, timeoutMS, majority = false) {
     try {
-      const [parent] = await Concept.aggregate<{ unlock: ProjectedPractice[] }>(
-        practiceUnlockStages(questionId, conceptId),
-      ).exec();
+      const [parent] = await Concept.aggregate<{
+        unlock: ProjectedPractice[];
+        moduleId: Types.ObjectId;
+        learningPathId: Types.ObjectId;
+      }>(practiceUnlockStages(questionId, conceptId))
+        .option({
+          ...(session ? { session } : {}),
+          ...(timeoutMS ? { timeoutMS } : {}),
+          readPreference: 'primary',
+          ...(majority ? { readConcern: { level: 'majority' } } : {}),
+        })
+        .exec();
       if (!parent || !parent.unlock.length) return null;
       if (parent.unlock.length !== 1) throw new Error('Invalid result');
-      const answer = practiceAnswerDto(parent.unlock[0]!);
-      if (answer.id !== questionId || answer.conceptId !== conceptId)
+      const answer = qualifiedPractice(parent.unlock[0]!, parent);
+      if (answer.data.id !== questionId || answer.data.conceptId !== conceptId)
         throw new Error('Invalid identity');
       return answer;
     } catch {

@@ -894,3 +894,45 @@ progress or production acceptance. F036 must establish committed owned immutable
 attempts and the approved final unlock policy before deployment; failed persistence
 must never fall back to transient disclosure. F035 submissions cannot be treated
 retroactively as saved attempts. See the F035 feature and API contracts.
+
+## F036 approved LOCAL ungraded attempt refinement
+
+F036 replaces F035 transient disclosure with durable practiceAttempts before
+release of answers. The canonical ungraded state uses result=SUBMITTED and
+score=null, including CODING/OUTPUT/DESCRIPTIVE/SCENARIO. This refines the table's
+required score for ungraded attempts; no zero score, grading or studentProgress
+write is invented. F037 and later progress/scoring contracts remain separate.
+
+The exact immutable record is _id,userId,questionId,conceptId,type,questionRevision,
+contentFingerprint,attemptNumber,studentAnswer,submittedAt,result,score,
+idempotencyKeyHash,requestFingerprint,schemaVersion=1. References/type/sequence/
+UTC time are server-owned; studentAnswer preserves nonblank 1-10,000 UTF-16 units.
+The public revision binds displayed safe content; the private fingerprint also
+binds the current solution and complete carried ancestry references. Store no
+solution snapshot, raw key, arbitrary metadata, IP, token or email. Digests are
+private identity data, not authorization or anonymization. No TTL or mutation API.
+
+Preserve the three existing design indexes and add unique
+{userId:1,idempotencyKeyHash:1}; userId/questionId/attemptNumber remains unique.
+Exact names/options and strict schema are in F036 Section 3. Automatic collection/
+index creation remains disabled. Owner permits index creation ONLY in separately
+approved fresh disposable integration testing, never persistent development/Atlas
+databases. HTTP/startup only inspect readiness; missing prerequisites fail closed.
+No migration, reconfiguration or persistent index provisioning is authorized.
+
+Submission uses snapshot transactions on the PRIMARY and majority+journal commit;
+read the committed owned identity with majority consistency, revalidate current
+eligibility/published content and only then construct the minimal answer/receipt
+DTO. Same-key exact requests converge on one immutable row; distinct keys can
+create numbered attempts. Known unique collisions and driver retries are bounded;
+unknown commit/proof yields no answer and requires explicit same-key resolution.
+Application model/repository guards enforce insert-only supported operations;
+privileged raw administrative access is not database WORM. Future evaluation or
+privacy erasure needs a separately approved policy, not mutation via this API.
+
+Private answers are retained in LOCAL storage without an automatic expiry/purge
+or promised retention duration. Owner-approved erasure/reset and production
+retention/backup obligations require separate review. Clear drafts does not erase
+attempts. Do not retroactively persist F035 memory or log private submissions,
+solutions, keys/fingerprints. Full practice-attempt/progress algorithm, first-score
+preservation and separately approved release readiness remain future requirements.

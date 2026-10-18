@@ -4,12 +4,12 @@ import type { PracticeQuery, PracticeUnlockInput } from './practice.schema.js';
 export function createPracticeController(service: PracticeService) {
   return {
     async unlock(req: Request, res: Response, input: PracticeUnlockInput) {
-      const data = await service.unlock(req.auth!, input);
+      const result = await service.unlock(req.auth!, input);
       res.json({
         success: true,
-        data,
+        data: result.data,
         message: null,
-        meta: { requestId: req.requestId },
+        meta: { requestId: req.requestId, attempt: result.attempt },
       });
     },
     async list(req: Request, res: Response, query: PracticeQuery) {

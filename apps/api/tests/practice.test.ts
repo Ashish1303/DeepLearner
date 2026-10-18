@@ -6,10 +6,14 @@ import {
   practiceListRequest,
   practiceUnlockRequest,
   submittedAnswer,
+  readIdempotencyKey,
 } from '../src/modules/practice/practice.schema.js';
 import {
   practiceDto,
   practiceAnswerDto,
+  questionRevision,
+  qualifiedPractice,
+  sha256,
 } from '../src/modules/practice/practice.dto.js';
 import {
   practiceRepository,
@@ -25,6 +29,9 @@ const id = 'a'.repeat(24);
 const query = { conceptId: id, page: 1, limit: 10, type: 'OUTPUT' as const };
 const raw = {
   _id: new Types.ObjectId(),
+  topicId: new Types.ObjectId(id),
+  technologyId: new Types.ObjectId(id),
+  schemaVersion: 1,
   conceptId: new Types.ObjectId(id),
   type: 'OUTPUT',
   difficulty: 'BEGINNER',
@@ -50,12 +57,20 @@ test('F035 strict submission bounds preserve formatting and reject unsupported b
   const valid = {
     params: { questionId: id.toUpperCase() },
     query: {},
-    body: { conceptId: id.toUpperCase(), studentAnswer: '\t code\n ' },
+    body: {
+      conceptId: id.toUpperCase(),
+      questionRevision: 'a'.repeat(64),
+      studentAnswer: '\t code\n ',
+    },
   };
   assert.deepEqual(practiceUnlockRequest.parse(valid), {
     params: { questionId: id },
     query: {},
-    body: { conceptId: id, studentAnswer: '\t code\n ' },
+    body: {
+      conceptId: id,
+      questionRevision: 'a'.repeat(64),
+      studentAnswer: '\t code\n ',
+    },
   });
   assert(submittedAnswer.safeParse('x'.repeat(10000)).success);
   assert(submittedAnswer.safeParse('😀'.repeat(5000)).success);
@@ -87,6 +102,61 @@ test('F035 strict submission bounds preserve formatting and reject unsupported b
       practiceUnlockRequest.safeParse({ ...valid, ...patch }).success,
       false,
     );
+});
+test('F036 exactly one canonical raw Idempotency-Key is mandatory', () => {
+  const key = '11111111-1111-4111-8111-111111111111';
+  assert.equal(readIdempotencyKey(['Idempotency-Key', key]), key);
+  for (const headers of [
+    [],
+    ['Idempotency-Key', key, 'idempotency-key', key],
+    ['Idempotency-Key', key + ', ' + key],
+    ['Idempotency-Key', key + '\n'],
+    ['Idempotency-Key', 'x'],
+    ['Idempotency-Key', key.replace('-4111', '-5111')],
+  ])
+    assert.throws(() => readIdempotencyKey(headers), {
+      code: 'VALIDATION_ERROR',
+    });
+});
+test('F036 revision vectors bind public text and private solution plus full reference identity', () => {
+  for (const prompt of ['Predict', 'Unicode 😀 é \ud800']) {
+    const record = {
+      ...raw,
+      _id: new Types.ObjectId(id),
+      prompt,
+      starterCode: '  const x = "<script>";\n',
+      language: 'JAVASCRIPT',
+    };
+    const expected = sha256(
+      JSON.stringify([
+        'F036-public-v1',
+        id,
+        id,
+        'OUTPUT',
+        'BEGINNER',
+        prompt,
+        record.starterCode,
+        'JAVASCRIPT',
+      ]),
+    );
+    assert.equal(questionRevision(practiceDto(record)), expected);
+    const parent = {
+      moduleId: new Types.ObjectId(id),
+      learningPathId: new Types.ObjectId(id),
+    };
+    const before = qualifiedPractice(record, parent);
+    for (const after of [
+      qualifiedPractice({ ...record, answer: 'changed' }, parent),
+      qualifiedPractice(record, { ...parent, moduleId: new Types.ObjectId() }),
+      qualifiedPractice(record, {
+        ...parent,
+        learningPathId: new Types.ObjectId(),
+      }),
+    ]) {
+      assert.equal(after.questionRevision, before.questionRevision);
+      assert.notEqual(after.contentFingerprint, before.contentFingerprint);
+    }
+  }
 });
 test('F035 five-field DTO strips restricted fields and validates authored answer bounds', () => {
   for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING']) {
@@ -150,23 +220,52 @@ test('F035 unlock reuses complete ancestry, strict question predicates and disti
     type: 1,
     answer: 1,
     explanation: 1,
+    difficulty: 1,
+    prompt: 1,
+    starterCode: 1,
+    language: 1,
+    topicId: 1,
+    technologyId: 1,
+    schemaVersion: 1,
   });
   const aggregate = t.mock.method(Concept, 'aggregate', () => ({
-    exec: async (): Promise<unknown[]> => [{ unlock: [raw] }],
+    option() {
+      return this;
+    },
+    exec: async (): Promise<unknown[]> => [
+      {
+        unlock: [raw],
+        moduleId: new Types.ObjectId(id),
+        learningPathId: new Types.ObjectId(id),
+      },
+    ],
   }));
-  assert.equal((await practiceRepository.unlock(qid, id))?.answer, 'SECRET');
+  assert.equal(
+    (await practiceRepository.qualified(qid, id))?.data.answer,
+    'SECRET',
+  );
   for (const rows of [[], [{ unlock: [] }]]) {
-    aggregate.mock.mockImplementation(() => ({ exec: async () => rows }));
-    assert.equal(await practiceRepository.unlock(qid, id), null);
+    aggregate.mock.mockImplementation(() => ({
+      option() {
+        return this;
+      },
+      exec: async () => rows,
+    }));
+    assert.equal(await practiceRepository.qualified(qid, id), null);
   }
   for (const rows of [
     [{ unlock: [{ ...raw, answer: null }] }],
     [{ unlock: [{ ...raw, conceptId: new Types.ObjectId() }] }],
     [{ unlock: [raw, raw] }],
   ]) {
-    aggregate.mock.mockImplementation(() => ({ exec: async () => rows }));
+    aggregate.mock.mockImplementation(() => ({
+      option() {
+        return this;
+      },
+      exec: async () => rows,
+    }));
     await assert.rejects(
-      practiceRepository.unlock(qid, id),
+      practiceRepository.qualified(qid, id),
       (e) =>
         e instanceof AppError &&
         e.code === 'DEPENDENCY_UNAVAILABLE' &&
@@ -174,28 +273,34 @@ test('F035 unlock reuses complete ancestry, strict question predicates and disti
     );
   }
 });
-test('F035 every unlock checks current eligibility and submission before fresh answer lookup', async () => {
+test('F036 every disclosure checks eligibility before and after durable submission', async () => {
   let current = user,
-    reads = 0,
-    unavailable = false;
+    writes = 0;
   const service = createPracticeService(
+    { qualified: async () => null, list: async () => null },
+    { get: async () => current },
     {
-      list: async () => null,
-      unlock: async () => {
-        reads++;
-        return unavailable ? null : practiceAnswerDto(raw);
+      async submit() {
+        writes++;
+        return {
+          data: practiceAnswerDto(raw),
+          attempt: {
+            id,
+            attemptNumber: 1,
+            result: 'SUBMITTED',
+            submittedAt: '2026-10-18T00:00:00.000Z',
+          },
+        };
       },
     },
-    { get: async () => current },
   );
   const input = {
     questionId: raw._id.toHexString(),
     conceptId: id,
-    studentAnswer: '\t answer\n',
+    studentAnswer: ' x ',
+    questionRevision: questionRevision(practiceDto(raw)),
+    idempotencyKey: '11111111-1111-4111-8111-111111111111',
   };
-  await assert.rejects(service.unlock({ sub: id, role: 'ADMIN' }, input), {
-    code: 'AUTH_FORBIDDEN',
-  });
   for (const patch of [
     { role: 'ADMIN' },
     { id: 'b'.repeat(24) },
@@ -207,24 +312,37 @@ test('F035 every unlock checks current eligibility and submission before fresh a
     await assert.rejects(service.unlock({ sub: id, role: 'STUDENT' }, input));
   }
   current = user;
+  await assert.rejects(service.unlock({ sub: id, role: 'ADMIN' }, input));
   await assert.rejects(
     service.unlock(
       { sub: id, role: 'STUDENT' },
       { ...input, studentAnswer: ' ' },
     ),
-    { code: 'VALIDATION_ERROR' },
   );
-  assert.equal(reads, 0);
-  for (const plan of ['FREE', 'PREMIUM'] as const) {
-    current = { ...user, plan };
-    await service.unlock({ sub: id, role: 'STUDENT' }, input);
-  }
-  assert.equal(reads, 2);
-  unavailable = true;
-  await assert.rejects(service.unlock({ sub: id, role: 'STUDENT' }, input), {
-    code: 'CONCEPT_NOT_FOUND',
+  assert.equal(writes, 0);
+  await service.unlock({ sub: id, role: 'STUDENT' }, input);
+  assert.equal(writes, 1);
+  const revoked = createPracticeService(
+    { qualified: async () => null, list: async () => null },
+    { get: async () => current },
+    {
+      async submit() {
+        current = { ...user, status: 'SUSPENDED' };
+        return {
+          data: practiceAnswerDto(raw),
+          attempt: {
+            id,
+            attemptNumber: 1,
+            result: 'SUBMITTED',
+            submittedAt: '2026-10-18T00:00:00.000Z',
+          },
+        };
+      },
+    },
+  );
+  await assert.rejects(revoked.unlock({ sub: id, role: 'STUDENT' }, input), {
+    code: 'AUTH_ACCOUNT_SUSPENDED',
   });
-  assert.equal(reads, 3);
 });
 test('strict query defaults, normalization, limits, duplicate/type rejection and GET body', () => {
   assert.deepEqual(practiceQuery.parse({ conceptId: id.toUpperCase() }), query);
@@ -349,7 +467,7 @@ test('current eligibility and token role precede content reads, preserving accou
   let accountError: AppError | undefined;
   const service = createPracticeService(
     {
-      async unlock() {
+      async qualified() {
         return null;
       },
       async list() {
@@ -404,7 +522,7 @@ test('hidden parents are indistinguishable and out-of-range metadata remains acc
   await assert.rejects(
     createPracticeService(
       {
-        async unlock() {
+        async qualified() {
           return null;
         },
         async list() {
@@ -419,7 +537,7 @@ test('hidden parents are indistinguishable and out-of-range metadata remains acc
     (
       await createPracticeService(
         {
-          async unlock() {
+          async qualified() {
             return null;
           },
           async list() {

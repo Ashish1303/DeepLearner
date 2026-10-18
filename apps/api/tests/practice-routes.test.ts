@@ -51,16 +51,8 @@ async function fixture(max = 120, ip = 300, unlock = 30) {
   let failure: AppError | undefined;
   const service = createPracticeService(
     {
-      async unlock(questionId, conceptId) {
-        unlockReads++;
-        if (failure) throw failure;
-        return {
-          id: questionId,
-          conceptId,
-          type,
-          answer: 'OFFICIAL_SENTINEL',
-          explanation: null,
-        };
+      async qualified() {
+        return null;
       },
       async list(query) {
         reads++;
@@ -84,6 +76,27 @@ async function fixture(max = 120, ip = 300, unlock = 30) {
     {
       async get() {
         return current;
+      },
+    },
+    {
+      async submit(_userId, { questionId, conceptId }) {
+        unlockReads++;
+        if (failure) throw failure;
+        return {
+          data: {
+            id: questionId,
+            conceptId,
+            type,
+            answer: 'OFFICIAL_SENTINEL',
+            explanation: null,
+          },
+          attempt: {
+            id: 'f'.repeat(24),
+            attemptNumber: 1,
+            result: 'SUBMITTED',
+            submittedAt: '2026-10-18T00:00:00.000Z',
+          },
+        };
       },
     },
   );
@@ -351,7 +364,11 @@ test('F032/F033 HTTP defaults OUTPUT and returns each explicit type with seven s
   }
 });
 
-const unlockBody = { conceptId: id, studentAnswer: '\tSTUDENT_SENTINEL\n ' };
+const unlockBody = {
+  questionRevision: 'a'.repeat(64),
+  conceptId: id,
+  studentAnswer: '\tSTUDENT_SENTINEL\n ',
+};
 const post = (
   f: Awaited<ReturnType<typeof fixture>>,
   body: unknown = unlockBody,
@@ -363,6 +380,7 @@ const post = (
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Idempotency-Key': '11111111-1111-4111-8111-111111111111',
       ...(token ? { Authorization: 'Bearer ' + token } : {}),
       ...extra,
     },
@@ -427,7 +445,15 @@ test('F035 signed Student POST returns exactly five fields with no-store and GET
       );
       assert.equal(body.data.type, type);
       assert.equal(body.data.answer, 'OFFICIAL_SENTINEL');
-      assert.deepEqual(body.meta, { requestId: r.headers.get('x-request-id') });
+      assert.deepEqual(body.meta, {
+        requestId: r.headers.get('x-request-id'),
+        attempt: {
+          id: 'f'.repeat(24),
+          attemptNumber: 1,
+          result: 'SUBMITTED',
+          submittedAt: '2026-10-18T00:00:00.000Z',
+        },
+      });
       assert.equal(body.message, null);
       assert.doesNotMatch(
         JSON.stringify(body),
@@ -610,6 +636,35 @@ test('F035 sanitized failures and selected-field logging omit both submitted and
     );
     assert.doesNotMatch(logged, /SENTINEL|studentAnswer|Bearer|conceptId/);
     assert.match(logged, /practice-questions\/:questionId\/unlock/);
+  } finally {
+    await f.close();
+  }
+});
+test('F036 key validation and durable failure codes stay answer-free and no-store', async () => {
+  const f = await fixture();
+  try {
+    for (const key of ['', 'bad', '11111111-1111-5111-8111-111111111111']) {
+      const response = await post(f, unlockBody, '', f.token, {
+        'Idempotency-Key': key,
+      });
+      assert.equal(response.status, 400);
+      assert.equal(response.headers.get('cache-control'), 'no-store');
+      assert.doesNotMatch(await response.text(), /SENTINEL/);
+    }
+    assert.equal(f.unlockReads(), 0);
+    for (const [status, code] of [
+      [409, 'PRACTICE_IDEMPOTENCY_CONFLICT'],
+      [409, 'PRACTICE_QUESTION_CHANGED'],
+      [503, 'PRACTICE_COMMIT_UNCONFIRMED'],
+    ] as const) {
+      f.fail(new AppError(status, code, 'Submission unavailable'));
+      const response = await post(f);
+      assert.equal(response.status, status);
+      assert.equal(response.headers.get('cache-control'), 'no-store');
+      const body = await response.text();
+      assert.match(body, new RegExp(code));
+      assert.doesNotMatch(body, /SENTINEL|"attempt"|"studentAnswer"/);
+    }
   } finally {
     await f.close();
   }

@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import { test } from 'node:test';
 import { Types } from 'mongoose';
+import { randomUUID } from 'node:crypto';
+import { PracticeAttempt } from '../src/modules/practice/practice-attempt.model.js';
+import { practiceAttemptRepository } from '../src/modules/practice/practice-attempt.repository.js';
 import { createDatabase, mongoose } from '../src/config/database.js';
 import { Technology } from '../src/modules/technologies/technology.model.js';
 import { LearningPath } from '../src/modules/learning-paths/learning-path.model.js';
@@ -13,7 +16,7 @@ import { User } from '../src/modules/users/user.model.js';
 import { PracticeQuestion } from '../src/modules/practice/practice-question.model.js';
 import { practiceRepository } from '../src/modules/practice/practice.repository.js';
 test(
-  'F031-F035 disposable publication, projection and authenticated HTTP',
+  'F031-F036 disposable publication, projection and authenticated HTTP',
   { timeout: 90000 },
   async (t) => {
     assert.equal(process.env.APP_ENV, 'LOCAL');
@@ -59,6 +62,7 @@ test(
         Topic,
         Concept,
         PracticeQuestion,
+        PracticeAttempt,
       ]) {
         await model.createCollection();
         owned.unshift(model.collection.name);
@@ -74,6 +78,7 @@ test(
         status: 'ACTIVE',
         emailVerifiedAt: new Date(),
       });
+      await PracticeAttempt.createIndexes();
       const audit = {
         createdBy: student._id,
         updatedBy: student._id,
@@ -465,7 +470,7 @@ test(
         },
       );
       await t.test(
-        'F035 fresh qualified unlocks disclose exactly five fields without persisting attempts',
+        'F036 qualified content reads keep five answer fields private and do not persist attempts',
         async () => {
           const collection = db.collection('practiceQuestions');
           const before = await collection.find().sort({ _id: 1 }).toArray();
@@ -479,16 +484,16 @@ test(
             [301, 'CODING'],
           ] as const) {
             const questionId = n.toString(16).padStart(24, '0');
-            const value = await practiceRepository.unlock(
+            const value = await practiceRepository.qualified(
               questionId,
               concept.id,
             );
             assert(value);
-            assert.equal(value.type, type);
-            assert.equal(value.answer, 'ANSWER_SENTINEL');
-            assert.equal(value.explanation, 'EXPLANATION_SENTINEL');
+            assert.equal(value.data.type, type);
+            assert.equal(value.data.answer, 'ANSWER_SENTINEL');
+            assert.equal(value.data.explanation, 'EXPLANATION_SENTINEL');
             assert.deepEqual(
-              Object.keys(value).sort(),
+              Object.keys(value.data).sort(),
               ['id', 'conceptId', 'type', 'answer', 'explanation'].sort(),
             );
             assert.doesNotMatch(
@@ -510,7 +515,7 @@ test(
               !row.technologyId.equals(tech._id)
             )
               assert.equal(
-                await practiceRepository.unlock(
+                await practiceRepository.qualified(
                   row._id.toHexString(),
                   concept.id,
                 ),
@@ -518,7 +523,7 @@ test(
               );
           }
           assert.equal(
-            await practiceRepository.unlock(
+            await practiceRepository.qualified(
               firstId.toHexString(),
               new Types.ObjectId().toHexString(),
             ),
@@ -532,18 +537,173 @@ test(
             (await db.listCollections().toArray()).map((x) => x.name).sort(),
             collectionsBefore,
           );
-          assert(!collectionsBefore.includes('practiceAttempts'));
+          assert(collectionsBefore.includes('practiceAttempts'));
+          assert.equal(
+            await db.collection('practiceAttempts').countDocuments(),
+            0,
+          );
           await collection.updateOne(
             { _id: firstId },
             { $set: { status: 'DRAFT' } },
           );
           assert.equal(
-            await practiceRepository.unlock(firstId.toHexString(), concept.id),
+            await practiceRepository.qualified(
+              firstId.toHexString(),
+              concept.id,
+            ),
             null,
           );
           await collection.updateOne(
             { _id: firstId },
             { $set: { status: 'PUBLISHED' } },
+          );
+        },
+      );
+      await t.test(
+        'F036 durable commits, idempotency, concurrency and private ownership',
+        async () => {
+          const qid = firstId.toHexString(),
+            content = await practiceRepository.qualified(qid, concept.id);
+          assert(content);
+          const request = {
+            questionId: qid,
+            conceptId: concept.id,
+            studentAnswer: '\t persisted answer\n ',
+            questionRevision: content.questionRevision,
+            idempotencyKey: randomUUID(),
+          };
+          const before = await db
+            .collection('practiceQuestions')
+            .find()
+            .sort({ _id: 1 })
+            .toArray();
+          const [a, b] = await Promise.all([
+            practiceAttemptRepository.submit(student.id, request),
+            practiceAttemptRepository.submit(student.id, request),
+          ]);
+          assert.equal(a.attempt.id, b.attempt.id);
+          assert.equal(
+            await db.collection('practiceAttempts').countDocuments(),
+            1,
+          );
+          await assert.rejects(
+            practiceAttemptRepository.submit(student.id, {
+              ...request,
+              studentAnswer: 'changed',
+            }),
+            { code: 'PRACTICE_IDEMPOTENCY_CONFLICT' },
+          );
+          const next = await Promise.all([
+            practiceAttemptRepository.submit(student.id, {
+              ...request,
+              idempotencyKey: randomUUID(),
+            }),
+            practiceAttemptRepository.submit(student.id, {
+              ...request,
+              idempotencyKey: randomUUID(),
+            }),
+          ]);
+          assert.deepEqual(
+            next.map((x) => x.attempt.attemptNumber).sort(),
+            [2, 3],
+          );
+          const persisted = await db
+            .collection('practiceAttempts')
+            .find()
+            .sort({ attemptNumber: 1 })
+            .toArray();
+          assert(
+            persisted.every(
+              (row) =>
+                row.userId.equals(student._id) &&
+                row.result === 'SUBMITTED' &&
+                row.score === null &&
+                row.studentAnswer === request.studentAnswer,
+            ),
+          );
+          assert.deepEqual(
+            await db
+              .collection('practiceQuestions')
+              .find()
+              .sort({ _id: 1 })
+              .toArray(),
+            before,
+          );
+          const indexList = await db.collection('practiceAttempts').indexes();
+          assert(
+            indexList.some(
+              (index) =>
+                index.name === 'uq_practice_attempt_idempotency' &&
+                index.unique,
+            ),
+          );
+          assert(
+            indexList.some(
+              (index) =>
+                index.name === 'uq_practice_attempt_sequence' && index.unique,
+            ),
+          );
+          await db
+            .collection('practiceQuestions')
+            .updateOne(
+              { _id: firstId },
+              { $set: { answer: 'CHANGED_SOLUTION' } },
+            );
+          await assert.rejects(
+            practiceAttemptRepository.submit(student.id, request),
+            { code: 'PRACTICE_QUESTION_CHANGED' },
+          );
+          await db
+            .collection('practiceQuestions')
+            .updateOne(
+              { _id: firstId },
+              { $set: { answer: 'ANSWER_SENTINEL' } },
+            );
+          assert.equal(
+            await db.collection('practiceAttempts').countDocuments(),
+            3,
+          );
+          await db
+            .collection('practiceQuestions')
+            .updateOne({ _id: firstId }, { $set: { status: 'DRAFT' } });
+          await assert.rejects(
+            practiceAttemptRepository.submit(student.id, request),
+            { code: 'CONCEPT_NOT_FOUND' },
+          );
+          await db
+            .collection('practiceQuestions')
+            .updateOne({ _id: firstId }, { $set: { status: 'PUBLISHED' } });
+          // Only this future, externally verified disposable collection is touched.
+          await db
+            .collection('practiceAttempts')
+            .dropIndex('uq_practice_attempt_idempotency');
+          try {
+            await assert.rejects(
+              practiceAttemptRepository.submit(student.id, {
+                ...request,
+                idempotencyKey: randomUUID(),
+              }),
+              { code: 'DEPENDENCY_UNAVAILABLE' },
+            );
+            assert.equal(
+              await db.collection('practiceAttempts').countDocuments(),
+              3,
+            );
+          } finally {
+            await PracticeAttempt.createIndexes();
+          }
+          assert.deepEqual(
+            await db
+              .collection('practiceAttempts')
+              .find()
+              .sort({ attemptNumber: 1 })
+              .toArray(),
+            persisted,
+          );
+          assert(
+            !(await db.listCollections().toArray()).some(
+              (x) => x.name === 'studentProgress',
+            ),
           );
         },
       );
@@ -562,7 +722,7 @@ test(
                 .collection(name)
                 .updateOne({ _id: key }, { $set: { status } });
               assert.equal(
-                await practiceRepository.unlock(
+                await practiceRepository.qualified(
                   firstId.toHexString(),
                   concept.id,
                 ),
@@ -602,7 +762,7 @@ test(
                 { $set: { [field]: new Types.ObjectId() } },
               );
             assert.equal(
-              await practiceRepository.unlock(
+              await practiceRepository.qualified(
                 firstId.toHexString(),
                 concept.id,
               ),
@@ -675,11 +835,20 @@ test(
           try {
             assert.equal((await fetch(url)).status, 401);
             const unlockUrl = `http://127.0.0.1:${address.port}/api/v1/practice-questions/`;
-            const submit = (questionId: string, tokenValue = token) =>
-              fetch(unlockUrl + questionId + '/unlock', {
+            const submissionKeys = new Map<string, string>();
+            const submit = async (questionId: string, tokenValue = token) => {
+              const content = await practiceRepository.qualified(
+                questionId,
+                concept.id,
+              );
+              assert(content);
+              const key = submissionKeys.get(questionId) ?? randomUUID();
+              submissionKeys.set(questionId, key);
+              return fetch(unlockUrl + questionId + '/unlock', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
+                  'Idempotency-Key': key,
                   ...(tokenValue
                     ? { Authorization: 'Bearer ' + tokenValue }
                     : {}),
@@ -687,8 +856,10 @@ test(
                 body: JSON.stringify({
                   conceptId: concept.id,
                   studentAnswer: '\t inert answer\n ',
+                  questionRevision: content.questionRevision,
                 }),
               });
+            };
             assert.equal((await submit(firstId.toHexString(), '')).status, 401);
             const before = await db
               .collection('practiceQuestions')

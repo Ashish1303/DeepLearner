@@ -925,7 +925,54 @@ F001-F034 remain APPROVED_COMPLETE and F036 NOT_STARTED. See F035 Sections 11-15
 
 ### F036 — Practice Attempts Persistence
 **Dependencies:** F031  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+Owner approved the exact 27-path F036 implementation/offline scope and P1-P5
+(2026-10-18). Replace LOCAL-only transient disclosure with immutable SUBMITTED,
+null-score attempts, account-scoped idempotency, revision binding and confirmed
+commit/ownership before answers. No grading, execution or F037 progress. Index
+creation is permitted only in separately approved disposable integration tests;
+missing prerequisites fail closed. Browser expected 133 NOT_RUN including eight
+new F036 cases and the existing 125; no earlier exception transfers. MongoDB and
+browser execution remain separately gated. See [F036 plan](features/F036-practice-attempts-persistence.md).
+
+Offline implementation PASS: 44 focused API/model/repository/HTTP tests plus 54
+relevant regressions (98 distinct passing evidence); focused web 48 plus remaining
+168 regressions (216 distinct passing evidence). Build, TypeScript, lint and
+browser-spec compilation passed; final formatting/scope evidence is retained in
+the feature document. Separate source review found no Critical/High/Medium issue;
+two Low findings were corrected (explicit refusal refresh/focus and a prepared
+OPTIONS mock). No unresolved finding. Strict owned commit proof, GET secrecy,
+five-field answers/four-field receipt, LOCAL/no-store/rate behavior and bounded
+idempotency/reveal isolation are verified at source/offline level. No grading,
+execution, progress, dependencies or additional paths.
+
+Guarded MongoDB initially produced 7 PASS / 3 FAIL (including the parent) because
+operation timeoutMS conflicted with timed withTransaction. Preserve that failure.
+The separately authorized correction uses the transaction deadline inside its
+callback and bounded post-commit reads; 13 distinct focused cases passed. The one
+fresh guarded rerun passed 10/10 including parent, with owned disposable indexes,
+real durable/idempotent/concurrent submissions and graceful cleanup; protected
+baselines unchanged. Persistent index provisioning remains unauthorized and missing
+runtime prerequisites fail closed. Retained API 98/frontend 216 and static/security
+evidence remains; no full-suite rerun is implied by focused verification.
+
+FINAL REVIEW PASS WITH F036 BROWSER EXCEPTION (2026-10-18), LOCAL DEVELOPMENT ONLY.
+Final source/security review: no unresolved Critical/High/Medium/Low findings;
+exact approved 27-file scope retained. Owner explicitly accepts the one-time F036
+deferral: eight new mounted cases NOT_RUN; complete expected 133 NOT_RUN includes
+those eight and the earlier 125. No browser PASS, production readiness or future
+exception is implied. Primary-host Playwright remains prohibited. Unverified risks
+include submit/retry, saved receipts, keyboard/focus, responsive behavior, post-
+commit network interruption, stale responses, account/Concept/question/revision
+isolation and F031-F035 compatibility. Preserve F022/F024/F029, Windows taskkill/
+shutdown, screen-reader/background-throttling and all historical verification gaps.
+Private attempt retention/erasure/backups, persistent prerequisites and separately
+approved browser-regression/release readiness remain deployment gates. See F036
+Sections 11-14. Owner explicitly approved completion on 2026-10-18 for LOCAL
+DEVELOPMENT ONLY and authorized scoped 27-file Git delivery after preflight.
+F001-F035 APPROVED_COMPLETE; F037 NOT_STARTED. No browser PASS, production deployment,
+future exception or next-feature work is authorized by this approval.
 
 ### F037 — Student Concept Progress
 **Dependencies:** F036  
@@ -1381,9 +1428,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F035 - Answer Unlock Flow
+**Current Feature:** F036 - Practice Attempts Persistence
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F036 - Practice Attempts Persistence (not authorized)
+**Next Feature:** F037 - Student Concept Progress (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---
