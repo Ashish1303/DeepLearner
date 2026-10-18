@@ -35,9 +35,207 @@ function fixture(
   load: PracticeClient['load'] = async (_id, n) => page(n),
   account = 'one',
   concept = id,
+  unlock: PracticeClient['unlock'] = async (
+    conceptId,
+    questionId,
+    _answer,
+    _token,
+    _signal,
+    type,
+  ) => ({
+    id: questionId,
+    conceptId,
+    type,
+    answer: 'Official',
+    explanation: null,
+  }),
 ) {
-  return createPracticeController({ load }, auth, account, concept);
+  return createPracticeController({ load, unlock }, auth, account, concept);
 }
+test('F035 four-type reveal is single-question memory and clearing reveals preserves unrelated drafts', async () => {
+  let calls = 0;
+  const c = fixture(
+    typedLoad,
+    'one',
+    id,
+    async (conceptId, questionId, answer, _token, _signal, type) => {
+      calls++;
+      assert.equal(answer, '\t answer\n ');
+      return {
+        id: questionId,
+        conceptId,
+        type,
+        answer: 'Official',
+        explanation: null,
+      };
+    },
+  );
+  const q = page().data[0]!.id;
+  await c.load();
+  await c.submitAnswer(q);
+  assert.equal(calls, 0);
+  for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'] as const) {
+    await c.selectType(type);
+    c.setDraft(q, '\t answer\n ');
+    await c.submitAnswer(q, type);
+    assert.equal(c.getSnapshot().reveal?.status, 'ready');
+    assert.equal(c.getSnapshot().reveal?.submittedAnswer, '\t answer\n ');
+    c.clearDrafts();
+    const ticket = c.getSnapshot().clearConfirmation!;
+    c.cancelClearDrafts();
+    c.confirmClearDrafts(ticket);
+    assert.equal(c.getSnapshot().reveal?.status, 'ready');
+    c.setDraft(q, 'changed');
+    assert.equal(c.getSnapshot().reveal, null);
+    c.setDraft(q, '\t answer\n ');
+    await c.submitAnswer(q);
+    await c.load(2);
+    assert.equal(c.getSnapshot().reveal, null);
+    await c.load(1);
+    assert.equal(c.getSnapshot().drafts[q], '\t answer\n ');
+  }
+  for (const other of [
+    fixture(typedLoad, 'other'),
+    fixture(typedLoad, 'one', 'b'.repeat(24)),
+  ]) {
+    await other.load();
+    assert.equal(other.getSnapshot().reveal, null);
+    assert.deepEqual(other.getSnapshot().drafts, {});
+  }
+  c.clearDrafts();
+  c.confirmClearDrafts(c.getSnapshot().clearConfirmation!);
+  assert.equal(c.getSnapshot().reveal, null);
+  assert.deepEqual(c.getSnapshot().drafts, {});
+});
+test('F035 stale unlock success/error cannot survive edits, navigation, type change, clearing or disposal', async () => {
+  const q = page().data[0]!.id;
+  for (const fail of [false, true])
+    for (const action of ['edit', 'navigate', 'type', 'clear', 'dispose']) {
+      let release!: () => void;
+      const gate = new Promise<void>((r) => {
+        release = r;
+      });
+      let signal: AbortSignal | undefined,
+        calls = 0;
+      const c = fixture(
+        typedLoad,
+        'one',
+        id,
+        async (conceptId, questionId, _answer, _token, s, type) => {
+          calls++;
+          signal = s;
+          await gate;
+          if (fail) throw Error('SECRET');
+          return {
+            id: questionId,
+            conceptId,
+            type,
+            answer: 'Official',
+            explanation: null,
+          };
+        },
+      );
+      await c.load();
+      c.setDraft(q, 'draft');
+      const pending = c.submitAnswer(q);
+      await c.submitAnswer(q);
+      assert.equal(calls, 1);
+      if (action === 'edit') c.setDraft(q, 'edited');
+      if (action === 'navigate') await c.load(2);
+      if (action === 'type') await c.selectType('CODING');
+      if (action === 'clear') {
+        c.clearDrafts();
+        c.confirmClearDrafts(c.getSnapshot().clearConfirmation!);
+      }
+      if (action === 'dispose') c.cancel();
+      assert.equal(signal?.aborted, true);
+      release();
+      await pending;
+      assert.equal(c.getSnapshot().reveal, null);
+      assert.doesNotMatch(c.getSnapshot().message, /SECRET/);
+    }
+});
+test('F035 superseded question submission and stale confirmation cannot replace current reveal', async () => {
+  const q = page().data[0]!.id,
+    second = page(2).data[0]!.id;
+  let release!: () => void;
+  const gate = new Promise<void>((r) => {
+    release = r;
+  });
+  let old: AbortSignal | undefined;
+  const c = fixture(
+    async () => ({ ...page(), data: [page().data[0]!, page(2).data[0]!] }),
+    'one',
+    id,
+    async (conceptId, questionId, _answer, _token, signal, type) => {
+      if (questionId === q) {
+        old = signal;
+        await gate;
+      }
+      return {
+        id: questionId,
+        conceptId,
+        type,
+        answer: 'Official ' + questionId,
+        explanation: null,
+      };
+    },
+  );
+  await c.load();
+  c.setDraft(q, 'first');
+  c.setDraft(second, 'second');
+  const pending = c.submitAnswer(q);
+  c.clearDrafts();
+  const stale = c.getSnapshot().clearConfirmation!;
+  c.setDraft(second, 'changed');
+  c.confirmClearDrafts(stale);
+  await c.submitAnswer(second);
+  assert.equal(old?.aborted, true);
+  release();
+  await pending;
+  assert.equal(c.getSnapshot().reveal?.questionId, second);
+  assert.equal(c.getSnapshot().reveal?.status, 'ready');
+  c.setDraft(q, 'unrelated');
+  assert.equal(c.getSnapshot().reveal?.questionId, second);
+  c.cancel();
+  assert.equal(c.getSnapshot().reveal, null);
+});
+test('F035 retry is explicit and malformed identities never reveal official content', async () => {
+  const q = page().data[0]!.id;
+  let calls = 0,
+    mode = 'error';
+  const c = fixture(
+    typedLoad,
+    'one',
+    id,
+    async (conceptId, questionId, _answer, _token, _signal, type) => {
+      calls++;
+      if (mode === 'error') throw Error('SECRET');
+      return {
+        id: mode === 'wrong' ? 'b'.repeat(24) : questionId,
+        conceptId,
+        type,
+        answer: 'Official',
+        explanation: null,
+      };
+    },
+  );
+  await c.load();
+  c.setDraft(q, 'answer');
+  await c.submitAnswer(q);
+  assert.equal(calls, 1);
+  assert.equal(c.getSnapshot().reveal?.status, 'error');
+  assert.doesNotMatch(c.getSnapshot().reveal!.message, /SECRET/);
+  mode = 'wrong';
+  await c.submitAnswer(q);
+  assert.equal(c.getSnapshot().reveal?.result, null);
+  mode = 'ok';
+  await c.submitAnswer(q);
+  assert.equal(c.getSnapshot().reveal?.status, 'ready');
+  assert.equal(calls, 3);
+  await c.submitAnswer(q, 'CODING');
+  assert.equal(calls, 3);
+});
 test('drafts retain exact whitespace across pages/retry and clear on changed question content', async () => {
   let prompt = 'Predict';
   const c = fixture(async (_id, n) => page(n, prompt));

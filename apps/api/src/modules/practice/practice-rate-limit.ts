@@ -5,9 +5,12 @@ import { AppError } from '../../common/errors/app-error.js';
 export const practiceLimitDefaults = {
   ip: 300,
   get: 120,
+  unlock: 30,
   windowMs: 15 * 60 * 1000,
 };
-export type PracticeLimits = typeof practiceLimitDefaults;
+export type PracticeLimits = Omit<typeof practiceLimitDefaults, 'unlock'> & {
+  unlock?: number;
+};
 export function createPracticeRateLimits(
   config: PracticeLimits = practiceLimitDefaults,
 ) {
@@ -31,6 +34,9 @@ export function createPracticeRateLimits(
         ),
     });
   return {
+    unlock: limit(config.unlock ?? practiceLimitDefaults.unlock, (req) =>
+      obscure(req.auth?.sub ?? 'unauthenticated'),
+    ),
     ip: limit(config.ip, (req) =>
       obscure(ipKeyGenerator(req.ip ?? 'unknown', 56)),
     ),

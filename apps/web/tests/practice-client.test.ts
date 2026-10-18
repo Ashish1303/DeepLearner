@@ -18,6 +18,152 @@ const body = () => ({
   data: [{ ...item }],
   meta: { requestId: 'test', page: 1, limit: 10, total: 1, totalPages: 1 },
 });
+const unlockBody = (
+  type: 'OUTPUT' | 'DESCRIPTIVE' | 'SCENARIO' | 'CODING' = 'OUTPUT',
+) => ({
+  success: true,
+  message: null,
+  data: { id, conceptId: id, type, answer: 'Official', explanation: null },
+  meta: { requestId: 'test' },
+});
+test('F035 POST preserves student formatting, private bearer and no-store for all four types', async () => {
+  for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'] as const) {
+    let calls = 0;
+    const answer = '\t  const value = 1;\n\n ';
+    const client = createPracticeClient(
+      'http://localhost/api',
+      async (url, init) => {
+        calls++;
+        assert.equal(
+          String(url),
+          'http://localhost/api/practice-questions/' + id + '/unlock',
+        );
+        assert.equal(init?.method, 'POST');
+        assert.equal(init?.cache, 'no-store');
+        assert.equal(init?.credentials, 'omit');
+        assert.equal(init?.redirect, 'error');
+        assert.deepEqual(init?.headers, {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer synthetic',
+        });
+        assert.deepEqual(JSON.parse(String(init?.body)), {
+          conceptId: id,
+          studentAnswer: answer,
+        });
+        return Response.json(unlockBody(type));
+      },
+    );
+    assert.deepEqual(
+      await client.unlock(
+        id,
+        id,
+        answer,
+        'synthetic',
+        new AbortController().signal,
+        type,
+      ),
+      unlockBody(type).data,
+    );
+    assert.equal(calls, 1);
+  }
+});
+test('F035 unlock rejects bad inputs before fetch and strict response identity/allowlist violations', async () => {
+  let calls = 0;
+  const client = createPracticeClient('http://localhost', async () => {
+    calls++;
+    return Response.json(unlockBody());
+  });
+  const signal = new AbortController().signal;
+  for (const answer of ['', ' \t\n', 'x'.repeat(10001), '😀'.repeat(5001)])
+    await assert.rejects(
+      client.unlock(id, id, answer, 'test', signal, 'OUTPUT'),
+      { code: 'VALIDATION_ERROR' },
+    );
+  await assert.rejects(
+    client.unlock(id, 'invalid', 'x', 'test', signal, 'OUTPUT'),
+    { code: 'VALIDATION_ERROR' },
+  );
+  await assert.rejects(
+    client.unlock('invalid', id, 'x', 'test', signal, 'OUTPUT'),
+    { code: 'VALIDATION_ERROR' },
+  );
+  assert.equal(calls, 0);
+  const good = unlockBody();
+  for (const raw of [
+    { ...good, extra: true },
+    { ...good, data: { ...good.data, studentAnswer: 'secret' } },
+    { ...good, data: { ...good.data, id: 'b'.repeat(24) } },
+    { ...good, data: { ...good.data, conceptId: 'b'.repeat(24) } },
+    { ...good, data: { ...good.data, type: 'CODING' } },
+    { ...good, data: { ...good.data, evaluation: {} } },
+    { ...good, data: { ...good.data, answer: ' trim ' } },
+    { ...good, data: { ...good.data, explanation: undefined } },
+    { ...good, meta: { ...good.meta, total: 1 } },
+    { ...good, data: { ...good.data, answer: 'x'.repeat(50001) } },
+  ]) {
+    const unsafe = createPracticeClient('http://localhost', async () =>
+      Response.json(raw),
+    );
+    await assert.rejects(unsafe.unlock(id, id, 'x', 'test', signal, 'OUTPUT'), {
+      code: 'INVALID_RESPONSE',
+    });
+  }
+});
+test('F035 unlock cancellation, deadline and safe errors do not retry or leak response messages', async () => {
+  for (const before of [true, false]) {
+    const cancel = new AbortController();
+    let calls = 0;
+    if (before) cancel.abort();
+    const client = createPracticeClient('http://localhost', async () => {
+      calls++;
+      cancel.abort();
+      return Response.json(unlockBody());
+    });
+    await assert.rejects(
+      client.unlock(id, id, 'x', 'test', cancel.signal, 'OUTPUT'),
+      { name: 'AbortError' },
+    );
+    assert.equal(calls, before ? 0 : 1);
+  }
+  const signal = new AbortController().signal;
+  for (const [status, code] of [
+    [401, 'AUTH_ACCESS_TOKEN_EXPIRED'],
+    [403, 'AUTH_FORBIDDEN'],
+    [404, 'CONCEPT_NOT_FOUND'],
+    [404, 'ROUTE_NOT_FOUND'],
+    [429, 'RATE_LIMIT_EXCEEDED'],
+    [503, 'DEPENDENCY_UNAVAILABLE'],
+  ] as const) {
+    let calls = 0;
+    const client = createPracticeClient('http://localhost', async () => {
+      calls++;
+      return Response.json(
+        {
+          success: false,
+          error: { code, message: 'SECRET' },
+          meta: { requestId: 'test' },
+        },
+        { status },
+      );
+    });
+    await assert.rejects(
+      client.unlock(id, id, 'x', 'test', signal, 'OUTPUT'),
+      (e) => e instanceof Error && !e.message.includes('SECRET'),
+    );
+    assert.equal(calls, 1);
+  }
+  const timeout = createPracticeClient(
+    'http://localhost',
+    async (_url, init) =>
+      new Promise((_resolve, reject) =>
+        init!.signal!.addEventListener('abort', () => reject(Error('timeout'))),
+      ),
+    1,
+  );
+  await assert.rejects(timeout.unlock(id, id, 'x', 'test', signal, 'OUTPUT'), {
+    code: 'NETWORK_ERROR',
+  });
+});
 
 test('F033 each requested type uses its own URL and rejects wrong-type or secret-bearing DTOs', async () => {
   const types = ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'] as const;

@@ -25,3 +25,24 @@ export const practiceListRequest = z.object({
   params: z.strictObject({}),
   body: z.undefined().optional(),
 });
+
+export const submittedAnswer = z
+  .string()
+  .min(1)
+  .max(10000)
+  .refine((value) => value.length <= 10000)
+  .refine((value) => value.trim().length > 0);
+const unlockId = z
+  .string()
+  .regex(/^[a-fA-F0-9]{24}(?![\s\S])/)
+  .transform((value) => value.toLowerCase());
+export const practiceUnlockRequest = z.strictObject({
+  params: z.strictObject({ questionId: unlockId }),
+  query: z.strictObject({}),
+  body: z.strictObject({ conceptId: unlockId, studentAnswer: submittedAnswer }),
+});
+export type PracticeUnlockInput = {
+  questionId: string;
+  conceptId: string;
+  studentAnswer: string;
+};

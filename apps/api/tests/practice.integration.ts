@@ -13,7 +13,7 @@ import { User } from '../src/modules/users/user.model.js';
 import { PracticeQuestion } from '../src/modules/practice/practice-question.model.js';
 import { practiceRepository } from '../src/modules/practice/practice.repository.js';
 test(
-  'F031-F034 disposable publication, projection and authenticated HTTP',
+  'F031-F035 disposable publication, projection and authenticated HTTP',
   { timeout: 90000 },
   async (t) => {
     assert.equal(process.env.APP_ENV, 'LOCAL');
@@ -465,6 +465,89 @@ test(
         },
       );
       await t.test(
+        'F035 fresh qualified unlocks disclose exactly five fields without persisting attempts',
+        async () => {
+          const collection = db.collection('practiceQuestions');
+          const before = await collection.find().sort({ _id: 1 }).toArray();
+          const collectionsBefore = (await db.listCollections().toArray())
+            .map((x) => x.name)
+            .sort();
+          for (const [n, type] of [
+            [1, 'OUTPUT'],
+            [101, 'DESCRIPTIVE'],
+            [201, 'SCENARIO'],
+            [301, 'CODING'],
+          ] as const) {
+            const questionId = n.toString(16).padStart(24, '0');
+            const value = await practiceRepository.unlock(
+              questionId,
+              concept.id,
+            );
+            assert(value);
+            assert.equal(value.type, type);
+            assert.equal(value.answer, 'ANSWER_SENTINEL');
+            assert.equal(value.explanation, 'EXPLANATION_SENTINEL');
+            assert.deepEqual(
+              Object.keys(value).sort(),
+              ['id', 'conceptId', 'type', 'answer', 'explanation'].sort(),
+            );
+            assert.doesNotMatch(
+              JSON.stringify(value),
+              /EVALUATION_SENTINEL|createdBy|status|studentAnswer/,
+            );
+            const get = await practiceRepository.list({ ...query, type });
+            assert.doesNotMatch(
+              JSON.stringify(get),
+              /SENTINEL|answer|explanation|evaluation/,
+            );
+          }
+          for (const row of before) {
+            if (
+              row.status !== 'PUBLISHED' ||
+              row.schemaVersion !== 1 ||
+              !row.conceptId.equals(concept._id) ||
+              !row.topicId.equals(topic._id) ||
+              !row.technologyId.equals(tech._id)
+            )
+              assert.equal(
+                await practiceRepository.unlock(
+                  row._id.toHexString(),
+                  concept.id,
+                ),
+                null,
+              );
+          }
+          assert.equal(
+            await practiceRepository.unlock(
+              firstId.toHexString(),
+              new Types.ObjectId().toHexString(),
+            ),
+            null,
+          );
+          assert.deepEqual(
+            await collection.find().sort({ _id: 1 }).toArray(),
+            before,
+          );
+          assert.deepEqual(
+            (await db.listCollections().toArray()).map((x) => x.name).sort(),
+            collectionsBefore,
+          );
+          assert(!collectionsBefore.includes('practiceAttempts'));
+          await collection.updateOne(
+            { _id: firstId },
+            { $set: { status: 'DRAFT' } },
+          );
+          assert.equal(
+            await practiceRepository.unlock(firstId.toHexString(), concept.id),
+            null,
+          );
+          await collection.updateOne(
+            { _id: firstId },
+            { $set: { status: 'PUBLISHED' } },
+          );
+        },
+      );
+      await t.test(
         'every ancestor status, absence and denormalized mismatch fail closed',
         async () => {
           for (const [name, key] of [
@@ -478,6 +561,13 @@ test(
               await db
                 .collection(name)
                 .updateOne({ _id: key }, { $set: { status } });
+              assert.equal(
+                await practiceRepository.unlock(
+                  firstId.toHexString(),
+                  concept.id,
+                ),
+                null,
+              );
               for (const type of [
                 'OUTPUT',
                 'DESCRIPTIVE',
@@ -511,6 +601,13 @@ test(
                 { _id: key },
                 { $set: { [field]: new Types.ObjectId() } },
               );
+            assert.equal(
+              await practiceRepository.unlock(
+                firstId.toHexString(),
+                concept.id,
+              ),
+              null,
+            );
             for (const type of [
               'OUTPUT',
               'DESCRIPTIVE',
@@ -577,6 +674,22 @@ test(
           const url = `http://127.0.0.1:${address.port}/api/v1/practice-questions?conceptId=${concept.id}`;
           try {
             assert.equal((await fetch(url)).status, 401);
+            const unlockUrl = `http://127.0.0.1:${address.port}/api/v1/practice-questions/`;
+            const submit = (questionId: string, tokenValue = token) =>
+              fetch(unlockUrl + questionId + '/unlock', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...(tokenValue
+                    ? { Authorization: 'Bearer ' + tokenValue }
+                    : {}),
+                },
+                body: JSON.stringify({
+                  conceptId: concept.id,
+                  studentAnswer: '\t inert answer\n ',
+                }),
+              });
+            assert.equal((await submit(firstId.toHexString(), '')).status, 401);
             const before = await db
               .collection('practiceQuestions')
               .find()
@@ -656,6 +769,29 @@ test(
                 /SENTINEL|answer|explanation|evaluation|createdBy/,
               );
             }
+            for (const [n, type] of [
+              [1, 'OUTPUT'],
+              [101, 'DESCRIPTIVE'],
+              [201, 'SCENARIO'],
+              [301, 'CODING'],
+            ] as const) {
+              const r = await submit(n.toString(16).padStart(24, '0'));
+              assert.equal(r.status, 200);
+              assert.equal(r.headers.get('cache-control'), 'no-store');
+              const data = (
+                (await r.json()) as { data: Record<string, unknown> }
+              ).data;
+              assert.equal(data.type, type);
+              assert.equal(data.answer, 'ANSWER_SENTINEL');
+              assert.deepEqual(
+                Object.keys(data).sort(),
+                ['id', 'conceptId', 'type', 'answer', 'explanation'].sort(),
+              );
+              assert.doesNotMatch(
+                JSON.stringify(data),
+                /EVALUATION_SENTINEL|createdBy|studentAnswer/,
+              );
+            }
             assert.deepEqual(
               await db
                 .collection('practiceQuestions')
@@ -672,6 +808,7 @@ test(
               await db
                 .collection('users')
                 .updateOne({ _id: student._id }, { $set: patch });
+              assert.equal((await submit(firstId.toHexString())).status, 403);
               for (const type of [
                 'OUTPUT',
                 'DESCRIPTIVE',

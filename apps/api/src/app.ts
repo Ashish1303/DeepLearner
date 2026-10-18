@@ -70,6 +70,16 @@ export function createApp(
   app.use(requestId);
   app.use(requestLogger);
   app.use(helmet());
+  // Match the same single-segment unlock route before CORS/body-parser errors.
+  // Invalid identifiers still receive no-store; validation remains in the router.
+  app.use((req, res, next) => {
+    if (
+      req.method === 'POST' &&
+      /^\/api\/v1\/practice-questions\/[^/]+\/unlock\/?$/i.test(req.path)
+    )
+      res.setHeader('Cache-Control', 'no-store');
+    next();
+  });
   app.use(
     cors((req, done) =>
       done(null, {

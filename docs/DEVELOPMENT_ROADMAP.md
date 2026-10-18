@@ -861,7 +861,63 @@ implementation is not authorized.
 
 ### F035 — Answer Unlock Flow
 **Dependencies:** F031  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+Owner approved P1-P8 reconciliation and the expanded 27-file implementation/offline
+scope (2026-10-18). Canonical LOCAL-only POST /practice-questions/:questionId/unlock
+qualifies a nonblank submitted answer before a five-field response. This temporary
+local submit-to-reveal creates no immutable attempt, score or progress; F036 must
+establish durable attempt policy before deployment. GET remains seven-field and
+answer-free. See [F035 plan](features/F035-answer-unlock-flow.md).
+Owner approved the narrow app.ts exact-route POST no-store touchpoint before
+CORS/JSON parsing; no broad prefix matching. Offline implementation PASS: 86 distinct
+API tests (27 focused + 44 relevant + 15 shared HTTP/logging), 210 distinct web
+tests (42 focused + 168 regression), build/lint/typecheck/format/browser-spec static
+and exact-scope/security/UTF-8/LF/whitespace checks PASS. Separate formal review:
+no Critical/High/Medium findings; one Low Retry-focus finding corrected and
+rechecked, none unresolved. The initial UTF-16 boundary/rendering-check failures
+and corrected passing evidence are retained.
+
+Separately authorized disposable MongoDB integration: **9/9 PASS**, one invocation,
+zero retries. Fresh owned 27018/f021-test/deeplearner-f021-test PRIMARY and empty
+target verified; full ancestry/reference checks, four-type qualified disclosure,
+STUDENT authorization, exact five-field DTO, GET secrecy and nonmutating reads
+passed. LOCAL-only/strict-input/rate/error no-store negatives retain offline
+evidence rather than being claimed as repeated database assertions. Graceful
+shutdown PASS, no force, Job empty, port released, handles/storage released and
+protected MongoDB/development identities/demo metadata unchanged. Preserve the
+initial ownership-blocked attempt, inconclusive original subcheck and forced
+cleanup/UNKNOWN exit; separate diagnostic confirmed the native/CIM precision
+mismatch. Authorized common-microsecond UTC comparison preserved raw values and
+exact native-handle identity; all other ownership safeguards remained intact.
+
+**FINAL REVIEW PASS WITH F035 BROWSER EXCEPTION (2026-10-18).** Final security
+review found no unresolved Critical/High/Medium/Low finding. Exactly 27 approved
+paths; all non-feature-document source hashes match retained passing evidence.
+Owner explicitly accepts this ONE-TIME, F035-only exception for LOCAL DEVELOPMENT
+ONLY under AGENTS.md: **7 mounted NOT_RUN; expected full regression 125 NOT_RUN,
+INCLUDING those seven**. No runtime discovery, browser PASS, complete regression
+acceptance or production readiness is claimed. Unverified Submit/Retry behavior,
+answer/explanation rendering, responsiveness, real keyboard/focus/accessibility,
+identity/cancellation races, account/question reveal isolation and earlier Practice/
+shared-authentication/Concept-publication compatibility remain accepted local risks.
+No security/API/database test is waived; no prior or future feature inherits this
+exception. Historical F022 EPERM/taskkill PID-reuse, F024 worker lifecycle, F029
+intermittent scrolling/recovery and screen-reader/background-throttling/Windows
+shutdown gaps remain. Primary-host Playwright stays prohibited pending separate
+ownership-safe approval; the stopped prototype is untouched. Manual checks are
+supplemental only. Required future verification: approved safe execution, actual
+discovery, all 125 expected scenarios with F024 segmentation, zero retries and
+existing budgets, then separately approved browser-regression/release readiness.
+
+F035 is temporary nonpersistent submit-to-reveal and does NOT create immutable
+practice attempts. F036 must implement durable owned attempts and the final
+answer-unlock prerequisite before Internet deployment, with no transient fallback
+on persistence failure. Owner explicitly approved F035 APPROVED_COMPLETE for LOCAL
+DEVELOPMENT ONLY and the exact twenty-seven-file commit/safe push to origin/dev
+(2026-10-18). The feature-specific browser exception and all prior evidence remain
+unchanged; no browser PASS, production readiness or deployment is authorized.
+F001-F034 remain APPROVED_COMPLETE and F036 NOT_STARTED. See F035 Sections 11-15.
 
 ---
 
@@ -1325,9 +1381,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F034 - Coding Questions
+**Current Feature:** F035 - Answer Unlock Flow
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F035 - Answer Unlock Flow (not authorized)
+**Next Feature:** F036 - Practice Attempts Persistence (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

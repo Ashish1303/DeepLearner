@@ -8,8 +8,19 @@ import {
   DRAFT_LENGTH,
   type PracticePage,
   type PracticeItem,
+  submittedAnswer,
+  type PracticeUnlockResult,
 } from './contracts';
+export type PracticeReveal = {
+  questionId: string;
+  type: PracticeType;
+  status: 'pending' | 'ready' | 'error';
+  submittedAnswer: string;
+  result: PracticeUnlockResult | null;
+  message: string;
+};
 export type PracticeState = {
+  reveal: PracticeReveal | null;
   type: PracticeType;
   clearConfirmation: number | null;
   status: 'idle' | 'loading' | 'ready' | 'error';
@@ -27,6 +38,7 @@ export function createPracticeController(
   conceptId: string,
 ) {
   let state: PracticeState = {
+    reveal: null,
     type: 'OUTPUT',
     clearConfirmation: null,
     status: 'idle',
@@ -40,6 +52,13 @@ export function createPracticeController(
   let generation = 0;
   let abort: AbortController | undefined;
   let confirmationSequence = 0;
+  let unlockGeneration = 0;
+  let unlockAbort: AbortController | undefined;
+  const invalidateReveal = () => {
+    unlockGeneration++;
+    unlockAbort?.abort();
+    unlockAbort = undefined;
+  };
   const stores: Record<
     PracticeType,
     { drafts: Record<string, string>; authored: Map<string, string> }
@@ -57,6 +76,7 @@ export function createPracticeController(
   const fingerprint = (item: PracticeItem) =>
     JSON.stringify([item.prompt, item.starterCode, item.language]);
   async function load(page = state.page, focus = false) {
+    invalidateReveal();
     abort?.abort();
     const version = ++generation;
     const type = state.type;
@@ -65,6 +85,7 @@ export function createPracticeController(
     abort = request;
     emit({
       ...state,
+      reveal: null,
       page,
       status: 'loading',
       clearConfirmation: null,
@@ -117,14 +138,103 @@ export function createPracticeController(
     }
   }
   return {
+    async submitAnswer(id: string, expectedType: PracticeType = state.type) {
+      const item = state.data?.data.find((value) => value.id === id);
+      if (
+        state.status !== 'ready' ||
+        expectedType !== state.type ||
+        !item ||
+        (state.reveal?.questionId === id && state.reveal.status === 'pending')
+      )
+        return;
+      const value = state.drafts[id] ?? '';
+      if (!submittedAnswer.safeParse(value).success) {
+        emit({
+          ...state,
+          notice: 'Enter a nonblank answer of at most 10,000 characters.',
+        });
+        return;
+      }
+      invalidateReveal();
+      const version = unlockGeneration,
+        type = state.type,
+        context = fingerprint(item);
+      const request = new AbortController();
+      unlockAbort = request;
+      const current = () =>
+        version === unlockGeneration &&
+        !request.signal.aborted &&
+        state.status === 'ready' &&
+        state.type === type &&
+        state.drafts[id] === value &&
+        state.data?.data.some(
+          (question) => question.id === id && fingerprint(question) === context,
+        );
+      emit({
+        ...state,
+        notice: '',
+        reveal: {
+          questionId: id,
+          type,
+          status: 'pending',
+          submittedAnswer: value,
+          result: null,
+          message: '',
+        },
+      });
+      try {
+        const result = await auth.runAuthenticatedRead(
+          accountId,
+          request.signal,
+          (token, signal) =>
+            client.unlock(conceptId, id, value, token, signal, type),
+        );
+        if (!current()) return;
+        if (
+          result.id !== id ||
+          result.conceptId !== conceptId ||
+          result.type !== type
+        )
+          throw new ApiError('INVALID_RESPONSE');
+        emit({
+          ...state,
+          reveal: {
+            questionId: id,
+            type,
+            status: 'ready',
+            submittedAnswer: value,
+            result,
+            message: '',
+          },
+        });
+      } catch (error) {
+        if (!current()) return;
+        emit({
+          ...state,
+          reveal: {
+            questionId: id,
+            type,
+            status: 'error',
+            submittedAnswer: value,
+            result: null,
+            message:
+              error instanceof ApiError
+                ? error.message
+                : 'Answer could not be revealed. Please retry.',
+          },
+        });
+      }
+    },
     load,
     selectType(type: PracticeType) {
       if (!practiceType.safeParse(type).success || type === state.type)
         return Promise.resolve();
       abort?.abort();
       generation++;
+      invalidateReveal();
       emit({
         ...state,
+        reveal: null,
         type,
         page: 1,
         status: 'loading',
@@ -184,7 +294,15 @@ export function createPracticeController(
         store.authored.delete(id);
       }
       store.drafts = drafts;
-      emit({ ...state, drafts, notice: '', clearConfirmation: null });
+      const clearReveal = state.reveal?.questionId === id;
+      if (clearReveal) invalidateReveal();
+      emit({
+        ...state,
+        drafts,
+        notice: '',
+        clearConfirmation: null,
+        reveal: clearReveal ? null : state.reveal,
+      });
     },
     clearDrafts() {
       emit({ ...state, clearConfirmation: ++confirmationSequence });
@@ -198,6 +316,7 @@ export function createPracticeController(
         state.clearConfirmation !== confirmation
       )
         return;
+      invalidateReveal();
       for (const store of Object.values(stores)) {
         store.authored.clear();
         store.drafts = {};
@@ -205,12 +324,14 @@ export function createPracticeController(
       emit({
         ...state,
         drafts: {},
+        reveal: null,
         clearConfirmation: null,
         notice:
           'All drafts for this Concept, across all four question types, cleared.',
       });
     },
     cancel() {
+      invalidateReveal();
       generation++;
       abort?.abort();
       for (const store of Object.values(stores)) {
@@ -223,6 +344,7 @@ export function createPracticeController(
         page: 1,
         status: 'idle',
         data: null,
+        reveal: null,
         drafts: {},
         clearConfirmation: null,
         notice: '',

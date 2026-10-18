@@ -235,8 +235,18 @@ for (const width of [1280, 768, 390]) {
         await expect
           .poll(() => code.evaluate((el) => el.scrollLeft))
           .toBeGreaterThan(0);
+      const submit = page
+        .getByRole('article', { name: 'Question 1', exact: true })
+        .getByRole('button', {
+          name: 'Submit Answer for Question 1',
+          exact: true,
+        });
+      await expect(submit).toBeVisible();
+      await expect(submit).toBeEnabled();
       await expect(
-        page.getByRole('button', { name: /Submit|Unlock|Score/i }),
+        page.getByRole('button', {
+          name: /Run|Execute|Unlock|Reveal|Score|Grade/i,
+        }),
       ).toHaveCount(0);
       expect(m.requestedTypes).toEqual(['OUTPUT', 'DESCRIPTIVE']);
       expect(m.external).toEqual([]);

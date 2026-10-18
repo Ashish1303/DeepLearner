@@ -38,3 +38,31 @@ export function practiceDto(record: ProjectedPractice): PracticeDto {
     language: record.language === undefined ? null : record.language,
   });
 }
+
+const authoredAnswer = text.refine(
+  (value) => value === value.trim() && value.length <= 50000,
+);
+const unlockDto = z.strictObject({
+  id,
+  conceptId: id,
+  type: z.enum(['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING']),
+  answer: authoredAnswer,
+  explanation: authoredAnswer.nullable(),
+});
+export type PracticeAnswerDto = z.output<typeof unlockDto>;
+export function practiceAnswerDto(
+  record: ProjectedPractice,
+): PracticeAnswerDto {
+  const identity = (value: unknown) =>
+    value instanceof Types.ObjectId ? value.toHexString() : value;
+  return unlockDto.parse({
+    id: identity(record._id),
+    conceptId: identity(record.conceptId),
+    type: record.type,
+    answer: record.answer,
+    explanation:
+      record.explanation === undefined
+        ? null
+        : authoredAnswer.parse(record.explanation),
+  });
+}

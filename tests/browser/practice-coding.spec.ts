@@ -263,8 +263,18 @@ for (const width of [1280, 768, 390]) {
       ).toHaveCount(0);
       await expect(page.locator('main a[href^="javascript:"]')).toHaveCount(0);
       expect(await page.evaluate(() => 'f034Injected' in window)).toBe(false);
+      const submit = page
+        .getByRole('article', { name: 'Question 1', exact: true })
+        .getByRole('button', {
+          name: 'Submit Answer for Question 1',
+          exact: true,
+        });
+      await expect(submit).toBeVisible();
+      await expect(submit).toBeEnabled();
       await expect(
-        page.getByRole('button', { name: /^(Run|Submit|Unlock|Score)/i }),
+        page.getByRole('button', {
+          name: /^(Run|Execute|Unlock|Reveal|Score|Grade)/i,
+        }),
       ).toHaveCount(0);
       expect(m.requestedTypes).toEqual(['OUTPUT', 'CODING']);
       expect(m.external).toEqual([]);

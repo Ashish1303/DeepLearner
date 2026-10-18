@@ -870,3 +870,27 @@ F024 resolves only the earlier revise deferral through an optional strict embedd
 Missing optional fields remain absent in storage. Explicit nulls, invalid types/coercion, blank present strings, unknown fields and missing summary are invalid. Plain text is data, escaped when rendered; Markdown is untrusted data, not sanitized storage or executable code. Existing Concept provenance and publication ancestry apply. Detail DTO normalization to null/[] does not write defaults back to MongoDB. The entire completionRules field and all other deferred workflows remain deferred.
 
 Interactive flashcards and PDF export are expressly deferred for F024 despite the broader PRD/design references; the canonical PRD remains unchanged. See [F024 approved plan](features/F024-concept-revise-mode.md).
+
+## F035 approved temporary local sequencing refinement
+
+The PRD submission-before-disclosure rule and Section 11 immutable-attempt
+algorithm remain the final architecture. Owner-approved F035 temporarily offers
+LOCAL-only, request-scoped submit-to-reveal before F036 persistence exists. A
+validated nonblank answer plus fresh STUDENT/publication/ancestry authorization
+qualifies only that response; it does NOT create an immutable attempt.
+
+F035 adds no model, collection, index, migration, transaction, practiceAttempts or
+studentProgress write, grading, scoring or execution. Its qualified aggregation
+reuses the full F021 published Concept ancestry and consistent Question references,
+PUBLISHED status, schemaVersion 1 and four canonical types. It explicitly projects
+then allowlists id/conceptId/type/answer/explanation; existing GET remains answer-
+free. Defensive select is not service authorization. Authored data is inert.
+
+Submitted/revealed answers have no server/browser persistence or reusable unlock
+receipt. Current-at-read content is not version-locked; already disclosed answers
+cannot be recalled. Tests must verify unchanged question snapshots and no attempt
+or progress collections created. This refinement does not satisfy final history,
+progress or production acceptance. F036 must establish committed owned immutable
+attempts and the approved final unlock policy before deployment; failed persistence
+must never fall back to transient disclosure. F035 submissions cannot be treated
+retroactively as saved attempts. See the F035 feature and API contracts.

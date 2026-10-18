@@ -11,6 +11,7 @@ import { ConceptMarkdown } from '../src/components/concepts/concept-markdown';
 import type { PracticeState } from '../src/lib/practice/practice-controller';
 const id = 'a'.repeat(24);
 const state: PracticeState = {
+  reveal: null,
   type: 'OUTPUT',
   clearConfirmation: null,
   status: 'ready',
@@ -94,6 +95,7 @@ function fixture(current = state, pending = false, role = 'STUDENT') {
   };
   new Function('require', 'exports', output)(load, exports);
   const controller = {
+    submitAnswer() {},
     retry() {},
     load() {},
     setDraft() {},
@@ -129,7 +131,7 @@ test('practice safely renders restricted Markdown, inert code and escaped drafts
   assert.match(html, /<label for="practice-test-/);
   assert.match(html, /maxLength="10000"/);
   assert.match(html, /aria-describedby=/);
-  assert.match(html, /Nothing is submitted or saved/);
+  assert.match(html, /Answers are sent only when you choose Submit Answer/);
   assert.doesNotMatch(html, />Submit</);
   assert.match(html, /aria-label="Practice pagination"/);
 });
@@ -358,4 +360,102 @@ test('F033 Scenario retains safe rendering alongside four native selectors', () 
     }).html,
     /No published SCENARIO/,
   );
+});
+test('F035 four-type native Submit action is disabled for blank drafts and hidden solutions stay absent', () => {
+  for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'] as const) {
+    const current = {
+      ...state,
+      type,
+      data: {
+        ...state.data!,
+        data: state.data!.data.map((item) => ({ ...item, type })),
+      },
+    };
+    for (const draft of ['', ' \t\n']) {
+      const html = fixture({ ...current, drafts: { [id]: draft } }).html;
+      assert.match(
+        html,
+        /<button[^>]*disabled=""[^>]*>Submit Answer for Question 1/,
+      );
+      assert.doesNotMatch(
+        html,
+        /Official Answer|Answer revealed\.|aria-label="Revealed answer for/,
+      );
+    }
+    const html = fixture(current).html;
+    assert.match(html, />Submit Answer for Question 1</);
+    assert.doesNotMatch(html, />Run Code<|>Score<|>Grade<|>Unlock</);
+  }
+});
+test('F035 pending/error/success are accessible and revealed Markdown and student code stay inert', () => {
+  const base = {
+    questionId: id,
+    type: 'OUTPUT' as const,
+    submittedAnswer: '\t<script>student()</script>\n ',
+    result: null,
+    message: '',
+  };
+  const pending = fixture({
+    ...state,
+    reveal: { ...base, status: 'pending' },
+  }).html;
+  assert.match(pending, /aria-busy="true"/);
+  assert.match(pending, /role="status">Revealing answer/);
+  const error = fixture({
+    ...state,
+    reveal: { ...base, status: 'error', message: 'Please retry' },
+  }).html;
+  assert.match(error, /role="alert">Please retry/);
+  assert.match(error, /Retry answer submission for Question 1/);
+  assert.equal(
+    (
+      error.match(
+        /<button[^>]*>Retry answer submission for Question 1<\/button>/g,
+      ) ?? []
+    ).length,
+    1,
+  );
+  assert.doesNotMatch(error, />Submit Answer for Question 1</);
+  assert.match(pending, /aria-disabled="true">Submit Answer for Question 1/);
+  assert.doesNotMatch(pending, /disabled=""[^>]*aria-disabled="true"/);
+  const html = fixture({
+    ...state,
+    reveal: {
+      ...base,
+      status: 'ready',
+      result: {
+        id,
+        conceptId: id,
+        type: 'OUTPUT',
+        answer:
+          '# Official\n\n<script>execute()</script>\n\n[Bad](javascript:alert%281%29)',
+        explanation:
+          '![bad](https://image.invalid)\n\n<img src=x onerror=execute()>',
+      },
+    },
+  }).html;
+  assert.match(html, /aria-label="Revealed answer for Question 1"/);
+  assert.match(
+    html,
+    /Answer revealed\. This attempt has not been saved or graded\./,
+  );
+  assert.match(html, /Your submitted answer for Question 1/);
+  assert.match(html, /\t&lt;script&gt;student/);
+  assert.doesNotMatch(html, /<script|<img|href="javascript/);
+  const other = fixture({
+    ...state,
+    reveal: {
+      ...base,
+      questionId: 'b'.repeat(24),
+      status: 'ready',
+      result: {
+        id,
+        conceptId: id,
+        type: 'OUTPUT',
+        answer: 'SECRET',
+        explanation: null,
+      },
+    },
+  }).html;
+  assert.doesNotMatch(other, /SECRET|Official Answer/);
 });

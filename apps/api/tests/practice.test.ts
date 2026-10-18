@@ -4,11 +4,17 @@ import { Types } from 'mongoose';
 import {
   practiceQuery,
   practiceListRequest,
+  practiceUnlockRequest,
+  submittedAnswer,
 } from '../src/modules/practice/practice.schema.js';
-import { practiceDto } from '../src/modules/practice/practice.dto.js';
+import {
+  practiceDto,
+  practiceAnswerDto,
+} from '../src/modules/practice/practice.dto.js';
 import {
   practiceRepository,
   practiceStages,
+  practiceUnlockStages,
 } from '../src/modules/practice/practice.repository.js';
 import { createPracticeService } from '../src/modules/practice/practice.service.js';
 import { Concept } from '../src/modules/concepts/concept.model.js';
@@ -40,6 +46,186 @@ const user: UserDto = {
   authMethods: ['PASSWORD'],
   createdAt: new Date().toISOString(),
 };
+test('F035 strict submission bounds preserve formatting and reject unsupported bodies', () => {
+  const valid = {
+    params: { questionId: id.toUpperCase() },
+    query: {},
+    body: { conceptId: id.toUpperCase(), studentAnswer: '\t code\n ' },
+  };
+  assert.deepEqual(practiceUnlockRequest.parse(valid), {
+    params: { questionId: id },
+    query: {},
+    body: { conceptId: id, studentAnswer: '\t code\n ' },
+  });
+  assert(submittedAnswer.safeParse('x'.repeat(10000)).success);
+  assert(submittedAnswer.safeParse('😀'.repeat(5000)).success);
+  for (const answer of [
+    '',
+    ' \t\n',
+    'x'.repeat(10001),
+    '😀'.repeat(5001),
+    null,
+    1,
+    true,
+    {},
+    [],
+  ])
+    assert.equal(submittedAnswer.safeParse(answer).success, false);
+  for (const patch of [
+    { params: { questionId: id + '\n' } },
+    { params: { questionId: { id } } },
+    { params: { questionId: id, x: 1 } },
+    { query: { includeAnswer: 'true' } },
+    { query: { type: 'OUTPUT' } },
+    { body: [] },
+    { body: null },
+    { body: { conceptId: id, studentAnswer: 'x', answer: 'SECRET' } },
+    { body: { conceptId: id + ' ', studentAnswer: 'x' } },
+    { body: { conceptId: id } },
+  ])
+    assert.equal(
+      practiceUnlockRequest.safeParse({ ...valid, ...patch }).success,
+      false,
+    );
+});
+test('F035 five-field DTO strips restricted fields and validates authored answer bounds', () => {
+  for (const type of ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING']) {
+    const value = practiceAnswerDto({ ...raw, type, updatedBy: id });
+    assert.deepEqual(
+      Object.keys(value).sort(),
+      ['id', 'conceptId', 'type', 'answer', 'explanation'].sort(),
+    );
+    assert.equal(value.type, type);
+    assert.equal(value.answer, 'SECRET');
+  }
+  assert.equal(
+    practiceAnswerDto({ ...raw, explanation: undefined }).explanation,
+    null,
+  );
+  assert.equal(
+    practiceAnswerDto({ ...raw, answer: 'x'.repeat(50000) }).answer.length,
+    50000,
+  );
+  for (const patch of [
+    { answer: '' },
+    { answer: ' trim ' },
+    { answer: 1 },
+    { answer: 'x'.repeat(50001) },
+    { explanation: null },
+    { explanation: ' ' },
+    { explanation: 'x'.repeat(50001) },
+    { type: 'OTHER' },
+  ])
+    assert.throws(() => practiceAnswerDto({ ...raw, ...patch }));
+});
+test('F035 unlock reuses complete ancestry, strict question predicates and distinct projection', async (t) => {
+  const qid = raw._id.toHexString(),
+    prefix = publishedConceptStages(id),
+    stages = practiceUnlockStages(qid, id);
+  assert.deepEqual(stages.slice(0, prefix.length), prefix);
+  const lookup = stages[prefix.length] as unknown as {
+    $lookup: {
+      pipeline: {
+        $match?: Record<string, unknown>;
+        $project?: Record<string, number>;
+      }[];
+    };
+  };
+  const match = lookup.$lookup.pipeline[0]!.$match!;
+  assert.equal(match.status, 'PUBLISHED');
+  assert.equal(match.schemaVersion, 1);
+  assert.deepEqual(match.type, {
+    $in: ['OUTPUT', 'DESCRIPTIVE', 'SCENARIO', 'CODING'],
+  });
+  assert.deepEqual(match._id, raw._id);
+  assert.deepEqual(match.$expr, {
+    $and: [
+      { $eq: ['$topicId', '$$topicId'] },
+      { $eq: ['$technologyId', '$$technologyId'] },
+    ],
+  });
+  assert.deepEqual(lookup.$lookup.pipeline[1]!.$project, {
+    _id: 1,
+    conceptId: 1,
+    type: 1,
+    answer: 1,
+    explanation: 1,
+  });
+  const aggregate = t.mock.method(Concept, 'aggregate', () => ({
+    exec: async (): Promise<unknown[]> => [{ unlock: [raw] }],
+  }));
+  assert.equal((await practiceRepository.unlock(qid, id))?.answer, 'SECRET');
+  for (const rows of [[], [{ unlock: [] }]]) {
+    aggregate.mock.mockImplementation(() => ({ exec: async () => rows }));
+    assert.equal(await practiceRepository.unlock(qid, id), null);
+  }
+  for (const rows of [
+    [{ unlock: [{ ...raw, answer: null }] }],
+    [{ unlock: [{ ...raw, conceptId: new Types.ObjectId() }] }],
+    [{ unlock: [raw, raw] }],
+  ]) {
+    aggregate.mock.mockImplementation(() => ({ exec: async () => rows }));
+    await assert.rejects(
+      practiceRepository.unlock(qid, id),
+      (e) =>
+        e instanceof AppError &&
+        e.code === 'DEPENDENCY_UNAVAILABLE' &&
+        !e.message.includes('SECRET'),
+    );
+  }
+});
+test('F035 every unlock checks current eligibility and submission before fresh answer lookup', async () => {
+  let current = user,
+    reads = 0,
+    unavailable = false;
+  const service = createPracticeService(
+    {
+      list: async () => null,
+      unlock: async () => {
+        reads++;
+        return unavailable ? null : practiceAnswerDto(raw);
+      },
+    },
+    { get: async () => current },
+  );
+  const input = {
+    questionId: raw._id.toHexString(),
+    conceptId: id,
+    studentAnswer: '\t answer\n',
+  };
+  await assert.rejects(service.unlock({ sub: id, role: 'ADMIN' }, input), {
+    code: 'AUTH_FORBIDDEN',
+  });
+  for (const patch of [
+    { role: 'ADMIN' },
+    { id: 'b'.repeat(24) },
+    { status: 'SUSPENDED' },
+    { status: 'DISABLED' },
+    { emailVerified: false },
+  ]) {
+    current = { ...user, ...patch } as UserDto;
+    await assert.rejects(service.unlock({ sub: id, role: 'STUDENT' }, input));
+  }
+  current = user;
+  await assert.rejects(
+    service.unlock(
+      { sub: id, role: 'STUDENT' },
+      { ...input, studentAnswer: ' ' },
+    ),
+    { code: 'VALIDATION_ERROR' },
+  );
+  assert.equal(reads, 0);
+  for (const plan of ['FREE', 'PREMIUM'] as const) {
+    current = { ...user, plan };
+    await service.unlock({ sub: id, role: 'STUDENT' }, input);
+  }
+  assert.equal(reads, 2);
+  unavailable = true;
+  await assert.rejects(service.unlock({ sub: id, role: 'STUDENT' }, input), {
+    code: 'CONCEPT_NOT_FOUND',
+  });
+  assert.equal(reads, 3);
+});
 test('strict query defaults, normalization, limits, duplicate/type rejection and GET body', () => {
   assert.deepEqual(practiceQuery.parse({ conceptId: id.toUpperCase() }), query);
   assert.equal(
@@ -163,6 +349,9 @@ test('current eligibility and token role precede content reads, preserving accou
   let accountError: AppError | undefined;
   const service = createPracticeService(
     {
+      async unlock() {
+        return null;
+      },
       async list() {
         reads++;
         return { items: [], total: 0 };
@@ -215,6 +404,9 @@ test('hidden parents are indistinguishable and out-of-range metadata remains acc
   await assert.rejects(
     createPracticeService(
       {
+        async unlock() {
+          return null;
+        },
         async list() {
           return null;
         },
@@ -227,6 +419,9 @@ test('hidden parents are indistinguishable and out-of-range metadata remains acc
     (
       await createPracticeService(
         {
+          async unlock() {
+            return null;
+          },
           async list() {
             return { items: [], total: 11 };
           },

@@ -84,8 +84,8 @@ export function PracticeView({
           {typeLabel} practice
         </h1>
         <p id={prefix + '-instructions'}>
-          Draft only. Nothing is submitted or saved. Answers and explanations
-          are not available in this increment.
+          Answers are sent only when you choose Submit Answer. Nothing is saved
+          or graded. Revealed answers are kept only on this page.
         </p>
       </header>
       <div className={styles.controls} role="group" aria-label="Question type">
@@ -137,6 +137,11 @@ export function PracticeView({
             {data.data.map((item, index) => {
               const label = `${prefix}-${item.id}`;
               const number = (state.page - 1) * data.meta.limit + index + 1;
+              const reveal =
+                state.reveal?.questionId === item.id &&
+                state.reveal.type === state.type
+                  ? state.reveal
+                  : null;
               return (
                 <article
                   key={item.id}
@@ -203,6 +208,61 @@ export function PracticeView({
                   >
                     Clear draft for Question {number}
                   </button>
+                  <div aria-busy={reveal?.status === 'pending'}>
+                    <button
+                      type="button"
+                      aria-describedby={prefix + '-instructions'}
+                      disabled={!state.drafts[item.id]?.trim()}
+                      aria-disabled={reveal?.status === 'pending'}
+                      onClick={() =>
+                        void controller.submitAnswer(item.id, state.type)
+                      }
+                    >
+                      {reveal?.status === 'error'
+                        ? `Retry answer submission for Question ${number}`
+                        : `Submit Answer for Question ${number}`}
+                    </button>
+                    {reveal?.status === 'pending' && (
+                      <p role="status">
+                        Revealing answer for Question {number}...
+                      </p>
+                    )}
+                    {reveal?.status === 'error' && (
+                      <p role="alert">{reveal.message}</p>
+                    )}
+                    {reveal?.status === 'ready' && reveal.result && (
+                      <section
+                        aria-label={`Revealed answer for Question ${number}`}
+                      >
+                        <p role="status">
+                          Answer revealed. This attempt has not been saved or
+                          graded.
+                        </p>
+                        <h3>Your Answer</h3>
+                        <pre
+                          tabIndex={0}
+                          role="region"
+                          aria-label={`Your submitted answer for Question ${number}`}
+                        >
+                          <code>{reveal.submittedAnswer}</code>
+                        </pre>
+                        <h3>Official Answer</h3>
+                        <ConceptMarkdown
+                          body={reveal.result.answer}
+                          headingBase={4}
+                        />
+                        <h3>Explanation</h3>
+                        {reveal.result.explanation === null ? (
+                          <p>No explanation is available.</p>
+                        ) : (
+                          <ConceptMarkdown
+                            body={reveal.result.explanation}
+                            headingBase={4}
+                          />
+                        )}
+                      </section>
+                    )}
+                  </div>
                 </article>
               );
             })}

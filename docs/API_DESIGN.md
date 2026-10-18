@@ -1792,3 +1792,56 @@ four stores; stale confirmations are rejected. Identity disposal clears memory.
 No editor dependency, draft persistence, answer unlocking, scoring or progress.
 See [F034](features/F034-coding-questions.md) for separately gated MongoDB/browser
 verification and formal final code review. No historical browser exception transfers.
+
+## F035 temporary LOCAL-only submit-to-reveal
+
+Owner-approved local-development sequencing refinement; not the final immutable
+attempt contract. POST /api/v1/practice-questions/:questionId/unlock is registered
+only by server-side APP_ENV=LOCAL. Other environments retain ROUTE_NOT_FOUND;
+request headers, query/body flags and browser state cannot enable the route.
+Existing GET retrieval remains unchanged and answer-free (exact seven fields).
+
+Require an authenticated current ACTIVE, verified STUDENT (FREE/PREMIUM parity).
+Params contain one strict 24-hex questionId; body is exactly conceptId (24-hex)
+and studentAnswer (nonblank string, 1-10,000 UTF-16 units). Normalize IDs only;
+preserve accepted answer whitespace/code formatting. Query must be empty. Reject
+extra/nested/null/coerced values, malformed/non-JSON/oversized payloads using
+existing errors and the existing 256kb parser. No code execution or grading.
+
+Each POST freshly qualifies the PUBLISHED schemaVersion-1 question in any of the
+four canonical types, its requested Concept and the complete F021 published
+Concept/Topic/Module/LearningPath/Technology chain, including denormalized reference
+consistency. No new author-provenance policy is introduced. Mongoose select is
+not authorization: the qualified aggregation and explicit DTO both limit access.
+
+Success uses the existing envelope with exactly id, conceptId, type, answer and
+explanation in data, message null, and only requestId in meta. Authored answer and
+explanation follow F030's trimmed, nonblank 1-50,000-unit bounds; absent explanation
+becomes response null; malformed stored values fail closed with sanitized 503.
+No student answer, evaluation, status/provenance, attempt ID, version or score is
+returned. Hidden/mismatched content uses generic 404 CONCEPT_NOT_FOUND. Auth,
+validation, media, size, rate and dependency errors retain existing safe envelopes.
+
+Apply Cache-Control: no-store to the canonical unlock POST, including CORS/parser
+errors before routing. Matching uses its exact single-question route structure,
+case-insensitive with the existing optional trailing slash; it is not a broad
+Practice prefix. Invalid identifier segments receive no-store but still fail
+validation. Unrelated methods/routes retain their existing early-error behavior.
+GET keeps its existing no-store policy. No client capability flag or shared auth
+change. Shared 300/IP/15min budget includes GET and POST; GET 120/subject stays
+unchanged, unlock has a separate 30/subject/15min across all questions/types.
+No submitted/correct answers, tokens, raw errors or actual URLs enter logs.
+
+Client POST uses bearer, credentials omit, no-store, redirect error, 15-second
+deadline and cancellation, with no automatic resend. Strict five-field response
+and account/Concept/type/question checks gate memory-only revelation. At most one
+pending/revealed result; editing its draft, navigation, identity change, confirmed
+clear or disposal invalidates it. Unrelated drafts retain existing bounds. Native
+Submit Answer feedback and restricted Markdown/inert code preserve safety. Display:
+"Answer revealed. This attempt has not been saved or graded."
+
+This endpoint creates no practiceAttempt, history, durable entitlement, score,
+progress, transaction or stored answer. Nonblank input is not proof of effort.
+Content is current at read, not version-locked. F036 must establish durable attempt
+persistence and the final unlock policy before deployment, with no transient
+fallback on persistence failure. No F035 memory is retroactively a recorded attempt.

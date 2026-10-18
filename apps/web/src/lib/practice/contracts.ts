@@ -55,3 +55,27 @@ export type PracticeItem = z.output<typeof practiceItem>;
 export type PracticePage = z.output<typeof practiceEnvelope>;
 export const DRAFT_LENGTH = 10000;
 export const DRAFT_CAPACITY = 100;
+export const submittedAnswer = z
+  .string()
+  .min(1)
+  .max(DRAFT_LENGTH)
+  .refine((value) => value.length <= DRAFT_LENGTH)
+  .refine((value) => value.trim().length > 0);
+const answerText = text.refine(
+  (value) => value === value.trim() && value.length <= 50000,
+);
+export const practiceUnlockEnvelope = z.strictObject({
+  success: z.literal(true),
+  message: z.null(),
+  data: z.strictObject({
+    id: practiceId,
+    conceptId: practiceId,
+    type: practiceType,
+    answer: answerText,
+    explanation: answerText.nullable(),
+  }),
+  meta: z.strictObject({ requestId: z.string().min(1) }),
+});
+export type PracticeUnlockResult = z.output<
+  typeof practiceUnlockEnvelope
+>['data'];
