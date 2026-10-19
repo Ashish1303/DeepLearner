@@ -976,7 +976,45 @@ future exception or next-feature work is authorized by this approval.
 
 ### F037 — Student Concept Progress
 **Dependencies:** F036  
-**Status:** `NOT_STARTED`
+**Status:** `APPROVED_COMPLETE`
+
+Owner approved the exact 33-path activity-only implementation/offline scope and
+clarified strict unique-index readiness for BOTH progress GET and submission writes.
+Missing/incorrect/unverifiable indexes fail closed; no automatic provisioning.
+Attempt and activity summary changes are atomic; no completion, mastery, score,
+XP or F038/F039 work. F036 disclosure/durability rules remain unchanged. Browser
+expected 141 NOT_RUN includes 133 existing plus eight prepared F037 cases; no prior
+exception transfers. Further database/browser execution remains separately gated.
+Offline evidence: 117 distinct API and 229 distinct frontend tests have passing
+evidence; build, lint, workspace TypeScript, formatting and browser-spec static
+compilation pass. The separate source/security review reports no unresolved
+Critical/High/Medium/Low findings. Separately authorized disposable integration
+passed 11/11 including the parent, with owned index provisioning, graceful cleanup,
+empty Job, released port and unchanged protected baselines. Missing-index refusal
+was verified live; incorrect/nonunique/unverifiable-index refusal has offline
+evidence only. No persistent provisioning or migration was performed.
+
+FINAL REVIEW PASS WITH F037 BROWSER EXCEPTION on 2026-10-19. The owner explicitly
+accepts the named F037 risks for LOCAL DEVELOPMENT ONLY: activity layout/rendering,
+keyboard/screen-reader accessibility, loading/empty/error/Retry, account/Concept
+navigation/cancellation/stale responses, responsive behavior and compatibility
+with existing Concept/Practice interfaces. Eight F037 mounted scenarios NOT_RUN;
+complete expected regression 141 NOT_RUN INCLUDING those eight. No browser PASS,
+production readiness or completion approval is claimed. Primary-host Playwright
+remains prohibited. Retain F022 EPERM/PID-reuse/Windows teardown, F024 shared-worker
+cleanup, F029 scrolling, screen-reader/background-throttling and shutdown gaps.
+The exception does not transfer to F038 or any other feature. Persistent indexes/
+topology, privacy/retention/erasure/backups and separately approved safe browser
+regression/release readiness remain deployment gates.
+
+Owner completion approval dated 2026-10-19 marks F037 APPROVED_COMPLETE for LOCAL
+DEVELOPMENT ONLY and authorizes one scoped 33-file commit and safe origin/dev push
+after Git preflight. Retain API 117 distinct PASS, frontend 229 distinct PASS,
+MongoDB 11/11 PASS, all static/security checks and zero unresolved review findings.
+Retain the live missing-index versus offline-only incorrect-index distinction and
+graceful-cleanup evidence. The eight/141 browser NOT_RUN disclosures and F037-only
+exception remain unchanged. No production readiness, new execution, persistent
+provisioning or F038/F039 work is authorized; F038 remains NOT_STARTED.
 
 ### F038 — Completion Rules
 **Default Passing Score:** 70%  
@@ -1428,9 +1466,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F036 - Practice Attempts Persistence
+**Current Feature:** F037 - Student Concept Progress
 **Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F037 - Student Concept Progress (not authorized)
+**Next Feature:** F038 - Completion Rules (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

@@ -3,6 +3,11 @@ import { test } from 'node:test';
 import { Types, type ClientSession } from 'mongoose';
 import { MongoClient, MongoInvalidArgumentError } from 'mongodb';
 import {
+  ProgressWriteConflict,
+  type ProgressBaseline,
+} from '../src/modules/progress/progress.repository.js';
+import type { ProgressRecord } from '../src/modules/progress/progress.model.js';
+import {
   createPracticeAttemptRepository,
   verifyAttemptIndexes,
   type AttemptStore,
@@ -45,6 +50,9 @@ function fixture() {
     bodyRuns: 1,
     now: 0,
     options: {} as Record<string, unknown>,
+    summary: null as ProgressRecord | null,
+    pendingSummary: null as ProgressRecord | null,
+    summaryFault: false,
   };
   const session = {
     async withTransaction(
@@ -55,15 +63,18 @@ function fixture() {
       try {
         for (let i = 0; i < state.bodyRuns; i++) {
           state.pending = [];
+          state.pendingSummary = null;
           await fn();
         }
         state.rows.push(...state.pending);
+        if (state.pendingSummary) state.summary = state.pendingSummary;
         state.pending = [];
         state.events.push('commit');
         if (state.unknownCommit)
           throw { errorLabels: ['UnknownTransactionCommitResult'] };
       } catch (error) {
         state.pending = [];
+        state.pendingSummary = null;
         throw error;
       }
     },
@@ -73,6 +84,50 @@ function fixture() {
     },
   } as unknown as ClientSession;
   const store: AttemptStore = {
+    async progressBefore(owner, id, actual) {
+      assert.equal(actual, session);
+      state.events.push('progress-before');
+      const times = state.rows.map((row) => row.submittedAt.getTime());
+      return {
+        userId: owner,
+        hierarchy: {
+          conceptId: id,
+          technologyId: new Types.ObjectId(),
+          learningPathId: new Types.ObjectId(),
+          moduleId: new Types.ObjectId(),
+          topicId: new Types.ObjectId(),
+        },
+        stats: {
+          attemptCount: times.length,
+          startedAt: times.length ? new Date(Math.min(...times)) : null,
+          lastActivityAt: times.length ? new Date(Math.max(...times)) : null,
+        },
+        summary: state.summary,
+        session: actual,
+      };
+    },
+    async progressAfter(baseline, row, actual) {
+      assert.equal(actual, session);
+      assert.equal(baseline.session, actual);
+      state.events.push('summary');
+      if (state.summaryFault) throw Error('summary failure');
+      const times = [...state.rows, ...state.pending].map((item) =>
+        item.submittedAt.getTime(),
+      );
+      const now = new Date();
+      state.pendingSummary = {
+        ...baseline.hierarchy,
+        _id: state.summary?._id ?? new Types.ObjectId(),
+        userId: row.userId,
+        attemptCount: times.length,
+        status: 'IN_PROGRESS',
+        startedAt: new Date(Math.min(...times)),
+        lastActivityAt: new Date(Math.max(...times)),
+        createdAt: state.summary?.createdAt ?? now,
+        updatedAt: now,
+        schemaVersion: 1,
+      };
+    },
     async ready() {
       state.events.push('ready');
     },
@@ -138,7 +193,9 @@ test('majority commit, exact owned proof and fresh publication precede five-fiel
   assert.deepEqual(f.state.events, [
     'ready',
     'snapshot',
+    'progress-before',
     'insert',
+    'summary',
     'commit',
     'proof',
     'fresh',
@@ -374,6 +431,7 @@ test('readiness requires all exact unique/full indexes and never provisions them
 test('concurrent same-key requests converge; distinct keys use deterministic unique sequences', async () => {
   const f = fixture(),
     pending = new Map<ClientSession, AttemptRecord[]>(),
+    progressPending = new Map<ClientSession, ProgressRecord>(),
     stores = new Map<ClientSession, AttemptStore>();
   f.store.session = async () => {
     // Each store retains its own exact expected session; persisted rows are shared.
@@ -385,9 +443,12 @@ test('concurrent same-key requests converge; distinct keys use deterministic uni
       try {
         const result = await fn(session);
         f.state.rows.push(...pending.get(session)!);
+        if (progressPending.has(session))
+          f.state.summary = progressPending.get(session)!;
         return result;
       } finally {
         pending.delete(session);
+        progressPending.delete(session);
       }
     };
     stores.set(session, child.store);
@@ -396,6 +457,29 @@ test('concurrent same-key requests converge; distinct keys use deterministic uni
   f.store.byKey = (...args) => stores.get(args[2])!.byKey(...args);
   f.store.last = (...args) => stores.get(args[2])!.last(...args);
   f.store.proof = (...args) => stores.get(args[3])!.proof(...args);
+  f.store.progressBefore = (...args) =>
+    stores.get(args[2])!.progressBefore(...args);
+  f.store.progressAfter = async (baseline: ProgressBaseline, row, session) => {
+    assert.equal(session, baseline.session);
+    if ([...progressPending.keys()].some((other) => other !== session))
+      throw new ProgressWriteConflict();
+    const times = [...f.state.rows, ...pending.get(session)!].map((item) =>
+        item.submittedAt.getTime(),
+      ),
+      now = new Date();
+    progressPending.set(session, {
+      ...baseline.hierarchy,
+      _id: f.state.summary?._id ?? new Types.ObjectId(),
+      userId: row.userId,
+      attemptCount: times.length,
+      status: 'IN_PROGRESS',
+      startedAt: new Date(Math.min(...times)),
+      lastActivityAt: new Date(Math.max(...times)),
+      createdAt: f.state.summary?.createdAt ?? now,
+      updatedAt: now,
+      schemaVersion: 1,
+    });
+  };
   f.store.qualified = async () => f.state.content;
   f.store.insert = async (row, session) => {
     const active = [...f.state.rows, ...Array.from(pending.values()).flat()];
@@ -432,4 +516,35 @@ test('concurrent same-key requests converge; distinct keys use deterministic uni
   );
   assert.deepEqual(results.map((x) => x.attempt.attemptNumber).sort(), [2, 3]);
   assert.equal(pending.size, 0);
+  assert.equal(progressPending.size, 0);
+  assert.equal(f.state.summary?.attemptCount, 3);
+});
+
+test('missing progress readiness and summary failure cannot partially commit or reveal; replay never updates summary', async () => {
+  const missing = fixture();
+  missing.store.ready = async () => {
+    throw Error('missing summary unique index');
+  };
+  await assert.rejects(missing.repo.submit(user, input), {
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
+  assert.equal(missing.state.rows.length, 0);
+  assert.equal(missing.state.summary, null);
+  const failed = fixture();
+  failed.state.summaryFault = true;
+  await assert.rejects(failed.repo.submit(user, input), {
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
+  assert.equal(failed.state.rows.length, 0);
+  assert.equal(failed.state.summary, null);
+  assert(!failed.state.events.includes('proof'));
+  const ok = fixture();
+  await ok.repo.submit(user, input);
+  const snapshot = JSON.stringify(ok.state.summary);
+  await ok.repo.submit(user, input);
+  assert.equal(JSON.stringify(ok.state.summary), snapshot);
+  assert.equal(
+    ok.state.events.filter((event) => event === 'summary').length,
+    1,
+  );
 });

@@ -13,6 +13,7 @@ export default defineConfig(foundation, {
     'practice-coding.spec.ts',
     'practice-answer-unlock.spec.ts',
     'practice-attempts.spec.ts',
+    'concept-progress.spec.ts',
   ],
   globalTimeout: 600_000,
   timeout: 45_000,

@@ -10,6 +10,11 @@ import {
 } from './practice-attempt.model.js';
 import { practiceRepository } from './practice.repository.js';
 import {
+  progressRepository,
+  ProgressWriteConflict,
+  type ProgressBaseline,
+} from '../progress/progress.repository.js';
+import {
   attemptReceipt,
   sha256,
   type QualifiedPractice,
@@ -86,6 +91,16 @@ export interface AttemptStore {
     session: ClientSession,
   ): Promise<number>;
   insert(record: AttemptRecord, session: ClientSession): Promise<void>;
+  progressBefore(
+    userId: Types.ObjectId,
+    conceptId: Types.ObjectId,
+    session: ClientSession,
+  ): Promise<ProgressBaseline>;
+  progressAfter(
+    baseline: ProgressBaseline,
+    record: AttemptRecord,
+    session: ClientSession,
+  ): Promise<void>;
   proof(
     id: Types.ObjectId,
     userId: Types.ObjectId,
@@ -116,6 +131,9 @@ const mongoStore: AttemptStore = {
     const remaining = Math.floor(timeoutMS - (performance.now() - start));
     if (remaining <= 0) throw unavailable();
     verifyAttemptIndexes(await collection().indexes({ timeoutMS: remaining }));
+    const progressTime = Math.floor(timeoutMS - (performance.now() - start));
+    if (progressTime <= 0) throw unavailable();
+    await progressRepository.ready(progressTime);
   },
   session: () => mongoose.connection.startSession({ causalConsistency: true }),
   qualified: (questionId, conceptId, session, timeoutMS, majority) =>
@@ -146,6 +164,10 @@ const mongoStore: AttemptStore = {
   async insert(record, session) {
     await new PracticeAttempt(record).save({ session });
   },
+  progressBefore: (userId, conceptId, session) =>
+    progressRepository.prepare(userId, conceptId, session),
+  progressAfter: (baseline, record, session) =>
+    progressRepository.record(baseline, record, session),
   proof: (id, userId, key, session, timeoutMS) =>
     collection().findOne(
       { _id: id, userId, idempotencyKeyHash: key },
@@ -278,6 +300,11 @@ export function createPracticeAttemptRepository(
                 }
                 if (content.questionRevision !== input.questionRevision)
                   throw changed();
+                const progress = await store.progressBefore(
+                  owner,
+                  concept,
+                  session!,
+                );
                 const last = await store.last(owner, question, session!);
                 if (
                   !Number.isSafeInteger(last) ||
@@ -303,6 +330,7 @@ export function createPracticeAttemptRepository(
                   schemaVersion: 1,
                 });
                 await store.insert(row, session!);
+                await store.progressAfter(progress, row, session!);
                 candidate = row;
               },
               {
@@ -318,7 +346,12 @@ export function createPracticeAttemptRepository(
             committed = candidate;
           } catch (error) {
             if (unknownCommit(error)) throw unconfirmed();
-            if (knownDuplicate(error) && bodies < 3) continue;
+            if (
+              (knownDuplicate(error) ||
+                error instanceof ProgressWriteConflict) &&
+              bodies < 3
+            )
+              continue;
             if (error instanceof AppError) throw error;
             throw candidate ? unconfirmed() : unavailable();
           }

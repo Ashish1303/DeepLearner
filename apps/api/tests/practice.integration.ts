@@ -5,6 +5,11 @@ import { test } from 'node:test';
 import { Types } from 'mongoose';
 import { randomUUID } from 'node:crypto';
 import { PracticeAttempt } from '../src/modules/practice/practice-attempt.model.js';
+import {
+  StudentProgress,
+  progressIndex,
+} from '../src/modules/progress/progress.model.js';
+import { progressRepository } from '../src/modules/progress/progress.repository.js';
 import { practiceAttemptRepository } from '../src/modules/practice/practice-attempt.repository.js';
 import { createDatabase, mongoose } from '../src/config/database.js';
 import { Technology } from '../src/modules/technologies/technology.model.js';
@@ -16,7 +21,7 @@ import { User } from '../src/modules/users/user.model.js';
 import { PracticeQuestion } from '../src/modules/practice/practice-question.model.js';
 import { practiceRepository } from '../src/modules/practice/practice.repository.js';
 test(
-  'F031-F036 disposable publication, projection and authenticated HTTP',
+  'F031-F037 disposable publication, atomic activity and authenticated HTTP',
   { timeout: 90000 },
   async (t) => {
     assert.equal(process.env.APP_ENV, 'LOCAL');
@@ -63,6 +68,7 @@ test(
         Concept,
         PracticeQuestion,
         PracticeAttempt,
+        StudentProgress,
       ]) {
         await model.createCollection();
         owned.unshift(model.collection.name);
@@ -79,6 +85,7 @@ test(
         emailVerifiedAt: new Date(),
       });
       await PracticeAttempt.createIndexes();
+      await StudentProgress.createIndexes();
       const audit = {
         createdBy: student._id,
         updatedBy: student._id,
@@ -700,10 +707,149 @@ test(
               .toArray(),
             persisted,
           );
-          assert(
-            !(await db.listCollections().toArray()).some(
-              (x) => x.name === 'studentProgress',
-            ),
+          const summary = await db
+            .collection('studentProgress')
+            .findOne({ userId: student._id, conceptId: concept._id });
+          assert(summary);
+          assert.equal(summary.attemptCount, 3);
+          assert.equal(summary.status, 'IN_PROGRESS');
+          assert(!Object.hasOwn(summary, 'score'));
+          assert(!Object.hasOwn(summary, 'mastery'));
+        },
+      );
+      await t.test(
+        'F037 historical fallback, atomic summary rollback, replay and index refusal',
+        async () => {
+          const qid = firstId.toHexString(),
+            content = await practiceRepository.qualified(qid, concept.id);
+          assert(content);
+          const input = {
+            questionId: qid,
+            conceptId: concept.id,
+            studentAnswer: 'F037 synthetic answer',
+            questionRevision: content.questionRevision,
+            idempotencyKey: randomUUID(),
+          };
+          const history = await db
+            .collection('practiceAttempts')
+            .find()
+            .sort({ _id: 1 })
+            .toArray();
+          assert.equal(history.length, 3);
+          await db
+            .collection('studentProgress')
+            .deleteOne({ userId: student._id, conceptId: concept._id });
+          const fallback = await progressRepository.read(
+            student.id,
+            concept.id,
+          );
+          assert.equal(fallback.attemptCount, 3);
+          assert.equal(
+            await db.collection('studentProgress').countDocuments(),
+            0,
+          );
+          assert.deepEqual(
+            await db
+              .collection('practiceAttempts')
+              .find()
+              .sort({ _id: 1 })
+              .toArray(),
+            history,
+          );
+          const save = t.mock.method(
+            StudentProgress.prototype,
+            'save',
+            async () => {
+              throw new Error('Synthetic summary failure');
+            },
+          );
+          try {
+            await assert.rejects(
+              practiceAttemptRepository.submit(student.id, input),
+              { code: 'DEPENDENCY_UNAVAILABLE' },
+            );
+          } finally {
+            save.mock.restore();
+          }
+          assert.equal(
+            await db.collection('practiceAttempts').countDocuments(),
+            3,
+          );
+          assert.equal(
+            await db.collection('studentProgress').countDocuments(),
+            0,
+          );
+          const result = await practiceAttemptRepository.submit(
+            student.id,
+            input,
+          );
+          const beforeReplay = await db
+            .collection('studentProgress')
+            .findOne({ userId: student._id, conceptId: concept._id });
+          assert(beforeReplay);
+          assert.equal(beforeReplay.attemptCount, 4);
+          const replay = await practiceAttemptRepository.submit(
+            student.id,
+            input,
+          );
+          assert.equal(replay.attempt.id, result.attempt.id);
+          assert.deepEqual(
+            await db
+              .collection('studentProgress')
+              .findOne({ userId: student._id, conceptId: concept._id }),
+            beforeReplay,
+          );
+          await db
+            .collection('studentProgress')
+            .updateOne(
+              { _id: beforeReplay._id },
+              { $set: { attemptCount: 999 } },
+            );
+          await assert.rejects(
+            progressRepository.read(student.id, concept.id),
+            { code: 'DEPENDENCY_UNAVAILABLE' },
+          );
+          await assert.rejects(
+            practiceAttemptRepository.submit(student.id, {
+              ...input,
+              idempotencyKey: randomUUID(),
+            }),
+            { code: 'DEPENDENCY_UNAVAILABLE' },
+          );
+          assert.equal(
+            await db.collection('practiceAttempts').countDocuments(),
+            4,
+          );
+          await db
+            .collection('studentProgress')
+            .updateOne(
+              { _id: beforeReplay._id },
+              { $set: { attemptCount: 4 } },
+            );
+          await db.collection('studentProgress').dropIndex(progressIndex.name);
+          try {
+            await assert.rejects(
+              progressRepository.read(student.id, concept.id),
+              { code: 'DEPENDENCY_UNAVAILABLE' },
+            );
+            await assert.rejects(
+              practiceAttemptRepository.submit(student.id, {
+                ...input,
+                idempotencyKey: randomUUID(),
+              }),
+              { code: 'DEPENDENCY_UNAVAILABLE' },
+            );
+            assert.equal(
+              await db.collection('practiceAttempts').countDocuments(),
+              4,
+            );
+          } finally {
+            await StudentProgress.createIndexes();
+          }
+          assert.equal(
+            (await progressRepository.read(student.id, concept.id))
+              .attemptCount,
+            4,
           );
         },
       );
@@ -832,8 +978,42 @@ test(
           const address = server.address();
           assert(address && typeof address !== 'string');
           const url = `http://127.0.0.1:${address.port}/api/v1/practice-questions?conceptId=${concept.id}`;
+          const progressUrl = `http://127.0.0.1:${address.port}/api/v1/progress?conceptId=${concept.id}`;
           try {
             assert.equal((await fetch(url)).status, 401);
+            assert.equal((await fetch(progressUrl)).status, 401);
+            const activityBefore = await db
+              .collection('studentProgress')
+              .find()
+              .toArray();
+            const activityResponse = await fetch(progressUrl, {
+              headers: { Authorization: 'Bearer ' + token },
+            });
+            assert.equal(activityResponse.status, 200);
+            assert.equal(
+              activityResponse.headers.get('cache-control'),
+              'no-store',
+            );
+            const activityBody = (await activityResponse.json()) as {
+              data: Record<string, unknown>;
+            };
+            assert.deepEqual(Object.keys(activityBody.data).sort(), [
+              'attemptCount',
+              'conceptId',
+              'lastActivityAt',
+              'startedAt',
+              'status',
+            ]);
+            assert.equal(activityBody.data.conceptId, concept.id);
+            assert.equal(activityBody.data.attemptCount, 4);
+            assert.doesNotMatch(
+              JSON.stringify(activityBody),
+              /SENTINEL|studentAnswer|score|userId/,
+            );
+            assert.deepEqual(
+              await db.collection('studentProgress').find().toArray(),
+              activityBefore,
+            );
             const unlockUrl = `http://127.0.0.1:${address.port}/api/v1/practice-questions/`;
             const submissionKeys = new Map<string, string>();
             const submit = async (questionId: string, tokenValue = token) => {
@@ -980,6 +1160,14 @@ test(
                 .collection('users')
                 .updateOne({ _id: student._id }, { $set: patch });
               assert.equal((await submit(firstId.toHexString())).status, 403);
+              assert.equal(
+                (
+                  await fetch(progressUrl, {
+                    headers: { Authorization: 'Bearer ' + token },
+                  })
+                ).status,
+                403,
+              );
               for (const type of [
                 'OUTPUT',
                 'DESCRIPTIVE',

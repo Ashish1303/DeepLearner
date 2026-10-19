@@ -936,3 +936,42 @@ retention/backup obligations require separate review. Clear drafts does not eras
 attempts. Do not retroactively persist F035 memory or log private submissions,
 solutions, keys/fingerprints. Full practice-attempt/progress algorithm, first-score
 preservation and separately approved release readiness remain future requirements.
+
+## F037 approved saved-activity summary refinement
+
+This increment refines the canonical studentProgress table for ungraded activity.
+Store exactly _id,userId,conceptId,technologyId,learningPathId,moduleId,topicId,
+attemptCount,status,startedAt,lastActivityAt,createdAt,updatedAt,schemaVersion=1.
+Persist only positive safe-integer counts and IN_PROGRESS; virtual zero is returned
+without a row. Identity/hierarchy fields are server-owned immutable ObjectIds.
+All four timestamps are valid dates; first/latest are authoritative owned attempt
+min/max and createdAt/updatedAt are ordered server summary times. Strict validation
+rejects unknown fields. Store no submitted/correct answer, score, mastery,
+completion, required-section acknowledgements, percentage or artificial WEAK/zero
+score. Those canonical fields and algorithms remain F038/F039 decisions.
+
+Declare only uq_student_progress_owner_concept, unique {userId:1,conceptId:1}.
+Require the exact ordered key, unique=true, v=2 and expected name, with no partial,
+sparse, TTL, collation, hidden or other unapproved options. Defer the two analytics
+indexes until an approved consumer needs them. Automatic creation is disabled.
+Both GET and writes inspect full readiness and fail closed; no persistent index
+provisioning is authorized. Future separately approved disposable integration may
+create this index only after proving the database is fresh, empty and test-owned.
+
+F036 practiceAttempts remain authoritative. GET uses a bounded read-only snapshot
+of published ancestry, owned attempt metadata and at most one summary; absent rows
+may be derived without writes only after readiness. Duplicate, stale, wrong-owner,
+wrong-reference or inconsistent summary metadata returns sanitized dependency
+failure, never silent repair. No migration/backfill or historical attempt mutation.
+A new submission checks the baseline, inserts its attempt, recomputes count/min/max
+and inserts or narrowly updates the validated summary in the same existing
+transaction/session. Summary failure rolls everything back. Known exact summary
+unique collisions use the existing bounded conflict policy. Idempotent replay
+does not write the summary, including when it is absent.
+
+Preserve majority+journal attempt commit/proof before disclosure, revision/private
+fingerprint and fresh eligibility checks. Native supported summary writes are
+validated; privileged database administration is not database WORM. These private
+LOCAL summaries have no TTL, promised retention, public export/delete or erasure
+workflow. Retention, backups, coordinated erasure and production release need
+separate approval. No F038 completion or F039 mastery behavior is implemented.

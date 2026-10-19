@@ -13,6 +13,7 @@ import { learningRoute } from '../../lib/learning-paths/routes';
 import { ConceptMarkdown } from './concept-markdown';
 import { ConceptExamples } from './concept-examples';
 import { ConceptRevise } from './concept-revise';
+import { ConceptProgress } from './concept-progress';
 import styles from './concept-browser.module.css';
 
 export function ConceptBrowser({
@@ -93,6 +94,7 @@ export function ConceptContents({
               Difficulty: {difficultyLabels[concept.difficulty]}
             </p>
             <p>{concept.read.summary}</p>
+            <ConceptProgress conceptId={concept.id} />
             <Link href={`/concepts/${concept.id}/practice`}>
               Practice output questions
             </Link>

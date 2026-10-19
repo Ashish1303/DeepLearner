@@ -1890,3 +1890,41 @@ strict clients reject the new receipt metadata. No attempt history/Admin/deletio
 API, score/grade, execution, progress or production approval. Current-at-final-
 validation content is not instantaneous publisher revocation or monotonic edit
 history. See F036 for exact digest/replay/privacy rules and gated verification.
+
+## F037 saved Concept practice activity
+
+GET /api/v1/progress?conceptId=<24-hex-id> is an authenticated current-STUDENT,
+read-only, single-Concept endpoint. Query contains only scalar conceptId; params
+are empty and a GET body is rejected. Reuse the five-level published Concept
+ancestry/reference pipeline. Hidden or inconsistent content returns the generic
+Concept 404; current eligibility is checked before and after reading.
+
+Success uses the standard envelope with exactly five data fields: conceptId,
+status, attemptCount, startedAt, lastActivityAt. Zero owned durable attempts means
+NOT_STARTED, count 0 and null timestamps. Positive count means IN_PROGRESS and
+canonical UTC first/latest saved-attempt timestamps. No completion, mastery,
+score, percentages, user/hierarchy IDs, answers, revisions or internal metadata
+are disclosed. Counts include every owned saved attempt across four types;
+idempotent replay never increments them. A page visit or draft records nothing.
+
+Both progress GET and F036 submission writes first verify the exact unique
+studentProgress {userId:1,conceptId:1} index, including name/options/key order.
+Missing, incorrect, stale or unverifiable readiness fails closed with sanitized
+503 DEPENDENCY_UNAVAILABLE. There is no automatic index creation or fallback
+around readiness. After verification, an absent summary may be derived read-only
+from owned durable attempt metadata in the same published-hierarchy snapshot.
+Present conflicting summaries fail closed; GET and replay never repair data.
+
+A new F036 submission verifies the prior summary against authoritative attempts
+and updates or creates the summary in the same snapshot transaction as the
+immutable attempt. Majority-confirmed commit, exact owned proof and fresh answer
+disclosure checks remain mandatory; summary failure rolls back the attempt.
+No F035 transient fallback is restored. LOCAL-only unlock, receipt/replay DTOs,
+rate limits and bounded transaction policy are unchanged.
+
+Progress reads have a five-second repository budget and bounded snapshot retries.
+Use no-store for matching GET success/errors, including early CORS/parser errors;
+300/IP and 120/current-Student requests per 15 minutes. Errors expose no storage
+or submitted-answer details. The Concept panel loads independently, cancels stale
+account/Concept reads and offers explicit GET-only Retry without blocking content.
+No new deployment permission, retention/erasure API or browser verification claim.

@@ -1,4 +1,7 @@
 import { createPracticeRouter } from './modules/practice/practice.routes.js';
+import { createProgressRouter } from './modules/progress/progress.routes.js';
+import type { ProgressService } from './modules/progress/progress.service.js';
+import type { ProgressLimits } from './modules/progress/progress-rate-limit.js';
 import type { PracticeService } from './modules/practice/practice.service.js';
 import type { PracticeLimits } from './modules/practice/practice-rate-limit.js';
 import { createConceptRouter } from './modules/concepts/concept.routes.js';
@@ -64,6 +67,8 @@ export function createApp(
   conceptLimits?: typeof conceptLimitDefaults,
   practiceService?: PracticeService,
   practiceLimits?: PracticeLimits,
+  progressService?: ProgressService,
+  progressLimits?: ProgressLimits,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -74,8 +79,9 @@ export function createApp(
   // Invalid identifiers still receive no-store; validation remains in the router.
   app.use((req, res, next) => {
     if (
-      req.method === 'POST' &&
-      /^\/api\/v1\/practice-questions\/[^/]+\/unlock\/?$/i.test(req.path)
+      (req.method === 'POST' &&
+        /^\/api\/v1\/practice-questions\/[^/]+\/unlock\/?$/i.test(req.path)) ||
+      (req.method === 'GET' && /^\/api\/v1\/progress\/?$/i.test(req.path))
     )
       res.setHeader('Cache-Control', 'no-store');
     next();
@@ -134,6 +140,10 @@ export function createApp(
   app.use(
     '/api/v1/practice-questions',
     createPracticeRouter(practiceService, practiceLimits),
+  );
+  app.use(
+    '/api/v1/progress',
+    createProgressRouter(progressService, progressLimits),
   );
   app.use(notFound);
   app.use(errorHandler);

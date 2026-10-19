@@ -109,6 +109,18 @@ function fixture(
       };
     if (name === '../../lib/concepts/contracts') return contracts;
     if (name === '../../lib/learning-paths/routes') return routes;
+    if (name === './concept-progress')
+      return {
+        ConceptProgress: ({ conceptId }: { conceptId: string }) =>
+          createElement(
+            'section',
+            {
+              'aria-label': 'Saved practice activity',
+              'data-concept-id': conceptId,
+            },
+            'Saved practice activity',
+          ),
+      };
     if (name === './concept-examples' || name === './concept-revise') {
       const nested = {};
       const source = readFileSync(
@@ -264,7 +276,8 @@ test('detail renders one page title, escaped summary, Read and source without pr
   assert(html.includes('<h3>Definition</h3>'));
   assert(html.includes('noopener noreferrer'));
   assert(html.includes('Back to Topic'));
-  // F031 adds a normal navigation link, not completion, scoring or progress.
+  // F037 adds saved activity only; completion, scoring and XP remain forbidden.
+  assert(html.includes('Saved practice activity'));
   for (const text of ['Mark complete', 'Start learning', 'XP'])
     assert(!html.includes(text));
   for (const conceptId of [concept.id, 'f'.repeat(24)]) {
@@ -292,6 +305,7 @@ test('detail renders one page title, escaped summary, Read and source without pr
     );
   }
   assert(!fixture(ready, 'topic').html.includes('Practice output questions'));
+  assert(!fixture(ready, 'topic').html.includes('Saved practice activity'));
 });
 
 test('F025 source footer remains escaped, safe and below all three modes without fetches', () => {
