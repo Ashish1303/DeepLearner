@@ -355,7 +355,6 @@ test('concept source requires explicit metadata and HTTPS without credentials', 
 });
 test('concept strict schemas exclude deferred fields and nested internal fields', () => {
   for (const field of [
-    'completionRules',
     'previousPublishedSnapshot',
     'publishedAt',
     'publishedBy',

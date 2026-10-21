@@ -6,13 +6,16 @@ export const auditSchema = new Schema(
   {
     category: {
       type: String,
-      enum: ['AUTH', 'USER_ADMIN'],
+      enum: ['AUTH', 'USER_ADMIN', 'CONTENT_APPROVAL'],
       required: true,
       immutable: true,
     },
     action: {
       type: String,
       enum: [
+        'PRACTICE_RUBRIC_AUTHORED',
+        'PRACTICE_RUBRIC_APPROVED',
+        'PRACTICE_RUBRIC_REVOKED',
         'USER_PROFILE_UPDATED',
         'AUTH_REGISTERED',
         'AUTH_EMAIL_VERIFIED',
@@ -41,13 +44,17 @@ export const auditSchema = new Schema(
     },
     resourceType: {
       type: String,
-      enum: ['USER'],
+      enum: ['USER', 'PRACTICE_RUBRIC'],
       required: true,
       immutable: true,
     },
     resourceId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: function (this: { resourceType: string }) {
+        return this.resourceType === 'PRACTICE_RUBRIC'
+          ? 'PracticeRubricVersion'
+          : 'User';
+      },
       required: function (this: { action: string }): boolean {
         return this.action !== 'AUTH_LOGIN_FAILED';
       },
@@ -75,7 +82,15 @@ export const auditSchema = new Schema(
             required: function (this: {
               ownerDocument(): { action: string };
             }): boolean {
-              return this.ownerDocument().action !== 'USER_PROFILE_UPDATED';
+              const action = this.ownerDocument().action;
+              return (
+                action !== 'USER_PROFILE_UPDATED' &&
+                ![
+                  'PRACTICE_RUBRIC_AUTHORED',
+                  'PRACTICE_RUBRIC_APPROVED',
+                  'PRACTICE_RUBRIC_REVOKED',
+                ].includes(action)
+              );
             },
           },
           changedFields: {
@@ -100,6 +115,12 @@ export const auditSchema = new Schema(
             ],
           },
           reactivatedFromExpiredSuspension: { type: Boolean },
+          rubricVersion: {
+            type: Number,
+            cast: false,
+            min: 1,
+            validate: Number.isSafeInteger,
+          },
         },
         { _id: false, strict: 'throw' },
       ),
@@ -125,6 +146,41 @@ export const auditSchema = new Schema(
 auditSchema.pre('validate', function () {
   const action = this.action;
   const meta = this.metadata;
+  if (
+    [
+      'PRACTICE_RUBRIC_AUTHORED',
+      'PRACTICE_RUBRIC_APPROVED',
+      'PRACTICE_RUBRIC_REVOKED',
+    ].includes(action)
+  ) {
+    if (
+      this.category !== 'CONTENT_APPROVAL' ||
+      this.resourceType !== 'PRACTICE_RUBRIC' ||
+      !this.actorId ||
+      !this.resourceId
+    )
+      this.invalidate('category', 'Invalid rubric audit identity');
+    if (
+      !meta ||
+      !Number.isSafeInteger(meta.rubricVersion) ||
+      meta.rubricVersion! < 1 ||
+      [
+        meta.source,
+        meta.changedFields,
+        meta.provider,
+        meta.sessionId,
+        meta.revokedSessions,
+        meta.failureReason,
+        meta.reactivatedFromExpiredSuspension,
+      ].some((value) => value !== undefined)
+    )
+      this.invalidate('metadata', 'Invalid rubric audit metadata');
+    return;
+  }
+  if (this.resourceType !== 'USER')
+    this.invalidate('resourceType', 'User resource required');
+  if (meta?.rubricVersion !== undefined)
+    this.invalidate('metadata', 'Rubric metadata prohibited');
   const success = ['AUTH_LOGIN_SUCCESS', 'AUTH_REFRESH_SUCCESS'].includes(
     action,
   );
@@ -261,5 +317,25 @@ auditSchema.pre('validate', function () {
 
 auditSchema.index({ actorId: 1, createdAt: -1 });
 auditSchema.index({ resourceType: 1, resourceId: 1, createdAt: -1 });
+function immutableAudit(): never {
+  throw new Error('Audit records are append-only');
+}
+auditSchema.pre('save', function () {
+  if (!this.isNew) immutableAudit();
+});
+for (const operation of [
+  'updateOne',
+  'updateMany',
+  'replaceOne',
+  'findOneAndUpdate',
+  'findOneAndReplace',
+  'deleteOne',
+  'deleteMany',
+  'findOneAndDelete',
+] as const)
+  auditSchema.pre(operation, immutableAudit);
+auditSchema.pre('deleteOne', { document: true, query: false }, immutableAudit);
+auditSchema.pre('bulkWrite', immutableAudit);
+auditSchema.pre('insertMany', immutableAudit);
 export type AuditRecord = InferSchemaType<typeof auditSchema>;
 export const Audit = mongoose.model('Audit', auditSchema);

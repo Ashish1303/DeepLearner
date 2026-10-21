@@ -138,7 +138,10 @@ test('practice safely renders restricted Markdown, inert code and escaped drafts
   assert.match(html, /<label for="practice-test-/);
   assert.match(html, /maxLength="10000"/);
   assert.match(html, /aria-describedby=/);
-  assert.match(html, /Submit Answer saves your answer but does not grade it/);
+  assert.match(
+    html,
+    /Submit Answer saves your answer before revealing the solution/,
+  );
   assert.doesNotMatch(html, />Submit</);
   assert.match(html, /aria-label="Practice pagination"/);
 });
@@ -443,10 +446,7 @@ test('F035 pending/error/success are accessible and revealed Markdown and studen
     },
   }).html;
   assert.match(html, /aria-label="Revealed answer for Question 1"/);
-  assert.match(
-    html,
-    /Answer revealed\. This attempt has been saved but has not been graded\./,
-  );
+  assert.match(html, /Answer revealed\. This attempt has been saved\./);
   assert.match(html, /Your submitted answer for Question 1/);
   assert.match(html, /\t&lt;script&gt;student/);
   assert.doesNotMatch(html, /<script|<img|href="javascript/);

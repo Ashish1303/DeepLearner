@@ -7,7 +7,9 @@ export const progressLimitDefaults = {
   get: 120,
   windowMs: 15 * 60 * 1000,
 };
-export type ProgressLimits = typeof progressLimitDefaults;
+export type ProgressLimits = typeof progressLimitDefaults & {
+  completionPost?: number;
+};
 export function createProgressRateLimits(
   config: ProgressLimits = progressLimitDefaults,
 ) {
@@ -35,6 +37,9 @@ export function createProgressRateLimits(
       obscure(ipKeyGenerator(req.ip ?? 'unknown', 56)),
     ),
     get: limit(config.get, (req) =>
+      obscure(req.auth?.sub ?? 'unauthenticated'),
+    ),
+    completionPost: limit(config.completionPost ?? 30, (req) =>
       obscure(req.auth?.sub ?? 'unauthenticated'),
     ),
   };

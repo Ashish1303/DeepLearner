@@ -302,8 +302,7 @@ const revealed = (page: Page, number = 1) =>
     name: 'Revealed answer for Question ' + number,
     exact: true,
   });
-const disclaimer =
-  'Answer revealed. This attempt has been saved but has not been graded.';
+const disclaimer = 'Answer revealed. This attempt has been saved.';
 
 test('F035 desktop all four types require submission before transient five-field reveal', async ({
   page,

@@ -10,6 +10,7 @@ import {
 import {
   progressIndex,
   type ProgressRecord,
+  emptyCompletionFields,
 } from '../src/modules/progress/progress.model.js';
 import { progressRequest } from '../src/modules/progress/progress.schema.js';
 import { progressDto } from '../src/modules/progress/progress.dto.js';
@@ -107,6 +108,164 @@ function fixture() {
     repo: createProgressRepository(store, () => state.now),
   };
 }
+test('Slice 2 F037 reads v2 as the same five-field activity view without writes or leaking completion scores', async () => {
+  const f = fixture();
+  f.state.stats = { attemptCount: 1, startedAt: at, lastActivityAt: at };
+  f.state.rows = [
+    {
+      _id: new Types.ObjectId(),
+      userId: new Types.ObjectId(uid),
+      ...f.hierarchy,
+      ...f.state.stats,
+      status: 'IN_PROGRESS',
+      schemaVersion: 2,
+      createdAt: at,
+      updatedAt: at,
+      ...emptyCompletionFields(),
+      firstScore: 100,
+      latestScore: 100,
+      bestScore: 100,
+    },
+  ];
+  const view = await f.repo.read(uid, cid);
+  assert.equal(Object.keys(view).length, 5);
+  assert.equal(view.status, 'IN_PROGRESS');
+  assert.equal('firstScore' in view, false);
+  assert.equal(f.state.writes.length, 0);
+});
+test('Slice 2 new qualifying activity creates v2 atomically; replay-free ordinary updates preserve its extension', async () => {
+  const f = fixture();
+  f.state.stats = { attemptCount: 0, startedAt: null, lastActivityAt: null };
+  const id = new Types.ObjectId(),
+    a = {
+      _id: id,
+      userId: new Types.ObjectId(uid),
+      conceptId: new Types.ObjectId(cid),
+      submittedAt: at,
+    } as AttemptRecord;
+  f.store.qualifyingScores = async () => ({
+    firstScore: 0,
+    latestScore: 0,
+    bestScore: 0,
+    attemptIds: [id.toHexString()],
+  });
+  const baseline = await f.repo.prepare(a.userId, a.conceptId, f.session);
+  f.state.stats = { attemptCount: 1, startedAt: at, lastActivityAt: at };
+  await f.repo.record(baseline, a, f.session);
+  const row = f.state.writes[0]!;
+  assert.equal(row.schemaVersion, 2);
+  if (row.schemaVersion !== 2) assert.fail();
+  assert.equal(row.firstScore, 0);
+  assert.equal(row.status, 'IN_PROGRESS');
+  assert.equal(row.completion, null);
+  const next = await f.repo.prepare(a.userId, a.conceptId, f.session),
+    later = {
+      ...a,
+      _id: new Types.ObjectId(),
+      submittedAt: new Date(at.getTime() + 1000),
+    };
+  f.state.stats = {
+    attemptCount: 2,
+    startedAt: at,
+    lastActivityAt: later.submittedAt,
+  };
+  await f.repo.record(next, later, f.session);
+  const updated = f.state.writes[1]!;
+  assert.equal(updated.schemaVersion, 2);
+  if (updated.schemaVersion !== 2) assert.fail();
+  assert.equal(updated.firstScore, 0);
+  assert.equal(updated.completion, null);
+  assert.equal(updated.attemptCount, 2);
+});
+test('Slice 2 ordinary v1 activity does not invent a score or migrate unrelated summaries', async () => {
+  const f = fixture(),
+    a = {
+      _id: new Types.ObjectId(),
+      userId: new Types.ObjectId(uid),
+      conceptId: new Types.ObjectId(cid),
+      submittedAt: at,
+    } as AttemptRecord;
+  f.store.qualifyingScores = async () => null;
+  const baseline = await f.repo.prepare(a.userId, a.conceptId, f.session);
+  f.state.stats = { attemptCount: 1, startedAt: at, lastActivityAt: at };
+  await f.repo.record(baseline, a, f.session);
+  assert.equal(f.state.writes[0]!.schemaVersion, 1);
+  assert.equal('firstScore' in f.state.writes[0]!, false);
+});
+test('Slice 2 ordinary attempts preserve an existing completed decision while activity GET stays IN_PROGRESS', async () => {
+  const f = fixture(),
+    completion = {
+      policyId: new Types.ObjectId(),
+      policyVersion: 1,
+      policyFingerprint: 'a'.repeat(64),
+      conceptRevision: 'b'.repeat(64),
+      sourceEpoch: 'c'.repeat(64),
+      decisionVersion: 1,
+      requiredSections: ['READ', 'VISUALIZE', 'EXAMPLE', 'PRACTICE'],
+      sectionReceipts: ['READ', 'VISUALIZE', 'EXAMPLE'].map((section) => ({
+        section,
+        receiptId: new Types.ObjectId(),
+      })),
+      assessmentId: new Types.ObjectId(),
+      attemptId: new Types.ObjectId(),
+      minimumScore: 70,
+      selectedScore: 100,
+      requestReceiptId: new Types.ObjectId(),
+    };
+  f.state.stats = { attemptCount: 1, startedAt: at, lastActivityAt: at };
+  f.state.rows = [
+    {
+      _id: new Types.ObjectId(),
+      userId: new Types.ObjectId(uid),
+      ...f.hierarchy,
+      ...f.state.stats,
+      createdAt: at,
+      updatedAt: at,
+      schemaVersion: 2,
+      status: 'COMPLETED',
+      completion,
+      completedAt: at,
+      sections: {
+        readCompleted: true,
+        visualizeCompleted: true,
+        exampleCompleted: true,
+        practiceCompleted: true,
+        reviseCompleted: false,
+      },
+      firstScore: 100,
+      latestScore: 100,
+      bestScore: 100,
+    },
+  ];
+  const before = await f.repo.prepare(
+      new Types.ObjectId(uid),
+      new Types.ObjectId(cid),
+      f.session,
+    ),
+    later = new Date(at.getTime() + 1000);
+  f.state.stats = { attemptCount: 2, startedAt: at, lastActivityAt: later };
+  await f.repo.record(
+    before,
+    {
+      _id: new Types.ObjectId(),
+      userId: new Types.ObjectId(uid),
+      conceptId: new Types.ObjectId(cid),
+      submittedAt: later,
+    } as AttemptRecord,
+    f.session,
+  );
+  const row = f.state.writes[0]!;
+  assert.equal(row.schemaVersion, 2);
+  if (row.schemaVersion !== 2) assert.fail();
+  assert.equal(row.status, 'COMPLETED');
+  assert.deepEqual(row.completion, completion);
+  assert.equal(row.completedAt!.getTime(), at.getTime());
+  assert.equal(row.firstScore, 100);
+  const publicView = await f.repo.read(uid, cid);
+  assert.equal(publicView.status, 'IN_PROGRESS');
+  assert.equal(publicView.attemptCount, 2);
+  assert.equal(Object.keys(publicView).length, 5);
+});
 test('GET index refusal precedes snapshots/fallback for missing, stale, nonunique and unverifiable definitions', async () => {
   for (const mode of ['missing', 'nonunique', 'wrong', 'unknown']) {
     const f = fixture();

@@ -84,9 +84,9 @@ export function PracticeView({
           {typeLabel} practice
         </h1>
         <p id={prefix + '-instructions'}>
-          Submit Answer saves your answer but does not grade it. Cancelling a
-          request or clearing drafts does not delete a saved attempt. Revealed
-          answers are kept only on this page.
+          Submit Answer saves your answer before revealing the solution.
+          Cancelling a request or clearing drafts does not delete a saved
+          attempt. Revealed answers are kept only on this page.
         </p>
       </header>
       <div className={styles.controls} role="group" aria-label="Question type">
@@ -243,8 +243,7 @@ export function PracticeView({
                         aria-label={`Revealed answer for Question ${number}`}
                       >
                         <p role="status">
-                          Answer revealed. This attempt has been saved but has
-                          not been graded.
+                          Answer revealed. This attempt has been saved.
                         </p>
                         <p>
                           Saved attempt {reveal.result.attempt.attemptNumber} at{' '}

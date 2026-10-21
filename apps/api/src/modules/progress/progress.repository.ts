@@ -4,13 +4,21 @@ import { MongoServerError } from 'mongodb';
 import { z } from 'zod';
 import { mongoose } from '../../config/database.js';
 import { AppError } from '../../common/errors/app-error.js';
-import { Concept } from '../concepts/concept.model.js';
+import {
+  Concept,
+  completionRulesFromStorage,
+} from '../concepts/concept.model.js';
 import { publishedConceptStages } from '../concepts/concept.repository.js';
-import type { AttemptRecord } from '../practice/practice-attempt.model.js';
+import {
+  attemptRecord,
+  type AttemptRecord,
+} from '../practice/practice-attempt.model.js';
+import { completionAssessmentRecord } from '../practice/practice-assessment.model.js';
 import {
   StudentProgress,
   progressIndex,
   progressRecord,
+  emptyCompletionFields,
   type ProgressRecord,
 } from './progress.model.js';
 import {
@@ -81,6 +89,16 @@ export interface ProgressStore {
     session: ClientSession,
   ): Promise<unknown[]>;
   insert(row: ProgressRecord, session: ClientSession): Promise<void>;
+  qualifyingScores?(
+    userId: Types.ObjectId,
+    conceptId: Types.ObjectId,
+    session: ClientSession,
+  ): Promise<{
+    firstScore: 0 | 100;
+    latestScore: 0 | 100;
+    bestScore: 0 | 100;
+    attemptIds: string[];
+  } | null>;
   update(
     before: ProgressRecord,
     after: ProgressRecord,
@@ -219,11 +237,87 @@ const nativeStore: ProgressStore = {
           startedAt: after.startedAt,
           lastActivityAt: after.lastActivityAt,
           updatedAt: after.updatedAt,
+          ...(after.schemaVersion === 2
+            ? {
+                schemaVersion: 2,
+                sections: after.sections,
+                firstScore: after.firstScore,
+                latestScore: after.latestScore,
+                bestScore: after.bestScore,
+                completedAt: after.completedAt,
+                completion: after.completion,
+              }
+            : {}),
         },
       },
       { session },
     );
     return result.matchedCount === 1 && result.modifiedCount === 1;
+  },
+  async qualifyingScores(userId, conceptId, session) {
+    const values = await db()
+      .collection('practiceAssessments')
+      .find(
+        { userId, conceptId, purpose: 'COMPLETION_INPUT', schemaVersion: 2 },
+        { session },
+      )
+      .sort({ evaluatedAt: 1, _id: 1 })
+      .limit(11)
+      .toArray();
+    if (!values.length) return null;
+    if (values.length > 10) throw unavailable();
+    const parent = await db()
+      .collection('concepts')
+      .findOne(
+        { _id: conceptId },
+        { session, projection: { completionRules: 1 } },
+      );
+    if (!parent?.completionRules) throw unavailable();
+    const rules = completionRulesFromStorage(parent.completionRules);
+    const rows = values.map((v) => completionAssessmentRecord.parse(v));
+    if (
+      new Set(rows.map((r) => r.attemptId.toHexString())).size !== rows.length
+    )
+      throw unavailable();
+    for (const r of rows) {
+      const policy = rules.versions.find(
+        (p) =>
+          p.policyId === r.policyId.toHexString() &&
+          p.version === r.policyVersion,
+      );
+      const a = attemptRecord.parse(
+        await db()
+          .collection('practiceAttempts')
+          .findOne({ _id: r.attemptId, userId, conceptId }, { session }),
+      );
+      if (
+        !policy ||
+        policy.approvedAt === null ||
+        policy.approvedAt > r.evaluatedAt ||
+        policy.fingerprint !== r.policyFingerprint ||
+        policy.sourceEpoch !== r.sourceEpoch ||
+        policy.questionId !== r.questionId.toHexString() ||
+        policy.rubricId !== r.rubricId.toHexString() ||
+        policy.rubricVersion !== r.rubricVersion ||
+        policy.rubricDefinitionFingerprint !== r.rubricDefinitionFingerprint ||
+        policy.questionRevision !== r.questionRevision ||
+        policy.contentFingerprint !== r.contentFingerprint ||
+        !r.userId.equals(userId) ||
+        !r.conceptId.equals(conceptId) ||
+        a.attemptNumber !== 1 ||
+        !a.questionId.equals(r.questionId) ||
+        a.requestFingerprint !== r.attemptRequestFingerprint ||
+        a.questionRevision !== r.questionRevision ||
+        a.contentFingerprint !== r.contentFingerprint
+      )
+        throw unavailable();
+    }
+    return {
+      firstScore: rows[0]!.score,
+      latestScore: rows.at(-1)!.score,
+      bestScore: rows.some((r) => r.score === 100) ? 100 : 0,
+      attemptIds: rows.map((r) => r.attemptId.toHexString()),
+    };
   },
 };
 export function createProgressRepository(
@@ -293,13 +387,58 @@ export function createProgressRepository(
       const now = new Date(
         Math.max(Date.now(), baseline.summary?.updatedAt.getTime() ?? 0),
       );
+      const grades = await store.qualifyingScores?.(
+        baseline.userId,
+        attempt.conceptId,
+        session,
+      );
+      const prior = baseline.summary;
+      if (
+        prior?.schemaVersion === 2 &&
+        prior.firstScore !== null &&
+        store.qualifyingScores
+      ) {
+        if (
+          !grades ||
+          grades.firstScore !== prior.firstScore ||
+          (!grades.attemptIds.includes(attempt._id.toHexString()) &&
+            (grades.latestScore !== prior.latestScore ||
+              grades.bestScore !== prior.bestScore))
+        )
+          throw unavailable();
+      }
+      const v2 =
+        prior?.schemaVersion === 2 ||
+        grades?.attemptIds.includes(attempt._id.toHexString());
       const row = progressRecord.parse({
         ...baseline.hierarchy,
         _id: baseline.summary?._id ?? new Types.ObjectId(),
         userId: baseline.userId,
         ...stats,
-        status: 'IN_PROGRESS',
-        schemaVersion: 1,
+        status: prior?.schemaVersion === 2 ? prior.status : 'IN_PROGRESS',
+        schemaVersion: v2 ? 2 : 1,
+        ...(v2
+          ? {
+              ...emptyCompletionFields(),
+              ...(prior?.schemaVersion === 2
+                ? {
+                    sections: prior.sections,
+                    completion: prior.completion,
+                    completedAt: prior.completedAt,
+                    firstScore: prior.firstScore,
+                    latestScore: prior.latestScore,
+                    bestScore: prior.bestScore,
+                  }
+                : {}),
+              ...(grades
+                ? {
+                    firstScore: grades.firstScore,
+                    latestScore: grades.latestScore,
+                    bestScore: grades.bestScore,
+                  }
+                : {}),
+            }
+          : {}),
         createdAt: baseline.summary?.createdAt ?? now,
         updatedAt: now,
       });

@@ -1019,7 +1019,178 @@ provisioning or F038/F039 work is authorized; F038 remains NOT_STARTED.
 ### F038 — Completion Rules
 **Default Passing Score:** 70%  
 **Dependencies:** F037  
-**Status:** `NOT_STARTED`
+**Status:** `IN_PROGRESS`
+
+Owner approved the exact six-file POLICY FOUNDATION ONLY on 2026-10-19.
+Concept-level pure eligibility evaluation requires verified section metadata and
+a valid graded candidate; VISUALIZE/PRACTICE are mandatory, default sections add
+READ/EXAMPLE, and REVISE is optional unless configured. No activity count or
+ungraded F036 attempt implies completion. No persistence, API/UI, grading,
+evidence-production, completion action or F039 work is included. This partial
+foundation cannot complete F038. Browser additions zero; existing 141 NOT_RUN
+and all historical local-only exceptions/limitations remain unchanged.
+
+Stage A offline evidence: pure-policy focused tests 22/22 PASS; relevant API
+regressions 117/117 PASS and frontend regressions 68/68 PASS. API build, API
+TypeScript, repository lint and source formatting PASS. Exact six-file scope and
+separate source/security review report zero unresolved Critical/High/Medium/Low
+findings. The initial focused run had 21 PASS / 1 FAIL for missing-version blocker
+classification; its implementation correction and passing verification are
+retained in the F038 document. This is a partial foundation, not full F038
+acceptance. Trusted evidence/grading/selection, persistence, completion API/UI,
+initiation/invalidation/revocation and final acceptance require separate approval.
+
+Stage B1: owner approved P1-P6 and the exact four-path pure OUTPUT grading
+increment. Explicit APPROVED TEXT/EXACT_TEXT/NONE rubric metadata and exact
+question/Concept/public-revision/private-fingerprint/rubric id/version binding
+are required before comparison. Valid literal matches score 100, valid differences
+score 0; invalid/unsupported inputs return fixed refusals without scores. No
+runtime imports, authentic approval verification, persisted assessment, Stage A
+evidence adapter, attempt mutation, completion API/UI or F039 work is included.
+studentProgress remains canonical and F037 remains activity-only.
+
+B1 evidence: focused 23/23 PASS; nine relevant existing API regression files
+96/96 PASS, including the 22 existing policy tests. API build/TypeScript, root
+lint and source formatting PASS; separate source/security review has zero
+unresolved Critical/High/Medium/Low findings. The initial sandbox test launch
+failed before loading tests in tsx's Windows user lookup; the supported ordinary-
+user run passed without code/environment changes. See F038 Section 10. B1 changes
+four paths; cumulative F038 scope is eight unique paths, preserving Stage A.
+No MongoDB or browser execution. Browser additions zero; all 141 remain NOT_RUN.
+F038 remains IN_PROGRESS, partial foundations only. Trusted evidence/grading
+integration and the actual completion lifecycle still require separate approval.
+
+Stage B2: owner approved reconciled P1-P8, additive canonical diagnostic storage/
+audit contracts and fourteen paths (seven CREATE, seven MODIFY, including the
+single auth-audit.test.ts export-expectation addition). Internal LOCAL-only commands
+verify current independent Admin approval and owned immutable F036 attempts;
+terminal revocation shares the transactional fence with grading/replay. Separate
+append-only DIAGNOSTIC records never reveal answers, mutate attempts/progress or
+qualify for completion. Required audit persistence is atomic. Existing public
+routes, six audit writer behaviors, F036 disclosure and F037 activity remain intact.
+
+B2 offline evidence: new focused 23/23 PASS; relevant existing API regressions
+159/159 PASS (182 distinct including the focused cases). API build, source/test
+TypeScript, repository lint and source formatting PASS. Separate final review:
+zero unresolved Critical/High/Medium/Low findings; two Low validation/boundary
+issues were corrected within scope before final checks (F038 Section 13).
+B2 changes fourteen paths; cumulative F038 scope is eighteen unique paths while
+preserving Stage A/B1. Prepared MongoDB integration has ten child scenarios plus
+one parent, all NOT_RUN; mock transaction/index/concurrency evidence is not live
+database evidence. No indexes or persistent storage were provisioned. Future
+execution requires separate guarded disposable-database approval. Browser
+additions zero; existing 141 NOT_RUN remain unchanged. F038 stays IN_PROGRESS;
+completion evidence, lifecycle, privacy/erasure/backups and final acceptance remain
+separately owner-gated. No production release or F039 work is authorized.
+
+Stage C1: owner approved P1-P8 and exactly four paths (two pure policy source/test
+creations and two documentation modifications). validateSectionEvidencePolicy
+checks only bounded claimed account/Concept/section/revision/policy, checkpoint,
+time and replay metadata. Acknowledgements classify as ACTIVITY_CANDIDATE;
+matched declared checkpoint metadata as CHECKPOINT_CANDIDATE. Every result has
+completionQualification=NOT_ESTABLISHED; Practice always remains unqualified.
+No authentication, genuine evidence, challenge consumption, persistence, API/UI,
+grading, Stage A adapter, progress/completion mutation or F039 work is added.
+
+C1 evidence: focused 32/32 PASS; twelve relevant API regression files 148/148
+PASS (180 distinct across those invocations). API build/source-test TypeScript,
+repository lint, targeted formatting, UTF-8/LF and scope/whitespace checks PASS.
+Separate formal source review: zero unresolved Critical/High/Medium/Low findings.
+Initial focused 31 PASS / 1 FAIL was a combined-defect fixture that removed its
+own earlier lifecycle contradiction; its correction and passing result remain
+in F038 Section 18. C1 changes four paths; cumulative F038 scope is twenty unique
+paths, preserving prior stages and B2's Sections 14-16 evidence/limitations.
+No MongoDB or browser execution; zero new browser scenarios, existing 141 NOT_RUN.
+F038 remains IN_PROGRESS, partial foundations only. Trusted producers, current
+revision/authorization, replay transactions, qualifying Practice policy and the
+completion lifecycle/privacy/release decisions still require separate approval.
+
+Stage C2: owner approved the exact eleven-file scope and reconciled Section 19
+decisions for a LOCAL-only internal READ acknowledgement producer. New private
+challenges and append-only ACTIVITY_ONLY receipts use current Student/publication
+checks, server snapshot hashes, fixed five-minute expiry, shared withdrawal/replay
+fence, three exact unique indexes and majority-confirmed owned proof. There is no
+route, UI, automatic invocation, comprehension/VERIFIED/completion qualification,
+F036/F037/audit mutation or F039 work. Additive canonical refinements preserve
+studentProgress. Offline verification evidence is recorded in F038 Section 20;
+MongoDB integration and persistent operational use require separate approval.
+C2 adds zero browser cases; existing 141 NOT_RUN remain unchanged. F038 stays
+IN_PROGRESS, partial foundations only; F039 remains NOT_STARTED.
+
+Stage C3a: owner approved the exact four-path pure visualization checkpoint
+verification foundation. Strict authored SINGLE_CHOICE data and exact Concept/
+visualization/revision/checkpoint/policy bindings precede exact choice-id comparison.
+CORRECT/INCORRECT are response-comparison outcomes only, not scores or trusted
+evidence; completionQualification always remains NOT_ESTABLISHED. Unsupported
+lifecycle metadata refuses under the strict schema; freshness/expiry/revocation
+are future trusted-producer responsibilities. No routes, UI, storage, challenge
+operations, F036/F037 mutation, grading integration or completion state is added.
+Implementation/offline evidence is recorded in F038 Section 25. No dependency or
+canonical architecture amendment. Browser additions zero; existing 141 remain
+NOT_RUN. F038 stays IN_PROGRESS, partial foundations only; F039 NOT_STARTED.
+
+Stage C3a evidence: 35 focused PASS plus 158 relevant API regression PASS (193
+distinct). API build, source/test TypeScript, repository lint, source formatting,
+UTF-8/LF, exact four-file scope and whitespace checks PASS. Separate formal
+source/security review reports zero unresolved Critical/High/Medium/Low findings.
+The initial sandbox launch failed before loading tests in tsx's Windows user
+lookup; the supported ordinary-user run passed without source/environment changes.
+See F038 Section 25. No MongoDB/browser execution; all 141 browser cases remain
+NOT_RUN. Trusted producer integration and full F038 acceptance require later gates.
+
+Stage C3b: owner approved P1-P8, fifteen paths and additive internal API/database
+refinements for a LOCAL-only trusted visualization checkpoint activity producer.
+Independently reviewed immutable definitions bind current server snapshots;
+one-active/three-fresh persisted issuance limits, two revocation/consumption fences,
+strict VISUALIZE shared-storage variants and owned majority proof preserve C2 READ.
+Correct and incorrect responses both consume; invalid responses do not. This is
+activity-only, not comprehension, Stage A VERIFIED evidence, completion or mastery.
+Snapshot ABA/publication-history and persistent privacy/release limits remain.
+Actual offline verification is recorded in F038 Section 27; prepared MongoDB
+integration requires separate approval. C3b adds zero browser cases; all 141 remain
+NOT_RUN. F038 remains IN_PROGRESS, partial foundations only; F039 NOT_STARTED.
+
+Stage C3b offline evidence: 38 focused C3b PASS, 49 READ PASS (46 existing plus
+three new compatibility controls) and 180 additional API regression PASS; 267
+distinct tests, with subset/repeated runs not added. API build, source/test
+TypeScript, lint, source formatting, UTF-8/LF, fifteen-path scope and whitespace
+checks PASS. Separate formal review: two Low findings resolved within scope,
+zero unresolved Critical/High/Medium/Low. Approved additive canonical text preserves
+prior document bytes/contracts. Prepared MongoDB suite has fifteen children plus
+parent, all NOT_RUN; live verification and owned cleanup require a separate gate.
+See F038 Section 27 for initial typing corrections, findings and evidence limits.
+No database/browser execution; all 141 browser cases remain NOT_RUN.
+
+Owner-approved F038 Slice 1 Option B implements only LOCAL synthetic origin,
+reviewed explicit 70% Concept policy and atomic first-submission OUTPUT
+qualification. The unchanged F036 attempt, distinct qualifying assessment and
+existing F037 activity update share one majority transaction; historical or
+reveal-assisted attempts cannot qualify. READ/VISUALIZE compatibility and
+activity-only section contracts remain separate from completion. Native runtime
+supervisor attestation is replaced by server-owned creation provenance; disposable
+MongoDB ownership/isolation safeguards remain mandatory. See F038 Section 31 for
+the exact 32-path boundary and actual verification evidence. Slice 1 offline:
+39 focused plus 366 relevant API tests (405 distinct) and 229 frontend tests PASS;
+build/static checks PASS; zero unresolved source/security findings. Actual changes
+24 files (five new/nineteen modified). Integration is
+prepared only; no MongoDB or browser execution is authorized in this gate.
+Slice 2 persistence/API and Slice 3 student workflow remain unimplemented.
+Existing 141 browser cases remain NOT_RUN; twelve proposed cases are unimplemented.
+F038 remains IN_PROGRESS; no production readiness or F039 implementation.
+
+Owner-approved Slice 2 adds LOCAL synthetic-scope completion APIs, canonical
+studentProgress v2 and append-only request receipts, preserving F036 durability
+and F037's five-field activity GET. Offline verification: 57 focused plus 378
+relevant API regression tests PASS (435 distinct in this gate); API build,
+source/test TypeScript, lint, formatting and browser-spec static compilation PASS.
+Two Medium source-review findings were resolved; no unresolved findings remain.
+Exactly twenty approved paths changed (eight creations/twelve modifications).
+Slice 1's accepted 14/14 guarded integration and historical failures remain in
+the feature document. Slice 2's ten prepared MongoDB records are NOT_RUN; its
+thirteen index definitions are declared, not provisioned. Separate disposable
+integration approval is required. Existing 141 browser cases remain NOT_RUN;
+twelve proposed Slice 3 cases and Student UI remain unimplemented. See F038
+Sections 32-33. F038 stays IN_PROGRESS; no production release or F039 is authorized.
 
 ### F039 — Weak / Improving / Strong Classification
 **Dependencies:** F037  
@@ -1466,9 +1637,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F037 - Student Concept Progress
-**Current Status:** `APPROVED_COMPLETE`
-**Next Feature:** F038 - Completion Rules (not authorized)
+**Current Feature:** F038 - Completion Rules (partial policy/grading foundations only)
+**Current Status:** `IN_PROGRESS`
+**Next Feature:** F039 - Weak / Improving / Strong Classification (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

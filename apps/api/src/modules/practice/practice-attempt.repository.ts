@@ -10,6 +10,12 @@ import {
 } from './practice-attempt.model.js';
 import { practiceRepository } from './practice.repository.js';
 import {
+  completionGrading,
+  type CompletionGrading,
+} from './completion-grading.service.js';
+import { GradingWriteConflict } from './practice-rubric.repository.js';
+import { mongoQualification } from '../progress/section-evidence.repository.js';
+import {
   progressRepository,
   ProgressWriteConflict,
   type ProgressBaseline,
@@ -52,6 +58,258 @@ const conflict = () =>
     'PRACTICE_IDEMPOTENCY_CONFLICT',
     'Submission key conflicts with this request',
   );
+interface CoordinationPermit {
+  readonly replayOnly: boolean;
+  assert(): void;
+  finish(success: boolean): void;
+}
+interface CoordinationSource {
+  local(): boolean;
+  generation(): { client: object; database: object; live: boolean };
+  onLoss(invalidate: () => void): () => void;
+}
+interface CoordinationWaiter {
+  remaining(): number;
+  resolve(permit: CoordinationPermit): void;
+  reject(error: AppError): void;
+  cancelTimer(): void;
+}
+interface CoordinationEntry {
+  fingerprint: string;
+  active: symbol;
+  queue: CoordinationWaiter[];
+  dead: boolean;
+}
+interface CoordinationDomain {
+  client: object;
+  database: object;
+  entries: Map<string, CoordinationEntry>;
+  dead: boolean;
+  unsubscribe: (() => void) | undefined;
+}
+/** Internal scheduling only. Entries contain digests and permits, never submission/results. */
+export function createPracticeAttemptCoordination(
+  source: CoordinationSource,
+  schedule: (run: () => void, ms: number) => () => void = (run, ms) => {
+    const timer = setTimeout(run, ms);
+    return () => clearTimeout(timer);
+  },
+) {
+  const clients = new WeakMap<object, WeakMap<object, CoordinationDomain>>();
+  const activeKeys = new Set<CoordinationEntry>();
+  const waitingBudget = (remaining: () => number) => {
+    const ms = remaining();
+    if (!Number.isFinite(ms) || ms <= 2000 || ms > 10_000) throw unavailable();
+    return ms;
+  };
+  const forget = (domain: CoordinationDomain) => {
+    if (domain.entries.size) return;
+    const databases = clients.get(domain.client);
+    if (databases?.get(domain.database) === domain)
+      databases.delete(domain.database);
+    const unsubscribe = domain.unsubscribe;
+    domain.unsubscribe = undefined;
+    unsubscribe?.();
+  };
+  const failWaiters = (entry: CoordinationEntry) => {
+    for (const waiter of entry.queue.splice(0)) {
+      waiter.cancelTimer();
+      waiter.reject(unconfirmed());
+    }
+  };
+  const invalidate = (domain: CoordinationDomain) => {
+    domain.dead = true;
+    for (const entry of domain.entries.values()) {
+      entry.dead = true;
+      failWaiters(entry);
+    }
+    // Active permits retain capacity until their original operation finishes.
+    const databases = clients.get(domain.client);
+    if (databases?.get(domain.database) === domain)
+      databases.delete(domain.database);
+    const unsubscribe = domain.unsubscribe;
+    domain.unsubscribe = undefined;
+    try {
+      unsubscribe?.();
+    } catch {
+      // The domain is already terminal; its active permits cannot authorize a return.
+    }
+  };
+  const current = (domain: CoordinationDomain) => {
+    try {
+      const generation = source.generation();
+      if (
+        !source.local() ||
+        domain.dead ||
+        !generation.live ||
+        generation.client !== domain.client ||
+        generation.database !== domain.database
+      )
+        throw unavailable();
+    } catch {
+      invalidate(domain);
+      throw unavailable();
+    }
+  };
+  const permit = (
+    domain: CoordinationDomain,
+    key: string,
+    entry: CoordinationEntry,
+    replayOnly: boolean,
+  ): CoordinationPermit => {
+    const ticket = Symbol();
+    entry.active = ticket;
+    let finished = false;
+    return Object.freeze({
+      replayOnly,
+      assert() {
+        current(domain);
+        if (finished || entry.dead || entry.active !== ticket)
+          throw unavailable();
+      },
+      finish(success: boolean) {
+        if (finished) return;
+        finished = true;
+        try {
+          current(domain);
+        } catch {
+          success = false;
+        }
+        if (!success || entry.dead) {
+          entry.dead = true;
+          failWaiters(entry);
+        } else {
+          while (entry.queue.length) {
+            const waiter = entry.queue.shift()!;
+            waiter.cancelTimer();
+            try {
+              waitingBudget(waiter.remaining);
+              current(domain);
+              waiter.resolve(permit(domain, key, entry, true));
+              return;
+            } catch {
+              waiter.reject(unavailable());
+            }
+          }
+        }
+        if (domain.entries.get(key) === entry) domain.entries.delete(key);
+        activeKeys.delete(entry);
+        try {
+          forget(domain);
+        } catch {
+          throw unconfirmed();
+        }
+      },
+    });
+  };
+  return Object.freeze({
+    async enter(
+      owner: string,
+      keyHash: string,
+      fingerprint: string,
+      remaining: () => number,
+    ): Promise<CoordinationPermit | null> {
+      let generation: ReturnType<CoordinationSource['generation']>;
+      try {
+        if (!source.local()) return null;
+        generation = source.generation();
+      } catch {
+        throw unavailable();
+      }
+      if (
+        !/^[a-f0-9]{24}(?![\s\S])/.test(owner) ||
+        !/^[a-f0-9]{64}(?![\s\S])/.test(keyHash) ||
+        !/^[a-f0-9]{64}(?![\s\S])/.test(fingerprint)
+      )
+        throw unavailable();
+      waitingBudget(remaining);
+      if (
+        !generation.live ||
+        !generation.client ||
+        !generation.database ||
+        typeof generation.client !== 'object' ||
+        typeof generation.database !== 'object'
+      )
+        throw unavailable();
+      let databases = clients.get(generation.client);
+      if (!databases)
+        clients.set(generation.client, (databases = new WeakMap()));
+      let domain = databases.get(generation.database);
+      if (!domain) {
+        if (activeKeys.size >= 100) throw unavailable();
+        domain = {
+          client: generation.client,
+          database: generation.database,
+          entries: new Map(),
+          dead: false,
+          unsubscribe: undefined,
+        };
+        databases.set(generation.database, domain);
+        try {
+          const created = domain;
+          const unsubscribe = source.onLoss(() => invalidate(created));
+          domain.unsubscribe = unsubscribe;
+          current(domain);
+        } catch {
+          invalidate(domain);
+          throw unavailable();
+        }
+      }
+      current(domain);
+      const key = `${owner}:${keyHash}`;
+      const existing = domain.entries.get(key);
+      if (!existing) {
+        if (activeKeys.size >= 100) throw unavailable();
+        const entry: CoordinationEntry = {
+          fingerprint,
+          active: Symbol(),
+          queue: [],
+          dead: false,
+        };
+        domain.entries.set(key, entry);
+        activeKeys.add(entry);
+        return permit(domain, key, entry, false);
+      }
+      if (existing.fingerprint !== fingerprint) throw conflict();
+      if (existing.dead || existing.queue.length >= 10) throw unavailable();
+      return new Promise<CoordinationPermit>((resolve, reject) => {
+        const waiter: CoordinationWaiter = {
+          remaining,
+          resolve,
+          reject,
+          cancelTimer() {},
+        };
+        existing.queue.push(waiter);
+        try {
+          waiter.cancelTimer = schedule(
+            () => {
+              const index = existing.queue.indexOf(waiter);
+              if (index < 0) return;
+              existing.queue.splice(index, 1);
+              waiter.cancelTimer();
+              reject(unavailable());
+            },
+            waitingBudget(remaining) - 2000,
+          );
+        } catch {
+          existing.queue.splice(existing.queue.indexOf(waiter), 1);
+          reject(unavailable());
+        }
+      });
+    },
+  });
+}
+export type PracticeAttemptCoordination = ReturnType<
+  typeof createPracticeAttemptCoordination
+>;
+// Match the existing validated server APP_ENV default without parsing unrelated secrets here.
+// This immutable server-side snapshot is never supplied by a request.
+const localCoordination = (process.env.APP_ENV ?? 'LOCAL') === 'LOCAL';
+export const practiceAttemptCoordination = createPracticeAttemptCoordination({
+  local: () => localCoordination,
+  generation: () => mongoQualification.generation(),
+  onLoss: (invalidate) => mongoQualification.onLoss(invalidate),
+});
 export function verifyAttemptIndexes(indexes: Record<string, unknown>[]) {
   for (const expected of attemptIndexes) {
     const actual = indexes.find((index) => index.name === expected.name);
@@ -116,7 +374,7 @@ const collection = () => {
   if (!mongoose.connection.db) throw unavailable();
   return mongoose.connection.db.collection<AttemptRecord>('practiceAttempts');
 };
-const mongoStore: AttemptStore = {
+export const mongoAttemptStore: AttemptStore = {
   async ready(timeoutMS) {
     const db = mongoose.connection.db;
     if (!db) throw unavailable();
@@ -206,8 +464,14 @@ function unknownCommit(error: unknown, depth = 0): boolean {
   return 'cause' in error && unknownCommit(error.cause, depth + 1);
 }
 export function createPracticeAttemptRepository(
-  store: AttemptStore = mongoStore,
+  store: AttemptStore = mongoAttemptStore,
   clock = () => performance.now(),
+  qualification: CompletionGrading | null = store === mongoAttemptStore
+    ? completionGrading
+    : null,
+  coordination: PracticeAttemptCoordination | null = store === mongoAttemptStore
+    ? practiceAttemptCoordination
+    : null,
 ) {
   return {
     async submit(
@@ -264,8 +528,23 @@ export function createPracticeAttemptRepository(
         commitReturned = false;
       let outcome: PracticeUnlockOutcome | undefined,
         failure: AppError | undefined;
+      let assessment: Awaited<ReturnType<CompletionGrading['record']>>;
+      let coordinated: CoordinationPermit | null | undefined;
       try {
         await store.ready(remaining());
+        await qualification?.before(userId, input.questionId, remaining());
+        coordinated = await coordination?.enter(
+          userId,
+          key,
+          request,
+          remaining,
+        );
+        coordinated?.assert();
+        if (coordinated?.replayOnly) {
+          await store.ready(remaining());
+          await qualification?.before(userId, input.questionId, remaining());
+          coordinated.assert();
+        }
         session = await store.session();
         while (!committed && bodies < 3) {
           const available = remaining() - 2000;
@@ -275,7 +554,9 @@ export function createPracticeAttemptRepository(
             await session.withTransaction(
               async () => {
                 if (++bodies > 3 || remaining() <= 2000) throw unavailable();
+                coordinated?.assert();
                 candidate = undefined;
+                assessment = undefined;
                 const content = await store.qualified(
                   input.questionId,
                   input.conceptId,
@@ -295,9 +576,13 @@ export function createPracticeAttemptRepository(
                     row.type !== content.data.type
                   )
                     throw changed();
+                  assessment = await qualification?.record(row, true, {
+                    session: session!,
+                  });
                   candidate = row;
                   return;
                 }
+                if (coordinated?.replayOnly) throw unconfirmed();
                 if (content.questionRevision !== input.questionRevision)
                   throw changed();
                 const progress = await store.progressBefore(
@@ -330,6 +615,9 @@ export function createPracticeAttemptRepository(
                   schemaVersion: 1,
                 });
                 await store.insert(row, session!);
+                assessment = await qualification?.record(row, false, {
+                  session: session!,
+                });
                 await store.progressAfter(progress, row, session!);
                 candidate = row;
               },
@@ -348,7 +636,8 @@ export function createPracticeAttemptRepository(
             if (unknownCommit(error)) throw unconfirmed();
             if (
               (knownDuplicate(error) ||
-                error instanceof ProgressWriteConflict) &&
+                error instanceof ProgressWriteConflict ||
+                error instanceof GradingWriteConflict) &&
               bodies < 3
             )
               continue;
@@ -386,6 +675,16 @@ export function createPracticeAttemptRepository(
           current.data.conceptId !== input.conceptId
         )
           throw changed();
+        await qualification?.proof(
+          proof.data,
+          {
+            session,
+            timeoutMS: remaining(),
+            majority: true,
+          },
+          assessment,
+        );
+        coordinated?.assert();
         outcome = { data: current.data, attempt: attemptReceipt(proof.data) };
       } catch (error) {
         failure =
@@ -401,6 +700,20 @@ export function createPracticeAttemptRepository(
           } catch {
             failure ??= unconfirmed();
             Object.defineProperty(failure, 'cleanupFailed', { value: true });
+            outcome = undefined;
+          }
+        }
+        if (coordinated) {
+          try {
+            coordinated.assert();
+          } catch {
+            failure ??= unconfirmed();
+            outcome = undefined;
+          }
+          try {
+            coordinated.finish(!failure && outcome !== undefined);
+          } catch {
+            failure ??= unconfirmed();
             outcome = undefined;
           }
         }

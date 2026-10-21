@@ -2,6 +2,7 @@ import { createPracticeRouter } from './modules/practice/practice.routes.js';
 import { createProgressRouter } from './modules/progress/progress.routes.js';
 import type { ProgressService } from './modules/progress/progress.service.js';
 import type { ProgressLimits } from './modules/progress/progress-rate-limit.js';
+import type { CompletionService } from './modules/progress/completion.service.js';
 import type { PracticeService } from './modules/practice/practice.service.js';
 import type { PracticeLimits } from './modules/practice/practice-rate-limit.js';
 import { createConceptRouter } from './modules/concepts/concept.routes.js';
@@ -69,6 +70,7 @@ export function createApp(
   practiceLimits?: PracticeLimits,
   progressService?: ProgressService,
   progressLimits?: ProgressLimits,
+  completionService?: CompletionService,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -81,7 +83,12 @@ export function createApp(
     if (
       (req.method === 'POST' &&
         /^\/api\/v1\/practice-questions\/[^/]+\/unlock\/?$/i.test(req.path)) ||
-      (req.method === 'GET' && /^\/api\/v1\/progress\/?$/i.test(req.path))
+      (req.method === 'GET' &&
+        /^\/api\/v1\/progress(?:\/completion)?\/?$/i.test(req.path)) ||
+      (req.method === 'POST' &&
+        /^\/api\/v1\/progress\/completion\/[^/]+\/(?:challenges|responses|complete)\/?$/i.test(
+          req.path,
+        ))
     )
       res.setHeader('Cache-Control', 'no-store');
     next();
@@ -106,6 +113,18 @@ export function createApp(
       }),
     ),
   );
+  // Only new completion commands receive the smaller streamed JSON bound.
+  const completionJson = express.json({ limit: 4096, inflate: false });
+  app.use((req, res, next) => {
+    if (
+      req.method === 'POST' &&
+      /^\/api\/v1\/progress\/completion\/[^/]+\/(?:challenges|responses|complete)\/?$/i.test(
+        req.path,
+      )
+    )
+      return completionJson(req, res, next);
+    next();
+  });
   app.use(express.json({ limit: '256kb' }));
   app.use('/api/v1/health', healthRouter);
   app.use(
@@ -143,7 +162,7 @@ export function createApp(
   );
   app.use(
     '/api/v1/progress',
-    createProgressRouter(progressService, progressLimits),
+    createProgressRouter(progressService, progressLimits, completionService),
   );
   app.use(notFound);
   app.use(errorHandler);

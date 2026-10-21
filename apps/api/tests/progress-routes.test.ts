@@ -257,3 +257,23 @@ test('progress rate limiting preserves safe 429/no-store behavior', async () => 
     await f.close();
   }
 });
+test('Slice 2 completion routing does not consume the existing activity service or change its envelope', async () => {
+  const f = await fixture();
+  try {
+    const headers = { Authorization: 'Bearer ' + f.token };
+    const invalid = await fetch(
+      f.base + '/progress/completion?conceptId=invalid',
+      { headers },
+    );
+    assert.equal(invalid.status, 400);
+    assert.equal(f.reads(), 0);
+    const activity = await fetch(f.url, { headers });
+    assert.equal(activity.status, 200);
+    const body = (await activity.json()) as { data: typeof data };
+    assert.deepEqual(body.data, data);
+    assert.equal(Object.keys(body.data).length, 5);
+    assert.equal(f.reads(), 1);
+  } finally {
+    await f.close();
+  }
+});

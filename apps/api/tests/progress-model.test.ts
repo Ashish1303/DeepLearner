@@ -5,6 +5,8 @@ import {
   StudentProgress,
   progressRecord,
   progressIndex,
+  progressV2Record,
+  emptyCompletionFields,
 } from '../src/modules/progress/progress.model.js';
 import { verifyProgressIndexes } from '../src/modules/progress/progress.repository.js';
 const now = new Date('2026-10-19T00:00:00.000Z');
@@ -90,4 +92,81 @@ test('supported mutation methods refuse identity/update/delete bypasses without 
     /owned progress repository/,
   );
   assert.equal(StudentProgress.db.readyState, 0);
+});
+test('Slice 2 preserves exact v1 while v2 requires the complete canonical extension', async () => {
+  const v2 = {
+    ...record,
+    ...emptyCompletionFields(),
+    schemaVersion: 2 as const,
+    firstScore: 0 as const,
+    latestScore: 0 as const,
+    bestScore: 0 as const,
+  };
+  progressV2Record.parse(v2);
+  const doc = new StudentProgress(v2);
+  await doc.validate();
+  assert.deepEqual(Object.keys(doc.toObject()).sort(), Object.keys(v2).sort());
+  for (const patch of [
+    { mastery: 'STRONG' },
+    { firstScore: 70 },
+    { latestScore: null },
+    { sections: { readCompleted: true } },
+    { status: 'COMPLETED' },
+    { completion: {} },
+  ])
+    assert(!progressRecord.safeParse({ ...v2, ...patch }).success);
+  assert(progressRecord.safeParse(record).success);
+});
+test('Slice 2 completed claim requires passing provenance, exact required source references and coherent flags', () => {
+  const completion = {
+    policyId: new Types.ObjectId(),
+    policyVersion: 1,
+    policyFingerprint: 'a'.repeat(64),
+    conceptRevision: 'b'.repeat(64),
+    sourceEpoch: 'c'.repeat(64),
+    decisionVersion: 1,
+    requiredSections: ['READ', 'VISUALIZE', 'EXAMPLE', 'PRACTICE'],
+    sectionReceipts: ['READ', 'VISUALIZE', 'EXAMPLE'].map((section) => ({
+      section,
+      receiptId: new Types.ObjectId(),
+    })),
+    assessmentId: new Types.ObjectId(),
+    attemptId: new Types.ObjectId(),
+    minimumScore: 70,
+    selectedScore: 100,
+    requestReceiptId: new Types.ObjectId(),
+  };
+  const v2 = {
+    ...record,
+    ...emptyCompletionFields(),
+    schemaVersion: 2,
+    status: 'COMPLETED',
+    firstScore: 100,
+    latestScore: 100,
+    bestScore: 100,
+    completedAt: now,
+    completion,
+    sections: {
+      readCompleted: true,
+      visualizeCompleted: true,
+      exampleCompleted: true,
+      practiceCompleted: true,
+      reviseCompleted: false,
+    },
+  };
+  assert(progressRecord.safeParse(v2).success);
+  for (const patch of [
+    { selectedScore: 0 },
+    { minimumScore: 0 },
+    { requiredSections: ['READ', 'EXAMPLE', 'PRACTICE'] },
+    { sectionReceipts: [] },
+    { answer: 'private' },
+    { policyId: 'a'.repeat(24) },
+  ])
+    assert(
+      !progressRecord.safeParse({
+        ...v2,
+        completion: { ...completion, ...patch },
+      }).success,
+    );
 });

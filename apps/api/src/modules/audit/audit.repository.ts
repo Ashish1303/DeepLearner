@@ -1,6 +1,46 @@
 import type { ProfileField } from '../users/user.schema.js';
-import type { ClientSession, Types } from 'mongoose';
+import { type ClientSession, Types } from 'mongoose';
+import { z } from 'zod';
 import { Audit } from './audit.model.js';
+
+const rubricAuditInput = z.strictObject({
+  id: z.instanceof(Types.ObjectId),
+  action: z.enum([
+    'PRACTICE_RUBRIC_AUTHORED',
+    'PRACTICE_RUBRIC_APPROVED',
+    'PRACTICE_RUBRIC_REVOKED',
+  ]),
+  actorId: z.instanceof(Types.ObjectId),
+  definitionId: z.instanceof(Types.ObjectId),
+  rubricVersion: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  requestId: z.string().regex(/^[A-Za-z0-9_-]{1,128}(?![\s\S])/),
+  createdAt: z.date(),
+});
+export async function appendRubricAudit(
+  input: z.output<typeof rubricAuditInput>,
+  session: ClientSession,
+) {
+  if (!session.inTransaction())
+    throw new Error('Rubric audit requires an active transaction');
+  const row = rubricAuditInput.parse(input);
+  await Audit.create(
+    [
+      {
+        _id: row.id,
+        category: 'CONTENT_APPROVAL',
+        action: row.action,
+        actorId: row.actorId,
+        resourceId: row.definitionId,
+        resourceType: 'PRACTICE_RUBRIC',
+        requestId: row.requestId,
+        metadata: { rubricVersion: row.rubricVersion },
+        createdAt: row.createdAt,
+      },
+    ],
+    { session },
+  );
+  return row.id;
+}
 
 type GoogleAudit = { userId: Types.ObjectId; requestId: string } & (
   | { action: 'AUTH_PROVIDER_LINKED' }

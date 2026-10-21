@@ -1309,6 +1309,16 @@ ADMIN_USER_PLAN_CHANGED
 
 Audit logs must never contain raw passwords, reset/verification tokens, refresh secrets, access tokens, Google credentials, or secret headers.
 
+F038 B2 adds narrowly typed CONTENT_APPROVAL events PRACTICE_RUBRIC_AUTHORED,
+PRACTICE_RUBRIC_APPROVED and PRACTICE_RUBRIC_REVOKED. actorId is the verified
+current Admin; resourceType is PRACTICE_RUBRIC and resourceId is the immutable
+rubric-definition id. Metadata is exactly {rubricVersion}. Independent review,
+actor/resource binding, an active transaction and provenance validation are
+mandatory. Required audit failure rolls back the associated operation; uncertain
+proof confers no authorization. Existing AUTH/USER_ADMIN fields, metadata and
+subject-equality rules remain unchanged. No sensitive text/hash logging,
+unrestricted writer, audit-read API, database WORM claim or automatic provisioning.
+
 # 26. Transaction and Atomicity Rules
 
 Most auth operations use single-document atomic updates plus carefully ordered writes.
@@ -1928,3 +1938,280 @@ Use no-store for matching GET success/errors, including early CORS/parser errors
 or submitted-answer details. The Concept panel loads independently, cancels stale
 account/Concept reads and offers explicit GET-only Retry without blocking content.
 No new deployment permission, retention/erasure API or browser verification claim.
+
+## F038 Stage A - internal completion policy foundation only
+
+No endpoint, controller, route registration, authentication strategy or public DTO
+is added by this stage. evaluateCompletionPolicy accepts bounded internal policy/
+evidence metadata and returns only eligibility plus stable allowlisted blockers.
+ELIGIBLE does not mark a Concept complete, authorize a caller, unlock an answer or
+promise that the supplied evidence is genuine. It is not a public request contract.
+No existing API calls or imports this evaluator; there is no runtime adapter.
+
+Concept-level defaults are READ, VISUALIZE, EXAMPLE and PRACTICE. VISUALIZE and
+PRACTICE cannot be removed; REVISE is optional unless required. Valid explicit
+integer minimumScore 0-100 overrides the default 70; invalid configuration never
+falls back. Finite graded scores are compared without rounding; even threshold 0
+requires a verified graded candidate and all configured sections. Ungraded F036
+attempts and F037 counts never substitute for passing evidence. Unknown sections,
+invalid/mismatched owner/Concept/policy/revision metadata or contradictory evidence
+fail closed. Output contains no answers, scores, evidence IDs or private contents.
+
+VERIFIED metadata is a trust-boundary assertion, not authentication or grading
+provenance. Future integration must approve and implement server-side evidence/
+selection verifiers, current STUDENT ownership/publication validation and fresh
+revision checks. Never accept client-asserted verification as proof. Score
+selection, configured-threshold source precedence, completion initiation,
+persistence and revocation remain unresolved; none is introduced through this
+pure module. Existing F036 LOCAL-only durable unlock and F037 five-field read-only
+activity endpoints remain unchanged. No new deployment authorization is implied.
+
+## F038 Stage B2 - internal LOCAL-only diagnostic grading
+
+The owner approved an explicitly invoked internal diagnostic grading service.
+No new HTTP endpoint, Admin UI, client rubric input, submission hook or public
+grading DTO is added. Existing access-token validation and fresh account checks
+authorize independent Admin rubric review and Student-owned attempt grading.
+Server-loaded approval provenance, exact content/rubric binding and serialized
+revocation are mandatory; approval flags alone do not authorize. All operations
+refuse outside server-configured APP_ENV=LOCAL; request flags cannot enable them.
+
+F036 unlock/receipt/secrecy/no-store contracts and F037 activity-only GET stay
+unchanged. Grade only after majority-confirmed owned submission. Internal results
+are allowlisted id, attemptId, purpose=DIAGNOSTIC, outcome, nullable score,
+nullable refusalCode and canonical evaluatedAt. No correct answer, explanation,
+rubric, fingerprint or authorization token is returned. Diagnostic results never
+establish completion eligibility or create Stage A VERIFIED evidence.
+
+Unique assessment identity, bounded transaction conflicts and majority commit/proof
+are mandatory. Uncertain commit/proof returns no result; explicit same-identity
+resolution must repeat current authorization/content/approval checks. New internal
+errors are PRACTICE_ASSESSMENT_CONFLICT (409) and
+PRACTICE_ASSESSMENT_UNCONFIRMED (503), with fixed sanitized messages. Existing
+auth/validation/hidden-resource/dependency conventions remain. No new production
+release, persistent provisioning or browser-verification claim is implied.
+
+## F038 Stage C2 - internal LOCAL-only READ activity acknowledgement
+
+The owner approved the additive internal contract proposed in F038 Section 19.
+F038 C2 provides a LOCAL-only internal READ acknowledgement service. Owned
+challenge issue, explicit acknowledgement and approved withdrawal return
+allowlisted private activity DTOs only after current authorization,
+publication/binding validation and durable proof. No public endpoint,
+comprehension claim, VERIFIED evidence or completion qualification is introduced.
+Existing public Auth/Concept/Practice/progress routes and GET secrecy remain
+unchanged. The service is not automatically invoked; database behavior awaits
+separately approved disposable integration, not production execution.
+
+Trusted server construction supplies the existing AccessTokens verifier and
+validated APP_ENV; every method refuses outside LOCAL. Current ACTIVE, verified
+STUDENT ownership is rechecked before/inside the transaction and at proof.
+Request account/hash/policy/approval flags never authorize. Exact internal commands:
+
+- issue({conceptId,idempotencyKey},requestId).
+- acknowledge({challengeId,acknowledged:true,idempotencyKey},requestId).
+- revoke({challengeId},requestId), current owner withdrawal only.
+
+Access token is a separate argument. Strict bounded command/correlation allowlists
+reject extras; lowercase ObjectIds and canonical UUID-v4 idempotency keys only.
+Issue/acknowledge require freshly published Concept and full ancestry/reference
+consistency plus exact server snapshot/policy bindings. Withdrawal can restrict an
+owned challenge even after content unpublication; it cannot authorize a new action.
+
+Issue DTO exactly: id, conceptId, section=READ, conceptRevision, sectionRevision,
+policyId, policyVersion, expiresAt. Activity receipt DTO exactly: id, conceptId,
+section=READ, acknowledgedAt, completionQualification=NOT_ESTABLISHED. Withdrawal
+DTO exactly: challengeId, state=REVOKED. Times are UTC ISO strings. Never return
+answers, content copies, account IDs, key hashes or private request provenance.
+
+Challenges have a fixed five-minute server interval. Receipt creation and one-use
+consumption are atomic, fenced against terminal withdrawal and majority-proven.
+Same-key/exact-request replay repeats current authorization/binding/owned proof;
+changed requests conflict. Even replay refuses at original expiry, after withdrawal
+or on stale content/policy. Lost responses can coexist with committed history;
+uncertainty never implies rollback or authorizes a result without proof. Snapshot
+hashes preserve exact authored text but do not provide monotonic publication history
+or prevent identical restored content from matching. No global instantaneous
+publication/account revocation guarantee is introduced.
+
+Existing sanitized auth/validation/CONCEPT_NOT_FOUND/dependency conventions apply.
+New internal errors: SECTION_CHALLENGE_NOT_FOUND (404, including unowned IDs),
+SECTION_EVIDENCE_CONFLICT and SECTION_CHALLENGE_UNAVAILABLE (409), and
+SECTION_EVIDENCE_UNCONFIRMED (503). Missing/incorrect/unverifiable exact indexes
+return DEPENDENCY_UNAVAILABLE (503); no auto-provisioning or fallback.
+There is no HTTP route or new HTTP caching/rate-limit configuration in C2.
+Future public exposure requires separate approval and applicable no-store/abuse
+controls. No grading, F036/F037 mutation, Stage A adapter, completion UI/persistence,
+production readiness or new browser verification is implied.
+
+## F038 Stage C3b - internal LOCAL-only visualization checkpoint activity
+
+F038 C3b is a LOCAL-only internal visualization checkpoint producer. Independently
+reviewed, server-loaded snapshot-bound definitions authorize owned five-minute
+challenges. Both valid correct and incorrect responses consume once and create
+majority-proven ACTIVITY_ONLY receipts. Exact replay revalidates current scope;
+no trusted completion evidence or public endpoint is introduced. This additive
+contract is approved in F038 Section 26.9; existing Auth, Concept, Practice,
+studentProgress and C2 READ commands/DTOs/errors remain unchanged.
+
+Trusted server construction supplies existing token verification, APP_ENV and
+repository/time dependencies, not command claims. Current ACTIVE, email-verified
+ADMIN author and independent ADMIN reviewer provenance are server-recorded. Their
+eligibility and the authenticated STUDENT owner are rechecked for issue/submit/
+replay, including postcommit proof. No self-approval, arbitrary Student definition,
+claimed approval flag or caller-supplied revision authorizes a checkpoint.
+
+Internal commands, with token and nonsensitive requestId as separate arguments:
+
+| Method | Exact strict body |
+| --- | --- |
+| author | {conceptId,visualizationId,checkpointId,checkpointVersion,prompt,textAlternative,choices,expectedChoiceId}; current Admin only, server computes revisions and policy. |
+| approve | {definitionId}; current independent Admin only. |
+| revokeDefinition | {definitionId}; current Admin, terminal restriction. |
+| issue | {definitionId,idempotencyKey}; current Student, server loads definition. |
+| submit | {challengeId,selectedChoiceId,idempotencyKey}; current owning Student; same-request replay uses this same command. |
+| withdraw | {challengeId}; current owning Student, terminal restriction. |
+
+Canonical ObjectIds/UUID-v4 keys, exact C3a SINGLE_CHOICE ids and bounded inert
+prompt/choice/alternative text are required. No client owner/outcome/expected-choice
+field is accepted in Student commands. Fresh published Concept ancestry/reference
+checks, current PUBLISHED visualization references and exact server Concept/
+visualization/definition/policy versions are required for new activity/replay.
+Snapshot hashes establish current equality, not publication history, absence of
+edit/restore ABA or a global fence with every content/account writer.
+
+Exact output allowlists:
+
+- Definition administration: id, state.
+- Issue: id, conceptId, visualizationId, checkpointId, checkpointVersion,
+  policyId, policyVersion, prompt, textAlternative, choices (id/label), expiresAt.
+- Receipt: id, conceptId, visualizationId, checkpointId, checkpointVersion,
+  outcome (CORRECT|INCORRECT), respondedAt, completionQualification=NOT_ESTABLISHED.
+- Withdrawal: challengeId, state=REVOKED. Dates are UTC ISO strings.
+
+The server fixes expiry to five minutes. One unexpired AVAILABLE challenge and at
+most three distinct fresh issues per account/immutable definition are permitted;
+expired/withdrawn/consumed issues count. Exact issue replay does not charge again.
+Valid correct AND incorrect responses atomically consume and create a receipt;
+invalid responses never consume. Changed-payload key reuse conflicts. Receipt
+replay requires fresh authorization/bindings, original unexpired/nonrevoked
+challenge, approved definition and exact owned majority proof. Revocation and
+withdrawal restrict future results without rewriting historical receipts.
+
+Reuse existing sanitized auth, validation, Concept and C2 challenge/conflict/
+uncertainty errors. Add VISUALIZATION_CHECKPOINT_NOT_FOUND (404, including
+unavailable definition), VISUALIZATION_CHECKPOINT_CONFLICT (409) and
+VISUALIZATION_CHECKPOINT_LIMIT (429). Missing/incorrect/unverifiable readiness is
+DEPENDENCY_UNAVAILABLE (503); uncertain commit/proof cannot return a receipt.
+Never echo private expected choices, bodies, keys or driver details in errors.
+Required outcome feedback can reveal correctness by inference; it is not a promise
+that a guessed choice's correctness stays secret. No expected-choice field is
+returned, copied into receipts or logged.
+
+Equivalent textual/native choice paths must work without playback, precise timing
+or motion; internal contract tests are not mounted accessibility evidence. There
+is no public HTTP route, UI, automatic caller, new cache middleware or production
+readiness. Future public exposure requires separately approved no-store/error and
+abuse controls. Persistent use requires privacy/retention/erasure/release approval.
+No F036 attempt, F037 progress, B2 assessment, Stage A evidence or F039 mutation.
+
+## F038 Slice 1 - LOCAL synthetic origin and atomic qualification
+
+This owner-approved internal refinement preserves the F036 route, exact request,
+five-field answer data, receipt metadata, rate limits and no-store behavior. No
+new public endpoint is introduced. It does not implement completion persistence,
+completion API/UI, Topic aggregation or F039 mastery.
+
+Qualification supports only server-created synthetic identities in the exact
+LOCAL test target. A trusted internal creator generates account, Concept and
+question IDs, performs insert-only validated writes, and confirms majority commit
+and owned creation proof before establishing origin. Existing/imported IDs,
+missing attempts, timestamps, flags and environment values cannot establish origin.
+
+The module-private, nonserializable in-memory registry binds actual database/client
+generation, owner, Concept, question, current reviewed policy/rubric and revisions.
+Reconnect, restart, disposal or uncertain lifecycle invalidates origin permanently;
+stored epochs cannot restore it. Runtime supervisor attestation is not required
+under the explicit Option B replacement. Disposable integration still requires
+the existing external native-handle/Job ownership and cleanup safeguards.
+
+Only an independently reviewed current 70% Concept policy is supported.
+Concept > Topic > Learning Path > default 70 precedence remains canonical, but
+unsupported inheritance is inactive: absent/invalid/revoked Concept authority
+cannot silently activate a lower policy or default qualification.
+
+For the original first eligible OUTPUT submission, immutable F036 attempt,
+distinct COMPLETION_INPUT assessment and existing F037 activity update commit in
+one bounded majority+journal transaction. Both exact owned proofs and current
+authorization/content bindings precede disclosure. Every prior committed attempt
+is possible exposure, including a lost response. Historical/unknown-origin
+attempts and reveal-assisted later submissions cannot qualify. Exact replay never
+creates a missing assessment; changed requests conflict. Loss of origin refuses
+qualification and recovery of its first qualifying unlock rather than recreating
+authority from storage. Ordinary later Practice attempts remain ungraded,
+unlimited and separate from qualification.
+
+B2 DIAGNOSTIC records are unchanged and are never automatically promoted.
+The binary assessment is genuine exact-text CORRECT/100 or INCORRECT/0; no
+invalid input receives a fabricated score. No completion state is written.
+This establishes application disclosure ordering, not protection against external
+copying, prior human knowledge or privileged server/database tampering.
+
+## F038 Slice 2 - LOCAL durable Concept completion and Student APIs
+
+F038 Slice 2 adds only the four LOCAL authenticated Student completion routes
+specified in F038 Section 32.4. Authority is server-established, generation-bound
+synthetic origin under accepted Option B, not physical storage attestation.
+Current policy-bound owned actions and the original qualifying assessment precede
+explicit durable Concept completion. Exact DTOs, validation, no-store and rate
+limits are as Section 32.4; F037 activity GET and F036 submission/answer contracts
+remain unchanged. This is a partial LOCAL foundation, not Slice 3 UI, Topic
+aggregation, F039 mastery or production readiness.
+
+| Method and route | Strict input | Successful data |
+| --- | --- | --- |
+| GET /api/v1/progress/completion | Scalar conceptId query; no body. | Nine-field completion view. |
+| POST /api/v1/progress/completion/:conceptId/challenges | Empty query; body {section}; one canonical UUID-v4 Idempotency-Key. | {section,challenge}; exact existing producer issue DTO. |
+| POST /api/v1/progress/completion/:conceptId/responses | Empty query/key as above; body {challengeId,acknowledged:true} or {challengeId,selectedChoiceId}. | {section,receipt}; existing ACTIVITY_ONLY/NOT_ESTABLISHED DTO. |
+| POST /api/v1/progress/completion/:conceptId/complete | Empty query/key as above; body {viewRevision}. | Current nine-field COMPLETED view only after majority-owned proof. |
+
+The view allowlist is exactly conceptId,viewRevision,requiredSections,sections,
+practice,eligibility,blockers,completion,visualization. Nested fields/enums are
+exactly F038 30.6/32.4: section/status pairs, practice
+{questionId,type,status,score,minimumScore}, completion {status,completedAt}, and
+null or visualization {id,graph}. Graph is bounded authored F026/F027 data, not
+private checkpoint fields. Unproven score is null, not guessed zero. viewRevision
+hashes only public safe source/configuration; it is not an authority credential.
+No submitted/correct answer, private rubric, account ID, private fingerprint,
+approval metadata, raw key or internal record is returned. No public Admin,
+assessment, withdrawal or attempt-history route is added.
+
+Require current ACTIVE, email-verified STUDENT, published full ancestry, live
+owned synthetic scope and an independently approved current 70% Concept policy.
+Unsupported Topic/Path inheritance and historical/exposure-unknown qualification
+remain unavailable. Required Read/Example/conditional Revise acknowledgements and
+correct authorized Visualize interaction qualify only through the trusted adapter;
+they do not prove comprehension or change producer NOT_ESTABLISHED claims.
+Practice uses the original pre-disclosure qualifying assessment, never activity
+counts, ungraded attempts or B2 DIAGNOSTIC promotion.
+
+All four paths use no-store, including applicable early CORS/parser/validation/
+authentication errors. Exact new POST paths accept at most 4 KiB uncompressed
+JSON with streamed bounds; global 256 KiB parsing and unrelated routes remain
+unchanged. Reject extra fields, duplicate key headers, query arrays, unsupported
+media/encodings and caller authority/score/definition claims. Completion GET shares
+existing 300/IP and 120/subject per 15 minutes with activity GET. Completion POSTs
+share 30/subject per 15 minutes plus the IP guard; replays count. Existing Practice
+limits and security/CORS behavior are unchanged.
+
+Preserve existing envelopes and fixed sanitized errors. Add only 409
+COMPLETION_INELIGIBLE, COMPLETION_VIEW_CHANGED, COMPLETION_IDEMPOTENCY_CONFLICT,
+COMPLETION_RECEIPT_UNAVAILABLE and 503 COMPLETION_COMMIT_UNCONFIRMED. Missing or
+unverifiable dependencies/indexes return sanitized 503. Safe allowlisted blockers
+are obtained through GET, not a new error-details format. No body/key/answer or
+driver-detail logging. GET never repairs data; stale/revoked claims cannot assert
+current completion. Exact replay revalidates original owned request/decision and
+current sources; superseded decisions cannot be resurrected with an old key.
+Loss of a response does not prove rollback. Browser/release acceptance, privacy,
+retention/erasure, real-person enrollment/migration and persistent provisioning
+remain separately approved prerequisites.

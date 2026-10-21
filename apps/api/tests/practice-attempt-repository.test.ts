@@ -9,14 +9,18 @@ import {
 import type { ProgressRecord } from '../src/modules/progress/progress.model.js';
 import {
   createPracticeAttemptRepository,
+  createPracticeAttemptCoordination,
+  practiceAttemptCoordination,
   verifyAttemptIndexes,
   type AttemptStore,
+  type PracticeAttemptCoordination,
 } from '../src/modules/practice/practice-attempt.repository.js';
 import {
   attemptIndexes,
   type AttemptRecord,
 } from '../src/modules/practice/practice-attempt.model.js';
 import type { QualifiedPractice } from '../src/modules/practice/practice.dto.js';
+import { AppError } from '../src/common/errors/app-error.js';
 const user = 'a'.repeat(24),
   question = 'b'.repeat(24),
   concept = 'c'.repeat(24);
@@ -27,7 +31,7 @@ const input = {
   questionRevision: 'd'.repeat(64),
   idempotencyKey: '11111111-1111-4111-8111-111111111111',
 };
-function fixture() {
+function fixture(coordination: PracticeAttemptCoordination | null = null) {
   const state = {
     rows: [] as AttemptRecord[],
     pending: [] as AttemptRecord[],
@@ -184,7 +188,12 @@ function fixture() {
   return {
     state,
     store,
-    repo: createPracticeAttemptRepository(store, () => state.now),
+    repo: createPracticeAttemptRepository(
+      store,
+      () => state.now,
+      null,
+      coordination,
+    ),
   };
 }
 test('majority commit, exact owned proof and fresh publication precede five-field disclosure', async () => {
@@ -547,4 +556,631 @@ test('missing progress readiness and summary failure cannot partially commit or 
     ok.state.events.filter((event) => event === 'summary').length,
     1,
   );
+});
+
+function coordinationFixture() {
+  const state = { local: true, client: {}, database: {}, live: true };
+  const listeners = new Set<() => void>();
+  const timers: { run(): void; ms: number; active: boolean }[] = [];
+  const gate = createPracticeAttemptCoordination(
+    {
+      local: () => state.local,
+      generation: () => state,
+      onLoss(invalidate) {
+        listeners.add(invalidate);
+        return () => {
+          listeners.delete(invalidate);
+        };
+      },
+    },
+    (run, ms) => {
+      const timer = { run, ms, active: true };
+      timers.push(timer);
+      return () => {
+        timer.active = false;
+      };
+    },
+  );
+  return {
+    gate,
+    state,
+    listeners,
+    timers,
+    lose() {
+      for (const listener of [...listeners]) listener();
+    },
+    fire(index: number) {
+      const timer = timers[index]!;
+      if (timer.active) {
+        timer.active = false;
+        timer.run();
+      }
+    },
+  };
+}
+const gateKey = '1'.repeat(64),
+  gateFingerprint = '2'.repeat(64),
+  fullBudget = () => 10_000;
+function deferred() {
+  let resolve!: () => void;
+  const promise = new Promise<void>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+async function until(check: () => boolean) {
+  for (let i = 0; i < 40 && !check(); i++) await Promise.resolve();
+  assert(
+    check(),
+    'bounded microtask observation did not reach the expected stage',
+  );
+}
+function pausedProof(coordination: PracticeAttemptCoordination) {
+  const f = fixture(coordination),
+    reached = deferred(),
+    resume = deferred(),
+    original = f.store.proof;
+  let reads = 0;
+  f.store.proof = async (...args) => {
+    if (++reads === 1) {
+      reached.resolve();
+      await resume.promise;
+    }
+    return original(...args);
+  };
+  return { ...f, reached, resume, reads: () => reads };
+}
+
+test('LOCAL same-key permits are FIFO, serialize replays and contain no cached result', async () => {
+  const f = coordinationFixture(),
+    leader = await f.gate.enter(user, gateKey, gateFingerprint, fullBudget);
+  assert(leader);
+  assert.equal(leader.replayOnly, false);
+  const order: number[] = [];
+  const first = f.gate
+    .enter(user, gateKey, gateFingerprint, fullBudget)
+    .then((p) => {
+      order.push(1);
+      return p!;
+    });
+  const second = f.gate
+    .enter(user, gateKey, gateFingerprint, fullBudget)
+    .then((p) => {
+      order.push(2);
+      return p!;
+    });
+  assert.deepEqual(order, []);
+  leader.finish(true);
+  const a = await first;
+  assert.deepEqual(order, [1]);
+  assert.equal(a.replayOnly, true);
+  assert.throws(() => leader.assert(), { code: 'DEPENDENCY_UNAVAILABLE' });
+  a.finish(true);
+  const b = await second;
+  assert.deepEqual(order, [1, 2]);
+  assert.equal(b.replayOnly, true);
+  assert.deepEqual(Object.keys(b).sort(), ['assert', 'finish', 'replayOnly']);
+  assert.equal(JSON.stringify(b), '{"replayOnly":true}');
+  b.finish(true);
+  assert.equal(f.listeners.size, 0);
+  assert(f.timers.every((timer) => !timer.active));
+});
+
+test('same account/key changed fingerprint conflicts while other accounts and keys are isolated', async () => {
+  const f = coordinationFixture(),
+    leader = await f.gate.enter(user, gateKey, gateFingerprint, fullBudget);
+  assert(leader);
+  await assert.rejects(
+    f.gate.enter(user, gateKey, '3'.repeat(64), fullBudget),
+    { code: 'PRACTICE_IDEMPOTENCY_CONFLICT', statusCode: 409 },
+  );
+  const otherAccount = await f.gate.enter(
+      'f'.repeat(24),
+      gateKey,
+      gateFingerprint,
+      fullBudget,
+    ),
+    otherKey = await f.gate.enter(
+      user,
+      '4'.repeat(64),
+      gateFingerprint,
+      fullBudget,
+    );
+  assert(otherAccount && otherKey);
+  assert.equal(otherAccount.replayOnly, false);
+  assert.equal(otherKey.replayOnly, false);
+  assert.equal(f.timers.length, 0);
+  leader.finish(true);
+  otherAccount.finish(true);
+  otherKey.finish(true);
+  assert.equal(f.listeners.size, 0);
+});
+
+test('coordination enforces 100 active keys across generations and releases capacity', async () => {
+  const f = coordinationFixture();
+  const leaders = [];
+  for (let i = 0; i < 100; i++)
+    leaders.push(
+      (await f.gate.enter(
+        user,
+        i.toString(16).padStart(64, '0'),
+        gateFingerprint,
+        fullBudget,
+      ))!,
+    );
+  await assert.rejects(
+    f.gate.enter(user, 'f'.repeat(64), gateFingerprint, fullBudget),
+    { code: 'DEPENDENCY_UNAVAILABLE', statusCode: 503 },
+  );
+  f.lose();
+  f.state.client = {};
+  f.state.database = {};
+  await assert.rejects(
+    f.gate.enter(user, 'f'.repeat(64), gateFingerprint, fullBudget),
+    { code: 'DEPENDENCY_UNAVAILABLE' },
+  );
+  leaders.shift()!.finish(false);
+  const next = await f.gate.enter(
+    user,
+    'f'.repeat(64),
+    gateFingerprint,
+    fullBudget,
+  );
+  assert(next);
+  for (const leader of leaders) leader.finish(false);
+  next.finish(true);
+  assert.equal(f.listeners.size, 0);
+});
+
+test('coordination admits at most ten queued followers and rejects overflow deterministically', async () => {
+  const f = coordinationFixture(),
+    leader = await f.gate.enter(user, gateKey, gateFingerprint, fullBudget);
+  assert(leader);
+  const failures = Array.from({ length: 10 }, () =>
+    assert.rejects(f.gate.enter(user, gateKey, gateFingerprint, fullBudget), {
+      code: 'PRACTICE_COMMIT_UNCONFIRMED',
+    }),
+  );
+  await assert.rejects(
+    f.gate.enter(user, gateKey, gateFingerprint, fullBudget),
+    {
+      code: 'DEPENDENCY_UNAVAILABLE',
+    },
+  );
+  assert.equal(f.timers.length, 10);
+  leader.finish(false);
+  await Promise.all(failures);
+  assert(f.timers.every((timer) => !timer.active));
+  assert.equal(f.listeners.size, 0);
+});
+
+test('deadline detaches only its follower and stale admission cannot spend the proof reserve', async () => {
+  const f = coordinationFixture(),
+    leader = await f.gate.enter(user, gateKey, gateFingerprint, fullBudget);
+  assert(leader);
+  let remaining = 2300;
+  const timedOut = assert.rejects(
+    f.gate.enter(user, gateKey, gateFingerprint, () => remaining),
+    { code: 'DEPENDENCY_UNAVAILABLE' },
+  );
+  assert.equal(f.timers[0]!.ms, 300);
+  remaining = 2000;
+  f.fire(0);
+  await timedOut;
+  leader.assert();
+  const expired = assert.rejects(
+    f.gate.enter(user, gateKey, gateFingerprint, () => remaining + 1),
+    { code: 'DEPENDENCY_UNAVAILABLE' },
+  );
+  const valid = f.gate.enter(user, gateKey, gateFingerprint, fullBudget);
+  remaining = 1999;
+  leader.finish(true);
+  await expired;
+  const follower = await valid;
+  assert(follower?.replayOnly);
+  follower.finish(true);
+  assert.equal(f.listeners.size, 0);
+});
+
+test('nonlocal, malformed, unavailable or unverifiable coordination contexts cannot grant a permit', async () => {
+  const f = coordinationFixture();
+  f.state.local = false;
+  assert.equal(
+    await f.gate.enter(user, gateKey, gateFingerprint, fullBudget),
+    null,
+  );
+  assert.equal(f.listeners.size, 0);
+  f.state.local = true;
+  for (const remaining of [
+    0,
+    2000,
+    Number.NaN,
+    Number.POSITIVE_INFINITY,
+    10_001,
+  ])
+    await assert.rejects(
+      f.gate.enter(user, gateKey, gateFingerprint, () => remaining),
+      {
+        code: 'DEPENDENCY_UNAVAILABLE',
+      },
+    );
+  await assert.rejects(
+    f.gate.enter(user + '\n', gateKey, gateFingerprint, fullBudget),
+    {
+      code: 'DEPENDENCY_UNAVAILABLE',
+    },
+  );
+  f.state.live = false;
+  await assert.rejects(
+    f.gate.enter(user, gateKey, gateFingerprint, fullBudget),
+    {
+      code: 'DEPENDENCY_UNAVAILABLE',
+    },
+  );
+  const unavailable = createPracticeAttemptCoordination({
+    local: () => true,
+    generation() {
+      throw Error('private context');
+    },
+    onLoss() {
+      throw Error('must not subscribe');
+    },
+  });
+  await assert.rejects(
+    unavailable.enter(user, gateKey, gateFingerprint, fullBudget),
+    {
+      code: 'DEPENDENCY_UNAVAILABLE',
+      message: 'Practice submission unavailable',
+    },
+  );
+  assert.equal(f.listeners.size, 0);
+});
+
+test('runtime coordination honors the existing LOCAL default and never opens a database connection', async () => {
+  if ((process.env.APP_ENV ?? 'LOCAL') === 'LOCAL')
+    await assert.rejects(
+      practiceAttemptCoordination.enter(
+        user,
+        gateKey,
+        gateFingerprint,
+        fullBudget,
+      ),
+      { code: 'DEPENDENCY_UNAVAILABLE' },
+    );
+  else
+    assert.equal(
+      await practiceAttemptCoordination.enter(
+        user,
+        gateKey,
+        gateFingerprint,
+        fullBudget,
+      ),
+      null,
+    );
+});
+
+test('generation loss rejects old waiters and permits permanently without leaking into a new generation', async () => {
+  const f = coordinationFixture(),
+    leader = await f.gate.enter(user, gateKey, gateFingerprint, fullBudget);
+  assert(leader);
+  const failed = assert.rejects(
+    f.gate.enter(user, gateKey, gateFingerprint, fullBudget),
+    {
+      code: 'PRACTICE_COMMIT_UNCONFIRMED',
+    },
+  );
+  f.lose();
+  await failed;
+  assert.throws(() => leader.assert(), { code: 'DEPENDENCY_UNAVAILABLE' });
+  // Even if the driver retains client/Db object identities, the old domain is terminal.
+  const next = await f.gate.enter(user, gateKey, gateFingerprint, fullBudget);
+  assert(next && !next.replayOnly);
+  leader.finish(true);
+  next.assert();
+  next.finish(true);
+  assert.equal(f.listeners.size, 0);
+});
+
+test('changed actual database identity refuses stale permits even without a delivered loss event', async () => {
+  const f = coordinationFixture(),
+    leader = await f.gate.enter(user, gateKey, gateFingerprint, fullBudget);
+  assert(leader);
+  const failed = assert.rejects(
+    f.gate.enter(user, gateKey, gateFingerprint, fullBudget),
+    {
+      code: 'PRACTICE_COMMIT_UNCONFIRMED',
+    },
+  );
+  f.state.database = {};
+  assert.throws(() => leader.assert(), { code: 'DEPENDENCY_UNAVAILABLE' });
+  await failed;
+  const next = await f.gate.enter(user, gateKey, gateFingerprint, fullBudget);
+  assert(next);
+  leader.finish(false);
+  next.finish(true);
+  assert.equal(f.listeners.size, 0);
+});
+
+test('coordinated identical submissions each verify owned proof and never reuse the leader result', async () => {
+  const coordination = coordinationFixture(),
+    f = pausedProof(coordination.gate),
+    first = f.repo.submit(user, input);
+  await f.reached.promise;
+  const second = f.repo.submit(user, input);
+  await until(() => coordination.timers.length === 1);
+  f.resume.resolve();
+  const [a, b] = await Promise.all([first, second]);
+  assert.deepEqual(a, b);
+  assert.notEqual(a, b);
+  assert.equal(f.reads(), 2);
+  assert.equal(f.state.rows.length, 1);
+  assert.equal(f.state.events.filter((event) => event === 'summary').length, 1);
+  assert.equal(f.state.events.filter((event) => event === 'fresh').length, 2);
+  assert.equal(f.state.events.filter((event) => event === 'closed').length, 2);
+  assert.equal(coordination.listeners.size, 0);
+});
+
+test('queued requests retain their original elapsed budget when beginning the replay transaction', async () => {
+  const coordination = coordinationFixture(),
+    f = pausedProof(coordination.gate),
+    first = f.repo.submit(user, input);
+  await f.reached.promise;
+  let followerNow = 0;
+  const followerRepo = createPracticeAttemptRepository(
+    f.store,
+    () => followerNow,
+    null,
+    coordination.gate,
+  );
+  const second = followerRepo.submit(user, input);
+  await until(() => coordination.timers.length === 1);
+  followerNow = 6000;
+  f.resume.resolve();
+  await Promise.all([first, second]);
+  assert.equal(f.state.options.timeoutMS, 2000);
+  assert.equal(f.state.options.maxCommitTimeMS, 2000);
+  assert.equal(f.state.rows.length, 1);
+});
+
+test('timed-out repository follower detaches without cancelling its leader or starting a session', async () => {
+  const coordination = coordinationFixture(),
+    f = pausedProof(coordination.gate),
+    first = f.repo.submit(user, input);
+  await f.reached.promise;
+  let followerNow = 0;
+  const repo = createPracticeAttemptRepository(
+    f.store,
+    () => followerNow,
+    null,
+    coordination.gate,
+  );
+  const rejected = assert.rejects(repo.submit(user, input), {
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
+  await until(() => coordination.timers.length === 1);
+  followerNow = 8000;
+  coordination.fire(0);
+  await rejected;
+  assert.equal(f.reads(), 1);
+  f.resume.resolve();
+  await first;
+  assert.equal(f.state.rows.length, 1);
+  assert.equal(f.state.events.filter((event) => event === 'closed').length, 1);
+});
+
+test('leader failure, uncertain commit and cleanup failure reject all queued followers without takeover', async () => {
+  for (const fault of ['insert', 'unknown', 'cleanup'] as const) {
+    const coordination = coordinationFixture(),
+      f = fixture(coordination.gate),
+      reached = deferred(),
+      resume = deferred(),
+      insert = f.store.insert;
+    f.store.insert = async (...args) => {
+      reached.resolve();
+      await resume.promise;
+      if (fault === 'insert') throw Error('private transaction failure');
+      return insert(...args);
+    };
+    f.state.unknownCommit = fault === 'unknown';
+    f.state.cleanupFault = fault === 'cleanup';
+    const first = assert.rejects(f.repo.submit(user, input), {
+      code:
+        fault === 'insert'
+          ? 'DEPENDENCY_UNAVAILABLE'
+          : 'PRACTICE_COMMIT_UNCONFIRMED',
+    });
+    await reached.promise;
+    const second = assert.rejects(f.repo.submit(user, input), {
+      code: 'PRACTICE_COMMIT_UNCONFIRMED',
+    });
+    await until(() => coordination.timers.length === 1);
+    resume.resolve();
+    await Promise.all([first, second]);
+    assert.equal(
+      f.state.events.filter((event) => event === 'insert').length,
+      fault === 'insert' ? 0 : 1,
+    );
+    assert.equal(
+      f.state.events.filter((event) => event === 'closed').length,
+      1,
+    );
+    assert.equal(coordination.listeners.size, 0);
+    assert(coordination.timers.every((timer) => !timer.active));
+  }
+});
+
+test('followers recheck publication, revisions and solution binding and never replace a missing original', async () => {
+  for (const fault of [
+    'publication',
+    'revision',
+    'solution',
+    'missing',
+  ] as const) {
+    const coordination = coordinationFixture(),
+      f = pausedProof(coordination.gate),
+      ready = f.store.ready;
+    let readiness = 0;
+    f.store.ready = async (...args) => {
+      await ready(...args);
+      if (++readiness === 3) {
+        if (fault === 'publication') f.state.content = null;
+        else if (fault === 'revision')
+          f.state.content!.questionRevision = 'f'.repeat(64);
+        else if (fault === 'solution')
+          f.state.content!.contentFingerprint = 'f'.repeat(64);
+        else f.state.rows.length = 0;
+      }
+    };
+    const first = f.repo.submit(user, input);
+    await f.reached.promise;
+    const second = assert.rejects(f.repo.submit(user, input), {
+      code:
+        fault === 'publication'
+          ? 'CONCEPT_NOT_FOUND'
+          : fault === 'missing'
+            ? 'PRACTICE_COMMIT_UNCONFIRMED'
+            : 'PRACTICE_QUESTION_CHANGED',
+    });
+    await until(() => coordination.timers.length === 1);
+    f.resume.resolve();
+    await Promise.all([first, second]);
+    assert.equal(
+      f.state.events.filter((event) => event === 'insert').length,
+      1,
+    );
+    assert.equal(f.reads(), 1);
+  }
+});
+
+test('coordinated followers independently invoke qualifying authority and assessment proof, including refusal', async () => {
+  for (const fault of ['none', 'authority', 'proof'] as const) {
+    const coordination = coordinationFixture(),
+      f = pausedProof(coordination.gate),
+      replays: boolean[] = [];
+    let proofs = 0;
+    const repo = createPracticeAttemptRepository(
+      f.store,
+      () => f.state.now,
+      {
+        async before() {},
+        async record(_attempt, replay) {
+          replays.push(replay);
+          if (replay && fault === 'authority')
+            throw new AppError(
+              503,
+              'DEPENDENCY_UNAVAILABLE',
+              'Authority unavailable',
+            );
+          return undefined;
+        },
+        async proof() {
+          if (++proofs === 2 && fault === 'proof')
+            throw new AppError(
+              503,
+              'DEPENDENCY_UNAVAILABLE',
+              'Proof unavailable',
+            );
+        },
+      },
+      coordination.gate,
+    );
+    const first = repo.submit(user, input);
+    await f.reached.promise;
+    const following = repo.submit(user, input);
+    const second =
+      fault === 'none'
+        ? following
+        : assert.rejects(following, { code: 'DEPENDENCY_UNAVAILABLE' });
+    await until(() => coordination.timers.length === 1);
+    f.resume.resolve();
+    await Promise.all([first, second]);
+    assert.deepEqual(replays, [false, true]);
+    assert.equal(proofs, fault === 'authority' ? 1 : 2);
+    assert.equal(f.state.rows.length, 1);
+    assert.equal(
+      f.state.events.filter((event) => event === 'summary').length,
+      1,
+    );
+    assert.equal(coordination.listeners.size, 0);
+  }
+});
+
+test('followers perform their own majority ownership proof and fail closed on mismatched proof', async () => {
+  const coordination = coordinationFixture(),
+    f = pausedProof(coordination.gate),
+    proof = f.store.proof;
+  let calls = 0;
+  f.store.proof = async (...args) => (++calls === 2 ? null : proof(...args));
+  const first = f.repo.submit(user, input);
+  await f.reached.promise;
+  const second = assert.rejects(f.repo.submit(user, input), {
+    code: 'PRACTICE_COMMIT_UNCONFIRMED',
+  });
+  await until(() => coordination.timers.length === 1);
+  f.resume.resolve();
+  await Promise.all([first, second]);
+  assert.equal(calls, 2);
+  assert.equal(f.state.rows.length, 1);
+});
+
+test('followers revalidate current qualification authority after waiting and before replay', async () => {
+  const coordination = coordinationFixture(),
+    f = pausedProof(coordination.gate);
+  let ready = 0;
+  const repo = createPracticeAttemptRepository(
+    f.store,
+    () => f.state.now,
+    {
+      async before() {
+        if (++ready === 3)
+          throw new AppError(403, 'AUTH_FORBIDDEN', 'Current Student required');
+      },
+      async record() {
+        return undefined;
+      },
+      async proof() {},
+    },
+    coordination.gate,
+  );
+  const first = repo.submit(user, input);
+  await f.reached.promise;
+  const second = assert.rejects(repo.submit(user, input), {
+    code: 'AUTH_FORBIDDEN',
+  });
+  await until(() => coordination.timers.length === 1);
+  f.resume.resolve();
+  await Promise.all([first, second]);
+  assert.equal(ready, 3);
+  assert.equal(f.reads(), 1);
+});
+
+test('loss during an active proof prevents leader disclosure and rejects its queued follower', async () => {
+  const coordination = coordinationFixture(),
+    f = pausedProof(coordination.gate),
+    first = assert.rejects(f.repo.submit(user, input), {
+      code: 'DEPENDENCY_UNAVAILABLE',
+    });
+  await f.reached.promise;
+  const second = assert.rejects(f.repo.submit(user, input), {
+    code: 'PRACTICE_COMMIT_UNCONFIRMED',
+  });
+  await until(() => coordination.timers.length === 1);
+  coordination.lose();
+  await second;
+  f.resume.resolve();
+  await first;
+  assert.equal(f.state.rows.length, 1);
+  assert.equal(coordination.listeners.size, 0);
+});
+
+test('coordination does not reset or bypass the existing three-work-body guard', async () => {
+  const coordination = coordinationFixture(),
+    f = fixture(coordination.gate);
+  f.state.bodyRuns = 4;
+  await assert.rejects(f.repo.submit(user, input), {
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
+  assert.equal(f.state.events.filter((event) => event === 'insert').length, 3);
+  assert.equal(f.state.rows.length, 0);
+  assert.equal(coordination.listeners.size, 0);
 });

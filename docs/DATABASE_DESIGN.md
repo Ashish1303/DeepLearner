@@ -63,6 +63,9 @@ erDiagram
 | Learning content | `practiceQuestions` | Coding, output, descriptive and scenario questions. |
 | Learning content | `interviewQuestions` | Dedicated interview Q&A content. |
 | Student learning | `practiceAttempts` | Immutable submitted practice attempts. |
+| Learning content | `practiceRubricVersions` | F038 B2 private immutable OUTPUT rubric definitions; internal diagnostic grading only. |
+| Content operations | `practiceRubricAuthorities` | F038 B2 independent review provenance, terminal revocation and transactional decision fence. |
+| Student learning | `practiceAssessments` | F038 B2 private append-only DIAGNOSTIC results linked to owned attempts; never completion evidence. |
 | Student learning | `studentProgress` | One summarized progress document per student + concept. |
 | Student learning | `studentNotes` | Private concept-linked notes. |
 | Student learning | `bookmarks` | Polymorphic bookmarks for concepts/topics/interview questions. |
@@ -418,6 +421,13 @@ or arbitrary JSON substitute. No grading, attempts, publishing or UI is implemen
 - **`contentReports`** — Reporter, resource type/id, reason, details, status, reviewer/admin resolution and timestamps.
 - **`contentApprovals`** — Resource type/id, action (`SUBMIT_REVIEW`, `REQUEST_CHANGES`, `APPROVE`, `PUBLISH`, `ARCHIVE`), actor, optional comment, timestamp.
 - **`auditLogs`** — Actor, action, resource, request correlation id, sanitized metadata and timestamp. Append-only from application perspective.
+
+F038 B2 extends existing auditLogs with CONTENT_APPROVAL rubric authored/approved/
+revoked events. Actor is the verified current Admin; resource is the immutable
+rubric definition; metadata is exactly {rubricVersion}. Preserve existing Auth/
+User subject and metadata rules through separate strict event discrimination.
+Required approval/revocation audit writes share the domain transaction; failure
+rolls back, and uncertain proof grants no authority. No generic logging/read API.
 - **`subscriptions`** — Future-ready collection for payment-provider state. Do not create payment logic in V1; user.plan remains sufficient during development.
 
 ## 8. Index Strategy
@@ -593,6 +603,20 @@ Indexes should be created intentionally from real query patterns. Do not index e
 | `{ userId: 1, createdAt: -1 }` | standard | User event correlation when necessary. |
 | `{ conceptId: 1, eventType: 1, createdAt: -1 }` | sparse | Content analytics. |
 
+### F038 B2 diagnostic indexes
+
+| Collection / name | Exact ordered key | Constraint |
+| --- | --- | --- |
+| practiceRubricVersions / uq_practice_rubric_version | {rubricId:1,version:1} | UNIQUE |
+| practiceRubricAuthorities / uq_practice_rubric_authority | {rubricId:1,version:1} | UNIQUE |
+| practiceAssessments / uq_practice_assessment_identity | {userId:1,attemptId:1,rubricId:1,rubricVersion:1,graderId:1,graderVersion:1} | UNIQUE |
+
+Default _id indexes also apply. B2 requires the exact name, ordered key, unique=true
+and v=2 with no additional options; missing/incorrect/unverifiable readiness fails
+closed. No automatic collection/index creation. Provision only under separately
+approved, verified disposable integration; no persistent provisioning authority.
+No new audit index, completion/history/analytics consumer or migration is added.
+
 ## 9. Key Query Patterns
 - **Published learning tree:** Load published paths/modules/topics/concepts in ordered batches using parent ID + status + order indexes. Avoid one giant nested document.
 - **Open a concept:** Fetch concept by topicId + slug (or _id), then fetch published visualizations and practice questions in parallel.
@@ -609,6 +633,14 @@ Use transactions only when multiple MongoDB writes must succeed or fail together
 - Publish content: change content status/publication metadata + append required approval/audit record when strict workflow consistency is required.
 - Badge award: create studentBadges + notification when duplicate awards must be prevented consistently.
 - Password reset completion: update password hash + revoke active sessions + mark token used, if implemented across multiple documents.
+
+F038 B2 keeps these workflows unchanged. Draft/approval/revocation and required
+rubric audit records commit together. Diagnostic grading/replay and revocation
+conditionally write the same approval-authority fence; a snapshot read alone is
+insufficient. New assessment plus fence write is atomic, with exact unique
+identity, bounded retries, majority+journal commit and owned majority proof.
+Audit/fence/assessment failure rolls back; uncertain outcome returns no result.
+No B2 transaction updates F036 attempts, F037 progress or completion/mastery.
 Do **not** use a MongoDB transaction to coordinate S3. Use an application-level state machine (`PENDING → READY`), idempotency, and cleanup for orphaned objects.
 
 ## 11. Practice Attempt + Progress Algorithm
@@ -975,3 +1007,450 @@ validated; privileged database administration is not database WORM. These privat
 LOCAL summaries have no TTL, promised retention, public export/delete or erasure
 workflow. Retention, backups, coordinated erasure and production release need
 separate approval. No F038 completion or F039 mastery behavior is implemented.
+
+## F038 Stage A - completion policy semantics, no storage changes
+
+The owner approves Concept-level pure candidate eligibility only. Default required
+sections are READ, VISUALIZE, EXAMPLE and PRACTICE; VISUALIZE/PRACTICE are mandatory
+minimums, with REVISE required only by explicit configuration. This preserves PRD
+§14's minimum conditions for this Concept-level candidate policy; Topic-level
+completion and aggregation remain unimplemented. This reconciles the canonical
+Concept policy example. There is no Topic aggregation or mastery rule.
+A valid explicitly supplied integer threshold 0-100 overrides default 70; a verified
+graded candidate must meet it. Missing, ungraded, contradictory or
+revision-mismatched metadata cannot establish eligibility. Actual evidence
+authenticity and current-revision verification require future trusted integration.
+F036 score:null and F037 activity counts remain insufficient.
+
+These are in-memory evaluator input semantics, not new Concept.completionRules
+storage, section-tracking documents, assessments or completed-state fields. Current
+models/indexes, immutable attempts and studentProgress schema/version/status are
+unchanged. No migration, historical promotion, backfill, index provisioning,
+transaction or database access occurs. F021's persisted completionRules deferral
+and F037's exact summary/index/readiness contract remain in place.
+
+Future verified evidence/grading requires separate owner-approved producers and
+storage/privacy rules, including treatment of immutable attempts without overwriting
+null scores. First/latest/best selection, evidence coverage, policy/Concept revision
+generation/invalidation, manual/automatic initiation and revocation are unresolved.
+studentProgress remains the canonical target summary described by Database Design
+§12. A separate completion record is only a proposed alternative and requires
+explicit owner approval before adoption. Completion persistence must separately
+decide compatibility, concurrency/idempotency and disposable database
+verification. No such storage architecture is silently chosen here. Retention,
+erasure, account deletion and backups must be reviewed before new private data is
+stored or deployed. A Stage A PASS is not end-to-end F038 or production acceptance.
+
+## F038 Stage B2 - private rubric authority and diagnostic assessment refinement
+
+The owner-approved B2 architecture adds the declared models below. Physical
+provisioning and live MongoDB verification remain separately gated; model presence
+is not proof of live transactions or production readiness. studentProgress remains
+the canonical completion summary; F037 remains activity-only and F036 attempts
+remain immutable SUBMITTED/null-score records. practiceQuestions.evaluation stays
+deferred. No completion persistence, grading-driven answer disclosure or F039 work.
+
+### practiceRubricVersions
+
+Strict schemaVersion=1, insert-only bodies, explicit reviewed OUTPUT literals.
+Editing creates a new version; absence of approval authority means draft only.
+
+| Fields | Contract |
+| --- | --- |
+| _id, rubricId, questionId, conceptId, authorId | Required server-owned ObjectIds; _id identifies the immutable definition, rubricId the version family. Author derives from authenticated current Admin. |
+| version | Positive safe integer; server-assigned within the rubric family, never latest/best selection for grading. |
+| type | OUTPUT only. |
+| questionRevision, contentFingerprint | Exact private stored bindings to the current F036 public revision and private solution/reference fingerprint. Canonical lowercase 64-hex strings. |
+| answerForm, comparison, normalization | Explicit TEXT, EXACT_TEXT, NONE. No implicit extraction from official Markdown. |
+| expectedAnswer | Private verbatim nonblank well-formed Unicode string, 1-10,000 UTF-16 units; no execution or normalization. |
+| definitionFingerprint | Private SHA-256 binding of the exact reviewed definition, not a signature or permission. |
+| createdAt, schemaVersion | Server UTC Date; literal 1. |
+
+Definition digest is UTF-8 JSON of this ordered array, with canonical lowercase id
+strings and no text normalization:
+["F038-rubric-v1",rubricId,version,questionId,conceptId,"OUTPUT",questionRevision,
+contentFingerprint,"TEXT","EXACT_TEXT","NONE",expectedAnswer,authorId]. Lifecycle
+timestamps are outside the content digest. Definitions are not client-authorized
+by possessing matching values; only authenticated independent review can approve.
+
+### practiceRubricAuthorities
+
+| Fields | Contract |
+| --- | --- |
+| _id, rubricId, definitionId, authorId, reviewerId, approvalAuditId | Required ObjectIds. Definition/author/reviewer/audit bindings are immutable; reviewer differs from author and is a current eligible Admin at approval and grading. |
+| version, definitionFingerprint | Exact immutable version and private reviewed digest. |
+| approvedAt, schemaVersion | Server UTC approval Date; literal 1. |
+| state, decisionFence | APPROVED or terminal REVOKED; nonnegative safe-integer fence. Only narrow repository compare-and-write operations advance the fence or revoke. |
+| revokedBy, revokedAt, revocationAuditId | All null while APPROVED; all required on REVOKED with valid Admin/audit ObjectIds and a UTC Date no earlier than approval. |
+
+Approval creates authority and its CONTENT_APPROVAL receipt in one transaction.
+Revocation is terminal for that version; no deletion, restore or definition edits.
+Grading and replay write the same authority row/fence as revocation, establishing
+commit ordering. Later revocation prevents fresh results/replay without deleting
+historical diagnostic records. Current actor/reviewer/publication checks are
+repeated at bounded boundaries; no globally instantaneous revocation claim.
+
+### practiceAssessments
+
+| Fields | Contract |
+| --- | --- |
+| _id, userId, attemptId, questionId, conceptId, requestedBy | Required ObjectIds; owner/requester derive from verified current Student and exact owned majority-read F036 attempt, never request claims. userId equals requestedBy. |
+| type, purpose | OUTPUT and DIAGNOSTIC only; never completion-qualified or a Stage A VERIFIED candidate. |
+| questionRevision, contentFingerprint, attemptRequestFingerprint | Exact private lowercase 64-hex bindings to the immutable owned attempt and current published content. |
+| rubricId, rubricVersion, rubricDefinitionFingerprint | Exact approved definition identity, positive safe version and private reviewed digest. |
+| graderId, graderVersion | OUTPUT_EXACT_TEXT and 1; server constants, not caller input. Semantics changes require explicit version review. |
+| outcome, score, refusalCode | CORRECT/100/null; INCORRECT/0/null; or REFUSED/null/INVALID_ANSWER for an authorized owned submission outside B1's valid-text subset. No score for refusal. Other authorization/binding/rubric failures create no assessment. |
+| evaluatedAt | Server UTC logical evaluation Date, unchanged on replay. |
+| authorityId, reviewerId, approvalAuditId, authorizationFence | Required server-recorded ObjectIds/provenance and positive safe fence observed at commit. Later valid fence advances do not erase historical provenance. |
+| requestFingerprint, schemaVersion | Private deterministic identity binding; literal 1. |
+
+Assessment request digest is UTF-8 JSON of:
+["F038-assessment-v1",userId,attemptId,attemptRequestFingerprint,questionId,
+conceptId,questionRevision,contentFingerprint,rubricId,rubricVersion,
+rubricDefinitionFingerprint,graderId,graderVersion]. Correlation ids, timestamps
+and fences do not force a second logical assessment. Same identity/exact payload
+replays the original record only after fresh authorization; conflicts never
+overwrite. Store no student answer, expected answer, explanation, token, raw key
+or solution snapshot. No historical attempt, activity row or completion is mutated.
+
+### B2 approval audit and privacy boundaries
+
+Use existing auditLogs with category CONTENT_APPROVAL, resourceType PRACTICE_RUBRIC
+and actions PRACTICE_RUBRIC_AUTHORED, PRACTICE_RUBRIC_APPROVED,
+PRACTICE_RUBRIC_REVOKED. actorId is the verified current Admin and resourceId is
+the immutable definition _id; metadata exactly {rubricVersion}, with validated
+correlation id and server UTC timestamp. Preserve every Auth/User event field,
+source rule and matching-subject constraint in its original branch. Verify exact
+audit provenance; no unrestricted writer or public/internal audit-browsing API.
+Supported application audit mutations are rejected; privileged raw administration
+is not database WORM. No new audit index is provisioned.
+
+All new models are strict, with automatic creation/indexing/buffering disabled.
+Only the typed owned repositories insert; no live route, job, Admin UI or automatic
+grading hook. No sensitive answers/rubrics/fingerprints are logged or returned.
+Private assessment/rubric retention, coordinated erasure, audit preservation and
+backups remain unresolved prerequisites for persistent/live use and release.
+Initial verification uses separately approved disposable synthetic data only;
+no TTL, migration, persistent provisioning, production or deployment approval.
+
+## F038 Stage C2 - private READ challenge and activity receipt refinement
+
+The owner approved the additive definitions proposed in F038 Section 19. C2 adds
+private sectionEvidenceChallenges and append-only sectionActivityReceipts for
+authenticated READ activity. Consumption and receipt insertion are atomic and
+majority-proven. Snapshot hashes are not monotonic editorial history. These rows
+cannot establish completion eligibility. studentProgress remains the canonical
+completion-summary target; immutable F036 attempts, F037 activity-only reporting
+and B2 DIAGNOSTIC assessments are unchanged. No public endpoint or automatic
+producer is added. Offline implementation does not establish live MongoDB behavior;
+disposable integration and persistent operation remain separately gated.
+
+### sectionEvidenceChallenges
+
+| Fields | Exact C2 contract |
+| --- | --- |
+| _id, userId, conceptId | Server-generated challenge reference, authenticated current Student owner and published Concept ObjectIds; immutable. A reference is not a bearer credential. |
+| schemaVersion, producerVersion | Immutable literal 1. |
+| section, policyId, policyVersion | Immutable READ, F038_READ_ACK_ACTIVITY, 1. |
+| conceptRevision, sectionRevision | Immutable lowercase 64-hex server snapshot SHA-256 digests; exact Section 19.3 ordered UTF-8 JSON arrays, preserving authored whitespace/Unicode and approved DTO absence normalization. No new Concept revision field. |
+| issueKeyHash, requestFingerprint | Immutable domain/account-bound SHA-256 values using exact Section 19.6 arrays. Never raw keys. |
+| issueRequestId, issuedAt, expiresAt | Immutable nonsensitive correlation and UTC Dates; expiresAt-issuedAt exactly 300,000 ms. |
+| state, decisionFence | AVAILABLE/CONSUMED/REVOKED; nonnegative safe integer fence changed only through owned transactional CAS. |
+| consumedAt, receiptId | Both null initially; set once together to a time in [issuedAt,expiresAt) and exact receipt ObjectId. Never cleared or replaced. |
+| revokedAt, revokedBy | Both null initially; terminal server UTC withdrawal and owner ObjectId, no earlier than issuance/consumption. |
+
+AVAILABLE -> CONSUMED inserts the cross-linked receipt in the same transaction.
+AVAILABLE/CONSUMED -> REVOKED is owner-only terminal withdrawal, retaining historical
+receipt references. No restore/extension or ownership transfer. Replays and
+withdrawal share the challenge fence; matching metadata alone cannot consume it.
+Expiration is checked against server UTC, including exact-boundary refusal,
+independently of cleanup. No TTL index is defined. Matching content restored later
+may reuse the same digest; fresh publication checks cannot reconstruct intervening
+unpublication. Stronger editorial-history/fencing rules require separate design.
+
+### sectionActivityReceipts
+
+All fields are immutable through supported application operations:
+
+| Fields | Exact C2 contract |
+| --- | --- |
+| _id, userId, conceptId, challengeId | Exact receipt, authenticated owner, Concept and consumed challenge ObjectIds. |
+| schemaVersion, producerVersion | Literal 1. |
+| section, policyId, policyVersion | READ, F038_READ_ACK_ACTIVITY, 1. |
+| conceptRevision, sectionRevision | Exact current owned challenge/server snapshot bindings. |
+| origin, purpose | ACKNOWLEDGEMENT_SERVICE and ACTIVITY_ONLY. |
+| ackKeyHash, requestFingerprint, ackRequestId | Account/operation-separated hashed key, exact acknowledgement fingerprint and bounded nonsensitive correlation. |
+| acknowledgedAt | Server UTC Date equal to challenge consumedAt. |
+
+No answers, source content, raw keys, tokens, scores, assessments, completion
+certificate or VERIFIED status. Exact hash serialization is F038 Sections 19.3
+and 19.6; policy/version constants are server-owned, never client configuration.
+Append-only application guards are not database-level WORM or privileged-admin
+protection. Later withdrawal preserves the historical receipt but refuses replay.
+
+### C2 indexes, transactions and privacy
+
+Only three secondary definitions, with default _id_ indexes:
+
+| Collection | Name | Ordered key | Constraint |
+| --- | --- | --- | --- |
+| sectionEvidenceChallenges | uq_section_evidence_issue_key | {userId:1,issueKeyHash:1} | UNIQUE |
+| sectionActivityReceipts | uq_section_activity_challenge | {userId:1,challengeId:1} | UNIQUE |
+| sectionActivityReceipts | uq_section_activity_ack_key | {userId:1,ackKeyHash:1} | UNIQUE |
+
+Require binary simple collection/index collation, exact name/key order/unique/v2,
+no sparse/partial/hidden/TTL/wildcard or alternate options. Every operation verifies
+readiness and transaction-capable PRIMARY/session prerequisites; missing, incorrect
+or unverifiable state fails closed. No automatic collections/indexes/buffering,
+persistent provisioning, migration or backfill. Initial standalone disposable C2
+fixtures require no F036/F037/B2 secondary indexes.
+
+Snapshot transactions use majority+journaled commit and bounded conflict handling;
+exact majority primary owned challenge/receipt proof and fresh authorization/content
+checks precede success. Uncertain commits/proof return no activity result. Same
+issue identity returns the original available unexpired challenge; changed request
+bindings conflict. Same acknowledgement key/fingerprint returns only the original
+owned receipt after fresh validation and within original challenge expiry. Different
+keys cannot consume again. Cleanup/proof errors cannot become success. The fence
+serializes challenge decisions, not all unrelated editorial/account updates.
+
+Narrow server-recorded domain provenance only; existing central audit vocabulary
+and all existing audit writes remain unchanged. No raw content/answers/keys or
+private record logging. Initial data is disposable synthetic only. Persistent use
+requires approved finite retention, access, coordinated receipt/challenge/account
+erasure and backup/restore handling. No indefinite replay guarantee after erasure,
+retention worker, tombstone or TTL policy is adopted here. No comprehension,
+completion eligibility, production readiness or F039 mastery is established.
+
+## F038 Stage C3b - private visualization checkpoint activity refinement
+
+Add private visualizationCheckpointDefinitions with immutable authored bindings,
+independent server-recorded approval and terminal fenced revocation as specified
+in F038 Section 26.2. Define uq_visual_checkpoint_version exactly as Section 26.7.
+No generic approval flag, WORM or monotonic publication-history guarantee.
+This owner-approved additive refinement preserves F026's existing authored model,
+studentProgress as canonical, immutable F036 attempts, F037 activity-only reporting,
+B2 DIAGNOSTIC assessments and existing C2 READ behavior.
+
+### visualizationCheckpointDefinitions
+
+| Fields | Approved C3b contract |
+| --- | --- |
+| _id, schemaVersion | Server ObjectId and literal 1. |
+| conceptId, visualizationId | Immutable canonical references, checked against current source scope. |
+| conceptRevision, visualizationRevision | Server lowercase 64-hex snapshot digests using exact ordered algorithms in F038 26.2; no client hashes. |
+| checkpointId, checkpointVersion | Immutable C3a bounded token and positive safe version; explicit version pinning, no implicit latest selection. |
+| policyId, policyVersion, verifierVersion | F038_VISUALIZE_CHECKPOINT_ACTIVITY, 1, 1. |
+| responseType, choices, expectedChoiceId | SINGLE_CHOICE, exact C3a 2-8 unique id/label choices and one authored expected id. Expected choice stays private in this catalog only. |
+| prompt, textAlternative | Immutable nonblank well-formed inert text, 1-2000 / 1-4000 UTF-16 units. Aggregate definition limited to 32 KiB UTF-8. |
+| definitionFingerprint | Server hash of exact bound verification/display projection in F038 26.2, immutable. |
+| authoredBy, authoredAt, authorRequestId | Immutable verified Admin provenance, server UTC time, nonsensitive correlation. |
+| state, decisionFence | DRAFT / APPROVED / REVOKED; safe nonnegative CAS fence. |
+| approvedBy, approvedAt, approvedFingerprint | Null until independent current eligible Admin approval, then immutable and bound to the exact authored fingerprint. |
+| revokedBy, revokedAt | Null until terminal current-Admin restriction; retain original review/authorship. |
+
+No self-approval or version edits; changed authored content needs a new version.
+Current role/status and published scope are revalidated, not assumed from stored
+provenance. Supported application operations guard immutable definitions and
+append-only history; privileged raw database writes are outside this boundary.
+Domain provenance only is introduced; existing central audit vocabulary is intact.
+
+### Strict VISUALIZE extensions of C2 storage
+
+Add strict VISUALIZE schemaVersion=2 challenge/receipt variants with definition/
+revision/checkpoint/verifier bindings and ACTIVITY_ONLY CORRECT/INCORRECT outcomes,
+preserving original READ behavior. Reuse existing unique indexes and add no
+expected-choice copies. Catalog and challenge fences serialize revocation,
+consumption and replay; majority-proven ownership precedes DTOs.
+
+READ remains schemaVersion=1 with its exact original fields, policy, fingerprints,
+DTOs and three-index readiness; no VISUALIZE defaults, conversion or migration.
+VISUALIZE has producerVersion=1 and its server policy/version above. Both new
+branches add immutable definitionId, definitionFingerprint, visualizationId,
+visualizationRevision, checkpointId, checkpointVersion and verifierVersion.
+conceptRevision is the server Concept digest; sectionRevision must exactly equal
+visualizationRevision. READ-only and VISUALIZE-only fields cannot be mixed.
+
+Challenges retain owner/Concept, issueKeyHash, requestFingerprint, issueRequestId,
+server issuedAt/expiresAt, lifecycle/fence, consumedAt/receiptId and revokedAt/
+revokedBy. Expiry is exactly 300,000 ms, enforced independently of cleanup.
+AVAILABLE -> CONSUMED and receipt insert are atomic. Owner withdrawal is terminal;
+definition revocation shares its fence with issue/submit/replay, without scanning
+or rewriting historical challenge/receipt rows.
+
+VISUALIZE receipts have origin=CHECKPOINT_SERVICE, purpose=ACTIVITY_ONLY,
+respondedAt and CORRECT|INCORRECT outcome instead of READ's acknowledgedAt.
+Existing ackKeyHash/ackRequestId storage names are retained with distinct C3b
+response hash domains. Records remain application append-only, not WORM. Store
+no selected/expected choice, raw answer, visualization text, raw key, token, score
+or completion certificate. Exact fingerprints and ordered arrays are F038 26.6;
+low-entropy choice-derived hashes are not encryption or anonymization.
+
+### C3b indexes, issuance, durability and privacy
+
+| Collection | Exact name | Ordered key | Constraint |
+| --- | --- | --- | --- |
+| visualizationCheckpointDefinitions | uq_visual_checkpoint_version | {visualizationId:1,checkpointId:1,checkpointVersion:1} | UNIQUE |
+| sectionEvidenceChallenges | uq_section_evidence_issue_key | {userId:1,issueKeyHash:1} | UNIQUE, unchanged |
+| sectionActivityReceipts | uq_section_activity_challenge | {userId:1,challengeId:1} | UNIQUE, unchanged |
+| sectionActivityReceipts | uq_section_activity_ack_key | {userId:1,ackKeyHash:1} | UNIQUE, unchanged |
+
+Require exact name/key order/v2/unique and simple binary collation, standard _id_
+indexes and no partial/sparse/hidden/TTL/wildcard/alternate options. C3b readiness
+requires all four; READ still requires only the original three. No automatic or
+persistent provisioning, backfill, buffering, migration or TTL worker.
+
+Under the shared definition fence, one unexpired AVAILABLE challenge and three
+fresh issues total per account/definition are allowed. Count expired, withdrawn
+and consumed history; exact same-key issue replay does not charge again. Query
+at most four matching records with bounded timeout using the existing owner-key
+index. Serialization depends on every issuer taking the catalog fence. No reset
+or separate counter collection. Large-history scan costs and deletion-induced
+budget resets need a later persistent-use design.
+
+Use bounded primary-snapshot transactions with majority+journaled commit, at most
+three body entries and the inherited ten-second overall/two-second reserve policy.
+Definition revocation and challenge withdrawal fence issue/consume/replay. Fresh
+actor/publication/binding checks and exact primary-majority owned definition/
+challenge/receipt cross-link/outcome proof precede success. Uncertain commit,
+missing proof, stale state, unavailable indexes or cleanup error fails closed;
+possible committed history is not falsely called rolled back.
+
+Current source hashes do not prove monotonic editorial publication, prevent
+undetected edit/restore ABA or fence every account/content writer. Terminal catalog
+revocation cannot be undone by matching restored content. Initial use is LOCAL
+and disposable synthetic only. Finite retention, coordinated erasure/backups,
+authorized access, domain/central audit obligations and replay/budget-after-erasure
+remain release prerequisites. No persistent student deployment, trusted completion
+eligibility, automatic studentProgress mutation or F039 mastery is established.
+
+## F038 Slice 1 - reviewed Concept policy and qualification refinement
+
+### Reviewed Concept completionRules envelope
+
+This additive LOCAL synthetic subset resolves F021's completionRules deferral only
+for the bounded reviewed envelope in F038 Section 30, as reconciled by the owner
+and Section 31. schemaVersion is 1, decisionFence is a nonnegative safe integer,
+activeVersion is nullable, and versions contains at most ten immutable authored
+versions. No new policy collection, policy index, enrollment model or public
+authoring endpoint is introduced.
+
+Each version pins policy ID/version, Concept revision, sourceEpoch, required
+READ/VISUALIZE/EXAMPLE/PRACTICE sections (conditional REVISE), explicit minimumScore
+70, one OUTPUT question/public revision/private fingerprint, one rubric version
+and reviewed fingerprint, and one reviewed visualization checkpoint/snapshot.
+Reference identities persist as canonical BSON ObjectIds; internal comparisons
+use their lowercase canonical strings. Policy IDs are server-generated 24-hex
+tokens. The fingerprint covers the ordered authored projection specified in the
+implementation; it is not a signature or standalone approval credential.
+
+Current authorized Admin authors and independent reviewers are checked by the
+server. Approval identity, time and exact authored fingerprint are server-recorded
+and immutable. Narrow whole-envelope compare-and-write operations advance the
+transactional fence for approval, qualification/replay and terminal revocation.
+Versions are never edited, evicted or restored. A valid Concept policy takes
+precedence; Topic/Path authority remains unavailable in this subset. Missing,
+malformed, revoked or unverifiable Concept authority never falls back silently.
+
+### Append-only qualifying assessment provenance
+
+Preserve immutable F036 SUBMITTED/null-score attempts and B2 DIAGNOSTIC v1 records.
+Add a strict schemaVersion=2 COMPLETION_INPUT branch with graderId
+OUTPUT_EXACT_TEXT_COMPLETION and graderVersion=1. It reuses the existing six-key
+assessment identity index with the distinct grader namespace; no new index or
+runtime provisioning is introduced.
+
+The branch retains owned attempt/request, question/Concept/revision/private
+fingerprint, rubric definition, independent review/audit and authorization-fence
+bindings. It adds policyId/version/fingerprint, sourceEpoch, attemptNumber=1 and
+submissionProvenance=F036_FIRST_SUBMISSION_ATOMIC_V1. Only CORRECT/100 or INCORRECT/0
+with null refusalCode is valid. Store no second student answer, expected answer
+or explanation. Attempt, assessment and the unchanged F037 activity update commit
+atomically; verified majority-owned proof precedes disclosure. Never backfill,
+regrade historical attempts or relabel diagnostic assessments. studentProgress
+remains canonical; no completion fields or score-summary mutation is delivered
+in Slice 1. Application append-only guards are not database WORM.
+
+### Memory-only origin and connection-generation boundary
+
+Origin is established only by confirmed server-owned insertions and creation
+proof, not by an empty collection or supplied metadata. The private registry is
+nonserializable and bound to the actual database/client generation and exact
+synthetic identities. sourceEpoch records a logical creation generation; it is
+not native process/storage attestation and cannot reconstruct authority.
+
+Runtime native supervisor attestation and live supervisor IPC are explicitly
+removed by Option B. Reconnect, restart, disposal or lifecycle uncertainty
+invalidates origin. Persisted records cannot re-enrol old identities. The creator
+is restricted to LOCAL and 127.0.0.1:27018 / f021-test /
+deeplearner-f021-test; it does not adopt persistent demo users or imported content.
+Database integration continues to require independently verified owned processes,
+Job supervision, fresh disposable storage, exact indexes and protected-baseline
+cleanup. No persistent provisioning, migration or backfill is authorized.
+
+These partial foundations do not establish completion, Topic aggregation, mastery
+or production readiness. Privacy/retention/erasure, credential provisioning for
+later student workflow, release review and actual integration verification remain
+separate prerequisites. Historical stage contracts/evidence remain historical.
+
+## F038 Slice 2 - canonical completion summary and private request history
+
+Preserve strict v1 and add exactly the canonical v2 root/claim fields and
+score-provenance rules in F038 Section 32.3. F036 activity writers preserve v2
+decisions; F037 GET remains activity-only. Effective completion is revalidated;
+stale/revoked claims never assert current completion and GET never repairs them.
+
+The v2 root allowlist is _id,userId,conceptId,technologyId,learningPathId,moduleId,
+topicId,attemptCount,status,startedAt,lastActivityAt,createdAt,updatedAt,
+schemaVersion,sections,firstScore,latestScore,bestScore,completedAt,completion.
+Preserve owned BSON identities, exact count/min/max and ordered server timestamps.
+schemaVersion=2; status is IN_PROGRESS or COMPLETED. sections is exactly
+readCompleted,visualizeCompleted,exampleCompleted,practiceCompleted,reviseCompleted
+booleans. Scores are null or genuine 0/100; no DIAGNOSTIC/ungraded/retry score is
+invented. The original qualifying assessment precedes the activity update in
+F036's existing transaction, enabling atomic score summaries. Ordinary activity
+preserves decisions; no automatic completion, downgrade, migration or GET backfill.
+
+completion is null or exactly policyId,policyVersion,policyFingerprint,
+conceptRevision,sourceEpoch,decisionVersion,requiredSections,sectionReceipts,
+assessmentId,attemptId,minimumScore,selectedScore,requestReceiptId, with canonical
+BSON references, digests and safe versions. sectionReceipts contains unique
+non-Practice {section,receiptId} references. Require Read/Visualize/Example/Practice,
+conditional Revise and genuine score meeting the approved explicit 70% policy.
+completedAt is null or the explicit decision's server time. Historical root flags
+and status describe a bound claim, not current eligibility. Current source and
+authority checks determine its effective validity without rewriting history.
+studentProgress remains the sole canonical completion summary; no mastery field.
+
+Add only append-only completionRequests and uq_completion_request_owner_key as
+Section 32.3 for durable account-key request history, not alternate completion
+state. Summary and request writes share majority-confirmed transactions and owned
+proof. No index provisioning, backfill, TTL, retention worker or persistent-use
+approval. Exact request fields are _id,userId,conceptId,policyId,policyVersion,
+conceptRevision,viewRevision,requestKeyHash,requestFingerprint,summaryId,
+decisionVersion,committedAt,schemaVersion=1. No raw key, answer, content, rubric or
+score copy. Unique ordered {userId:1,requestKeyHash:1}, exact name
+uq_completion_request_owner_key, v2/simple binary semantics; no partial, sparse,
+hidden, TTL, collation or alternate options. The twelve approved prerequisite
+definitions remain unchanged; final completion operations verify all thirteen.
+Ordinary F036/F037 readiness sets remain unchanged; no automatic provisioning.
+
+Existing EXAMPLE/conditional REVISE v3 acknowledgement branches retain distinct
+producer namespaces/digests and ACTIVITY_ONLY receipts. Slice 2's trusted adapter
+qualifies current owned actions only for the approved policy; it never rewrites
+producer claims or infers comprehension. READ v1 and VISUALIZE v2 remain unchanged.
+Consumed receipts may outlive their response deadline only under the approved
+current-policy/source/lifecycle rules. Withdrawal or terminal authority restriction
+invalidates its bound completion; another receipt requires a new explicit decision.
+
+Use bounded primary snapshot transactions with majority+journal commit, shared
+policy/rubric/definition/challenge fences and canonical summary CAS. Exact owned
+summary decision and original/command request receipts, current sources and
+attempt/assessment proofs precede success. Same-key changed requests conflict;
+same-current decision with another key may append a receipt without resetting
+completedAt, count, score or the original claim reference. Uncertain commit/proof
+or cleanup fails closed. Application guards are not database WORM; content hashes
+are not monotonic publication history or physical storage attestation. This LOCAL
+synthetic subset does not authorize real-person enrollment/migration, persistent
+indexes or production use. Retention, linked erasure/backups, release readiness,
+Student UI, Topic aggregation and F039 remain outstanding.

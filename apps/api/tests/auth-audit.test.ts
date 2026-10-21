@@ -31,6 +31,7 @@ test('audit schema accepts only bounded F007 actions and metadata offline', asyn
     'appendLogoutAudit',
     'appendProfileAudit',
     'appendRecoveryAudit',
+    'appendRubricAudit',
   ]);
   assert.equal(Audit.db.readyState, 0);
   assert.equal(auditSchema.options.autoCreate, false);
