@@ -1454,3 +1454,65 @@ are not monotonic publication history or physical storage attestation. This LOCA
 synthetic subset does not authorize real-person enrollment/migration, persistent
 indexes or production use. Retention, linked erasure/backups, release readiness,
 Student UI, Topic aggregation and F039 remain outstanding.
+
+## F006 canonical Auth alignment (Sections 6 and 8)
+
+The earlier User/Session baseline tables in Sections 6 and 8 are historical where
+they differ from this owner-approved F006 alignment. This clarification documents
+existing implemented contracts; it introduces no schema/API/index behavior,
+migration, persistent provisioning or new authentication/authorization mechanism.
+
+users stores normalized lowercase unique email; required trimmed firstName and
+lastName (1-80 characters each); and derived-only displayName, not a separate
+required stored displayName. role is STUDENT or ADMIN, default STUDENT; public
+registration remains STUDENT only. plan is FREE or PREMIUM, default FREE;
+entitlement behavior is unchanged. status is PENDING_VERIFICATION, ACTIVE,
+DISABLED or SUSPENDED, default PENDING_VERIFICATION.
+
+passwordHash is optional/null Argon2id for password-capable accounts. authProviders
+contains GOOGLE/providerUserId identities, defaults empty for password-only
+accounts, and rejects duplicate pairs. At least one password/provider capability
+is required. Never store provider access/refresh tokens. Password hashes/provider
+identities are private; explicit safe projections remain necessary for raw reads.
+emailVerifiedAt and suspendedUntil are nullable dates; suspensionReason is optional
+trimmed text up to 500 characters; lastLoginAt is a nullable date. Existing
+createdAt/updatedAt timestamps remain. No plan/role/status bypass is inferred.
+
+The optional onboarding object is profile, not a separate onboarding field.
+profile contains existing optional experienceLevel, learningGoals,
+interestedTechnologyIds, preferredDifficulty and dailyStudyGoalMinutes. Use the
+approved enum allowlists; reject duplicate goals/technology IDs; at most 50
+technology IDs; dailyStudyGoalMinutes is an integer 5-240. profile remains absent
+until supplied; this adds no onboarding-completion or learning-completion flag.
+
+sessions retains required userId, private SHA-256 refreshTokenHash, expiresAt,
+createdAt and lastUsedAt; nullable revokedAt; optional revocationReason (trimmed,
+at most 500 characters), optional deviceInfo (userAgent up to 512, deviceLabel up
+to 200) and optional private SHA-256 ipHash. Store no raw refresh token. Existing
+expiry, rotation/reuse and revocation services remain authoritative; TTL deletion
+is asynchronous. Hashes/IP metadata remain excluded from ordinary serialization.
+
+The exact users index set is:
+- email_1: {email:1}, UNIQUE.
+- status_1_createdAt_-1: {status:1,createdAt:-1}, nonunique.
+- plan_1_createdAt_-1: {plan:1,createdAt:-1}, nonunique.
+- role_1_createdAt_-1: {role:1,createdAt:-1}, nonunique.
+- authProviders.provider_1_authProviders.providerUserId_1:
+  {"authProviders.provider":1,"authProviders.providerUserId":1}, UNIQUE,
+  partialFilterExpression:{"authProviders.providerUserId":{$type:"string"}}.
+This supersedes the old {role:1,status:1} listing and single-field sparse provider
+recommendations; it does not authorize creating both sets or dropping any index.
+
+The exact sessions index set is:
+- refreshTokenHash_1: {refreshTokenHash:1}, UNIQUE.
+- userId_1_revokedAt_1: {userId:1,revokedAt:1}, nonunique.
+- expiresAt_1: {expiresAt:1}, nonunique, expireAfterSeconds:0.
+
+These names are the installed driver's default names derived from the existing
+ordered model declarations, not newly named model indexes. For the fresh disposable
+fixture require v2 indexes and no explicit collection/index collation (simple
+binary comparison); no sparse/hidden/alternate options beyond the exact partial
+filter and TTL above. Existing persistent collections are not certified by this
+description and require separately approved inspection/migration decisions.
+Automatic indexing/collection creation remains disabled. Declaration approval
+is not provisioning approval. No F038 completion or F039 mastery rule changes.

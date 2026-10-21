@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { Types, type ClientSession } from 'mongoose';
+import { Readable, PassThrough } from 'node:stream';
 import { createCompletionEvidenceService } from '../src/modules/progress/completion-evidence.service.js';
 import type {
   QualificationStore,
@@ -23,6 +24,17 @@ import {
   issueFingerprint,
 } from '../src/modules/progress/section-evidence.service.js';
 import { evidencePolicy } from '../src/modules/progress/section-evidence-revision.js';
+import { verifyPassword } from '../src/modules/auth/password.service.js';
+import {
+  fixtureIndexes,
+  verifyFixtureIndex,
+  parseFixtureCredentials,
+  requireFixtureInitialization,
+  initializeCompletionStudentFixture,
+  readFixtureCredentials,
+} from '../scripts/completion-student-fixture.js';
+import { User } from '../src/modules/users/user.model.js';
+import { Session } from '../src/modules/auth/session.model.js';
 const author = 'a'.repeat(24),
   reviewer = 'b'.repeat(24),
   rev = 'd'.repeat(64);
@@ -35,7 +47,10 @@ const command = {
   prompt: 'Output?',
   answer: '1',
 };
-function fixture(environment = 'LOCAL') {
+function fixture(
+  environment = 'LOCAL',
+  credentialSource?: Parameters<typeof createCompletionEvidenceService>[4],
+) {
   const events: string[] = [],
     listeners: (() => void)[] = [];
   let rules: ConceptCompletionRules | null = null,
@@ -214,6 +229,7 @@ function fixture(environment = 'LOCAL') {
     { APP_ENV: environment },
     store,
     checkpoints,
+    credentialSource,
   );
   async function create() {
     const identity = await service.create(author, command);
@@ -279,8 +295,230 @@ function fixture(environment = 'LOCAL') {
     approve,
     rules: () => rules,
     store,
+    created: () => created,
   };
 }
+
+test('trusted internal credential source hashes before insert and returns IDs only; default remains private', async () => {
+  let calls = 0;
+  const password = 'Temporary test password';
+  const f = fixture('LOCAL', async (identity) => {
+    calls++;
+    assert(Object.isFrozen(identity));
+    assert.match(identity.userId, /^[a-f0-9]{24}$/);
+    return password;
+  });
+  const result = await f.create();
+  assert.equal(calls, 1);
+  assert(await verifyPassword(password, f.created()!.passwordHash));
+  assert.deepEqual(Object.keys(result).sort(), [
+    'conceptId',
+    'questionId',
+    'sourceEpoch',
+    'userId',
+  ]);
+  assert(!JSON.stringify(result).includes(password));
+  const normal = fixture();
+  await normal.create();
+  assert.match(normal.created()!.passwordHash, /^\$argon2id\$/);
+  assert(!(await verifyPassword(password, normal.created()!.passwordHash)));
+});
+test('invalid/failed credential source refuses before insertion with no secret in errors', async () => {
+  for (const value of ['', 'short', 'x'.repeat(129)]) {
+    const f = fixture('LOCAL', async () => value);
+    await assert.rejects(
+      f.create(),
+      (e: unknown) =>
+        e instanceof Error && e.message === 'Section activity is unavailable',
+    );
+    assert(!f.events.includes('insert'));
+  }
+  const f = fixture('LOCAL', async () => {
+    throw Error('synthetic-private-value');
+  });
+  await assert.rejects(
+    f.create(),
+    (e: unknown) =>
+      e instanceof Error && !e.message.includes('synthetic-private-value'),
+  );
+  assert(!f.events.includes('insert'));
+});
+test('public creation cannot supply passwords, auth flags or reconstruct origin', async () => {
+  const f = fixture();
+  for (const field of [
+    'password',
+    'passwordHash',
+    'credentialSource',
+    'bootstrapApproved',
+  ]) {
+    await assert.rejects(
+      f.service.create(author, {
+        ...command,
+        [field]: 'synthetic-private-value',
+      }),
+    );
+  }
+  assert(!f.events.includes('insert'));
+});
+test('fixture bootstrap refuses serialized authority and credentials are strict, bounded and sanitized', () => {
+  for (const value of [
+    undefined,
+    { approved: true },
+    { assertOwned: true },
+    { APP_ENV: 'LOCAL' },
+  ]) {
+    assert.throws(
+      () => requireFixtureInitialization(value as never),
+      /COMPLETION_FIXTURE_UNAVAILABLE/,
+    );
+  }
+  for (const input of [
+    {},
+    {
+      author: 'short',
+      reviewer: 'long enough password',
+      student: 'long enough password',
+    },
+    {
+      author: 'x'.repeat(129),
+      reviewer: 'x'.repeat(20),
+      student: 'x'.repeat(20),
+    },
+    {
+      author: 'x'.repeat(20),
+      reviewer: 'x'.repeat(20),
+      student: 'x'.repeat(20),
+      role: 'ADMIN',
+    },
+  ]) {
+    assert.throws(
+      () => parseFixtureCredentials(input),
+      (e: unknown) =>
+        e instanceof Error && e.message === 'COMPLETION_FIXTURE_UNAVAILABLE',
+    );
+  }
+});
+test('absent or failed supervisor authority refuses before configuration, connection or account creation', async () => {
+  await assert.rejects(
+    initializeCompletionStudentFixture(undefined as never),
+    /COMPLETION_FIXTURE_UNAVAILABLE/,
+  );
+  await assert.rejects(
+    initializeCompletionStudentFixture({
+      dbPath: 'E:\\disposable-only',
+      mongoPid: 123,
+      async assertOwned() {
+        throw Error('private diagnostic value');
+      },
+      onLoss() {
+        throw Error('must not subscribe');
+      },
+      async readCredentials() {
+        throw Error('must not read');
+      },
+    }),
+    (error: unknown) =>
+      error instanceof Error &&
+      error.message === 'COMPLETION_FIXTURE_UNAVAILABLE',
+  );
+});
+test('private input is bounded and malformed credentials never enter error payloads', async () => {
+  const input = {
+    author: 'unit-only author password',
+    reviewer: 'unit-only reviewer password',
+    student: 'unit-only student password',
+  };
+  assert.deepEqual(
+    await readFixtureCredentials(Readable.from([JSON.stringify(input) + '\n'])),
+    input,
+  );
+  const unicode = { ...input, author: 'unit-only café password' };
+  const bytes = Buffer.from(JSON.stringify(unicode) + '\n');
+  const split = bytes.indexOf(Buffer.from('é')) + 1;
+  assert.deepEqual(
+    await readFixtureCredentials(
+      Readable.from([bytes.subarray(0, split), bytes.subarray(split)]),
+    ),
+    unicode,
+  );
+  for (const text of [
+    '{"student":"private diagnostic value"}\n',
+    'x'.repeat(8193) + '\n',
+  ]) {
+    await assert.rejects(
+      readFixtureCredentials(Readable.from([text])),
+      (error: unknown) =>
+        error instanceof Error &&
+        error.message === 'COMPLETION_FIXTURE_UNAVAILABLE',
+    );
+  }
+});
+test('private credential deadline closes only the owned input and refuses without waiting indefinitely', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const input = new PassThrough();
+  try {
+    const refused = assert.rejects(
+      readFixtureCredentials(input),
+      /COMPLETION_FIXTURE_UNAVAILABLE/,
+    );
+    t.mock.timers.tick(15000);
+    await refused;
+    assert.equal(input.destroyed, true);
+    assert.equal(input.listenerCount('data'), 0);
+  } finally {
+    t.mock.timers.reset();
+    input.destroy();
+  }
+});
+test('twenty-one proposed fixture indexes include exact installed F006 declarations and refuse drift', () => {
+  assert.equal(fixtureIndexes.length, 21);
+  assert.equal(
+    new Set(fixtureIndexes.map((i) => i.collection + '/' + i.name)).size,
+    21,
+  );
+  for (const [collection, model] of [
+    ['users', User],
+    ['sessions', Session],
+  ] as const) {
+    for (const [key, opts] of model.schema.indexes()) {
+      const name = Object.entries(key).flat().join('_');
+      const expected = fixtureIndexes.find(
+        (i) => i.collection === collection && i.name === name,
+      )!;
+      assert(expected);
+      assert.deepEqual(expected.key, key);
+      assert.equal(expected.unique, opts.unique === true);
+      assert.deepEqual(
+        expected.partialFilterExpression,
+        opts.partialFilterExpression,
+      );
+      assert.equal(expected.expireAfterSeconds, opts.expireAfterSeconds);
+    }
+  }
+  for (const i of fixtureIndexes) {
+    const actual = {
+      v: 2,
+      name: i.name,
+      key: i.key,
+      ...(i.unique ? { unique: true } : {}),
+      ...(i.partialFilterExpression
+        ? { partialFilterExpression: i.partialFilterExpression }
+        : {}),
+      ...(i.expireAfterSeconds === undefined
+        ? {}
+        : { expireAfterSeconds: i.expireAfterSeconds }),
+    };
+    verifyFixtureIndex(actual, i);
+    for (const patch of [
+      { unique: !i.unique },
+      { key: { different: 1 } },
+      { collation: { locale: 'en' } },
+      { sparse: true },
+      { expireAfterSeconds: 123 },
+    ])
+      assert.throws(() => verifyFixtureIndex({ ...actual, ...patch }, i));
+  }
+});
 test('origin is registered only after successful insert, majority commit and owned creation proof', async () => {
   const f = fixture(),
     id = await f.create();

@@ -1,10 +1,16 @@
 # F038 - Completion Rules
 
-**Status:** IN_PROGRESS
+**Status:** APPROVED_COMPLETE
 **Plan date:** 2026-10-19 (Asia/Calcutta)
-**Current gate:** OWNER-APPROVED STAGE C1 IMPLEMENTATION/OFFLINE VERIFICATION (Section 18)
+**Current gate:** OWNER-APPROVED LOCAL COMPLETION AND SCOPED GIT DELIVERY (Section 47)
 **Formal roadmap dependency:** F037 APPROVED_COMPLETE for LOCAL DEVELOPMENT ONLY.
-**Authorized boundary:** Stage A: six Section 4 paths; B1: four Section 9.7 paths; B2: fourteen Section 13.1 paths; C1: four Section 17.8 paths. Partial foundations only.
+**Authorized boundary:** Approved Option B LOCAL-only synthetic Concept completion. Section 46 retains the F038-specific browser exception; Section 47 records explicit owner completion and scoped Git delivery approval. No production or F039 approval.
+
+The introduction below records historical foundation-stage authorization and its
+then-current restrictions/status. Preserve that history; Section 47 supersedes it
+for the present acceptance status. The earlier foundation inventories remain
+Stage A: six Section 4 paths; B1: four Section 9.7 paths; B2: fourteen Section 13.1
+paths; C1: four Section 17.8 paths.
 
 Historical Stage A authorization: the owner explicitly approved implementation and offline verification,
 including mandatory VISUALIZE/PRACTICE and the exact six-file boundary. Source
@@ -7788,3 +7794,1527 @@ Only this document is appended. F001-F037 APPROVED_COMPLETE and F038 IN_PROGRESS
 are unchanged. Existing **141 browser scenarios remain NOT_RUN**; twelve Slice 3
 cases remain unimplemented/proposed (153 expected NOT_RUN after static preparation).
 No production enrollment/migration/privacy/erasure/release or F039 work is implied.
+
+## 36. Slice 3 implementation and offline verification (partial F038)
+
+### 36.1 Owner scope and preserved history
+
+The owner approved Section 35's implementation/offline gate and exact additive
+F006 appendix. Implementation stopped after thirteen draft paths when the closed
+Concept rendering loader required an additional path. The owner then explicitly
+expanded Slice 3 from eighteen to nineteen paths, preserving all thirteen drafts.
+The added path is apps/web/tests/concept-rendering.test.ts: its loader recognizes
+./concept-completion and verifies exact Concept binding without deleting or
+weakening existing navigation, accessibility or security assertions.
+
+The complete actual boundary is eleven creations and eight modifications:
+
+| Operation | Exact literal path |
+| --- | --- |
+| CREATE | apps/web/src/lib/api/completion-client.ts |
+| CREATE | apps/web/src/lib/progress/completion-controller.ts |
+| CREATE | apps/web/src/lib/progress/completion-contracts.ts |
+| CREATE | apps/web/src/components/concepts/concept-completion.tsx |
+| CREATE | apps/web/src/components/concepts/concept-completion.module.css |
+| CREATE | apps/web/tests/completion-client.test.ts |
+| CREATE | apps/web/tests/completion-controller.test.ts |
+| CREATE | apps/web/tests/completion-rendering.test.ts |
+| CREATE | tests/browser/concept-completion.spec.ts |
+| CREATE | apps/api/scripts/completion-student-fixture.ts |
+| CREATE | apps/api/tests/completion-student-fixture.integration.ts |
+| MODIFY | docs/DEVELOPMENT_ROADMAP.md |
+| MODIFY | docs/features/F038-completion-rules.md |
+| MODIFY | apps/web/src/components/concepts/concept-browser.tsx |
+| MODIFY | playwright.f024.config.ts |
+| MODIFY | apps/api/src/modules/progress/completion-evidence.service.ts |
+| MODIFY | apps/api/tests/completion-evidence.test.ts |
+| MODIFY | docs/DATABASE_DESIGN.md |
+| MODIFY | apps/web/tests/concept-rendering.test.ts |
+
+No dependency, shared Auth implementation, public Admin registration, ordinary
+bootstrap, native supervisor, new API endpoint, index/model definition or F039
+implementation is added. F001-F037 APPROVED_COMPLETE and F038 IN_PROGRESS remain
+unchanged. All historical blocked/failed MongoDB runs and accepted Slice 1/2
+results remain intact; this gate neither reruns nor supersedes those results.
+
+### 36.2 Implementation and authority boundaries
+
+The Concept page mounts an account/Concept-keyed completion panel using the four
+existing Slice 2 APIs. Strict allowlisted public views/challenges/receipts reject
+extra private fields and mismatched identities. Required Read, Visualize, Example,
+Practice and conditional Revise remain server decisions. Only authoritative
+ELIGIBLE enables explicit completion; only a validated COMPLETED response displays
+saved completion. F037 activity is separate. No client score, mastery, evidence
+certificate or completion flag is invented. Normal Concepts outside the approved
+synthetic scope display unavailable, not fabricated missing/zero-score data.
+
+Explicit POSTs retain their UUID/body in memory for unchanged uncertain Retry.
+No automatic write retry or optimistic completion occurs. New view/cancellation,
+logout/account or Concept replacement suppresses late results and clears local
+commands. Abort does not imply rollback. Terminal validation/conflict errors demand
+fresh requirements. Native buttons, labelled radios, fieldset/legend, textual
+visualization alternatives, live announcements and action-result focus support
+keyboard/screen-reader/reduced-motion use without animation timing. Layout wraps
+for desktop/tablet/mobile; actual browser behavior remains NOT_RUN.
+
+The internal fixture has no CLI auto-start or public route. The owner-approved
+external initializer must supply the existing live native ownership supervisor's
+operations and verified private credential reader. Callable presence, LOCAL,
+GO/stdin or serialized fields are not ownership proof. The supervisor retains exact
+native handles, Job, executable/owner/parent/live identity and common-microsecond
+UTC checks, fresh storage/protected baselines, and remains responsible for MongoDB
+shutdown and disposal. This script does not implement a new attestation protocol
+or certify physical storage. An absent/failed supervisor operation refuses before
+configuration/connection/accounts. A real invocation requires separate approval
+and actual native operations; no fake/no-op authority adapter is acceptable.
+
+Before account writes the same serving process independently checks exact target,
+server PID/dbPath, single loopback replica set, writable PRIMARY, database
+exclusivity, empty collections and complete index readiness. It never provisions
+indexes. Exactly two new insert-only synthetic Admins use existing Argon2id and
+normal audited login/session issuance. Current distinct Admin subjects/sessions
+and existing independent rubric/checkpoint/policy approval services are required.
+No account adoption, role promotion, direct JWT signing or persistent demo writes.
+Setup refresh sessions are revoked through existing logout services; no immediate
+access-JWT invalidation claim is added.
+
+The optional trusted internal Student credential source is not a public command;
+default random/discard credentials and ID-only creation remain unchanged. Owner
+passwords arrive only through the supervisor-verified private channel, remain
+bounded, are hashed before inserts and never appear in outputs/logs/arguments,
+source credentials, environment examples or receipts. References are cleared;
+JavaScript heap zeroization is not claimed. Public creation rejects passwords and
+bootstrap claims. The initializer creates/seals Student/Concept/question/rubric/
+70% policy in its shared Mongoose generation, retains the creator while serving,
+and disposes it on authority loss/shutdown. Restart/reconnect cannot adopt or
+reconstruct origin. Student login/refresh/onboarding remain normal Auth behavior;
+a session itself grants no synthetic-origin authority.
+
+DATABASE_DESIGN.md receives only Section 35.4's exact approved additive F006 Auth
+alignment. Earlier canonical bytes/history are preserved. The eight names are
+installed-driver-derived model declarations, not live observations; partial-filter,
+TTL and simple-collation requirements are retained. API_DESIGN.md is unchanged.
+
+### 36.3 Offline evidence and separate source review
+
+Selected offline API evidence: **366 distinct PASS / 0 FAIL**, including 29 focused
+credential/fixture/origin tests and 337 relevant Auth, User/Session, immutable
+attempt, grading, Practice, activity, completion, section and checkpoint regressions.
+Selected final frontend run: **211 PASS / 0 FAIL**, including 27 focused
+completion/client/controller/rendering/Concept integration tests and 184 relevant
+Auth/onboarding, Concept, visualization, four-type Practice and activity regressions.
+Total **577 distinct selected tests** (56 focused + 521 regression). Repeated
+executions of the same tests are not added to these counts.
+
+Initial draft checks exposed typing issues and an incorrect new refusal-message
+expectation; these were corrected within scope. Sandbox tsx failed before assertions
+with uv_os_get_passwd ENOMEM. A repository-root frontend invocation used incorrect
+JSX context (React undefined); package-scoped ordinary-user execution passed with
+unchanged product/module configuration. These infrastructure/initial draft outcomes
+are retained rather than counted as passing assertions.
+
+API build and source/test TypeScript and web production build PASS. Final API source/test TypeScript, web build-generated TypeScript, changed-source
+lint, formatting, browser-spec static compilation, UTF-8/LF, scope and diff checks
+are completed in Section 36.5 below.
+
+### 36.4 Prepared integration and browser evidence (NOT_RUN)
+
+completion-student-fixture.integration.ts exports an explicitly invoked guarded
+integration entrypoint; importing it does not run tests or connect to MongoDB.
+Eight prepared records (parent plus seven children) cover actual distinct Admin
+login/provenance, genuine Student password/cookie/refresh/onboarding, same-process
+origin, first submission and section/completion APIs, F037 compatibility, duplicate
+bootstrap refusal, logout and connection-loss refusal. A failed dependent stage
+aborts the parent into cleanup. It uses no direct JWT signing. These records are
+prepared only and were NOT_RUN; real authentication/provisioning/durability and
+native cleanup for this new fixture remain unverified until separately authorized.
+
+The explicit disposable provisioning proposal is the thirteen unchanged Slice 2
+indexes plus eight F006 User/Session indexes (21 secondary definitions). Static
+checks reconcile exact collections, derived names, ordered keys, uniqueness,
+partial filter and TTL against installed declarations. No index has been created,
+removed or inspected live during this gate. Separate owner approval must cover
+native preflight, private input, the complete allowlist and one invocation.
+
+Exactly twelve new named browser specifications are prepared and statically
+compiled without Playwright execution. They use intercepted synthetic HTTP UI
+contracts, not real Auth/MongoDB evidence. Existing **141 NOT_RUN + 12 Slice 3
+NOT_RUN = 153 expected NOT_RUN**. Mounted rendering, interaction, focus,
+responsive behavior, navigation/account races and earlier feature compatibility
+remain unverified. No earlier feature exception transfers and no browser PASS
+or production readiness is claimed.
+
+F038 remains IN_PROGRESS. Real MongoDB failover, multi-process convergence,
+production enrollment/migration, privacy/retention/erasure/backups and release
+verification remain outstanding. Next owner gate: separately approve guarded
+fixture/session MongoDB verification and 21-index provisioning; subsequent final
+review and any named browser exception require their own approval. No completion
+or Git delivery is authorized by this evidence.
+
+### 36.5 Final offline checks and separate formal source-diff review
+
+**SLICE 3 IMPLEMENTATION / OFFLINE VERIFICATION PASS - PARTIAL F038.**
+
+Final focused reruns confirm 29 API and 27 web tests PASS after private-pipe and
+stale-view hardening; these repeat existing test identities except the single new
+deadline test and are not summed again. Distinct selected union is 366 API / 211
+web (577 total): 56 focused plus 521 regressions. The earlier 365-test API run
+remains retained, followed by the additional deadline test and final targeted
+verification. Final reader tests cover split UTF-8 input and closure on deadline;
+normal input stays available for the existing bounded STOP/EOF lifecycle. Terminal
+stop invalidates origin, shares one cleanup promise, closes HTTP/database resources
+and destroys the owned stdin. Real native/process cleanup remains integration-only.
+
+A separate complete nineteen-path source-diff review checked the final credential
+source, initializer, client/contracts/controller, Concept integration/CSS, test
+loader, new tests/specification, configuration inclusion, exact canonical appendix
+and roadmap/evidence additions. **Unresolved findings: CRITICAL 0 / HIGH 0 /
+MEDIUM 0 / LOW 0.** Review anchors (not findings):
+
+- apps/api/scripts/completion-student-fixture.ts:192 - trusted internal initializer
+  operations; missing/failed authority refusal, exact target/empty/index gates,
+  fixed insert-only Admin roles, genuine audited login, independent approval,
+  shared-origin lifecycle and existing bounded shutdown. Live supervisor operations
+  are mandatory; their existence is not inferred from a flag or callable shape.
+- apps/api/src/modules/progress/completion-evidence.service.ts:331 - internal-only
+  bounded password hashing, sanitized errors, reference clearing and unchanged
+  default random/discard and immutable synthetic creation/proof behavior.
+- apps/web/src/lib/progress/completion-controller.ts:56 - generation cancellation,
+  independently authenticated commands, frozen same-request retries, terminal
+  conflict recovery and no optimistic completion; loading clears stale views.
+- apps/web/src/lib/progress/completion-contracts.ts:7 and
+  apps/web/src/lib/api/completion-client.ts:45 - canonical identifiers, strict
+  allowlisted DTOs, Concept/section binding, fixed errors, bearer/no-store/
+  omit-cookie calls and abort/timeout handling, with no raw error details.
+- apps/web/src/components/concepts/concept-completion.tsx:16 - current Student UI
+  gate, keyed ownership, required/conditional sections, accessible explicit
+  actions, original-score warning and server-confirmed completion only.
+- apps/web/tests/concept-rendering.test.ts:124 - minimal added loader branch and
+  exact Concept-panel binding assertions; all previous assertions remain intact.
+
+Implementation hardening before this final pass rejects newline-tailed identities,
+suppresses duplicate Retry while saving, drops obsolete views during refresh,
+refuses expired/conflicting commands and closes the credential channel on deadline.
+No correction required another path, dependency, index, schema or API amendment.
+
+API build, API source/test typecheck, final web production build/typecheck,
+changed-source lint and formatting, static browser/config compilation, strict
+UTF-8/no-BOM/LF and git diff --check PASS. Exact scope is 19 paths (11 CREATE,
+8 MODIFY), with no source additions/removals outside the allowlist. The original
+feature-document prefix and Database Design prefix are byte-preserved; the F006
+appendix exactly matches Section 35.4. No stage, commit, push, MongoDB provisioning
+or browser execution occurred. Source hashes, selected test lists/logs, final
+focused logs, build output, source diff and scope audit are retained under the
+ignored .cache/f038-slice3-offline-2026-10-20-16-33-12 evidence directory.
+
+Eight real fixture/session integration records remain PREPARED / NOT_RUN. Genuine
+runtime Admin/Student sessions, native ownership, live 21-index readiness, serving
+lifecycle, durable end-to-end completion and protected-baseline cleanup are NOT
+promoted from static/offline evidence to live PASS. Existing 141 + twelve prepared
+browser cases = **153 expected NOT_RUN**. No browser exception or production release
+approval is inferred. F038 remains **IN_PROGRESS** pending separately approved
+owned disposable fixture/session integration and subsequent owner review.
+
+## 37. Slice 3 guarded integration preflight BLOCKED (no startup/invocation)
+
+### 37.1 Authorized gate and exact blocker
+
+The owner authorized one guarded disposable Slice 3 fixture/session execution,
+with the 21 previously declared secondary indexes and eight prepared records.
+No application, test or configuration correction was authorized. Inspection
+stopped before MongoDB startup, index creation or suite invocation.
+
+The prepared integration is an exported entrypoint, not a complete executable
+supervised launcher. It requires a concrete SupervisedFixtureInitialization:
+
+- apps/api/scripts/completion-student-fixture.ts:192-196 declares assertOwned,
+  onLoss and readCredentials, plus expected MongoDB PID/storage locators.
+- The initializer calls assertOwned before connection at line 221 and again
+  during generation checks; it requires onLoss lifecycle registration at line 276.
+- apps/api/tests/completion-student-fixture.integration.ts:22 accepts that object
+  from an external trusted initializer; it does not implement the native provider
+  or privately collect the owner's credentials itself.
+
+No verified concrete adapter implementing these callbacks was found in the
+inspected prepared artifacts or retained runner sources. The earlier supervised
+runner establishes native ownership in its PowerShell parent and uses a one-shot
+stdin barrier for helpers; that barrier is not a live callable ownership/loss
+provider for this new serving-process initializer. An empty callback, no-op loss
+subscription, GO/env flag or serialized assertion would not satisfy the contract.
+None was substituted. The owner-entered author/reviewer/Student private input
+channel also has not been established for this execution. No passwords were
+requested through chat, invented, read, logged or placed in arguments/files.
+
+Section 36's prepared integration evidence is retained. Its integration-readiness
+wording was too strong: eight assertions/records and source/offline coverage were
+prepared, but the concrete live supervised setup adapter was not supplied. Offline
+PASS and the earlier source-review result do not establish these runtime facts.
+The new gate is BLOCKED, not an executed test failure. A bounded concrete adapter/
+private-input reconciliation is required; no new handshake, attestation protocol,
+native-helper change or weakened authority was introduced under this approval.
+
+### 37.2 Observed preflight and index declarations
+
+Read-only ordinary-user inspection confirmed AdministratorEnabled=false and the
+expected unelevated Windows account. Port 27018 was initially free; 3000/4000/5173
+were also free in the observed listener set. No leftover deeplearner-*mongo*
+disposable storage directory was found. No test-owned MongoDB process, Job,
+retained test handle or storage was created. Consequently its native UTC/microsecond
+identity, writable PRIMARY and empty exclusive target checks were NOT_REACHED;
+full isolation preflight is BLOCKED rather than PASS.
+
+The 21 declared index definitions were statically reconciled as the unchanged
+thirteen Slice 2 declarations plus eight F006 User/Session declarations (14 UNIQUE,
+7 nonunique). The nine relevant existing index/model/repository source hashes
+match the previously accepted Slice 2 pins; the eight Auth declarations match
+Section 35 and current User/Session models, including the exact provider string
+partial filter and sessions.expiresAt TTL=0. All require v2/simple defaults with
+no unapproved sparse/hidden/collation/partial/TTL options. This is declaration
+reconciliation only: **0 indexes provisioned; live readiness NOT_RUN**. No database
+connection, collection operation, migration, backfill or persistent write occurred.
+The exact collection/name/ordered-key/uniqueness/options manifest is retained in
+the blocked evidence directory's declared-index-allowlist.json.
+
+### 37.3 Outcome, cleanup and next gate
+
+**Integration NOT_RUN: 0 PASS / 0 FAIL / 8 NOT_RUN; zero invocations/retries.**
+Admin/Student login/session provenance, same-process origin, first qualification
+and completion API assertions were not reached and are not promoted to live PASS.
+No new credentials or tokens were created or disclosed. No process termination or
+cleanup was necessary: no owned processes, Jobs, native handles or MongoDB storage
+were allocated. Owned exit codes/Job emptiness/handle closure/storage disposal are
+NOT_APPLICABLE, not fabricated cleanup PASS. No forced termination occurred.
+
+Protected MongoDB/development process identities and relevant listener metadata
+were unchanged across the read-only observation pair. Protected demo-storage
+relative paths, file sizes and write-time metadata were unchanged. This is a
+filesystem/process observation, not database-content inspection or a claim of
+physical WORM/production safety. Port 27018 remained free. Raw sanitized context,
+process/port/demo observations and result.json are retained under:
+
+E:/AI/DeepLearner/.cache/f038-slice3-integration-blocked-2026-10-20-22-49-40
+
+Only this feature document changes in the repository during this gate. All 577
+previously passing offline tests, earlier integration histories and approved
+feature contracts remain intact; no passing offline suite was repeated. Existing
+141 plus twelve Slice 3 browser cases remain **153 NOT_RUN**. No browser exception
+or production approval transfers. F001-F037 remain APPROVED_COMPLETE and F038
+remains **IN_PROGRESS**, not ready for full final review based on this gate.
+
+Next owner gate: approve a bounded design/correction for the concrete supervised
+initializer and verified private credential input within the accepted trust-code
+boundary, identifying any necessary extra paths or security-interface decisions.
+After that prerequisite is established, request a fresh single guarded execution.
+Do not automatically fix, invoke, rerun, stage, commit, push or begin F039.
+
+## 38. Slice 3 opt-in supervised launcher: offline evidence and blocked acceptance
+
+### 38.1 Owner-approved scope (2026-10-21, Asia/Calcutta)
+
+The owner approved implementation/offline verification in exactly these five paths:
+
+| Operation | Path | Boundary |
+| --- | --- | --- |
+| MODIFY | scripts/LocalProcessOwner.cs | Repository-owned native helper; opt-in extension. |
+| MODIFY | scripts/tests/LocalStartup.Tests.ps1 | Repository-owned focused and existing startup checks. |
+| MODIFY | docs/features/F038-completion-rules.md | Evidence only; existing history/status preserved. |
+| CREATE | .cache/f038-slice3-supervised-launcher.ps1 | Ignored, temporary test-only parent adapter. |
+| CREATE | .cache/f038-slice3-supervised-host.mjs | Ignored, temporary test-only fixture host/adapter. |
+
+Slice 3's repository inventory expands from 19 to 21 paths (11 creations and ten
+modifications); the feature document was already included. The two temporary
+adapters are separate, not production launchers or committed dependencies. Test
+output stays in the existing ignored .cache/local-startup-tests harness location.
+No canonical API/database, application, configuration, dependency or index changes
+are made at this gate. F001-F037 APPROVED_COMPLETE and F038 IN_PROGRESS remain.
+
+### 38.2 Implemented operational supervision, not qualification authority
+
+Owner.Start retains its existing signature and file-backed behavior. The explicit
+StartControlled path instead supplies private anonymous inherited stdin/stdout
+pipes; only the child's stdin/stdout/stderr are in the native handle allowlist.
+Parent pipe ends are noninheritable. Atomic suspended creation in the exact unnamed
+kill-on-close Job, retained process handles and existing no-breakaway behavior
+remain. Observe refuses foreign Child objects, closed owners/handles and arbitrary
+PID adoption. It observes retained and independently opened process handles, exact
+native creation FILETIMEs, executable, live state and membership in the same Job.
+
+The parent combines those observations with fresh CIM PID/executable/parent
+creation identity, owner name/SID and creation time truncated on both sides to the
+existing common UTC microsecond precision. Raw native times must still match
+exactly. No cached ownership PASS substitutes for a new assertion. Ordinary
+unelevated Windows context is required. Protected process/listener/demo-storage
+metadata is compared before/after, matching the accepted runner; full unrelated
+demo-tree/port enumeration is not performed inside each ownership RPC. Storage
+path/reparse checks and native/CIM/Job checks remain fresh per request.
+
+The opt-in adapter binds the actual launched peer to a 256-bit random child nonce
+and parent generation over those private handles. It validates exact canonical
+JSON fields/types, monotonically increasing ordinals and distinct per-request
+nonces. It bounds frames to 8 KiB, outstanding requests to 16, parent requests to
+1,024 and the run to 150 seconds (host accepts no lease beyond 180 seconds).
+Ownership requests have five-second deadlines; parent writes have one-second
+deadlines. PASS/FAIL/UNKNOWN are explicit; non-PASS, unknown/stale/replayed frames,
+EOF, malformed UTF-8, timeout and channel/process/Job loss refuse permanently.
+Two-second heartbeat/parent monitoring never replaces a fresh request check and
+does not enqueue redundant heartbeat work while an assertion is pending.
+
+onLoss latches once, rejects pending assertions, invokes registered disposal
+callbacks and immediately notifies a late subscriber. A stale callback or new
+connection cannot restore the generation. The existing initializer still wires
+this notification to origin disposal; existing Mongoose generation/pool/topology
+loss invalidation is unchanged. Abrupt parent death closes the Job and kills its
+contained processes; callback delivery to an already killed child is not claimed.
+Observations have bounded detection latency, not instantaneous global attestation.
+
+Exactly three hidden console entries use SecureString, a five-minute total input
+deadline, length bounds and redirected-input refusal. The same owner-held private
+channel delivers them once after another fresh ownership check. BSTRs are zeroed;
+references, pending values and SecureStrings are cleared/disposed on success or
+failure, including failures before launch. No credential goes into argv, process
+environment, source credentials, evidence, logs or fixture responses. Console
+entry itself was not exercised with owner passwords; only synthetic nonsecret
+values were used. Managed heap zeroization is not claimed.
+
+The host discards raw application/test stdout/stderr and forwards only bounded
+allowlisted record counters. Terminal counters are not ownership proof and cannot
+revive authority after the fixture's existing shutdown closes stdin. The enclosing
+verified runner retains MongoDB startup, PRIMARY/empty-target checks, the exact
+21-index allowlist and graceful MongoDB shutdown before any necessary owned-Job
+termination. These adapters neither create MongoDB nor provision indexes. A flag,
+nonce, LOCAL, JSON claim or a caller-supplied callback alone is not bootstrap
+authority; the accepted owner-approved trusted fixture-code/native-owner boundary
+remains required. This is not physical storage attestation or a new completion
+capability, and it does not change Option B origin or Slice 1/2 transactions.
+
+### 38.3 Actual offline verification and historical draft outcomes
+
+Final focused execution of the exact seven opt-in check blocks: **7 PASS / 0 FAIL**.
+Its separate Node protocol suite: **30 PASS / 0 FAIL**. These nested/check-wrapper
+counts are reported separately, not summed as distinct independent tests. Actual
+owned-process checks cover retained/CIM identity, wrong executable/parent/Job,
+changed creation-time pin, exited/closed handles, private duplex delivery, bounded
+frames, read deadlines, real inherited EOF, graceful exit and explicit forced
+Job cleanup. Controlled stale-identity refusal is not a real OS PID-reuse test.
+Protocol tests cover correlation/replay, invalid input, deadlines, heartbeat loss,
+permanent callback invalidation, credential one-use and safe result reporting.
+
+Final focused evidence: .cache/local-startup-tests/d69446980e284209b20369275d413555.
+Before/after protected process, port and demo-storage metadata matched. This is
+metadata observation, not a protected database-content read. Each focused Job
+emptied and native handles closed; graceful probe/resource exits were zero and
+deliberate forced negative controls were not described as graceful success.
+Port 27018 remained unused. No MongoDB, API service, browser or real credentials
+were started/collected. Actual owner-console entry remains NOT_VERIFIED.
+
+Normal mock-only regression: **15 PASS / 0 FAIL**, with native checks NOT_RUN in
+that invocation. New adapter checks require explicit -SupervisedFixture, so a
+normal checkout/test run does not depend on ignored temporary files. The actual
+Start-DeepLearner.ps1 and all application/Auth/transaction sources are unchanged.
+
+An earlier draft full harness passed 32/32, retained at
+.cache/local-startup-tests/610a4c82b53940e9ad97a6d208ec35fc. A later full run passed
+all new checks but stopped in the existing descendant-count assertion: 23 harness
+checks PASS / 1 FAIL / eight later checks NOT_RUN, plus the separately passing 30
+protocol tests. Evidence: .cache/local-startup-tests/9fa60d90b2344d4a9db6d4bf4028c8ac.
+That failure is not overwritten by the narrower final passing run.
+
+An isolated reproduction observed the Job transition from two to three members:
+root node.exe PID 23156, child node.exe PID 6492 and conhost.exe PID 27280. All
+were inside the exact owned Job. The unchanged legacy assertion demands exactly
+two and reports 'Descendant not observed' even when an additional owned console
+host exists. Cleanup used only that owned Job; later observation confirmed these
+PIDs absent and port 27018 free. The failed diagnostic's native exit codes were
+not retained and remain UNKNOWN. Its full before/after baseline comparison was
+not completed, so it is not promoted to the final focused baseline PASS.
+
+Earlier in-scope drafts exposed a nested test-runner probe bound to the active
+test, a PowerShell void-task-result pipeline artifact and unnecessary protected
+metadata scans exhausting an ownership deadline. The fresh top-level probe,
+discarded void result and before/after baseline placement corrected those issues
+without extending deadlines or weakening native identity checks. Initial parser/
+invocation mistakes in verification commands are not counted as passing tests.
+Sandbox PowerShell/CIM denial used the previously approved ordinary-user method;
+this did not enable Administrator membership or weaken ownership safeguards.
+
+API source/test TypeScript, C# compilation, PowerShell parse, Node syntax,
+temporary JavaScript formatting, UTF-8/no-BOM/LF and diff checks PASS. No full
+577-test suite or MongoDB suite was repeated. Full startup-regression acceptance
+is BLOCKED by the retained legacy assertion below; final focused PASS does not
+override it or authorize integration.
+
+### 38.4 Separate final source/security review and owner disposition
+
+Final five-path review: **CRITICAL 0 / HIGH 0 / MEDIUM 1 / LOW 1 unresolved**.
+
+| Severity / reference | Actual finding and required owner disposition |
+| --- | --- |
+| MEDIUM SL3-SUP-01 | .cache/f038-slice3-supervised-launcher.ps1:120 refuses secrets in the child environment as explicitly required. Existing apps/api/src/config/env.ts:26 requires ACCESS_TOKEN_SECRET from process.env before normal Auth can initialize. The temporary host deliberately does not invent another configuration/secret-injection mechanism. The guarded fixture cannot yet start with a valid Auth configuration under both constraints. Approve a narrowly scoped ephemeral signing-key exception to the environment prohibition, or separately approve a configuration-injection design and any required source path. Owner passwords/tokens must remain absent from environment/argv/logs/files in either case. |
+| LOW SL3-SUP-02 | scripts/tests/LocalStartup.Tests.ps1:361 preserves the existing exact ActiveCount==2 descendant assertion. The isolated reproduction confirms an additional owned conhost can make this assertion fail, although root/descendant remain contained. Authorize a focused test correction that checks actual root/descendant identities and exact Job containment/cleanup, including console hosts; do not silently relax/delete the assertion to manufacture PASS. |
+
+Review anchors, not extra findings: scripts/LocalProcessOwner.cs:53 (bounded
+private frames), :111 (retained/independent identity), :139 (opt-in launch);
+.cache/f038-slice3-supervised-launcher.ps1:22 (fresh native/CIM checks), :46 (hidden
+bounded input); .cache/f038-slice3-supervised-host.mjs:110 (async assertion), :248
+(terminal loss registration). No new public endpoint, arbitrary Admin authority,
+cached answer/result authorization, logging of credentials, completion mutation,
+index or canonical-contract change was found.
+
+**SUPERVISED LAUNCHER ACCEPTANCE / INTEGRATION READINESS BLOCKED.** The concrete
+channel/ownership/credential adapter passes focused offline checks; neither this
+nor the historical 577-test result resolves the two findings. Stop for owner
+disposition before another implementation correction or guarded invocation. The
+21 prior index definitions and eight integration records are unchanged and remain
+NOT_RUN for this gate. All historical blocked attempts remain above. Existing 141
+plus twelve Slice 3 browser cases remain **153 NOT_RUN**, with no inherited browser
+exception or production readiness. F038 stays **IN_PROGRESS**, not READY_FOR_REVIEW
+or APPROVED_COMPLETE; no Git delivery, next-stage or F039 work is authorized.
+
+Execution estimate was 40-70 minutes; the measured work window was approximately
+26 minutes (2026-10-21 06:47-07:14 Asia/Calcutta). Final comparison of 499 existing
+source files found only the three approved repository modifications, with no
+additional source creation/deletion; both temporary adapters are Git-ignored.
+The entire pre-gate feature-document byte prefix is preserved. Final UTF-8/LF,
+JavaScript syntax/formatting and diff checks passed. This timing/scope evidence
+does not resolve the two findings or authorize a MongoDB invocation.
+
+## 39. Owner-approved launcher corrections: offline verification PASS
+
+### 39.1 Exact correction authority and scope
+
+On 2026-10-21 the owner explicitly approved the narrow LOCAL disposable signing-key
+exception and replacement of the legacy exact-two-process assumption with positive
+containment/identity validation. Section 38's failures and findings remain history;
+this section records their resolution, not a retroactive PASS for those runs.
+
+Exactly five existing approved paths are modified:
+
+- scripts/LocalProcessOwner.cs
+- scripts/tests/LocalStartup.Tests.ps1
+- docs/features/F038-completion-rules.md
+- .cache/f038-slice3-supervised-launcher.ps1 (ignored, temporary)
+- .cache/f038-slice3-supervised-host.mjs (ignored, temporary)
+
+No repository path, dependency, public route, application/Auth source, model,
+index, configuration file or canonical document is added/changed. The existing 21-path
+Slice 3 repository inventory and two separate temporary helpers remain the scope.
+F001-F037 APPROVED_COMPLETE, F038 IN_PROGRESS and F039 NOT_STARTED are preserved.
+
+### 39.2 Private ephemeral Auth key and lifecycle
+
+The parent generates a new 64-byte cryptographically random key only after fresh
+retained-handle/CIM/executable/owner/parent/Job/storage checks for the owned resource
+and the actual fixture host. AUTH_KEY is a one-use operation on the same private
+inherited pipe, bound to existing nonce/generation/ordinal/request correlation and
+five-second ownership deadlines. No caller-supplied key or existing key is adopted.
+Parent byte buffers are cleared immediately after delivery; no key is passed in
+the CreateProcess environment, command arguments, files, logs or JSON evidence.
+
+Only the verified child temporarily sets ACCESS_TOKEN_SECRET while the existing
+config/env.ts validates its normal Auth configuration. It removes the environment
+entry immediately after module initialization, before application work or ordinary
+child-process launch. Nonsecret issuer/audience and LOCAL cookie/origin/port values
+use the existing contracts in a cloned child environment; the parent and machine
+environments are unchanged. Existing inherited-key/preload refusal remains. The
+normal application startup and production Auth configuration are untouched.
+
+The existing tsx/ESM loader and access-token implementation are loaded before key
+delivery. The installed Node loader worker is already running with its separate
+key-free environment; no SHARE_ENV or new worker is introduced for injection.
+The key is absent before the probe launches an unrelated child, which verifies
+that it does not inherit ACCESS_TOKEN_SECRET. This is the narrow owner-approved
+child-only initialization exception, not permission to put passwords, refresh or
+access tokens into an environment. Node documents the independent worker copies
+in its [process.env contract](https://nodejs.org/download/release/v24.15.0/docs/api/process.html#processenv).
+
+The temporary wrapper permits one initialization per supervisor, requires fresh
+owned proof, validates the canonical 64-byte encoding, and uses unchanged normal
+Auth signing/verification. Loss immediately invalidates the wrapper, clears its
+byte buffer/environment/config references and invokes existing origin/HTTP/DB
+shutdown. Cached Auth service buffers are not falsely claimed to be individually
+cryptographically revoked or securely zeroed. The host has a four-second exit
+fallback on loss; the existing parent shutdown deadline and exact owned-Job cleanup
+remain authoritative for an unresponsive event loop. No process restart can reuse
+or reconstruct this key. Managed-string/heap zeroization is not claimed.
+
+Offline tests exercise the real Auth factory's normal signing and verification,
+wrong-token/wrong-key refusal, loss invalidation, config cleanup, one-use refusal
+and independent-key rejection. They are not evidence of actual Admin/Student
+login, refresh sessions or database-backed authorization; those eight records
+still require separately approved guarded MongoDB execution.
+
+### 39.3 Exact process graph and retained conhost identity
+
+The native helper adds a bounded complete Job-member observation (at most 64
+members; truncated, ambiguous or failed results refuse). CaptureMember opens a
+read/query/synchronize-only retained handle only after exact native Job-list
+membership, then checks an independently opened handle and exact creation time.
+The opaque Member cannot create/adopt/terminate a process and is tied to its exact
+Owner; foreign, exited, disposed or changed identities refuse. All observational
+handles are closed by Owner.Dispose. The native list layout follows Microsoft's
+[JOB_OBJECT_BASIC_PROCESS_ID_LIST](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-jobobject_basic_process_id_list).
+
+The corrected test verifies the complete process graph, not a permissive count:
+exact original Node root; exact reported Node descendant with the pinned root as
+parent; and at most one additional conhost.exe from the OS-reported canonical
+Windows system directory with the root or verified descendant as its pinned
+parent. The reported PID only locates a candidate. Every accepted member requires
+retained/independent native identity, exact Job, native/CIM executable, current
+owner SID, common-microsecond creation time and matching parent creation identity.
+Complete membership is checked again after validation. Unknown extras, wrong
+executables/parents, unrelated same-Job peers, foreign Jobs and stale handles fail.
+
+The positive run actually observed two verified Node processes and one verified
+Windows conhost. Cleanup checked nonzero forced exit results for every retained
+member, empty Job and closed handles. Existing graceful/forced/crash-owner shutdown
+assertions remain. No protected PID is terminated/adopted and normal Owner.Start
+and Start-DeepLearner.ps1 behavior remains unchanged.
+
+### 39.4 Actual verification, timing and separate formal review
+
+Full relevant startup/native harness: **33 PASS / 0 FAIL**. Its nested protocol
+suite: **34 PASS / 0 FAIL** (reported separately, not added as independent wrapper
+tests). Evidence: .cache/local-startup-tests/f3e2335f33e141a79a05f47013affbc9.
+Protected MongoDB/development identities, listeners and demo-storage metadata
+matched before/after; parent signing-key presence/environment was unchanged.
+No database contents were read and no MongoDB or API service was started.
+
+Final targeted rerun after binding conhost to the OS system-directory API:
+**2/2 containment checks PASS**, plus a separate in-memory CSPRNG 64-byte size,
+nonreuse and byte-buffer clearing check PASS. The two checks repeat existing
+harness identities and are not added to the 33 count. Protected metadata again
+matched; evidence: .cache/local-startup-tests/3ba5cde2f43341dcab4e5e5d38ae825a.
+An initial draft hit a running-output-file sharing error before containment
+assertions; the fixture reader now explicitly shares the writer, within the
+approved test path. That failed draft is retained, not counted as a passing run.
+
+C# compile, PowerShell parse, API source/test TypeScript, temporary JavaScript
+syntax/formatting, UTF-8/no-BOM/LF, exact-scope and diff checks PASS. No unrelated
+passing API/frontend suites were repeated. Estimated duration was 20-35 minutes;
+actual elapsed was approximately 46 minutes, including a prolonged tool-return
+delay of about 25 minutes. The delay was reported; its exact infrastructure cause
+was not established. The pending focused command ultimately exited 0 and its
+actual checks passed with no deadline/budget increase or assertion weakening.
+
+Separate complete correction-diff security review: **CRITICAL 0 / HIGH 0 /
+MEDIUM 0 / LOW 0 unresolved**. SL3-SUP-01 and SL3-SUP-02 are resolved only by this
+explicit owner approval and new evidence. Review anchors (not findings):
+
+- .cache/f038-slice3-supervised-launcher.ps1:94 and :193: fresh CSPRNG key,
+  private one-use delivery after ownership proof; parent/child environment split.
+- .cache/f038-slice3-supervised-host.mjs:341 and :441: genuine Auth compatibility,
+  minimal child injection, terminal cleanup/exit, no cache-based authorization.
+- scripts/LocalProcessOwner.cs:95, :140, :158 and :169: observational retained
+  handles, complete native Job membership and foreign/stale-handle refusal.
+- scripts/tests/LocalStartup.Tests.ps1:18 and :409: canonical conhost identity,
+  exact parent graph, negative controls and unchanged cleanup assertions.
+
+**LAUNCHER CORRECTIONS / OFFLINE VERIFICATION PASS - PARTIAL F038.** The adapter is
+ready for a separately approved single guarded fixture/session integration, not
+for production or automatic execution. The exact 21 reconciled indexes and eight
+prepared integration records are unchanged; **0 integration invocations** occurred
+at this gate. Actual owner-console credential entry remains unverified; no real
+passwords were collected. All **153 browser scenarios remain NOT_RUN**. Existing
+failover, multi-process, privacy/retention/erasure and release limitations remain.
+F038 stays **IN_PROGRESS**; no completion approval, Git delivery or F039 work.
+
+## 40. Slice 3 guarded integration gate: private owner input BLOCKED
+
+Owner authorization: one guarded disposable execution using the verified
+supervised launcher, the unchanged 21-index allowlist and eight prepared records.
+This gate began 2026-10-21 at 02:38:42 UTC. The estimate communicated before work
+was 25-45 minutes, with live handoff, owner-console entry and MongoDB startup as
+uncertainties. It stopped after approximately eight minutes at a prerequisite,
+without a suite invocation or retry; there was no execution-time overrun.
+
+### 40.1 Read-only checks actually obtained
+
+- Ordinary Windows user execution was verified unelevated through the existing
+  supervisor context checks. Both ports 27018 and 4000 were free.
+- No previous disposable MongoDB process or matching disposable storage remained.
+  The installed Node/MongoDB executables and protected demo-storage directory were
+  observable. These observations do not attest a newly started process.
+- The existing exported fixture index metadata was compared with the retained
+  approved manifest from .cache/f038-slice3-integration-blocked-2026-10-20-22-49-40.
+  All **21 definitions matched**: ordered keys, names, collections, uniqueness,
+  partial filter and TTL. There are 14 unique and seven nonunique indexes, one
+  partial filter and one TTL definition. The comparison imported declarations
+  only; Mongoose remained disconnected and no tests were invoked. The established
+  v2/simple/default-option requirements remain unchanged. No indexes were created
+  or checked against a live database at this gate.
+- Retained native-handle/Job verification, common-microsecond UTC comparisons,
+  duplex assertOwned/onLoss and private one-use credential/key delivery were
+  inspected in the existing launcher. Their prior 33 harness / 34 protocol PASS
+  evidence is retained; those checks were not rerun or promoted to live MongoDB
+  integration evidence.
+
+### 40.2 Exact blocker and actual counts
+
+The approved private-input operation requires the owner's direct hidden entry
+of three temporary passwords in a real local console. The owner was asked only
+whether they were available for that local entry, explicitly not to send secrets
+in chat. Availability remained unconfirmed when the gate stopped. No console
+credential collection was started, and no substitute credentials, fabricated
+tokens or serialized ownership claims were used.
+
+Overall isolation/supervision preflight: **BLOCKED**, with private-entry readiness
+UNKNOWN. Fresh MongoDB/fixture process identity, writable PRIMARY, empty target,
+live supervision and live Auth verification are **NOT_RUN**, not PASS. Index
+provisioning: **NOT_RUN**. Integration: **0 PASS / 0 FAIL / 8 NOT_RUN**; **zero suite
+invocations**. Admin/Student authentication, synthetic-origin continuity,
+completion persistence/proof and session separation remain unverified by this
+guarded execution. This is not evidence of an application or launcher failure.
+
+### 40.3 Resource checks, preservation and next gate
+
+No MongoDB or fixture host was started, no disposable storage was created and no
+database connection was opened. Thus child exit codes, graceful/forced shutdown
+and child-handle cleanup are **NOT_APPLICABLE**; there was no forced termination.
+A separate empty observational Job was confirmed empty and disposed. Port 27018
+remained free; protected MongoDB/development-process, listener and demo-storage
+metadata matched across the closing read-only check. The ordinary-user parent
+environment was unchanged. No credentials, tokens, signing keys or private IPC
+payloads were collected, printed or persisted.
+
+Only this evidence document is authorized to change. Earlier blocked runs,
+corrections, offline evidence and acceptance history remain intact. F001-F037
+remain APPROVED_COMPLETE for local development; **F038 stays IN_PROGRESS**.
+All **153 browser scenarios remain NOT_RUN**. Real failover, multi-process,
+privacy/retention/erasure and production release verification remain outstanding.
+Next gate: arrange the owner's private local-console availability and authorize
+resumption of the guarded execution. No automatic startup, correction or rerun.
+
+## 41. Slice 3 single supervised integration: nonzero fixture host; review BLOCKED
+
+The owner subsequently confirmed readiness for private local-console entry.
+This resumed the authorized gate; Section 40 remains an accurate historical
+pre-start stop, not a suite invocation. No additional suite invocation was added
+to compensate for the outcome below.
+
+### 41.1 Timing and executed isolation checks
+
+Resumption began 2026-10-21 at 02:54:13 UTC. The communicated remaining estimate
+was 20-40 minutes, with credential handoff and live fixture startup uncertain.
+The supervisor began at 02:57:48 UTC and completed cleanup at 02:59:05 UTC.
+Preparation, execution, closing checks and evidence took approximately eight
+minutes overall; the early failure shortened execution, with no material overrun.
+
+The existing supervised launcher and native helper were invoked without source
+changes. Ordinary unelevated Windows execution, free ports 27018/4000, no stale
+disposable processes/storage, a fresh exact owned Job, fresh marked storage and
+protected process/listener/demo-storage baselines were checked. MongoDB and helper
+identity checks passed against retained and independent native handles, exact
+executable/parent/current owner/Job/live state and pinned creation time. Native
+and CIM UTC ticks were compared after truncation to common one-microsecond
+precision; exact retained/independent native creation identity remained required.
+
+The existing initializer verified the exact loopback target 127.0.0.1:27018,
+replica set f021-test, database deeplearner-f021-test, writable PRIMARY, permitted
+database enumeration and an empty exclusively owned target. It exited **0** and
+closed its MongoClient. Only then was the supervised fixture invoked. Live duplex
+ownership RPC checks passed; the final recorded resource and host checks were
+both PASS, completed in 1,568 ms with no failed identity predicates. Prior
+onLoss/protocol checks are retained; a passing live loss/restart scenario cannot
+be inferred from the incomplete result evidence below.
+
+### 41.2 Exact disposable provisioning and private boundary
+
+The unchanged fixture declarations were reconciled with the complete retained
+21-definition manifest before provisioning: collection/name, ordered keys,
+uniqueness, exact provider partial filter, session TTL, v2 and simple/default
+options. Only those **21 approved indexes** were created in the disposable target:
+13 approved Practice/progress/evidence/completion definitions plus eight approved
+User/Session definitions, comprising 14 unique and seven nonunique indexes.
+Every actual definition was checked through the existing strict fixture verifier;
+each collection had only its approved indexes plus automatic _id_, default
+collection options and zero documents before fixture execution. No extra indexes,
+persistent provisioning or migrations were performed.
+
+The owner entered the three temporary passwords directly in the approved hidden
+local console. The existing private inherited duplex channel and ephemeral Auth
+key path were used; no password, token, signing key or private IPC transcript was
+printed, persisted in evidence or supplied in command arguments. Existing child
+Auth configuration behavior was unchanged. Secure input was disposed/cleared by
+the launcher finally path; the fixture host exited. Parent environment remained
+unchanged. The fixture stderr file is empty; no raw child diagnostic output was
+forwarded to recover missing results.
+
+### 41.3 Actual failure and result observability limit
+
+**Exactly one suite invocation; zero invocation retries.** The existing eight
+prepared records and all assertions were unchanged. The supervisor received a
+valid bounded RESULT frame, then reached HOST_EXIT and refused the fixture's
+nonzero exit: **supervised-fixture exit 1**, sanitized category
+HOST_NONZERO_EXIT / SUPERVISED_FIXTURE_REFUSED. No implementation or assertion was
+changed and no automatic diagnosis/correction/rerun followed.
+
+**Integration outcome: FAIL / final acceptance BLOCKED. Exact PASS, FAIL and
+NOT_RUN record counts: UNKNOWN.** The current launcher keeps the received counts
+only in its local result variable and throws on nonzero exit before returning
+them. Its allowlisted exception data does not retain those counts or the failing
+record/category. The operational wrapper therefore cannot honestly report a
+numeric breakdown, or claim all eight records completed. The zero-initialized
+Pass/Fail properties in result.json are placeholders, **not observed zero-test
+counts**. Private frames were deliberately not recorded, and no process-memory
+or credential-bearing data inspection was attempted.
+
+Consequently independently authenticated Admin/Student sessions, reviewed
+policy/rubric approval, synthetic-origin continuity, completion APIs/proofs,
+session separation, origin-loss refusal and F036/F037 compatibility are **not
+confirmed by this execution**. The underlying fixture/launcher failure cause is
+INCONCLUSIVE from the retained sanitized evidence. A host exit or partial run
+must not be promoted to passing authentication, completion or secrecy assertions.
+
+### 41.4 Cleanup, preserved evidence and next owner gate
+
+Owned child exit codes were observable from the original Owner-retained Child
+handles: MongoDB **0**, initializer **0**, supervised fixture **1**, shutdown
+helper **0**. The graceful helper reverified the owned target and closed its
+MongoClient. No forced termination was needed. Job empty, all retained child
+handles closed, disposable storage safely removed, ports 27018 and 4000 released,
+and supervisor exit were verified. Protected process/listener/demo-storage
+metadata and parent environment matched; the runner's source pins were unchanged.
+No persistent database or protected process was modified.
+
+Safe evidence: .cache/f038-slice3-live-2026-10-21/result.json, progress.json,
+context.json, native identity checks, approved-index-definitions.json, initializer
+and shutdown markers, protected before/after snapshots and source pins. Result
+fields must be read with the count limitation above. No private channel transcript
+or credential values are part of this evidence.
+
+Only this feature evidence document changed. Prior 577 offline PASS, 33 harness
+PASS, 34 protocol PASS, earlier Slice 1/2 integration results, blocked attempts
+and correction history remain unchanged; no passing offline suite was repeated.
+**F038 remains IN_PROGRESS**; F001-F037 remain APPROVED_COMPLETE locally. All
+**153 browser scenarios remain NOT_RUN**. Real failover, multi-process convergence,
+privacy/retention/erasure and production release prerequisites remain unresolved.
+
+Next owner gate: separately approve bounded diagnosis of the nonzero fixture
+exit and the launcher's safe count/error-category retention gap. Any launcher
+correction and fresh guarded execution require separate approval. Full F038
+final acceptance is not ready; no Git delivery, production or F039 work follows.
+
+## 42. Slice 3 guarded diagnostic attempt: initializer BLOCKED before fixture
+
+### 42.1 Authorization, retained diagnostics and timing
+
+The owner authorized one guarded diagnostic execution using the instrumented
+supervised launcher, unchanged eight prepared records, twenty-one approved index
+definitions and eight required empty collections. Prior blocked attempts and
+Section 41's incomplete counter evidence remain historical evidence, not passing
+integration results. Subsequent retained failure evidence is also preserved in
+.cache/f038-slice3-rerun-2026-10-21-0355: resource ownership PASS, host ownership
+UNKNOWN, OWNERSHIP_REPLY / MethodInvocationException, counters UNKNOWN and graceful
+cleanup. This attempt does not retrospectively resolve that failure.
+
+The accepted diagnostic-only offline evidence remains 39/39 harness checks,
+54/54 nested protocol cases and 5/5 final targeted checks PASS, with zero unresolved
+Critical/High/Medium/Low review findings. Nested and repeated checks are not added
+as distinct tests. No passing offline suite was repeated during this gate.
+
+This gate began 2026-10-21 at 05:41:11 UTC. The communicated estimate was 20-40
+minutes; principal uncertainties were private entry, startup and the unresolved
+ownership channel. The visible supervisor started at 05:48:59 UTC, recorded its
+run at 05:49:01 UTC and completed cleanup at 05:49:46 UTC. Independent closing
+verification was recorded at 05:52:39 UTC. Preparation, verification and evidence
+took approximately thirteen minutes overall; the prerequisite failure shortened
+execution. There was no material overrun.
+
+### 42.2 Pre-start reconciliation and actual process isolation
+
+The owner explicitly confirmed readiness and entered three new temporary
+passwords only in the approved hidden local console. Private input completed
+before MongoDB startup. No substitute credentials, fabricated JWT or public Admin
+registration was used. No credential, key, token or private IPC frame was printed
+or persisted. SecureStrings were disposed and cleared in the finally path; the
+host was never started, so private credential/key delivery did not occur.
+
+Source metadata reconciled all 21 definitions with the previously retained
+approved manifest: exact collections/names/ordered keys, 14 unique and seven
+nonunique definitions, one exact provider partial filter and one session TTL.
+The manifest's descriptive v2/simple/no-alternate annotations were checked
+separately from the model declaration shape; the existing strict index verifier
+remains unchanged. The eight collection names also remain exactly auditLogs,
+technologies, learningPaths, modules, topics, concepts, practiceQuestions and
+visualizations. A sandboxed metadata import could not perform its Windows user
+lookup; the read-only comparison completed in the required ordinary-user context
+without a database connection. No index contract was changed.
+
+The ordinary unelevated supervisor verified ports 27018/4000 initially free,
+absence of previous disposable MongoDB/storage/fixture-host resources, executable
+pins, fresh marked isolated storage and protected process/listener/demo-storage
+baselines. The original native Owner created a fresh exact Job and retained the
+MongoDB/initializer/shutdown Child handles. Native and independent handle identity,
+executable, owner, parent, Job membership and live-state checks passed. Exact
+native creation identity and native/CIM UTC comparison truncated to common
+one-microsecond precision remained mandatory. Recorded identity durations were
+695-1,040 ms; all recorded predicates passed.
+
+An ignored per-attempt execution wrapper records the orchestration in the evidence
+directory. Existing launcher, host, native helper, application, test, Auth and
+configuration sources were not modified. This wrapper is execution evidence, not
+a new normal-startup or authentication contract.
+
+### 42.3 Exact stop and unverified conditions
+
+**Overall preflight BLOCKED at INITIALIZATION. One guarded attempt; zero fixture
+host or integration-suite invocations; zero invocation retries. Integration:
+0 PASS / 0 FAIL / 8 NOT_RUN.** These are known not-run counts from the pre-host
+gate, not fabricated counters from a failed host.
+
+The temporary initializer exited **1**, emitted only the allowlisted
+OWNED_INITIALIZER_REFUSED marker and confirmed OWNED_CLIENT_CLOSED. Neither
+WRITABLE_PRIMARY_EMPTY_EXCLUSIVE_TARGET nor the index-provisioning completion
+marker was emitted. The earliest retained failure is therefore initializer exit
+1 before the verified PRIMARY/empty-target gate. Its underlying operation and
+MongoDB error name/code were not retained: root cause **INCONCLUSIVE**. No
+application or Auth defect is established by this evidence.
+
+Index provisioning and eight-collection preparation are **NOT_RUN**. No fixture
+host was launched; live duplex assertOwned/onLoss, OWNERSHIP_REPLY diagnostics,
+Admin/Student authentication, independent approvals, synthetic-origin sealing,
+completion APIs/proofs, session isolation and answer-secrecy assertions are
+**NOT_RUN**, not PASS. Existing offline diagnostics remain available for a future
+separately approved attempt; no host observations are invented for this run.
+
+### 42.4 Forced cleanup, exact limitations and next gate
+
+The graceful shutdown helper was released only after fresh retained-handle checks
+on itself and MongoDB. It exited **1**, emitted OWNED_SHUTDOWN_REFUSED and confirmed
+OWNED_CLIENT_CLOSED. The original Owner then captured/verified remaining exact-Job
+membership and used owned-Job termination. **Forced cleanup occurred.** Initializer
+exit **1** and shutdown-helper exit **1** were observable. MongoDB's exit code
+remained **UNKNOWN** at the retained observation; it is not reported as zero or
+guessed from the forced-termination request. There was no fixture-host exit.
+
+The original Job was confirmed empty and all retained Child/observational handles
+closed. Disposable storage was removed only after checked absolute-root/run-ID,
+no-reparse and empty-Job/closed-handle gates. Ports 27018/4000 were released and the
+original supervisor exited. Protected process/database-process identities,
+listeners, demo-storage metadata and parent environment matched the original
+before/after evidence. A further independent metadata comparison also matched
+all values and array order, ignoring only JSON object-key serialization order;
+the initial cross-process raw-text comparison was not treated as a real resource
+change. All 501 pinned source paths matched before evidence documentation.
+
+Safe evidence is retained at
+.cache/f038-slice3-diagnostic-2026-10-21-0541: guarded-attempt.ps1, result.json,
+progress.json, final-verification.json, native identity observations, approved
+index manifest, fixed initializer/shutdown markers, executable/source pins,
+storage ownership and protected before/after/final comparisons. No private IPC
+transcript, credentials or signing key is retained. No application/test/assertion,
+launcher/native-helper correction or automatic rerun followed the stop.
+
+Only this feature document changes among repository source paths. F001-F037
+remain APPROVED_COMPLETE locally; **F038 remains IN_PROGRESS**. All **153 browser
+scenarios remain NOT_RUN**. Real MongoDB failover, multi-process convergence,
+privacy/retention/erasure, production enrollment/migration and release gates remain
+outstanding. No browser exception, production readiness, Git delivery or F039 work
+is authorized by this outcome.
+
+Next owner gate: separately approve bounded read-only diagnosis of the temporary
+initializer and strict shutdown-helper refusals, including missing safe inner
+error observability. Any justified helper correction and fresh guarded execution
+require separate approval. Full F038 final acceptance remains blocked.
+
+## 43. Slice 3 corrected supervised integration PASS (partial F038)
+
+### 43.1 Authorized single execution and preserved history
+
+On 2026-10-21 the owner approved one guarded rerun using the existing temporary
+.cache/f038-slice3-guarded-runner.ps1 and the corrected supervised launcher.
+The backend checkpoint remains 638ef017cd32ef43304f1094e6be3a55850aebbd, local
+only. No Git staging, commit or push occurred. The estimate communicated before
+execution was 20-40 minutes, principally dependent on private input and runtime
+readiness. The visible supervisor ran from 13:34:01 to 13:35:58 Asia/Calcutta
+(08:04:01-08:05:58 UTC), approximately 117 seconds including private entry,
+startup, execution and cleanup. No material overrun occurred.
+
+All previous blocked and failed attempts remain historical evidence. In
+particular, the immutable Section 42 initializer transcript is preserved. The
+subsequent ordering correction requires writable PRIMARY before enumeration.
+The later attempt at .cache/f038-slice3-run-0d6c241d173f47d5b447d6d71d2e4fd9
+remains **1 PASS / 2 FAIL / 5 NOT_RUN**, including the failed parent; its retained
+T02 diagnostic is FIXTURE_READY / AssertionError / ERR_ASSERTION. Read-only source
+tracing identified missing child CORS_ORIGINS, with the actual HTTP status not
+retained. The separately approved correction supplies exactly
+http://127.0.0.1:3000 to the fixture child. Its retained offline evidence is 18/18
+harness checks, 12/12 nested origin/cookie cases and 2/2 relevant Auth regressions
+PASS, with zero unresolved review findings. Those suites were not repeated here.
+
+### 43.2 Live isolation, preparation and private channel
+
+Ordinary unelevated execution, free ports 27018/4000, no leftover disposable
+resources, executable pins and protected process/listener/demo-storage baselines
+passed. Fresh isolated storage and an exact test-owned Job were used. Retained
+and independent native handle identity, executable, owner, parent, exact Job
+membership and live-state checks passed. Native creation identity remained exact;
+native/CIM UTC timestamps used the approved common one-microsecond comparison.
+
+Only 127.0.0.1:27018, replica set f021-test and database deeplearner-f021-test were
+used. The initializer verified server/process/storage identity, initiated the
+expected single-member replica, confirmed writable PRIMARY, then enumerated
+databases and verified the exclusive target empty. Startup/configuration signals
+alone were not accepted as PRIMARY readiness.
+
+All 21 declarations matched the approved canonical manifest before provisioning:
+exact collections/names, ordered keys, uniqueness, provider partial filter,
+session TTL and relevant options. Only those 21 secondary indexes were created
+and verified: 14 unique, seven nonunique, one partial filter and one TTL. The
+separately verified eight empty fixture collections were exactly auditLogs,
+technologies, learningPaths, modules, topics, concepts, practiceQuestions and
+visualizations. No persistent database/index provisioning occurred.
+
+The owner explicitly confirmed readiness and entered three new temporary
+passwords only in the masked local console. Existing private inherited channels,
+one-time credential delivery and child-only ephemeral signing-key handling were
+preserved. No credential, token, signing key or private IPC payload was printed
+or persisted as evidence. Child-only CORS did not alter parent/machine settings.
+Live ownership requests used validated correlation/generation and fresh resource
+and host identity checks. The host's bounded diagnostic confirms authenticated
+OWNED reply 19, status PASS, about 1,348 ms. Parent write completion alone still
+reports delivery UNKNOWN and is not treated as authenticated receipt or authority.
+
+### 43.3 Actual integration result and assertion boundaries
+
+**Exactly one fixture-host and suite invocation; zero invocation retries.
+Integration: 8 PASS / 0 FAIL / 0 NOT_RUN, including the parent; exit 0.** All
+original eight prepared records and assertions were preserved.
+
+| Record | Observed result |
+| --- | --- |
+| T01 | PASS: two distinct ACTIVE, verified Admin accounts with Argon2id hashes; genuine audited setup logins; setup refresh sessions revoked; no initial attempts/assessments. |
+| T02 | PASS: normal Student password login, access-token response, HttpOnly/SameSite=Lax refresh cookie and authenticated STUDENT self identity. |
+| T03 | PASS: refresh rotation with the same sealed origin; authorized no-store completion view, exact nine-field DTO, initially ineligible/not completed with no fabricated score. |
+| T04 | PASS: anonymous completion access denied; repeated initializer/nonadoption refused without account growth; no premature attempt creation. |
+| T05 | PASS: normal profile update, secret-free public question, first OUTPUT submission, one durable attempt/assessment, READ/VISUALIZE/EXAMPLE interactions, eligible score 100, explicit completion and durable reread; unchanged five-field F037 DTO/count. |
+| T06 | PASS: logout and subsequent refresh denial; no claim of immediate access-JWT invalidation. |
+| T07 | PASS: connection loss refused origin reconstruction/access and did not add a second completion. |
+| Parent | PASS: all seven child records completed successfully. |
+
+Independent author/reviewer policy, rubric and checkpoint approvals completed in
+the trusted initializer before serving the Student workflow. Option B origin was
+sealed in the same process/connection generation. This establishes the bounded
+synthetic workflow, not physical storage attestation or a general enrollment
+mechanism. The run verifies the existing anonymous/role/nonadoption boundaries;
+it does not expand the prepared suite into comprehensive cross-Student testing.
+The T05 practice disclosure follows durable submission; earlier Slice 1/2
+transaction/proof evidence remains retained, not counted as a fresh failover test.
+
+### 43.4 Cleanup, preservation and remaining gate
+
+Graceful cleanup PASS. All five supervised children exited **0**: MongoDB,
+initializer, collection preparation, fixture host and shutdown helper. The visible
+supervisor exited **0**. **No forced termination occurred; no cleanup errors.**
+Owned connections closed, Job empty, retained handles closed, ports released and
+checked disposable storage removed. Protected process/database-process identities,
+listeners and demo-storage metadata matched before/after; parent environment was
+unchanged. Independent closing checks again confirmed these resource baselines,
+absent fixture host/storage and released ports. Before this evidence append all
+503 pinned source paths matched, including the guarded runner, temporary host,
+launcher, native helper, tests and immutable failed transcript.
+
+The terminal host observation records INPUT_CLOSED, permanent authority
+invalidation, two loss callbacks and zero callback errors. No post-loss origin
+reconstruction or continued authority is claimed. Safe evidence is retained at
+.cache/f038-slice3-run-f7d9b70faece40a7a5fcf926acaccd67: result.json,
+final-verification.json, native identity observations, exact index manifest,
+fixed initializer/shutdown/collection markers, source/executable pins and
+protected baseline comparisons. No private IPC transcript is retained.
+
+Only this feature document is amended by this gate. All prior Slice 3 work and
+the local backend checkpoint remain preserved. F001-F037 remain
+APPROVED_COMPLETE locally; **F038 remains IN_PROGRESS**, pending separately
+approved consolidated final review. No new application/test/configuration,
+dependency, infrastructure or F039 implementation occurred.
+
+All **153 browser scenarios remain NOT_RUN** (141 existing plus 12 Slice 3).
+No browser exception transfers or browser/production readiness claim is made.
+Real MongoDB failover, multi-process convergence, actual browser accessibility
+and responsive behavior, production enrollment/migration, privacy/retention/
+erasure/backups and release checks remain unverified or outstanding. This PASS
+authorizes no deployment or Git delivery. Next owner gate: one consolidated
+F038 final source/security/architecture and acceptance review.
+
+## 44. F038-FR-01 guarded Slice 1 post-correction re-verification PASS
+
+### 44.1 Correction authority and retained evidence
+
+The consolidated final review stopped on MEDIUM F038-FR-01: qualifying-assessment
+proof captured one timeout allowance for multiple reads and did not recheck the
+request deadline before returning success. That historical review remains
+blocked/incomplete; this integration does not replace its remaining review work.
+
+The owner separately approved the two-file correction in
+apps/api/src/modules/practice/practice-attempt.repository.ts and
+apps/api/tests/practice-attempt-repository.test.ts. Each qualifying proof read now
+obtains the current original request budget through a timeout getter. Additional
+checks run before/after qualification proof, after session cleanup before a
+successful FIFO handoff, and immediately before return. Expiry returns a sanitized
+503 without a disclosure response; a previously durable attempt is not described
+as rolled back. The ten-second budget, three callback bodies and two-second
+verification reserve are unchanged.
+
+Retained correction evidence: 38 focused repository tests and 35 relevant
+qualification/Practice regressions, **73 PASS**; API build, source/test TypeScript,
+targeted lint, formatting, UTF-8/LF, exact scope and diff checks PASS. Seven new
+deadline cases cover shrinking per-operation allowances, exhaustion before and
+between proof reads, after successful proof, during cleanup and before final
+return, including queued-follower failure. All 31 earlier repository tests and
+assertions are byte-preserved. Focused source review: zero unresolved
+Critical/High/Medium/Low findings. Those suites were not repeated in this gate.
+
+The owner then authorized exactly one execution of the existing fourteen Slice 1
+integration records with unchanged assertions. The communicated estimate was
+15-35 minutes; preparation began at 15:42:09 Asia/Calcutta. The ordinary supervisor
+ran 15:48:47.838-15:49:16.987 Asia/Calcutta (10:18:47.838-10:19:16.987 UTC), about
+29.1 seconds including startup, execution and cleanup. No material overrun occurred.
+
+### 44.2 Isolation, twelve-index allowlist and single execution
+
+Preflight PASS: ordinary unelevated Windows execution; port 27018 initially free;
+no leftover disposable processes/storage; fresh exact owned Job and isolated
+storage; retained and independently observed native-handle identity, executable,
+owner, parent, live state and Job membership. Native creation times matched
+exactly; native/CIM comparison retained the approved common UTC microsecond
+truncation. Protected MongoDB/development-process/listener/demo-storage baselines
+were captured before startup and remained protected.
+
+The test-owned MongoDB used only 127.0.0.1:27018, replica set f021-test and database
+deeplearner-f021-test. The existing verified initializer established writable
+PRIMARY before database enumeration and exclusive empty-target verification.
+Initializer exit 0 and fresh MongoDB/helper identity checks preceded the sole
+integration GO handoff. No credential entry or Slice 3 fixture-host execution
+was needed by this existing internal-service Slice 1 suite.
+
+The twelve index definitions matched the prior approved manifest exactly before
+startup: collections, names, ordered keys, ten unique/two nonunique constraints,
+v2/simple comparison and no alternate options, partial filters or TTL. The
+unchanged parent suite asserts an empty target, creates its approved synthetic
+collections and provisions/checks only those twelve definitions. Its existing
+missing-assessment-index control/restoration remains unchanged. No persistent
+database/index provisioning, migration or backfill occurred.
+
+**Post-correction integration: 14 PASS / 0 FAIL / 0 NOT_RUN**, comprising thirteen
+children and the parent. **One suite invocation; zero invocation retries.**
+All original cases passed: independent 70% Concept-policy approval; server-owned
+sealed synthetic origin; first-submission eligibility; immutable attempt and
+atomic qualifying assessment/F037 activity; identical concurrent replay and
+changed-payload conflict; incorrect-first-answer preservation; activity-only
+section compatibility; terminal revocation; progress-failure rollback;
+controlled majority-proof loss and exact recovery; missing-index refusal;
+current STUDENT/publication/private-revision checks; prior ungraded-exposure
+exclusion; and unchanged DIAGNOSTIC grading. No completion/mastery mutation is
+introduced by this Slice 1 run.
+
+### 44.3 Live deadline observations and limits
+
+The existing sanitized concurrent-request instrumentation observed:
+
+| Observation | Request A (leader) | Request B (identical follower) |
+| --- | --- | --- |
+| Transaction calls / callbacks / commit acknowledgements | 1 / 1 / 1 | 1 / 1 / 1 |
+| Attempt and assessment ownership proofs | Both VERIFIED | Both independently VERIFIED |
+| Transaction-entry remaining budget / transaction timeout | 9,981 ms / 7,981 ms | 9,772 ms / 7,772 ms |
+| Clock reads during qualification-proof operation | 51 | 51 |
+| First / last remaining-time observation during that proof | 9,859 ms / 9,793 ms | 9,656 ms / 9,576 ms |
+| Result return | FULFILLED, about 214 ms | FULFILLED, about 433 ms |
+| Disclosure and trace retention | After both proofs; zero dropped events | After both proofs; zero dropped events |
+
+These are internal-service results, not HTTP status measurements. Repeated clock
+reads during real qualification proof demonstrate live remaining-time evaluation;
+they are not a count of database operations. Both requests retained their original
+budget, majority+journal commit and two-second transaction/proof reserve. The
+concurrency assertions verified identical committed results, one immutable first
+attempt and one qualifying assessment. Replay did not execute another insertion
+or activity update. The separate atomic case verified the F037 summary count.
+
+The unchanged suite exercises timely proofs and controlled proof loss; it does
+**not** inject ten-second elapsed-time exhaustion before/between/after proof or
+cleanup. Those exact refusal boundaries, the three-body saturation limit, larger
+FIFO queues and capacity limits retain focused offline evidence only. Do not
+upgrade them to live PASS. Controlled proof-loss injection is not real MongoDB
+failover testing; this run establishes no multi-process convergence.
+
+### 44.4 Cleanup, preserved scope and next gate
+
+Cleanup PASS: initializer, integration helper, shutdown helper and MongoDB all
+exited **0**; supervisor exit **0**. Graceful shutdown succeeded; **no forced
+termination, UNKNOWN exit or cleanup error**. Owned connections closed, Job
+empty, retained handles closed, port released and checked disposable storage
+removed. Protected baselines and parent environment were unchanged. Independent
+closing checks again confirmed released resources and unchanged protected
+process/demo-storage metadata. All 502 pinned source paths matched before this
+documentation append.
+
+Safe execution evidence is retained at
+.cache/f038-fr01-reverification-20261021-1015: ignored one-shot guarded-attempt.ps1,
+result.json, final-verification.json, native identity observations, exact index
+manifest, sanitized record results, fixed initializer/shutdown markers and source/
+executable/protected-resource pins. The wrapper reused existing verified ownership,
+PRIMARY-readiness and shutdown helpers without changing them. Request trace:
+.cache/f038-slice1-concurrency-observation-c2ae01b2-8553-48f4-afe8-fe2f01a4c9df.json.
+No answers, raw keys, private fingerprints, credentials or signing keys appear in
+the retained request trace or sanitized result counters.
+
+Only this feature document receives repository changes in this gate. Backend
+checkpoint 638ef017cd32ef43304f1094e6be3a55850aebbd and all existing Slice 3 work
+remain unchanged; no Git writes occurred. The earlier Slice 1 14/14 result remains
+historical, with this distinct 14/14 result explicitly post-correction. Historical
+Slice 2 **10/10** and Slice 3 **8/8** are not post-correction reruns. Every earlier
+failed/blocked attempt and correction remains preserved.
+
+F001-F037 remain APPROVED_COMPLETE locally; **F038 remains IN_PROGRESS**. All
+**153 browser scenarios remain NOT_RUN**. No browser exception or production
+readiness is granted. Real failover, multi-process convergence, persistent index/
+migration, privacy/retention/erasure/backups and production enrollment/operational
+release gates remain outstanding. No new defect was observed in this guarded run.
+Next owner gate: separately approve resuming the consolidated final source,
+security, architecture and acceptance review; no automatic final acceptance,
+commit/push, deployment or F039 work is authorized here.
+
+## 45. Resumed consolidated final source, security and architecture review
+
+**F038 CONSOLIDATED FINAL REVIEW PASS — PENDING BROWSER EXCEPTION AND OWNER COMPLETION APPROVAL**
+
+### 45.1 Review authority and findings
+
+The owner authorized completion of the interrupted final review on 2026-10-21.
+This gate reviewed the committed backend checkpoint, subsequent F038-FR-01
+correction and remaining Slice 3 working-tree source, tests, canonical additions
+and opt-in supervision changes. Review began at 11:37:57 UTC. The communicated
+estimate was 20-35 minutes, with remaining foundation/launcher contract review
+the principal uncertainty. No test, service, MongoDB, browser, credential-input
+or synthetic execution occurred. Retained execution evidence was inspected only.
+Review and documentation verification took approximately 13 minutes, with no
+material overrun. Closing checks confirmed only this document changed among the
+502 pinned paths, its historical prefix is byte-preserved, UTF-8 without BOM/LF
+and git diff --check pass, HEAD is unchanged and the index remains empty.
+
+| Severity | Unresolved findings |
+| --- | --- |
+| Critical | 0 |
+| High | 0 |
+| Medium | 0 |
+| Low | 0 |
+
+No new actionable finding was identified in the resumed source/security review.
+MEDIUM F038-FR-01 is resolved: practice-attempt.repository.ts:678 checks before
+qualifying proof; :685 supplies a live remaining-time getter for each proof
+operation; :692 checks after proof; :716 checks after session cleanup before
+successful FIFO handoff; :739 checks immediately before returning the disclosure
+result. The deadline regressions at practice-attempt-repository.test.ts:1209 and
+following preserve the existing ten-second budget, three callback bodies and
+two-second verification reserve. No prior durable commit is falsely called
+rolled back when a subsequent proof/deadline check refuses the response.
+
+### 45.2 Acceptance and security cross-check
+
+The following are source-review anchors, not additional findings or new execution
+results. Earlier stage decisions and historical failed/blocked evidence remain
+unchanged.
+
+| Boundary reviewed | Confirmed behavior / source anchors |
+| --- | --- |
+| Identity and authority | Current ACTIVE, verified STUDENT checks and complete published ancestry remain server-side. completion-evidence.service.ts:153 revalidates policy, rubric, checkpoint, independent current Admins and exact source bindings; :490 refuses self-approval. Stored approval flags, client scores and local login alone cannot establish authority. |
+| Origin and first submission | The module-private origin is bound to actual client/database generation, server-created identities and a sealed reviewed policy. Restart, reconnect, disposal and lifecycle loss cannot reconstruct it. completion-grading.service.ts records only the original first OUTPUT submission inside F036's transaction; historical, unknown-origin and reveal-assisted later attempts cannot replace its assessment. |
+| Required evidence and score | completion.repository.ts:591 verifies owned READ/EXAMPLE/conditional REVISE receipts and a CORRECT authorized VISUALIZE checkpoint with consumed-challenge cross-links, current revisions, producer/policy bindings and lifecycle checks. Practice requires the original COMPLETION_INPUT assessment, genuine binary score meeting the independently approved 70% Concept policy, and owned attempt/assessment proof. F037 counts and B2 DIAGNOSTIC records never substitute. Stage A receives trusted transient inputs only after verification. |
+| Atomic persistence and replay | Immutable attempt, qualifying assessment and existing activity update share F036's majority+journal transaction. Explicit completion separately commits canonical studentProgress v2 and append-only completionRequests together. completion.repository.ts:936, :1021 and :1184 retain CAS/fences, original receipt identity, bounded transactions, rollback/uncertainty refusal and fresh majority-owned proofs. FIFO handoff is scheduling only; followers independently prove and reauthorize their replay. |
+| Current validity and compatibility | Revision mismatch, withdrawal or terminal policy/rubric/definition restriction prevents a bound claim from asserting current completion. GET revalidates without repair writes. F037's exact five-field activity DTO remains activity-derived; ordinary Practice remains unlimited and preserves immutable attempts and existing completion claims. No Topic completion, mastery or F039 writer is introduced. |
+| API secrecy | Four LOCAL-only completion routes retain authentication, strict input/output allowlists, scoped JSON bounds, no-store including early errors, rate limits and sanitized errors. Public projections omit private answers, rubrics, raw keys, private fingerprints and account records. Required response correctness is established using server-loaded expected choices, never client authorization claims. |
+| Student UI | concept-completion.tsx:35 keys state by account/Concept; completion-controller.ts:68 and :236 retain current-account authorization, cancellation/generation guards and stale-response rejection. Stable pending command identity survives uncertain retries; receipts never mark completion locally. Explicit completion, native labelled radio controls/fieldset, textual alternatives, status/focus semantics and responsive CSS are present. Actual browser behavior remains NOT_VERIFIED. |
+| Fixture and supervision | completion-student-fixture.ts:214, :295 and :448 retain positive disposable bootstrap checks, insert-only distinct Admins, existing Argon2id/login/session services and private credentials. Origin is sealed in the serving process; stop/loss disposes it. The approved opt-in native/temporary adapters retain exact Job/native-handle/CIM identity, microsecond comparison, bounded authenticated private-channel requests, terminal onLoss behavior and sanitized results. Ephemeral child-only signing-key and exact child CORS exceptions do not alter normal startup or production Auth. |
+
+### 45.3 Canonical and Git integrity
+
+PRD Section 14's required sections, visualization, practice and default 70% rule
+are preserved within the explicitly accepted Concept-level LOCAL synthetic subset.
+This is not general Topic completion or arbitrary enrollment. Canonical precedence
+remains Concept > Topic > Learning Path > default; only the independently approved
+explicit 70% Concept policy is supported, with unsupported inheritance unavailable
+and invalid/missing authority failing closed. One pinned OUTPUT question and one
+reviewed checkpoint remain the approved initial coverage. Acknowledgement and
+checkpoint interaction do not prove comprehension or immunity to external copying.
+
+API_DESIGN.md's F038 additions and DATABASE_DESIGN.md's policy/assessment/origin,
+studentProgress v2/request-history and explicit F006 alignment are approved and
+additive. Earlier document text remains preserved. Auth models/services are not
+replaced; the F006 appendix reconciles historical tables against existing approved
+User/Session declarations. Synthetic-origin provenance is logical server-owned
+creation, not physical storage attestation. Application append-only guards are not
+database WORM. Historical partial-stage limitations remain historical rather than
+being silently rewritten as current general capabilities.
+
+HEAD remains **638ef017cd32ef43304f1094e6be3a55850aebbd**. Its 64-path backend
+checkpoint is unchanged. Remaining work is exactly **23 paths: 11 creations and
+12 modifications**, comprising the approved 21 Slice 3 paths plus two FR-01
+modifications. Combined checkpoint/working-tree inventory is 80 unique paths;
+overlapping paths are not counted twice. No unexpected path or unapproved normal
+startup, package, dependency, environment-example or shared-infrastructure change
+was identified. Native helper/test extensions are explicitly approved in Sections
+38-39, not silent additions.
+
+The exact remaining Slice 3 inventory is:
+
+| Operation | Path |
+| --- | --- |
+| CREATE | apps/api/scripts/completion-student-fixture.ts |
+| CREATE | apps/api/tests/completion-student-fixture.integration.ts |
+| CREATE | apps/web/src/components/concepts/concept-completion.module.css |
+| CREATE | apps/web/src/components/concepts/concept-completion.tsx |
+| CREATE | apps/web/src/lib/api/completion-client.ts |
+| CREATE | apps/web/src/lib/progress/completion-contracts.ts |
+| CREATE | apps/web/src/lib/progress/completion-controller.ts |
+| CREATE | apps/web/tests/completion-client.test.ts |
+| CREATE | apps/web/tests/completion-controller.test.ts |
+| CREATE | apps/web/tests/completion-rendering.test.ts |
+| CREATE | tests/browser/concept-completion.spec.ts |
+| MODIFY | apps/api/src/modules/progress/completion-evidence.service.ts |
+| MODIFY | apps/api/tests/completion-evidence.test.ts |
+| MODIFY | apps/web/src/components/concepts/concept-browser.tsx |
+| MODIFY | apps/web/tests/concept-rendering.test.ts |
+| MODIFY | docs/DATABASE_DESIGN.md |
+| MODIFY | docs/DEVELOPMENT_ROADMAP.md |
+| MODIFY | docs/features/F038-completion-rules.md |
+| MODIFY | playwright.f024.config.ts |
+| MODIFY | scripts/LocalProcessOwner.cs |
+| MODIFY | scripts/tests/LocalStartup.Tests.ps1 |
+
+FR-01 additionally modifies apps/api/src/modules/practice/practice-attempt.repository.ts
+and apps/api/tests/practice-attempt-repository.test.ts. The index is empty; no
+secret, generated data, disposable storage or temporary launcher is staged. The
+three approved .cache adapters remain ignored and untracked. Bounded source
+inspection found no private-key/credential marker or new source console logging.
+F001-F037 APPROVED_COMPLETE statuses and F039 NOT_STARTED remain unchanged.
+Before this append all 502 pinned source paths matched the review-start snapshot.
+This gate changes only this feature document; no Git write or delivery occurred.
+
+### 45.4 Retained verification and its limits
+
+- Slice 1 post-FR-01 guarded MongoDB: **14/14 PASS**, Section 44; one invocation,
+  twelve approved indexes, identical concurrent replay and fresh owned proofs.
+- Slice 2 historical guarded MongoDB: **10/10 PASS**, Section 33.7; thirteen
+  canonical indexes, missing/nonunique refusal and exact restoration verified.
+- Slice 3 historical guarded fixture/session MongoDB: **8/8 PASS**, Section 43;
+  twenty-one indexes, eight empty fixture collections, genuine Admin/Student
+  authentication, completion APIs and origin-loss refusal. Graceful cleanup and
+  protected-resource/parent-environment baselines passed.
+- Backend checkpoint isolated verification: **628 API + 10 Practice rendering
+  PASS**, retained checkpoint-validation.json and corresponding successful logs
+  under .cache/f038-backend-checkpoint-20261021. Earlier dependency-layout failure
+  remains excluded from PASS totals.
+- Slice 3 offline: **577 distinct PASS** (56 focused / 521 regressions), Section
+  36. FR-01 correction: **73 PASS** (38 focused / 35 relevant), Section 44. Prior
+  build, TypeScript, lint, formatting and security results remain retained.
+
+These counts describe their original gates, not new or combined distinct tests
+from this review. Slice 2/3 were not rerun after FR-01. Forced deadline exhaustion
+before/between/after proof remains focused offline evidence. The successful live
+Slice 1 run demonstrates timely live remaining-time accounting; it did not force
+expiry. Controlled proof-loss injection is not real MongoDB failover verification.
+Multi-process convergence and globally instantaneous account/content revocation
+are not established by a process-local gate or sequential fresh checks.
+
+### 45.5 Browser exception recommendation and remaining owner gate
+
+All **153 browser scenarios remain NOT_RUN: 141 existing + 12 prepared Slice 3**.
+Source/rendering/controller review does not establish actual mounted browser UI,
+screen-reader accessibility, keyboard/focus behavior, responsive layout,
+navigation, account-switch races or browser compatibility. The twelve prepared
+intercepted-HTTP scenarios also cannot replace genuine Auth/database evidence.
+No previous feature's browser exception transfers.
+
+An **F038-specific LOCAL-development exception is recommended as acceptable only
+if the owner explicitly accepts these exact unverified browser risks and coverage**,
+retains the approved synthetic-only scope, and requires later separately approved
+ownership-safe browser/regression verification. This review does not grant that
+exception. Security/Auth/API/database gates are not waived. Local acceptance
+cannot authorize production or transfer an exception to F039 or another feature.
+
+Real failover, multi-process convergence, persistent index provisioning/migrations,
+real-person enrollment, privacy/retention/linked erasure/backups and operational/
+production release reviews remain outstanding. No production readiness is claimed.
+Only after the separate browser-exception decision may the owner decide F038
+local completion; neither completion nor Git delivery is authorized here.
+**F038 remains IN_PROGRESS**, not READY_FOR_REVIEW or APPROVED_COMPLETE.
+
+## 46. Owner-approved F038 LOCAL browser exception and final acceptance gate
+
+**FINAL REVIEW PASS WITH F038 BROWSER EXCEPTION**
+
+### 46.1 Explicit owner decision and supported boundary
+
+On 2026-10-21 the owner explicitly approved a one-time, F038-specific browser-
+verification exception for **LOCAL DEVELOPMENT ONLY**, following Section 45's
+consolidated final review with zero unresolved Critical/High/Medium/Low findings.
+The owner accepted the precise unverified risks below and authorized moving F038
+to **READY_FOR_REVIEW**, pending a separate owner completion decision. This is
+not APPROVED_COMPLETE, Git delivery authorization or production release approval.
+
+All approved local acceptance conditions remain supported by the retained source,
+security, static, API/Auth and disposable database evidence. The exception waives
+only the named browser-verification gate for local review; it does not waive or
+weaken authentication, authorization, answer secrecy, transaction durability or
+database tests. No tests or services were rerun and no credentials were collected
+for this documentation-only decision.
+
+Qualification remains restricted to server-created synthetic identities in the
+approved LOCAL Option B scope, a live sealed connection generation, independently
+reviewed current 70% Concept policy/rubric, genuine first-submission assessment
+and current required section evidence. It is not general production enrollment,
+Topic completion, mastery, physical-storage attestation or copying prevention.
+
+### 46.2 Exact browser coverage and accepted unverified risks
+
+**153 expected browser scenarios remain NOT_RUN: 141 existing plus twelve F038
+Slice 3 scenarios.** None is converted to PASS by this exception. Browser-dependent
+UI and smoke checks remain NOT_VERIFIED. Primary Windows-host browser automation,
+including Playwright, remains prohibited until a separately approved ownership-
+safe execution procedure exists. Existing custom teardown/synthetic evidence is
+not authority to run browsers. No manual browser inspection substitutes for the
+missing automated evidence.
+
+The owner explicitly accepts these outstanding risks **for LOCAL DEVELOPMENT
+ONLY**:
+
+- Real-browser completion interactions.
+- Keyboard/focus behavior and screen-reader accessibility.
+- Responsive layout.
+- Login/session behavior in the browser.
+- Navigation and account-change races.
+- Cancellation and stale responses.
+- Retry and network interruption behavior.
+- Earlier Concept/Practice UI compatibility.
+
+The twelve prepared Slice 3 specifications and source/controller/rendering tests
+do not establish actual mounted-browser behavior. Genuine Auth/API/database
+verification is separately retained; it is not browser login/session acceptance.
+The exception is named for F038 only, one-time and non-transferable to F039 or
+any other feature. Prior F031-F037 exceptions do not transfer automatically and
+are not the authority for this decision.
+
+### 46.3 Evidence retained without rerun or retrospective alteration
+
+| Approved verification gate | Retained result |
+| --- | --- |
+| Slice 1 post-FR-01 guarded MongoDB | 14/14 PASS; Section 44. |
+| Slice 2 guarded MongoDB | 10/10 PASS; Section 33.7. |
+| Slice 3 guarded fixture/session MongoDB | 8/8 PASS; Section 43. |
+| Isolated backend checkpoint verification | 628 API + 10 Practice rendering PASS. |
+| Slice 3 offline selected union | 577 distinct PASS (56 focused / 521 regression). |
+| Deadline correction | 73 focused/relevant PASS (38 / 35). |
+| Build, TypeScript, lint, formatting and security checks | PASS at their original approved gates. |
+| Consolidated final source/security/architecture review | PASS; zero unresolved Critical/High/Medium/Low findings, Section 45. |
+
+All historical failed/blocked attempts, resolved findings and subsequent
+corrections remain preserved. These overlapping gate totals are not summed into
+a new distinct-test count. Slice 2/3 remain historical results, not post-FR-01
+reruns. Forced deadline exhaustion retains offline evidence only; successful
+live deadline accounting does not imply live expiry injection. Controlled proof-
+loss tests do not establish real MongoDB failover. Graceful cleanup and protected-
+baseline verification remain retained from the executed integration gates.
+
+### 46.4 Outstanding release gates and owner control
+
+Before production or broader qualification, separately approve and complete:
+
+- Real MongoDB failover verification.
+- Multi-process convergence verification.
+- Persistent index/migration provisioning and compatibility review.
+- Production enrollment and supported policy/content migration.
+- Privacy, retention, linked erasure and backup policies/verification.
+- Operational and release security verification.
+- Full real-browser acceptance and regression testing, including all 153 current
+  scenarios and actual UI/accessibility/focus/responsive/navigation/account-race,
+  cancellation/retry/session compatibility checks.
+
+Future browser execution requires separate ownership-safe execution approval; this
+exception neither authorizes execution now nor satisfies production release gates.
+No production readiness is claimed. Canonical PRD/API/Database contracts remain
+unchanged by this acceptance documentation.
+
+Only docs/features/F038-completion-rules.md and docs/DEVELOPMENT_ROADMAP.md change
+in this gate. Backend checkpoint **638ef017cd32ef43304f1094e6be3a55850aebbd** and
+all application/test/configuration and existing Slice 3 work remain preserved.
+No staging, commit, push, checkpoint amendment, dependency/infrastructure change
+or database/browser execution occurred. F001-F037 remain APPROVED_COMPLETE for
+local development; F039 remains NOT_STARTED and unauthorized.
+
+**F038 is READY_FOR_REVIEW for the bounded LOCAL-development acceptance only.**
+Next gate: explicit owner decision to mark F038 APPROVED_COMPLETE; any Git staging,
+commit or push needs its own explicit delivery authorization. Do not begin F039
+automatically. Earlier IN_PROGRESS/pending-browser statements remain historical.
+
+## 47. Owner completion approval and scoped Git delivery — LOCAL ONLY
+
+### 47.1 Explicit owner completion decision
+
+On 2026-10-21 the owner explicitly approved F038 **APPROVED_COMPLETE FOR LOCAL
+DEVELOPMENT ONLY**, following the consolidated final review and the F038-specific
+browser exception. This supersedes the historical READY_FOR_REVIEW / completion-
+pending status in Section 46; all earlier decisions, blocked/failed runs,
+corrections and review evidence remain preserved. F001-F037 remain
+APPROVED_COMPLETE locally. F039 remains NOT_STARTED and requires separate owner
+planning/implementation authorization; no next-feature work begins automatically.
+
+The accepted implementation is the approved bounded Option B synthetic Concept
+workflow, not general production qualification, enrollment, Topic completion or
+mastery. Current authorization, reviewed 70% Concept policy/rubric, original
+pre-disclosure qualifying submission, durable owned proofs, required current
+section evidence and generation/lifecycle restrictions remain mandatory.
+
+### 47.2 Preserved evidence, exception and release limitations
+
+Retained without rerun: Slice 1 post-correction MongoDB **14/14 PASS**, Slice 2
+**10/10 PASS**, Slice 3 **8/8 PASS**; backend checkpoint **628 API + 10 Practice
+rendering PASS**; Slice 3 offline **577 distinct PASS**; deadline correction
+**73 focused/relevant PASS**; build/static/security checks PASS; consolidated
+review **zero unresolved Critical/High/Medium/Low findings**. Historical results
+are not relabelled as new runs or summed into a new distinct-test count.
+
+The one-time F038-only LOCAL browser exception in Section 46 remains unchanged:
+**153 expected browser scenarios NOT_RUN — 141 existing plus twelve F038 Slice 3**.
+Browser UI/smoke, accessibility/focus, responsive layout, browser Auth/session,
+navigation/account races, cancellation/stale response, retry/interruption and
+earlier Concept/Practice compatibility remain NOT_VERIFIED. Primary-host browser
+automation stays prohibited; no prior exception transfers and this exception
+cannot transfer to F039 or another feature. No browser PASS is claimed.
+
+Real MongoDB failover and multi-process convergence remain unverified. Forced
+deadline exhaustion is offline evidence, distinct from timely live accounting;
+controlled proof loss is not real failover. Persistent index/migration provisioning,
+production enrollment, privacy/retention/linked erasure/backups, operational and
+release security verification, full real-browser acceptance/regressions and
+ownership-safe browser execution approval remain separate release prerequisites.
+LOCAL completion approval is **not production readiness or deployment approval**.
+
+### 47.3 Approved two-commit delivery boundary
+
+The owner authorized safe scoped delivery to origin/dev, preserving backend
+checkpoint **638ef017cd32ef43304f1094e6be3a55850aebbd** as a separate unchanged
+commit with parent **707d2d014233e53db8b688a29dcdd89d33501080**. Its approved
+64-path inventory (42 creations / 22 modifications) matches the retained manifest
+and all committed blob SHA-256 values; checkpoint-validation.json retains its
+verification evidence. No amend, reset, rebase, history rewrite or force push is
+authorized.
+
+Initial delivery preflight verified branch dev, origin
+https://github.com/Ashish1303/DeepLearner.git and fresh remote dev equal to that
+checkpoint parent. The exact remaining inventory is **23 paths: eleven creations
+and twelve modifications** — Section 45.3's 21 approved Slice 3 paths plus the two
+FR-01 repository/test modifications. Approved repository-owned native/helper test
+changes remain those in Sections 38-39. No other path or refactoring is authorized.
+
+Create one final commit with the exact message:
+`feat(completion): finalize F038 student completion workflow`.
+Stage only those explicit paths, inspect complete staged paths/hunks and encoding,
+scope, secrecy and diff checks, then recheck remote dev before commit/push. A
+divergent remote stops delivery without rebase or force push. Temporary .cache
+launchers/diagnostics, private credentials/tokens/keys, database storage and
+generated data are excluded. No tests, services, MongoDB or browser execution is
+part of this delivery gate; no configuration/dependency changes are introduced.
+
+This section records approval and the preflight, not a claim that a future push
+has already succeeded. Actual final commit/push hashes, fresh local/tracking/
+remote equality and clean working-tree outcome are reported after execution.
+**F038 is APPROVED_COMPLETE for LOCAL DEVELOPMENT ONLY; F039 is NOT_STARTED.**

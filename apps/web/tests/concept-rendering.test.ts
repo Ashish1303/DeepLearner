@@ -121,6 +121,14 @@ function fixture(
             'Saved practice activity',
           ),
       };
+    if (name === './concept-completion')
+      return {
+        ConceptCompletion: ({ conceptId }: { conceptId: string }) =>
+          createElement('section', {
+            'aria-label': 'Concept completion',
+            'data-completion-concept-id': conceptId,
+          }),
+      };
     if (name === './concept-examples' || name === './concept-revise') {
       const nested = {};
       const source = readFileSync(
@@ -276,8 +284,10 @@ test('detail renders one page title, escaped summary, Read and source without pr
   assert(html.includes('<h3>Definition</h3>'));
   assert(html.includes('noopener noreferrer'));
   assert(html.includes('Back to Topic'));
-  // F037 adds saved activity only; completion, scoring and XP remain forbidden.
+  // F037 activity stays separate; the F038 panel receives this exact Concept.
   assert(html.includes('Saved practice activity'));
+  assert(html.includes('aria-label="Concept completion"'));
+  assert(html.includes(`data-completion-concept-id="${concept.id}"`));
   for (const text of ['Mark complete', 'Start learning', 'XP'])
     assert(!html.includes(text));
   for (const conceptId of [concept.id, 'f'.repeat(24)]) {
@@ -306,6 +316,9 @@ test('detail renders one page title, escaped summary, Read and source without pr
   }
   assert(!fixture(ready, 'topic').html.includes('Practice output questions'));
   assert(!fixture(ready, 'topic').html.includes('Saved practice activity'));
+  assert(
+    !fixture(ready, 'topic').html.includes('aria-label="Concept completion"'),
+  );
 });
 
 test('F025 source footer remains escaped, safe and below all three modes without fetches', () => {

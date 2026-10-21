@@ -1019,7 +1019,7 @@ provisioning or F038/F039 work is authorized; F038 remains NOT_STARTED.
 ### F038 — Completion Rules
 **Default Passing Score:** 70%  
 **Dependencies:** F037  
-**Status:** `IN_PROGRESS`
+**Status:** `APPROVED_COMPLETE`
 
 Owner approved the exact six-file POLICY FOUNDATION ONLY on 2026-10-19.
 Concept-level pure eligibility evaluation requires verified section metadata and
@@ -1191,6 +1191,67 @@ thirteen index definitions are declared, not provisioned. Separate disposable
 integration approval is required. Existing 141 browser cases remain NOT_RUN;
 twelve proposed Slice 3 cases and Student UI remain unimplemented. See F038
 Sections 32-33. F038 stays IN_PROGRESS; no production release or F039 is authorized.
+
+Owner-approved Slice 3 now implements the accessible Concept completion panel and
+internal disposable two-Admin/Student credential setup within nineteen paths
+(eleven creations/eight modifications), including the explicitly added Concept
+rendering test-loader update. Selected offline verification: 366 API and 211 web
+tests PASS (577 distinct); API/web builds PASS. Native fixture/session MongoDB
+execution and all browser execution remain separately gated. Section 36 records
+actual scope, evidence and limitations; older Slice 1/2 gate statements above are
+historical. The eight-index F006 compatibility appendix preserves canonical Auth
+and User/Session behavior; no live or persistent provisioning occurred. Twelve
+Slice 3 browser specifications are prepared, NOT_RUN; existing 141 remain NOT_RUN
+(153 expected total). F038 remains IN_PROGRESS; no production or F039 approval.
+
+**Current acceptance gate — 2026-10-21:** FINAL REVIEW PASS WITH F038 BROWSER
+EXCEPTION. The owner explicitly approved a one-time F038-specific exception for
+LOCAL DEVELOPMENT ONLY after consolidated review found zero unresolved
+Critical/High/Medium/Low issues. F038 is READY_FOR_REVIEW, not APPROVED_COMPLETE;
+earlier stage statuses, failed/blocked runs and gate notes above remain historical.
+Retained results: Slice 1 post-correction MongoDB 14/14, Slice 2 10/10, Slice 3
+8/8, backend checkpoint 628 API + 10 Practice rendering, Slice 3 offline 577 and
+deadline correction 73 PASS; build/static/security checks PASS. No reruns occur.
+
+Exactly **153 browser scenarios remain NOT_RUN (141 existing + 12 F038 Slice 3)**.
+The owner accepts unverified real-browser completion, keyboard/focus/screen-reader,
+responsive layout, browser login/session, navigation/account-change races,
+cancellation/stale responses, retry/network interruptions and earlier Concept/
+Practice UI compatibility for LOCAL development only. Primary-host browser
+automation remains prohibited. Prior F031-F037 exceptions do not transfer; this
+F038 exception cannot transfer to F039 or another feature. Browser UI/smoke checks
+remain NOT_VERIFIED, with no browser PASS or production-readiness claim.
+
+Option B remains synthetic-only, generation-bound and independently approved;
+it is not general production qualification or Topic/mastery functionality. Real
+MongoDB failover, multi-process convergence, persistent indexes/migrations,
+production enrollment, privacy/retention/erasure/backups, operational/release
+security and full real-browser acceptance/regressions remain separate release
+gates. Future browser execution needs separate ownership-safe approval. See F038
+Section 46 for accepted risks, evidence and non-transferable exception terms.
+Backend checkpoint 638ef017cd32ef43304f1094e6be3a55850aebbd stays local and unchanged.
+Next: separate owner APPROVED_COMPLETE decision and explicit Git delivery approval;
+neither Git writes nor F039 work is authorized by this status update.
+
+**Owner completion approval — 2026-10-21:** F038 is APPROVED_COMPLETE for
+**LOCAL DEVELOPMENT ONLY**. The owner explicitly approved completion and scoped
+delivery to origin/dev, preserving backend checkpoint
+638ef017cd32ef43304f1094e6be3a55850aebbd and one separately reviewed final
+23-path commit (11 creations / 12 modifications). Section 47 of the feature plan
+records the delivery boundary; earlier status/gate notes above remain historical.
+No history rewriting, force push, production deployment or automatic F039 work.
+
+Retained evidence and limitations are unchanged: MongoDB Slice 1 post-correction
+14/14, Slice 2 10/10 and Slice 3 8/8 PASS; zero unresolved consolidated review
+findings. The approved F038-specific LOCAL browser exception retains **153 NOT_RUN
+(141 existing + twelve Slice 3)**, no browser PASS and no transfer to F039 or any
+other feature. All accepted unverified UI/session/accessibility/navigation/race/
+cancellation/retry/compatibility risks and primary-host browser prohibition remain.
+Synthetic-origin qualification is not a general production capability. Real
+failover, multi-process convergence, persistent index/migration provisioning,
+production enrollment, privacy/retention/erasure/backups, operational/release
+security and full real-browser acceptance/regressions remain separately gated.
+F001-F037 stay APPROVED_COMPLETE; F039 stays NOT_STARTED pending separate approval.
 
 ### F039 — Weak / Improving / Strong Classification
 **Dependencies:** F037  
@@ -1637,8 +1698,8 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F038 - Completion Rules (partial policy/grading foundations only)
-**Current Status:** `IN_PROGRESS`
+**Current Feature:** F038 - Completion Rules (APPROVED_COMPLETE for LOCAL DEVELOPMENT ONLY; F038-specific browser exception and release limitations preserved)
+**Current Status:** `APPROVED_COMPLETE`
 **Next Feature:** F039 - Weak / Improving / Strong Classification (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.

@@ -1,0 +1,93 @@
+.panel {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  margin-block: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #c8ded9;
+  border-radius: 1rem;
+  background: #f5fbf9;
+  color: #183d36;
+  overflow-wrap: anywhere;
+}
+.panel h2,
+.panel h3,
+.panel p {
+  margin: 0;
+}
+.note {
+  color: #365c53;
+  font-size: 0.9375rem;
+}
+.requirements {
+  margin: 0;
+  padding-inline-start: 1.5rem;
+}
+.requirements li {
+  margin-block: 0.75rem;
+}
+.requirements button {
+  margin-inline-start: 0.75rem;
+}
+.panel button {
+  min-height: 2.75rem;
+  max-width: 100%;
+  border: 1px solid #087f72;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: #fff;
+  color: #075b51;
+  font: inherit;
+  cursor: pointer;
+}
+.panel button:disabled {
+  border-color: #6b817c;
+  color: #536b65;
+  background: #eef3f1;
+  cursor: default;
+}
+.panel :is(button, input, a, [tabindex]):focus-visible {
+  outline: 3px solid #087f72;
+  outline-offset: 3px;
+}
+.panel a {
+  color: #075b51;
+  text-decoration: underline;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.challenge {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #c8ded9;
+  border-radius: 0.75rem;
+}
+.challenge fieldset {
+  min-width: 0;
+  padding: 1rem;
+}
+.choice {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding-block: 0.75rem;
+}
+.choice input {
+  flex-shrink: 0;
+}
+@media (max-width: 40rem) {
+  .panel {
+    padding: 1rem;
+  }
+  .requirements button {
+    display: block;
+    margin: 0.5rem 0 0;
+  }
+  .actions {
+    flex-direction: column;
+  }
+}

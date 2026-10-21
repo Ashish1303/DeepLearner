@@ -8,6 +8,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Win32.SafeHandles;
 
 namespace DeepLearnerLocal {
@@ -29,6 +30,7 @@ namespace DeepLearnerLocal {
         [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)] internal static extern Handle CreateJobObjectW(IntPtr security, string name);
         [DllImport("kernel32.dll", SetLastError=true)] internal static extern bool SetInformationJobObject(Handle job,int kind,ref Extended info,uint size);
         [DllImport("kernel32.dll", SetLastError=true)] internal static extern bool QueryInformationJobObject(Handle job,int kind,out Accounting info,uint size,IntPtr returned);
+        [DllImport("kernel32.dll", EntryPoint="QueryInformationJobObject", SetLastError=true)] internal static extern bool QueryJobMembers(Handle job,int kind,IntPtr info,uint size,out uint returned);
         [DllImport("kernel32.dll", SetLastError=true)] internal static extern bool TerminateJobObject(Handle job,uint code);
         [DllImport("kernel32.dll", SetLastError=true)] internal static extern bool IsProcessInJob(Handle process,Handle job,out bool member);
         [DllImport("kernel32.dll", SetLastError=true)] internal static extern Handle OpenProcess(uint access,bool inherit,uint pid);
@@ -42,14 +44,40 @@ namespace DeepLearnerLocal {
         [DllImport("kernel32.dll", SetLastError=true)] internal static extern uint ResumeThread(Handle thread);
         [DllImport("kernel32.dll", SetLastError=true)] internal static extern uint WaitForSingleObject(Handle handle,uint milliseconds);
         [DllImport("kernel32.dll", SetLastError=true)] internal static extern bool GetExitCodeProcess(Handle process,out uint code);
+        [DllImport("kernel32.dll", SetLastError=true)] internal static extern bool GetProcessTimes(Handle process,out long creation,out long exit,out long kernel,out long user);
+        [DllImport("kernel32.dll", SetLastError=true)] internal static extern uint GetProcessId(Handle process);
+        [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)] internal static extern bool QueryFullProcessImageNameW(Handle process,uint flags,StringBuilder name,ref uint size);
         internal static Exception Error(string stage) { return new Win32Exception(Marshal.GetLastWin32Error(),stage); }
     }
     public sealed class Child : IDisposable {
         internal readonly Handle Process, Thread;
         internal readonly StreamWriter Input;
+        readonly Stream control;
+        int reading, writing;
         public uint Id { get; private set; }
         public string Label { get; private set; }
-        internal Child(Handle process,Handle thread,StreamWriter input,uint id,string label) { Process=process;Thread=thread;Input=input;Id=id;Label=label; }
+        internal Child(Handle process,Handle thread,StreamWriter input,uint id,string label,Stream control=null) { Process=process;Thread=thread;Input=input;Id=id;Label=label;this.control=control; }
+        public bool HandlesClosed { get { return Process.IsClosed && Thread.IsClosed; } }
+        // Opt-in private control output only. A single reader, bounded frame, strict UTF-8.
+        // Parent enforces a deadline and kills only its owned Job if I/O cannot finish.
+        public async Task<string> ReadFrameAsync() {
+            if(control==null || Interlocked.Exchange(ref reading,1)!=0) throw new InvalidOperationException("CONTROL_READ_REJECTED");
+            try {
+                var bytes=new byte[8192];var one=new byte[1];int count=0;
+                while(true) {
+                    int read=await control.ReadAsync(one,0,1).ConfigureAwait(false);
+                    if(read==0) { if(count!=0) throw new IOException("CONTROL_TRUNCATED"); return null; }
+                    if(one[0]==10) return new UTF8Encoding(false,true).GetString(bytes,0,count);
+                    if(one[0]==13 || count==bytes.Length) throw new IOException("CONTROL_FRAME_REJECTED");
+                    bytes[count++]=one[0];
+                }
+            } finally { Volatile.Write(ref reading,0); }
+        }
+        public async Task SendFrameAsync(string line) {
+            if(control==null || line==null || Encoding.UTF8.GetByteCount(line)>8192 || line.IndexOfAny(new[]{'\r','\n'})>=0 || Interlocked.Exchange(ref writing,1)!=0) throw new InvalidOperationException("CONTROL_WRITE_REJECTED");
+            try { await Input.WriteLineAsync(line).ConfigureAwait(false);await Input.FlushAsync().ConfigureAwait(false); }
+            finally { Volatile.Write(ref writing,0); }
+        }
         public bool Wait(int milliseconds) {
             if(milliseconds<0) throw new ArgumentOutOfRangeException("milliseconds");
             uint result=Native.WaitForSingleObject(Process,(uint)milliseconds);
@@ -60,11 +88,25 @@ namespace DeepLearnerLocal {
         public bool HasExited { get { return Wait(0); } }
         public uint ExitCode { get { if(!HasExited) throw new InvalidOperationException("STILL_RUNNING"); uint code; if(!Native.GetExitCodeProcess(Process,out code)) throw Native.Error("EXIT_QUERY_FAILED"); return code; } }
         public void Send(string line) { if(line.IndexOfAny(new[]{'\r','\n'})>=0) throw new ArgumentException("ONE_LINE_REQUIRED"); Input.WriteLine(line);Input.Flush(); }
-        public void Dispose() { try { Input.Dispose(); } finally { Thread.Dispose();Process.Dispose(); } }
+        public void CloseInput() { Input.Dispose(); }
+        public void Dispose() { try { Input.Dispose(); } finally { try { if(control!=null) control.Dispose(); } finally { Thread.Dispose();Process.Dispose(); } } }
+    }
+    // Observational retained handle only: cannot create, adopt or terminate a PID.
+    public sealed class Member : IDisposable {
+        internal readonly Handle Process;
+        internal readonly Owner Source;
+        internal readonly long Creation;
+        public uint Id { get; private set; }
+        internal Member(Owner source,Handle process,uint id,long creation) { Source=source;Process=process;Id=id;Creation=creation; }
+        public bool HasExited { get { uint value=Native.WaitForSingleObject(Process,0);if(value==0)return true;if(value==258)return false;throw Native.Error("MEMBER_WAIT_FAILED"); } }
+        public bool HandleClosed { get { return Process.IsClosed; } }
+        public uint ExitCode { get { if(!HasExited)throw new InvalidOperationException("MEMBER_RUNNING");uint value;if(!Native.GetExitCodeProcess(Process,out value))throw Native.Error("MEMBER_EXIT_FAILED");return value; } }
+        public void Dispose() { Process.Dispose(); }
     }
     public sealed class Owner : IDisposable {
         readonly Handle job;
         readonly List<Child> children=new List<Child>();
+        readonly List<Member> members=new List<Member>();
         bool closed, terminal;
         public Owner() {
             if(!OperatingSystem.IsWindows() || RuntimeInformation.ProcessArchitecture!=Architecture.X64 || Marshal.SizeOf<Native.StartupEx>()!=112 || Marshal.SizeOf<Native.Extended>()!=144) throw new PlatformNotSupportedException("WINDOWS_X64_REQUIRED");
@@ -78,6 +120,57 @@ namespace DeepLearnerLocal {
         }
         public bool Owns(uint pid) {
             using(var process=Native.OpenProcess(0x1000,false,pid)) { bool member; return !process.IsInvalid && Native.IsProcessInJob(process,job,out member) && member; }
+        }
+        // Membership is not enough: callers cannot adopt a PID or a Child from another Owner.
+        public IDictionary<string,object> Observe(Child child) {
+            if(closed || terminal || !children.Contains(child) || child.Process.IsClosed || child.Process.IsInvalid) throw new InvalidOperationException("RETAINED_IDENTITY_UNAVAILABLE");
+            return ObserveHandle(child.Process,child.Id);
+        }
+        IDictionary<string,object> ObserveHandle(Handle process,uint id) {
+            long creation,exit,kernel,user,independent,ie,ik,iu;bool retainedJob,independentJob;
+            if(!Native.GetProcessTimes(process,out creation,out exit,out kernel,out user)) throw Native.Error("IDENTITY_TIME_FAILED");
+            var name=new StringBuilder(32768);uint size=32768;
+            if(!Native.QueryFullProcessImageNameW(process,0,name,ref size) || !Native.IsProcessInJob(process,job,out retainedJob)) throw Native.Error("IDENTITY_QUERY_FAILED");
+            using(var inspection=Native.OpenProcess(0x1000,false,id)) {
+                if(inspection.IsInvalid || !Native.GetProcessTimes(inspection,out independent,out ie,out ik,out iu) || !Native.IsProcessInJob(inspection,job,out independentJob)) throw Native.Error("INDEPENDENT_IDENTITY_FAILED");
+                uint state=Native.WaitForSingleObject(process,0);if(state!=0 && state!=258)throw Native.Error("IDENTITY_WAIT_FAILED");
+                return new Dictionary<string,object>{{"Pid",Native.GetProcessId(process)},{"IndependentPid",Native.GetProcessId(inspection)},{"Filetime",creation},{"IndependentFiletime",independent},{"Executable",name.ToString()},{"RetainedJob",retainedJob},{"IndependentJob",independentJob},{"Live",state==258}};
+            }
+        }
+        public uint[] MemberIds() {
+            if(closed || terminal)throw new InvalidOperationException("OWNER_CLOSED");
+            // Fixed bounded observation. Never accept a truncated process list.
+            const int capacity=64;int length=8+capacity*IntPtr.Size;
+            IntPtr buffer=Marshal.AllocHGlobal(length);
+            try {
+                uint returned;if(!Native.QueryJobMembers(job,3,buffer,(uint)length,out returned))throw Native.Error("JOB_MEMBERS_UNAVAILABLE");
+                uint assigned=(uint)Marshal.ReadInt32(buffer),count=(uint)Marshal.ReadInt32(buffer,4);
+                if(assigned!=count || count>capacity)throw new InvalidOperationException("JOB_MEMBERS_INCOMPLETE");
+                var ids=new uint[count];var seen=new HashSet<uint>();
+                for(int i=0;i<count;i++) {
+                    ulong value=(ulong)Marshal.ReadIntPtr(buffer,8+i*IntPtr.Size).ToInt64();
+                    if(value==0 || value>UInt32.MaxValue || !seen.Add((uint)value))throw new InvalidOperationException("JOB_MEMBER_ID_INVALID");
+                    ids[i]=(uint)value;
+                }
+                Array.Sort(ids);return ids;
+            } finally { Marshal.FreeHGlobal(buffer); }
+        }
+        public Member CaptureMember(uint pid) {
+            if(Array.IndexOf(MemberIds(),pid)<0)throw new InvalidOperationException("FOREIGN_MEMBER_REFUSED");
+            // SYNCHRONIZE + QUERY_LIMITED_INFORMATION; no mutation/termination access.
+            var process=Native.OpenProcess(0x101000,false,pid);
+            try {
+                if(process.IsInvalid)throw Native.Error("MEMBER_HANDLE_FAILED");
+                var observation=ObserveHandle(process,pid);
+                if(!(bool)observation["RetainedJob"] || !(bool)observation["IndependentJob"] || !(bool)observation["Live"] || (long)observation["Filetime"]!=(long)observation["IndependentFiletime"])throw new InvalidOperationException("MEMBER_IDENTITY_REFUSED");
+                var member=new Member(this,process,pid,(long)observation["Filetime"]);members.Add(member);return member;
+            } catch { process.Dispose();throw; }
+        }
+        public IDictionary<string,object> ObserveMember(Member member) {
+            if(closed || terminal || member==null || member.Source!=this || !members.Contains(member) || member.Process.IsClosed || member.Process.IsInvalid)throw new InvalidOperationException("MEMBER_HANDLE_UNAVAILABLE");
+            var value=ObserveHandle(member.Process,member.Id);
+            if((long)value["Filetime"]!=member.Creation)throw new InvalidOperationException("MEMBER_CREATION_CHANGED");
+            return value;
         }
         public bool WaitEmpty(int milliseconds) { var clock=Stopwatch.StartNew(); do { if(ActiveCount==0) return true;Thread.Sleep(25); } while(clock.ElapsedMilliseconds<milliseconds); return ActiveCount==0; }
         public void ForceStop() { terminal=true; if(!Native.TerminateJobObject(job,1)) throw Native.Error("JOB_TERMINATION_FAILED"); }
@@ -93,6 +186,13 @@ namespace DeepLearnerLocal {
             if(handle.IsInvalid) { handle.Dispose();throw Native.Error("LOG_CREATE_FAILED"); } return handle;
         }
         public Child Start(string label,string executable,string[] arguments,string directory,IDictionary<string,string> environment,string output,string error) {
+            return StartCore(label,executable,arguments,directory,environment,output,error,false);
+        }
+        // No file-backed control transcript; only the explicit parent receives this stdout.
+        public Child StartControlled(string label,string executable,string[] arguments,string directory,IDictionary<string,string> environment,string error) {
+            return StartCore(label,executable,arguments,directory,environment,null,error,true);
+        }
+        Child StartCore(string label,string executable,string[] arguments,string directory,IDictionary<string,string> environment,string output,string error,bool controlled) {
             if(closed || terminal) throw new InvalidOperationException("OWNER_CLOSED");
             if(!Path.IsPathFullyQualified(executable) || !File.Exists(executable) || !Path.IsPathFullyQualified(directory) || !Directory.Exists(directory)) throw new ArgumentException("EXECUTABLE_OR_DIRECTORY_REJECTED");
             var command=new StringBuilder(Quote(executable)); foreach(string argument in arguments) command.Append(' ').Append(Quote(argument));
@@ -104,9 +204,9 @@ namespace DeepLearnerLocal {
             }
             block.Append('\0');if(environment.Count==0) block.Append('\0');
             byte[] bytes=Encoding.Unicode.GetBytes(block.ToString());
-            IntPtr env=IntPtr.Zero,attrs=IntPtr.Zero,jobs=IntPtr.Zero,handles=IntPtr.Zero,pipeRead=IntPtr.Zero,pipeWrite=IntPtr.Zero;
+            IntPtr env=IntPtr.Zero,attrs=IntPtr.Zero,jobs=IntPtr.Zero,handles=IntPtr.Zero,pipeRead=IntPtr.Zero,pipeWrite=IntPtr.Zero,controlRead=IntPtr.Zero,controlWrite=IntPtr.Zero;
             bool initialized=false,created=false,transferred=false;
-            var ph=new Handle();var th=new Handle(); StreamWriter input=null;
+            var ph=new Handle();var th=new Handle(); StreamWriter input=null;Stream control=null;
             try {
                 env=Marshal.AllocHGlobal(bytes.Length);Marshal.Copy(bytes,0,env,bytes.Length);
                 IntPtr size=IntPtr.Zero;Native.InitializeProcThreadAttributeList(IntPtr.Zero,2,0,ref size);
@@ -118,7 +218,13 @@ namespace DeepLearnerLocal {
                 var security=new Native.Security { Length=Marshal.SizeOf<Native.Security>(),Inherit=1 };
                 if(!Native.CreatePipe(out pipeRead,out pipeWrite,ref security,0)) throw Native.Error("PIPE_CREATE_FAILED");
                 if(!Native.SetHandleInformation(pipeWrite,1,0)) throw Native.Error("PIPE_INHERIT_FAILED");
-                using(var stdout=Output(output)) using(var stderr=Output(error)) {
+                Handle stdout;
+                if(controlled) {
+                    if(!Native.CreatePipe(out controlRead,out controlWrite,ref security,0) || !Native.SetHandleInformation(controlRead,1,0)) throw Native.Error("CONTROL_PIPE_FAILED");
+                    stdout=new Handle();stdout.Adopt(controlWrite);controlWrite=IntPtr.Zero;
+                    var readHandle=new SafeFileHandle(controlRead,true);controlRead=IntPtr.Zero;control=new FileStream(readHandle,FileAccess.Read);
+                } else stdout=Output(output);
+                using(stdout) using(var stderr=Output(error)) {
                     handles=Marshal.AllocHGlobal(3*IntPtr.Size);Marshal.WriteIntPtr(handles,pipeRead);Marshal.WriteIntPtr(handles,IntPtr.Size,stdout.DangerousGetHandle());Marshal.WriteIntPtr(handles,2*IntPtr.Size,stderr.DangerousGetHandle());
                     if(!Native.UpdateProcThreadAttribute(attrs,0,new UIntPtr(0x20002),handles,new UIntPtr((uint)(3*IntPtr.Size)),IntPtr.Zero,IntPtr.Zero)) throw Native.Error("HANDLE_ATTRIBUTE_FAILED");
                     var startup=new Native.StartupEx();startup.Startup.Size=(uint)Marshal.SizeOf<Native.StartupEx>();startup.Startup.Flags=0x100;startup.Startup.Input=pipeRead;startup.Startup.Output=stdout.DangerousGetHandle();startup.Startup.Error=stderr.DangerousGetHandle();startup.Attributes=attrs;
@@ -127,15 +233,16 @@ namespace DeepLearnerLocal {
                     ph.Adopt(pi.Process);th.Adopt(pi.Thread);created=true;
                     var pipe=new SafeFileHandle(pipeWrite,true);pipeWrite=IntPtr.Zero;
                     input=new StreamWriter(new FileStream(pipe,FileAccess.Write),new UTF8Encoding(false));input.NewLine="\n";
-                    var child=new Child(ph,th,input,pi.Id,label);children.Add(child);transferred=true;
+                    var child=new Child(ph,th,input,pi.Id,label,control);children.Add(child);transferred=true;
                     bool member;if(!Native.IsProcessInJob(ph,job,out member) || !member) throw new InvalidOperationException("JOB_MEMBERSHIP_FAILED");
                     if(Native.ResumeThread(th)!=1) throw Native.Error("RESUME_FAILED");
                     th.Dispose();return child;
                 }
             } catch { if(created) { try { ForceStop(); } catch { job.Dispose();closed=true; } } throw; }
             finally {
-                if(!transferred) { if(input!=null) input.Dispose();ph.Dispose();th.Dispose(); }
+                if(!transferred) { if(input!=null) input.Dispose();if(control!=null) control.Dispose();ph.Dispose();th.Dispose(); }
                 if(pipeRead!=IntPtr.Zero) Native.CloseHandle(pipeRead);if(pipeWrite!=IntPtr.Zero) Native.CloseHandle(pipeWrite);
+                if(controlRead!=IntPtr.Zero) Native.CloseHandle(controlRead);if(controlWrite!=IntPtr.Zero) Native.CloseHandle(controlWrite);
                 if(initialized) Native.DeleteProcThreadAttributeList(attrs);
                 foreach(IntPtr pointer in new[]{attrs,jobs,handles}) if(pointer!=IntPtr.Zero) Marshal.FreeHGlobal(pointer);
                 if(env!=IntPtr.Zero) { for(int i=0;i<bytes.Length;i++) Marshal.WriteByte(env,i,0);Marshal.FreeHGlobal(env); }Array.Clear(bytes,0,bytes.Length);
@@ -144,7 +251,10 @@ namespace DeepLearnerLocal {
         public void Dispose() {
             if(closed)return;closed=true;
             try { job.Dispose(); }
-            finally { foreach(var child in children) { try { child.Dispose(); } catch(IOException) { /* Already-closed private stdin; still dispose every native handle. */ } } }
+            finally {
+                try { foreach(var child in children) { try { child.Dispose(); } catch(IOException) { /* Already-closed private stdin; still dispose every native handle. */ } } }
+                finally { foreach(var member in members)member.Dispose(); }
+            }
         }
     }
 }

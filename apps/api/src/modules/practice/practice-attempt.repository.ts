@@ -675,15 +675,21 @@ export function createPracticeAttemptRepository(
           current.data.conceptId !== input.conceptId
         )
           throw changed();
+        remaining();
         await qualification?.proof(
           proof.data,
           {
             session,
-            timeoutMS: remaining(),
+            // Proof runs after withTransaction: each database operation needs
+            // the caller's current deadline, not a reusable timeout snapshot.
+            get timeoutMS() {
+              return remaining();
+            },
             majority: true,
           },
           assessment,
         );
+        remaining();
         coordinated?.assert();
         outcome = { data: current.data, attempt: attemptReceipt(proof.data) };
       } catch (error) {
@@ -700,6 +706,16 @@ export function createPracticeAttemptRepository(
           } catch {
             failure ??= unconfirmed();
             Object.defineProperty(failure, 'cleanupFailed', { value: true });
+            outcome = undefined;
+          }
+        }
+        // Cleanup also spends the original budget. Refuse before admitting a
+        // queued follower as successful or allowing any disclosure response.
+        if (outcome && !failure) {
+          try {
+            remaining();
+          } catch {
+            failure = unavailable();
             outcome = undefined;
           }
         }
@@ -720,6 +736,7 @@ export function createPracticeAttemptRepository(
       }
       if (failure) throw failure;
       if (!outcome) throw unconfirmed();
+      remaining();
       return outcome;
     },
   };

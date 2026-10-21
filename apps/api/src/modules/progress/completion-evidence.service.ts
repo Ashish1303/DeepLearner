@@ -112,6 +112,8 @@ export function createCompletionEvidenceService(
     CheckpointStore,
     'definition' | 'source' | 'admin'
   > = mongoCheckpoint,
+  // Trusted fixture-code dependency only. Never part of a public command or DTO.
+  credentialSource?: (identity: Readonly<SyntheticIdentity>) => Promise<string>,
 ) {
   const repository = createGradingRepository(store);
   const origins = new Map<
@@ -329,13 +331,32 @@ export function createCompletionEvidenceService(
           authority,
         );
       try {
-        // Generated credentials are never returned or logged; fixture token/login
-        // provisioning remains outside this qualification API.
+        // Default remains random/discard. A supervised fixture may supply one
+        // owner-entered password internally; neither plaintext nor hash is returned.
+        let password = '';
+        let passwordHash: string;
+        try {
+          password = credentialSource
+            ? await credentialSource(Object.freeze({ ...identity }))
+            : randomBytes(32).toString('hex');
+          if (
+            typeof password !== 'string' ||
+            password.length < 10 ||
+            password.length > 128
+          )
+            throw evidenceUnavailable();
+          passwordHash = await hashPassword(password);
+        } catch {
+          throw evidenceUnavailable();
+        } finally {
+          // Reference clearing is not a claim of JavaScript heap zeroization.
+          password = '';
+        }
         const value: SyntheticCreation = {
           ...identity,
           ...cmd,
           authorId: author,
-          passwordHash: await hashPassword(randomBytes(32).toString('hex')),
+          passwordHash,
         };
         // Verify the exact target and writable PRIMARY BEFORE any fixture writes.
         // hello is a preflight command, not a command inside a MongoDB transaction.

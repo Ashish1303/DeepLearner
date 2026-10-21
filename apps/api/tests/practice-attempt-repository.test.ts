@@ -21,6 +21,8 @@ import {
 } from '../src/modules/practice/practice-attempt.model.js';
 import type { QualifiedPractice } from '../src/modules/practice/practice.dto.js';
 import { AppError } from '../src/common/errors/app-error.js';
+import type { CompletionGrading } from '../src/modules/practice/completion-grading.service.js';
+import { gradingOptions } from '../src/modules/practice/practice-rubric.repository.js';
 const user = 'a'.repeat(24),
   question = 'b'.repeat(24),
   concept = 'c'.repeat(24);
@@ -1183,4 +1185,197 @@ test('coordination does not reset or bypass the existing three-work-body guard',
   assert.equal(f.state.events.filter((event) => event === 'insert').length, 3);
   assert.equal(f.state.rows.length, 0);
   assert.equal(coordination.listeners.size, 0);
+});
+
+function proofRepository(
+  f: ReturnType<typeof fixture>,
+  proof: CompletionGrading['proof'],
+  coordination: PracticeAttemptCoordination | null = null,
+) {
+  return createPracticeAttemptRepository(
+    f.store,
+    () => f.state.now,
+    {
+      async before() {},
+      async record() {
+        return undefined;
+      },
+      proof,
+    },
+    coordination,
+  );
+}
+
+test('qualifying majority proof recomputes each operation timeout within the original request budget', async () => {
+  const f = fixture(),
+    observed: number[] = [];
+  const repo = proofRepository(f, async (attempt, read) => {
+    assert.equal(attempt._id.toHexString(), f.state.rows[0]!._id.toHexString());
+    assert.equal(read.session, await f.store.session());
+    assert.equal(read.majority, true);
+    // Exercise the real database-options adapter between separate proof reads.
+    for (const elapsed of [1000, 3000, 7000]) {
+      f.state.now = elapsed;
+      const options = gradingOptions(read);
+      assert.equal(options.readConcern?.level, 'majority');
+      assert.equal(options.readPreference, 'primary');
+      observed.push(options.timeoutMS!);
+    }
+    f.state.now = 9999;
+  });
+  const result = await repo.submit(user, input);
+  assert.deepEqual(observed, [9000, 7000, 3000]);
+  assert.equal(result.data.answer, 'PRIVATE');
+  assert.equal(f.state.rows.length, 1);
+  assert.equal(f.state.options.timeoutMS, 8000);
+  assert.equal(f.state.options.maxCommitTimeMS, 2000);
+  assert.deepEqual(f.state.options.writeConcern, { w: 'majority', j: true });
+  assert.equal(
+    f.state.events.filter((event) => event === 'snapshot').length,
+    1,
+  );
+});
+
+test('exhaustion before the first postcommit proof read suppresses disclosure without undoing a durable attempt', async () => {
+  const f = fixture(),
+    recordProgress = f.store.progressAfter;
+  f.store.progressAfter = async (...args) => {
+    await recordProgress(...args);
+    f.state.now = 10000;
+  };
+  let assessmentProofs = 0;
+  const repo = proofRepository(f, async () => {
+    assessmentProofs++;
+  });
+  await assert.rejects(repo.submit(user, input), {
+    statusCode: 503,
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
+  assert.equal(f.state.rows.length, 1);
+  assert.equal(assessmentProofs, 0);
+  assert(!f.state.events.includes('proof'));
+  assert(f.state.events.includes('closed'));
+});
+
+test('exhaustion before qualifying-assessment proof prevents its first database operation', async () => {
+  const f = fixture(),
+    qualified = f.store.qualified;
+  f.store.qualified = async (...args) => {
+    const value = await qualified(...args);
+    if (args[4]) f.state.now = 10000;
+    return value;
+  };
+  let proofCalls = 0;
+  const repo = proofRepository(f, async (_attempt, read) => {
+    proofCalls++;
+    gradingOptions(read);
+  });
+  await assert.rejects(repo.submit(user, input), {
+    statusCode: 503,
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
+  assert.equal(proofCalls, 0);
+  assert.equal(f.state.rows.length, 1);
+  assert(f.state.events.includes('proof'));
+  assert(f.state.events.includes('closed'));
+});
+
+test('exhaustion between qualifying proof reads refuses the next operation rather than renewing its allowance', async () => {
+  const f = fixture(),
+    completedReads: number[] = [];
+  const repo = proofRepository(f, async (_attempt, read) => {
+    f.state.now = 9000;
+    completedReads.push(gradingOptions(read).timeoutMS!);
+    f.state.now = 10000;
+    completedReads.push(gradingOptions(read).timeoutMS!);
+  });
+  await assert.rejects(repo.submit(user, input), {
+    statusCode: 503,
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
+  assert.deepEqual(completedReads, [1000]);
+  assert.equal(f.state.rows.length, 1);
+  assert.equal(f.state.events.filter((event) => event === 'insert').length, 1);
+});
+
+test('successful owned proof cannot authorize disclosure when its completion exhausts the deadline', async () => {
+  for (const expired of [10000, 10001]) {
+    const f = fixture();
+    let completed = false;
+    const repo = proofRepository(f, async (_attempt, read) => {
+      assert.equal(gradingOptions(read).readConcern?.level, 'majority');
+      completed = true;
+      f.state.now = expired;
+    });
+    await assert.rejects(repo.submit(user, input), (error: unknown) => {
+      assert(error instanceof AppError);
+      assert.equal(error.statusCode, 503);
+      assert.equal(error.code, 'DEPENDENCY_UNAVAILABLE');
+      assert(!JSON.stringify(error).includes('PRIVATE'));
+      return true;
+    });
+    assert(completed);
+    assert.equal(f.state.rows.length, 1);
+    assert(f.state.events.includes('closed'));
+  }
+});
+
+test('deadline spent closing a proven leader fails its queued identical follower closed', async () => {
+  const coordination = coordinationFixture(),
+    f = pausedProof(coordination.gate),
+    session = await f.store.session(),
+    end = session.endSession.bind(session);
+  session.endSession = async () => {
+    await end();
+    f.state.now = 10000;
+  };
+  let proofCalls = 0;
+  const repo = proofRepository(
+    f,
+    async () => {
+      proofCalls++;
+    },
+    coordination.gate,
+  );
+  const first = assert.rejects(repo.submit(user, input), {
+    statusCode: 503,
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
+  await f.reached.promise;
+  const second = assert.rejects(repo.submit(user, input), {
+    statusCode: 503,
+    code: 'PRACTICE_COMMIT_UNCONFIRMED',
+  });
+  await until(() => coordination.timers.length === 1);
+  f.resume.resolve();
+  await Promise.all([first, second]);
+  assert.equal(proofCalls, 1);
+  assert.equal(f.state.rows.length, 1);
+  assert.equal(f.state.events.filter((event) => event === 'insert').length, 1);
+  assert.equal(coordination.listeners.size, 0);
+});
+
+test('the final disclosure deadline also includes synchronous coordination cleanup', async () => {
+  const f = fixture();
+  let finished = false;
+  const coordination: PracticeAttemptCoordination = {
+    async enter() {
+      return {
+        replayOnly: false,
+        assert() {},
+        finish() {
+          finished = true;
+          f.state.now = 10000;
+        },
+      };
+    },
+  };
+  const repo = proofRepository(f, async () => {}, coordination);
+  await assert.rejects(repo.submit(user, input), {
+    statusCode: 503,
+    code: 'DEPENDENCY_UNAVAILABLE',
+  });
+  assert(finished);
+  assert.equal(f.state.rows.length, 1);
+  assert(f.state.events.includes('closed'));
 });
