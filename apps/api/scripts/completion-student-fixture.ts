@@ -245,7 +245,8 @@ export async function initializeCompletionStudentFixture(
   let origin: ReturnType<typeof createCompletionEvidenceService> | undefined;
   let unsubscribe: (() => void) | undefined;
   let closing: Promise<void> | undefined;
-  function stop(): Promise<void> {
+  let stopped: Promise<void> | undefined;
+  function stopResources(): Promise<void> {
     if (closing) return closing;
     disposed = true;
     credentials = undefined;
@@ -262,15 +263,16 @@ export async function initializeCompletionStudentFixture(
             );
           }
         } finally {
-          try {
-            await database.disconnect();
-          } finally {
-            process.stdin.destroy();
-          }
+          await database.disconnect();
         }
       }
     });
     return closing;
+  }
+  function stop(): Promise<void> {
+    // Legacy STOP/EOF callers retain control-input closure, including failures.
+    stopped ??= stopResources().finally(() => process.stdin.destroy());
+    return stopped;
   }
   try {
     unsubscribe = initialization.onLoss(() => {
@@ -644,6 +646,7 @@ export async function initializeCompletionStudentFixture(
       conceptId: created.conceptId,
       conceptUrl: 'http://127.0.0.1:3000/concepts/' + created.conceptId,
       stop,
+      stopResources,
     });
   } catch {
     await stop().catch(() => {

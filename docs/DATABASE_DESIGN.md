@@ -1516,3 +1516,17 @@ filter and TTL above. Existing persistent collections are not certified by this
 description and require separately approved inspection/migration decisions.
 Automatic indexing/collection creation remains disabled. Declaration approval
 is not provisioning approval. No F038 completion or F039 mastery rule changes.
+
+## F039 read-time classification refinement
+
+The persisted mastery field and submission-time recalculation in Sections 6/11
+remain a future target. F039's initial approved increment derives a current
+internal classification without writing mastery or changing studentProgress
+v1/v2. Score authority remains the original owned F038 qualifying assessment,
+with current policy/rubric/revision/origin proof, not historical summary numbers,
+ungraded attempts, activity or DIAGNOSTIC promotion. Configurable server-owned
+thresholds default to Weak <60, Improving >=60 and <80, Strong >=80 within
+0-100; absent/invalid/untrusted evidence is UNCLASSIFIED. No new collection,
+index, provisioning, migration, TTL or backfill is introduced. Canonical stored
+completion, immutable attempts and existing first/latest/best provenance are
+unchanged. Persisted mastery/analytics requires separate owner approval.

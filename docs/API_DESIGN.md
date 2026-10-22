@@ -2215,3 +2215,16 @@ current sources; superseded decisions cannot be resurrected with an old key.
 Loss of a response does not prove rollback. Browser/release acceptance, privacy,
 retention/erasure, real-person enrollment/migration and persistent provisioning
 remain separately approved prerequisites.
+
+## F039 internal LOCAL Concept classification
+
+F039 supplies an authenticated internal LOCAL-only Concept classification
+service, not a public endpoint or dashboard API. The server selects and freshly
+proves the original current policy-pinned owned F038 COMPLETION_INPUT assessment
+under the accepted synthetic-origin boundary. It returns exactly classification
+and allowlisted code, with no conceptId or additional fields. Missing evidence is UNCLASSIFIED, not zero;
+stale/revoked or untrusted sources never yield a label. Server-owned versioned
+classification thresholds default to 60/80 independently of completion's 70%.
+Existing Auth, F036 disclosure, F037 five-field GET and F038 completion routes/
+DTOs remain unchanged. No client-controlled score/policy, UI, persistence or
+production qualification is introduced.

@@ -1,10 +1,12 @@
 # F039 - Weak / Improving / Strong Classification
 
-**Status:** IN_PROGRESS
+**Status:** APPROVED_COMPLETE — LOCAL DEVELOPMENT ONLY
 **Plan date:** 2026-10-21 (Asia/Calcutta)
-**Planning result:** Slice 1 implementation and offline verification PASS; Slice 2 deferred.
-**Authority for this gate:** Owner-approved Slice 1 implementation and offline
-verification within four paths only. No Slice 2, canonical changes or Git delivery.
+**Planning result:** Both bounded slices accepted for LOCAL DEVELOPMENT ONLY;
+authenticated integration and final review PASS, with limitations in Section 14.
+**Authority for this gate:** Explicit owner completion and scoped Git delivery
+approval dated 2026-10-22. Preserve the Slice 1 checkpoint and deliver the eight
+reviewed Slice 2 paths in one new commit, with a non-force push to origin/dev.
 **Formal dependency:** F037, APPROVED_COMPLETE for LOCAL DEVELOPMENT.
 **Operational reuse prerequisite:** F038's accepted LOCAL-only assessment/origin
 and current-source proof contracts. F001-F038 remain APPROVED_COMPLETE locally.
@@ -199,8 +201,9 @@ This is an internal method, not a route, startup job or automatic consumer.
    deadline check after cleanup before returning. No deadline reset or unbounded
    retry. Revalidate token/current actor, exact selected source identity and all
    bindings/lifecycle/origin at proof and assert origin before return.
-6. Return exactly {conceptId,classification,code}, using the pure result fields
-   and the validated requested Concept. No score, record ID, private binding,
+6. Return exactly {classification,code}, using only the pure result fields.
+   Concept identity remains in trusted inputs and all ownership/revision checks.
+   No score, record ID, private binding,
    authorization claim, expected choice or answer is exposed/logged. No caching.
 
 The adapter must not require overall completion eligibility: genuine score 0
@@ -241,8 +244,8 @@ before Slice 2. Do not alter historical text or apply them in this planning gate
 > F039 supplies an authenticated internal LOCAL-only Concept classification
 > service, not a public endpoint or dashboard API. The server selects and freshly
 > proves the original current policy-pinned owned F038 COMPLETION_INPUT assessment
-> under the accepted synthetic-origin boundary. It returns only conceptId,
-> classification and allowlisted code. Missing evidence is UNCLASSIFIED, not zero;
+> under the accepted synthetic-origin boundary. It returns exactly classification
+> and allowlisted code, with no conceptId or additional fields. Missing evidence is UNCLASSIFIED, not zero;
 > stale/revoked or untrusted sources never yield a label. Server-owned versioned
 > classification thresholds default to 60/80 independently of completion's 70%.
 > Existing Auth, F036 disclosure, F037 five-field GET and F038 completion routes/
@@ -493,3 +496,442 @@ browser exception transfers and no production readiness is claimed.
 Next gate: owner review of this Slice 1 evidence and separate explicit approval
 for its scoped local Git checkpoint. No staging, commit or push occurred here;
 Slice 2 implementation/integration and feature completion remain separately gated.
+
+## 10. Slice 2 owner DTO reconciliation — 2026-10-21
+
+The original planning recommendation in Section 4 step 6 and Section 5's API
+proposal included conceptId in the service result. The first conditional Slice 2
+gate stopped read-only before edits because the owner's exact two-field approval
+conflicted with that three-field wording. The owner explicitly resolved this:
+return exactly **{classification,code}**, removing conceptId only from output.
+Concept identity remains mandatory in trusted internal inputs, source selection,
+ownership, publication and revision checks. Sections 4/5 above now reflect that
+decision; this paragraph preserves the original recommendation and blocked gate.
+
+The owner authorizes the documented seven-path Slice 2 implementation/offline
+verification and the exact additive Section 5 clarifications, with this sole DTO
+correction. No new route, UI, score producer, mastery persistence, dependency,
+index, MongoDB execution or Git delivery is authorized. F039 stays IN_PROGRESS.
+
+## 11. Slice 2 implementation and offline evidence — 2026-10-21
+
+### 11.1 Reconciliation and exact implemented scope — PASS
+
+F039-P1-P8 reconcile with the owner-approved two-field correction in Section 10.
+Classification remains Concept-level with an explicit validated 60/80 default
+profile; the original current reviewed policy-pinned first OUTPUT submission is
+the sole supported source (F038_ORIGINAL_FIRST_SUBMISSION_V1). No best/latest or
+caller-selected assessment, numeric summary, activity/completion flag, fabricated
+intermediate score, DIAGNOSTIC promotion or inferred policy can supply a score.
+Current F038 producers genuinely supply only 0 or 100, yielding WEAK or STRONG
+under defaults; IMPROVING remains supported by the pure policy, not manufactured
+by this adapter. Classification thresholds do not change completion's 70% rule.
+
+Exactly seven paths, three creations and four modifications:
+
+| Operation | Exact literal path |
+| --- | --- |
+| CREATE | apps/api/src/modules/progress/mastery.service.ts |
+| CREATE | apps/api/tests/mastery.test.ts |
+| CREATE | apps/api/tests/mastery.integration.ts |
+| MODIFY | docs/features/F039-weak-improving-strong-classification.md |
+| MODIFY | docs/DEVELOPMENT_ROADMAP.md |
+| MODIFY | docs/API_DESIGN.md |
+| MODIFY | docs/DATABASE_DESIGN.md |
+
+The Slice 1 checkpoint d0d1a1a30e84510a0cfd04a80f5fc3ef962f29eb and both Slice 1
+source/test files remain unchanged. Canonical edits append only the exact
+Section 5 wording, with the approved DTO correction. Existing canonical content,
+Auth/Practice contracts, studentProgress v1/v2 and F037 five-field GET remain
+intact. Persisted mastery remains a deferred target, not an implemented field.
+
+### 11.2 Internal service and trust boundary
+
+createMasteryService receives the existing token verifier, trusted LOCAL config,
+an explicit strict classification profile and read-only F038 store dependencies.
+classify accepts exactly {accessToken,conceptId}; safe plain-data inspection
+precedes strict command validation. Tokens are bounded to 4096 characters and
+Concept IDs are canonical lowercase IDs. No caller account ID, assessment ID,
+score, threshold, freshness or approval flag is accepted. Output is exactly
+{classification,code}, including refusal results, with no Concept ID or private
+grading details. Nothing mounts this service in app startup or a public route.
+
+The default mongoCompletionStore rechecks current ACTIVE/email-verified STUDENT,
+complete published ancestry and same-process sealed synthetic origin. Its scope
+and origin.current(...,false) revalidate current independent Admin policy/rubric
+authorization, audit provenance, private solution/content/revision bindings and
+connection generation. sources(...,false) selects only attemptNumber=1 for the
+approved pinned question, strictly parses original immutable records and invokes
+completionGrading.proof against that exact assessment. The adapter adds explicit
+ownership/identity/provenance/timestamp checks and supplies only those validated
+bindings and the actual numeric score to the unchanged pure evaluator.
+
+A read-only snapshot transaction is followed by fresh primary-majority loading
+of the same scope, original attempt and assessment, including owned proof.
+Exact semantic identity must match; no cached label or answer is reused. Token
+identity is reverified around proof and live origin assertions run before and
+after cleanup. Ten seconds total, at most three callback bodies and the two-second
+verification reserve are preserved. The majority read timeout getter recomputes
+the current remaining allowance for each underlying operation; final deadline
+checks include session cleanup. Unknown transactions, failed proof/index readiness,
+changed sources or failed cleanup return sanitized dependency refusal, never
+SCORE_MISSING or a successful label. No nested transaction or write fence exists.
+
+Known current scope with no eligible source returns UNCLASSIFIED/SCORE_MISSING.
+Known stale/revoked scope returns the corresponding allowlisted refusal; a
+concurrent source change between snapshot and proof fails closed. Malformed
+stored scores (including invented 70), DIAGNOSTIC/unsupported records returned as
+qualifying evidence, missing owned proof or unverifiable authority return 503.
+Authentication/eligibility/hidden ownership errors preserve sanitized 401/403/404.
+These are bounded point-in-time reads, not serialization with future revocation,
+production enrollment, physical-storage attestation or cross-process authority.
+
+### 11.3 Verification actually obtained — offline only
+
+- **27 focused service tests PASS** in mastery.test.ts.
+- **176 relevant regression tests PASS**: mastery-policy.test.ts,
+  access-token.test.ts, completion-grading.test.ts, completion-evidence.test.ts,
+  completion.test.ts, practice-attempt-repository.test.ts, progress.test.ts and
+  practice-grading.test.ts. **203 distinct selected tests PASS** in the final run.
+- API build and source/test TypeScript PASS, including compilation of the
+  prepared integration entrypoint. Targeted ESLint, zero warnings, and Prettier
+  PASS on the three new TypeScript files. Documentation remains excluded by the
+  existing formatter configuration and was reviewed manually.
+- UTF-8 without BOM/LF, exact seven-path scope, unchanged Slice 1 files/checkpoint,
+  canonical append-only checks, preserved historical/status content and
+  git diff --check PASS. No dependency, model, index, configuration or shared-path
+  changes. No staging, commit or push.
+
+Focused checks cover both actual score values; missing/untrusted/unsupported and
+malformed evidence; current account/publication; independent approval; exact
+owner/attempt/assessment/Concept/question/rubric/policy/revision/epoch bindings;
+no selector fallback; genuine Auth signature/expiry handling; fresh majority
+identity/proof; uncertainty/index/cleanup refusal; deadline recomputation and
+reserve/body limits; immutable-record replacement; concurrent nonmutating reads;
+safe two-field output and absence of grading/writes/public exposure.
+Initial TypeScript found a captured optional-session type and targeted lint found
+two unused hook parameter names; both were corrected within the approved files.
+Initial 24 focused tests passed; three additional review/entrypoint guards bring
+the final focused count to 27. The final combined run and static checks above
+supersede intermediate checks without rewriting their history. Tests ran under
+the ordinary Windows user outside the known tsx sandbox user-information failure;
+no database/service/browser or real credential execution occurred.
+After the combined run, the policy-copy assertion was strengthened to use a zero
+score and a caller mutation that would change its label if the profile were
+aliased. Focused 27/27 and targeted static checks passed again; implementation
+and regression sources were unchanged, and no distinct test is counted twice.
+
+### 11.4 Separate severity-based source review — PASS after in-scope resolution
+
+Reviewed all new service/test/integration source and four documentation diffs
+separately from test execution, including the default F038 call chain and canonical
+contracts. Final unresolved findings: **Critical 0, High 0, Medium 0, Low 0**.
+
+| Review item | Severity | Exact current source anchor | Resolution |
+| --- | --- | --- | --- |
+| F039-S2-R1 | Low | apps/api/src/modules/progress/mastery.service.ts:233 | Snapshot/proof identity comparison now retains the attempt ID, canonical request fingerprint and timestamp instead of serializing a second copy of the student's submitted answer. No persistence/output/logging exposure occurred. Exact owned proof remains required. |
+| F039-S2-R2 | Medium | apps/api/tests/mastery.integration.ts:105 | The additionally created synthetic origin now subscribes explicitly to supervisor loss, permanently disposes its authority, clears credential/token references and refuses setup after loss. It no longer relies solely on eventual database shutdown for this boundary. Prepared-only; no integration ran before correction. |
+| F039-S2-R3 | Low | apps/api/tests/mastery.test.ts:586 | The policy-copy test now mutates the caller's threshold so an aliased zero score would change from WEAK to IMPROVING; the former 100-score assertion could not distinguish isolation. The strengthened test passes. |
+
+Other reviewed anchors: mastery.service.ts:59 (LOCAL/strict command), :85 (verified
+actor), :136 (current origin authority), :158 (original strict records), :194
+(unchanged pure classifier), :250 (bounded snapshot transaction), :266 (fresh
+majority proof), :284 (cleanup/sanitized refusal) and :306 (final origin/deadline
+and exact DTO). Focused guards and final regressions passed after the corrections.
+No expected-answer disclosure, grading, progress/completion/mastery mutation,
+new authority assertion, sensitive logging or external consumer was introduced.
+
+### 11.5 Prepared MongoDB integration — NOT_RUN, separate approval required
+
+mastery.integration.ts exports runMasteryIntegration(initialization); import
+alone starts no test, connection, provisioning or credential collection. Prepared
+inventory: **nine records (one parent plus eight children)**. It reuses the exact
+existing **21-index fixture manifest**, genuine two-Admin/Student login and
+independent approval services under live verified supervisor operations. No index
+definition, collection contract or native/temporary launcher is changed.
+
+The prepared suite uses two independent server-created synthetic Student/Concept/
+question origins to obtain genuine correct 100 and incorrect 0 first submissions,
+without editing assessments or producing an intermediate score. Existing private
+owner input is retained only temporarily for genuine setup logins, cleared when
+setup finishes/on loss/finally; this is reference clearing, not heap zeroization.
+No credential appears in source values, arguments, result frames or diagnostics.
+Hashes of private records, rather than record dumps, check read nonmutation.
+
+Prepared cases cover missing evidence, current authenticated ownership and Admin
+refusal, correct/incorrect original grades, repeated/concurrent read nonmutation,
+controlled majority-proof-loss injection, terminal policy revocation, synthetic
+revision/publication drift and connection-loss refusal. Controlled proof loss is
+not real MongoDB failover. Fixture mutations occur only in this unexecuted,
+separately guarded disposable test; no persistent setup is authorized.
+
+Execution readiness is conditional: the existing ignored F038 launcher hardcodes
+its entrypoint/counter contract. A temporary F039 invocation/result adapter must be
+explicitly reconciled and separately approved, retaining native handles, exact
+Job/owner/parent/executable/microsecond identity, PRIMARY-before-enumeration,
+empty exclusive target, private channel, 21-index readiness and protected cleanup.
+No interface, environment flag or LOCAL mode alone provides supervision authority.
+There was no MongoDB connection, provisioning, synthetic fixture creation or
+integration invocation in this gate. Real failover/multi-process behavior remains
+unverified. All **153 existing browser scenarios remain NOT_RUN**, zero added;
+no prior exception transfers and no production readiness is claimed.
+
+Next gate: owner review of Slice 2 offline evidence and separate approval for
+the exact guarded disposable integration/temporary invocation adapter. After live
+verification, final review and a separately approved local Git checkpoint remain
+required. F039 stays **IN_PROGRESS**; F001-F038 stay APPROVED_COMPLETE locally.
+
+## 12. Slice 2 guarded disposable MongoDB integration — 2026-10-22
+
+**Integration PASS: authenticated 9 PASS / 0 FAIL / 0 NOT_RUN**, including the
+parent and all eight children. This owner-approved invocation ran once, with no
+suite retry, application/test/assertion change, offline-suite rerun or Git write.
+F039 remains **IN_PROGRESS**, pending the separately approved Slice 2 final review
+and subsequent Git checkpoint decision; this evidence is not feature acceptance.
+
+### 12.1 Isolation, manifests and execution identity
+
+Retained sanitized evidence is in the ignored directory
+`.cache/f039-slice2-run-581f1961fffe4c4397239a93a42363c3/`, principally `result.json`,
+the identity/baseline/source-pin files and bounded `fixture.stderr.log` events.
+Runner start: `2026-10-22T02:33:12.6991656Z`; cleanup completed:
+`2026-10-22T02:35:01.5305412Z`. The guarded runner, including private entry and
+cleanup, took approximately 109 seconds. Private masked credential readiness was
+explicitly confirmed; no credential, token, signing key or private IPC body is
+included in this evidence.
+
+Ordinary unelevated Windows execution, initially free ports 27018/4000 and absence
+of leftover disposable processes/storage passed. Fresh disposable storage and an
+exact owned Job were established. Retained and independent process handles,
+executable, owner SID, parent identity, live state and UTC creation times compared
+at the approved common microsecond precision all passed. Exact target:
+`127.0.0.1:27018`, replica set `f021-test`, database `deeplearner-f021-test`.
+Writable PRIMARY was established before database enumeration; the exclusive
+target was empty before provisioning. Protected MongoDB/demo-storage/development
+process and parent-environment baselines were retained.
+
+The existing canonical 21-index allowlist matched the prepared suite exactly,
+including collection/name, ordered keys, uniqueness, the User provider partial
+filter, Session TTL and absence of alternate collation/sparse/hidden options.
+Only those indexes were provisioned in the disposable target. The eight additional
+approved empty collections were verified: `auditLogs`, `technologies`,
+`learningPaths`, `modules`, `topics`, `concepts`, `practiceQuestions`,
+`visualizations`. No persistent provisioning occurred.
+
+### 12.2 Authenticated results and terminal coordination
+
+| Record | Verified result | Assertion coverage |
+| --- | --- | --- |
+| PARENT | PASS | Complete suite and resource-only fixture cleanup. |
+| T01 | PASS | Genuine independent Admin/Student authentication; missing score is not zero. |
+| T02 | PASS | Cross-account, Admin and invalid-access refusal. |
+| T03 | PASS | Original durable OUTPUT submissions yield genuine 100/STRONG and 0/WEAK. |
+| T04 | PASS | Repeated/concurrent classification reads preserve private records and exact DTOs. |
+| T05 | PASS | Controlled majority-proof loss refuses classification. |
+| T06 | PASS | Reviewed-policy revocation refuses the original assessment. |
+| T07 | PASS | `read.summary` mutation changes the actual F038 revision; stale assessment and unpublished Concept are refused. |
+| T08 | PASS | Connection loss permanently refuses origin authority without reconstruction. |
+
+Existing assertions proved original owned F036 attempts and F038 qualifying
+assessment provenance, current published ancestry and policy/rubric/revision
+bindings. Classification reads returned exactly `{classification, code}` without
+grading, answer/rubric disclosure, mastery persistence or mutation of existing
+attempt/progress/completion records. Synthetic setup and deliberate revocation,
+revision and connection-loss controls are fixture operations, not service writes.
+Live numeric grades were genuine 0/100 only; no intermediate score was fabricated.
+IMPROVING and configurable boundary behavior retain their earlier offline evidence,
+not a newly claimed live intermediate-score case. Diagnostic/unsupported refusal
+retains the accepted offline provenance coverage; this suite does not add an
+independent live DIAGNOSTIC fixture.
+
+All nine record outcomes were finalized by host elapsed 42.949 seconds. Terminal
+reporting began at 42.950 seconds; its admitted ownership RPC was drained before
+RESULT construction/transmission at 44.198 seconds. The last ownership reply was
+ordinal 21, PASS, with no pending RPC remaining at intentional disposal. The
+supervisor validated the nonce/generation binding, exact manifest and counters,
+performed fresh terminal ownership/baseline checks, and completed the RESULT-bound
+digest ACK write. The host recorded matching authenticated ACK verification at
+46.268 seconds, then intentionally disposed the channel and exited 0 at 46.273
+seconds. Thus acceptance is supported by parent validation plus host ACK evidence,
+not local RESULT transmission or EOF alone. The parent's low-level delivery field
+remains UNKNOWN; it is not relabelled as a transport receipt guarantee.
+
+The 180-second suite and 205-second supervision limits, original ownership RPC/
+heartbeat deadlines, transaction budgets, verification reserves and cleanup
+deadlines remained unchanged. This successful execution exercised live draining
+and ACK timing; the forced deadline, malformed/missing ACK, failure-ledger and
+fatal-loss refusals retain the prior 82 protocol/18 harness offline evidence.
+No repeated offline tests or injected real failover occurred in this gate.
+
+### 12.3 Cleanup, prior failures and remaining gates
+
+Graceful cleanup PASS, with no forced termination and no cleanup error. All five
+owned child exits were observed as 0: initialization, collection preparation,
+supervised fixture, shutdown helper and MongoDB. The console supervisor's retained
+observation handle also reported exit 0. The exact Job was empty, retained handles
+closed, ports released and disposable storage absent. Protected before/after
+baselines were byte-identical, parent environment unchanged and all 513 source
+pins unchanged before this authorized documentation append. An independent closing
+process/port check also passed. Slice 1 checkpoint
+`d0d1a1a30e84510a0cfd04a80f5fc3ef962f29eb` is unchanged.
+
+Historical failures remain retained and unmodified in ignored evidence:
+
+- `f039-slice2-run-b734797e5dc8434bbf85314fed72a4bf`: host exit 1,
+  terminal counters UNKNOWN, no forced cleanup or cleanup error.
+- `f039-slice2-run-8f87a58d6fc94bbfb7a144c2a85d82eb`: T07 failed before the
+  revision-fixture correction; host exit 1 and authenticated counters UNKNOWN.
+- `f039-slice2-run-4008d62a5902449e9f1640f98a2db33c`: nine outcomes observed PASS
+  but terminal counters UNKNOWN during the ownership-reply/shutdown race; host
+  exit 0 did not establish acceptance. The separately approved terminal drain/ACK
+  correction preceded this new run. Earlier results are not retroactively PASS.
+
+No unresolved execution defect was established by the accepted run. Real MongoDB
+failover and multi-process convergence remain unverified; controlled proof loss
+is not failover. LOCAL synthetic-origin qualification is not general production
+authority. Persisted mastery, public API/UI, production enrollment/privacy/retention/
+erasure/migration/backup and release verification remain outside this increment.
+All **153 browser scenarios remain NOT_RUN**, zero added; no browser exception
+transfers. F001-F038 remain APPROVED_COMPLETE for local development, F039 remains
+IN_PROGRESS and F040 remains NOT_STARTED. Next gate: owner approval for final
+Slice 2 source/security/architecture review, then a separately approved Git action.
+
+## 13. Slice 2 final source, security and architecture review — 2026-10-22
+
+**F039 SLICE 2 FINAL REVIEW PASS — PARTIAL F039**
+
+This owner-approved review inspected the complete Slice 2 service, focused tests,
+integration entrypoint and fixture corrections, canonical/documentation diffs and
+the temporary terminal drain/ACK supervision paths. It executed no tests, services,
+MongoDB or browser scenarios and made no implementation or Git change. Historical
+failed runs, resolved review items and their original evidence remain intact.
+
+### 13.1 Severity findings and reviewed security boundaries
+
+Final unresolved findings: **Critical 0, High 0, Medium 0, Low 0**. No new finding
+requiring correction was established. The following are reviewed source anchors,
+not substituted test results or newly reported defects:
+
+| Reviewed boundary | Exact source anchor | Review conclusion |
+| --- | --- | --- |
+| Authenticated identity and current scope | apps/api/src/modules/progress/mastery.service.ts:81; :104 | Existing token verification derives STUDENT identity; reused scope checks ACTIVE/email-verified account, published Concept ancestry and live sealed LOCAL origin. Caller identities, scores, selectors and approval claims are rejected. |
+| Policy/rubric provenance and original assessment | apps/api/src/modules/progress/mastery.service.ts:136; :158; :194 | Current independently reviewed policy/rubric/audit authority and exact original owned F036/F038 identity/revision bindings precede pure classification. DIAGNOSTIC, historical, unsupported and fabricated scores cannot become qualifying evidence. No best/latest fallback exists. |
+| Majority proof and refusal | apps/api/src/modules/progress/mastery.service.ts:250; :265; :287 | Bounded read-only snapshot followed by fresh primary-majority loading/proof and exact source comparison. Ten-second request budget, three callback bodies, two-second reserve, live remaining-time getter, final post-cleanup deadline/origin checks and sanitized uncertainty refusal remain intact. |
+| Read-only result and secrecy | apps/api/src/modules/progress/mastery.service.ts:313 | Exactly `{classification, code}`; no grading, answer/rubric output, public route, persistence, completion/activity update or mastery mutation. No automatic consumer was mounted. |
+| T07 and resource cleanup | apps/api/tests/mastery.integration.ts:496; :505; :557; apps/api/scripts/completion-student-fixture.ts:249; :272 | Genuine `read.summary` revision mutation is asserted before stale refusal. Resource-only cleanup preserves the control channel for reporting; legacy stop and genuine loss retain input closure and authority invalidation. |
+| Terminal result acceptance | .cache/f039-slice2-supervised-host.mjs:882; :1137; .cache/f039-slice2-supervised-launcher.ps1:323; :334 | Admitted ownership RPCs drain under their original deadlines. Strict authenticated nine-record RESULT validation, fresh terminal ownership/baseline checks and a matching digest ACK precede normal closure. Missing/invalid acknowledgement and fatal loss cannot authorize success; acknowledged failed records retain nonzero exit. These ignored helpers are not delivery artifacts. |
+
+Current score authority remains the accepted F038 binary OUTPUT producer. Its
+genuine 0/100 outcomes may produce WEAK/STRONG independently of completion, while
+missing/stale/revoked sources refuse classification as documented. IMPROVING,
+fractional boundaries and configurable thresholds retain offline policy coverage;
+this review does not claim a live intermediate grade or improvement transition.
+
+### 13.2 Canonical, scope and Git consistency
+
+API_DESIGN.md:2219 and DATABASE_DESIGN.md:1520 are only the approved additive
+internal-service/two-field DTO and nonpersistence clarifications from Sections
+5/10. Earlier Auth, Practice, F037 five-field progress GET, F038 Completion and
+studentProgress v1/v2 contracts remain intact. Persisted mastery is explicitly a
+deferred architectural target, not a newly implemented field. No public API/UI,
+Topic classification, new score producer, collection, index or migration was added.
+
+The remaining repository working tree has the seven approved Slice 2 paths plus
+the separately owner-approved resource-only fixture correction in
+apps/api/scripts/completion-student-fixture.ts. Temporary F039 adapters/tests are
+ignored and excluded from Git delivery. The index is empty; no secrets, .cache
+launchers, disposable database files or generated data are staged. Slice 1 commit
+`d0d1a1a30e84510a0cfd04a80f5fc3ef962f29eb` and both Slice 1 source/test files are
+unchanged. F001-F038 remain APPROVED_COMPLETE for local development; F039 remains
+IN_PROGRESS and F040 remains NOT_STARTED. No staging, commit, push or history
+rewrite occurred.
+
+### 13.3 Retained evidence, limitations and next gate
+
+Retained evidence, without reruns: Slice 1 30 focused plus 159 regressions,
+189 selected PASS; Slice 2 27 focused plus 176 regressions, 203 selected PASS;
+authenticated disposable MongoDB 9/9 PASS including parent; terminal protocol
+82 tests and PowerShell harness 18 checks PASS; accepted build, source/test
+TypeScript, lint, formatting and security checks PASS. Section 12 retains the live
+ACK observation, graceful child/supervisor exits and unchanged protected baselines.
+These counts are separate evidence sets, not an assertion that overlapping tests
+are distinct when added together.
+
+Real failover and multi-process behavior remain unverified; controlled proof loss
+is not failover verification. Intermediate IMPROVING grades are offline-only.
+No mastery persistence or public UI/API is delivered. LOCAL synthetic-origin
+qualification is not production enrollment or physical-storage attestation.
+Production privacy, retention, erasure, migration/index provisioning, backup,
+operational and release-security gates remain pending. All **153 browser scenarios
+remain NOT_RUN**; F039 adds zero, and no prior browser exception transfers.
+
+Slice 2 is ready for the separate owner completion and scoped Git delivery
+decision. This partial review does not approve completion, Git delivery,
+production release or F040 work. **F039 stays IN_PROGRESS.**
+
+## 14. Owner completion approval and scoped delivery — 2026-10-22
+
+The owner explicitly approves **F039 APPROVED_COMPLETE for LOCAL DEVELOPMENT
+ONLY**, following the final review with zero unresolved Critical/High/Medium/Low
+findings. This current status supersedes the historical gate statuses above;
+all earlier blocked executions, resolved findings and their original counts are
+preserved. F001-F038 remain APPROVED_COMPLETE locally; F040 remains NOT_STARTED
+and is not authorized by this decision.
+
+Retained verification: Slice 1 189 selected tests PASS; Slice 2 203 selected tests
+PASS; authenticated disposable MongoDB 9/9 PASS; terminal protocol 82 tests and
+PowerShell harness 18 checks PASS; accepted build, TypeScript, lint, formatting
+and security checks PASS. No test, service, database or browser rerun is part of
+this delivery. Separate evidence sets are not summed as globally distinct tests.
+
+### 14.1 Exact final Slice 2 commit inventory
+
+The owner authorizes the seven original Slice 2 paths plus the separately approved
+fixture cleanup correction after exact-diff reconciliation: **eight paths,
+three creations and five modifications**, relative to the retained Slice 1 commit.
+
+| Operation | Literal path |
+| --- | --- |
+| CREATE | apps/api/src/modules/progress/mastery.service.ts |
+| CREATE | apps/api/tests/mastery.test.ts |
+| CREATE | apps/api/tests/mastery.integration.ts |
+| MODIFY | apps/api/scripts/completion-student-fixture.ts |
+| MODIFY | docs/features/F039-weak-improving-strong-classification.md |
+| MODIFY | docs/DEVELOPMENT_ROADMAP.md |
+| MODIFY | docs/API_DESIGN.md |
+| MODIFY | docs/DATABASE_DESIGN.md |
+
+The fixture diff only extracts idempotent resource-only `stopResources()`, keeps
+legacy `stop()` input closure (including cleanup failures), and exposes the new
+internal teardown method used by mastery.integration.ts. It is required to finish
+authenticated terminal reporting before supervisor-channel closure. It changes no
+bootstrap, credential, authentication, grading or ownership rule and belongs
+exclusively to the approved F039 integration correction. Across both slices the
+feature therefore touches ten unique repository paths, including this explicitly
+approved additional shared-fixture path; the final commit itself has eight.
+
+Preserve Slice 1 commit `d0d1a1a30e84510a0cfd04a80f5fc3ef962f29eb` unchanged.
+Authorized new commit message:
+`feat(progress): complete F039 mastery classification adapter`.
+Only the reviewed paths above may be staged. All ignored .cache launchers,
+protocol/harness tests, diagnostic evidence and disposable storage are excluded.
+Delivery must verify branch dev, approved origin, fresh nondivergent remote HEAD,
+exact staged hunks and clean diff/encoding before commit and non-force push.
+No amend, reset, rebase, history rewrite, Git configuration change or automatic
+conflict resolution is authorized. A failed preflight stops delivery.
+
+### 14.2 Accepted local scope and outstanding release gates
+
+Intermediate IMPROVING grades and classification boundaries are verified offline
+only; the supported genuine F038 producer yields 0/100 without invented partial
+scores. No mastery persistence, public endpoint or Student UI is delivered.
+Real failover and multi-process behavior remain unverified. All **153 browser
+scenarios remain NOT_RUN**; F039 adds zero, no browser PASS is claimed and no
+feature-specific exception transfers automatically.
+
+Production enrollment, privacy, retention, erasure, backups, persistent index/
+migration provisioning, operational security, full browser acceptance/regression
+and release verification remain separately approved prerequisites. LOCAL sealed
+synthetic-origin authority is not a general production capability or physical
+storage attestation. This is local-development completion, not production
+readiness, deployment approval, paid-service authorization or F040 approval.
