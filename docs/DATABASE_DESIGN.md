@@ -1530,3 +1530,25 @@ thresholds default to Weak <60, Improving >=60 and <80, Strong >=80 within
 index, provisioning, migration, TTL or backfill is introduced. Canonical stored
 completion, immutable attempts and existing first/latest/best provenance are
 unchanged. Persisted mastery/analytics requires separate owner approval.
+
+## F040 internal LOCAL dashboard read refinement
+
+The owner-approved Slice 1 reader enumerates existing studentProgress summaries
+by authenticated userId and ascending exclusive conceptId, reusing the exact
+uq_student_progress_owner_concept UNIQUE {userId:1,conceptId:1} index. Examine at
+most 100 candidates plus one presence lookahead, filter full published Concept
+ancestry and return at most five items with proven continuation/exhaustion.
+Scan/time uncertainty fails closed. This is not active-path progress, recency
+order, Topic aggregation or exhaustive historical-attempt discovery.
+
+F036 attempts remain authoritative. Existing F037 preparation validates owned
+summaries against attempt metadata using ix_practice_attempt_owner_concept_time,
+ordered {userId:1,conceptId:1,submittedAt:-1}, nonunique. No GET repair/backfill.
+Ordinary classification unavailability requires established absence of qualifying
+evidence; existing practiceAssessments index readiness is required. Malformed or
+uncertain evidence/missing authority fails closed, never becomes a fabricated
+zero/WEAK result. F039 uses only existing live synthetic origin and original
+owned assessment proof. No stored mastery, assessment-selection change, mutation,
+new schema/collection/index, migration, TTL or provisioning is authorized.
+Existing canonical index names/options/collation and F039 readiness stay intact.
+See features/F040-dashboard-api.md for the exact supported subset and bounds.
