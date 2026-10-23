@@ -2228,3 +2228,121 @@ classification thresholds default to 60/80 independently of completion's 70%.
 Existing Auth, F036 disclosure, F037 five-field GET and F038 completion routes/
 DTOs remain unchanged. No client-controlled score/policy, UI, persistence or
 production qualification is introduced.
+
+## F040 Slice 2 - LOCAL authenticated dashboard read
+
+`GET /api/v1/dashboard` is mounted only in LOCAL mode. It reads the accepted
+F040 Slice 1 service; it does not enroll an account, establish synthetic origin,
+grade, repair data or persist progress, completion or mastery. F041 UI, active-path
+selection, recommendations, Topic percentages, study time and gamification remain
+excluded. This additive bounded subset does not replace the PRD's future full
+dashboard or amend existing Auth, Practice, Progress or Completion contracts.
+
+Require the existing Bearer access token and a current ACTIVE, email-verified
+STUDENT. Identity comes exclusively from verified server authentication; Admin
+impersonation and client account/assessment/policy/score selection are forbidden.
+Current account and complete published Concept ancestry are rechecked by the
+reader before success. Existing access-token/session, cookies and CORS semantics
+are unchanged, including ordinary access-token expiry after logout. A login alone
+does not establish LOCAL qualification authority.
+
+| Query | Exact accepted wire value | Default / bound |
+| --- | --- | --- |
+| limit | One canonical decimal string, `1` through `5` | 5; maximum 5 |
+| cursor | Optional single 24-character lowercase hexadecimal Concept ID | Omitted |
+
+Reject extra, duplicate, array/object, blank and noncanonical parameters. No GET
+body is accepted, including non-JSON or transfer-encoded bodies. Existing JSON
+parser size/charset/encoding errors remain authoritative; no global parser or
+middleware behavior is changed. HEAD cannot invoke the reader; other data methods
+and non-LOCAL environments retain unmatched-route behavior. Existing OPTIONS/CORS
+preflight remains unchanged. Success and errors are JSON using existing envelopes;
+matching responses, including early CORS/parser errors, carry
+`Cache-Control: no-store`.
+
+Success: HTTP 200, exactly
+`{success:true,data:{items,pagination:{limit,nextCursor}},message:null,meta:{requestId}}`.
+`items` is an array of zero to `limit` entries. `limit` is an integer 1..5;
+`nextCursor` is a canonical Concept ID or null. Each entry contains exactly:
+
+- `concept`: `{id,title,slug,difficulty}`. `id` is canonical lowercase hexadecimal;
+  title is trimmed text 1..120, slug is the existing lowercase hyphenated format
+  1..100, difficulty is BEGINNER/INTERMEDIATE/ADVANCED/INTERVIEW_READY.
+- `activity`: `{conceptId,status,attemptCount,startedAt,lastActivityAt}`. The ID
+  matches concept.id; status is IN_PROGRESS; count is a positive safe integer;
+  dates are nonnull, ordered canonical UTC millisecond timestamps. These retain
+  F037 meanings and reflect durable owned Practice attempts, not section visits
+  or completion.
+- `mastery`: `{status,result,unavailableCode}`. EVALUATED has `unavailableCode:null`
+  and exactly `{classification,code}` from trusted F039. WEAK/IMPROVING/STRONG use
+  NONE; UNCLASSIFIED uses only SCORE_MISSING/STALE_ASSESSMENT/REVOKED_ASSESSMENT.
+  UNAVAILABLE has `result:null` and
+  `unavailableCode:LOCAL_QUALIFICATION_UNAVAILABLE`.
+
+No numeric scores, answers, rubrics, account/session IDs, private fingerprints,
+approval records, completion claims or extra fields are serialized. The HTTP
+boundary validates the exact accepted DTO and refuses contradictory/extra output.
+Evaluated labels require existing live, owned, generation-bound synthetic origin
+and original majority-proven assessment. Ordinary v1 activity can be UNAVAILABLE
+only after proving no configured policy and no qualifying evidence; configured
+policy without origin, malformed/stale context or dependency uncertainty returns
+503. Stale/revoked F039 results cannot retain a classified label. Current genuine
+grades are binary 0/100; intermediate IMPROVING behavior is verified offline only.
+
+Ordering is ascending Concept ID with exclusive keyset cursor. Cursor is only a
+position, never authority or proof of existence. Discover authenticated-owner
+studentProgress summaries, scan at most 100 candidates plus one presence
+lookahead, and locate at most limit+1 visible Concepts. Continuation is the last
+returned ID only when visible lookahead exists. Null requires proven exhaustion;
+empty means no visible saved summaries in this query, not no historical attempts.
+Unpublished ancestry is omitted without exposing hidden identities. No totals,
+page counts, persistent snapshot or guessed continuation; unproven completeness
+refuses with 503. Existing indexes suffice; no provisioning is authorized here.
+
+Route-specific LOCAL limits are 100/IP/15 minutes before authentication and then
+20/authenticated Student/15 minutes. Existing IPv6 /56 grouping, process-random
+HMAC keys, draft-8 headers and Retry-After on 429 are retained. Each independent
+store admits at most 10,000 identities with per-identity fixed windows; active
+counters are never evicted to admit a new identity. Expired entries can be reclaimed
+with bounded work. Unknown identity, capacity exhaustion or store failure refuses
+503 without exposing another Student's counters. No raw identity/key, credentials
+or response data is retained in these stores; restart clears counters. These are
+single-process controls, not distributed or production guarantees.
+
+| HTTP | Existing error code / behavior |
+| --- | --- |
+| 400 | VALIDATION_ERROR; existing bounded allowlisted validation details or body/parser refusal |
+| 401 | AUTH_ACCESS_TOKEN_MISSING / AUTH_ACCESS_TOKEN_INVALID / AUTH_ACCESS_TOKEN_EXPIRED |
+| 403 | AUTH_FORBIDDEN / ORIGIN_NOT_ALLOWED |
+| 404 | ROUTE_NOT_FOUND |
+| 413 / 415 | PAYLOAD_TOO_LARGE / UNSUPPORTED_MEDIA_TYPE from existing parsing |
+| 429 | RATE_LIMIT_EXCEEDED; Too many requests; try again later |
+| 503 | DEPENDENCY_UNAVAILABLE; Dashboard is temporarily unavailable |
+| 500 | INTERNAL_ERROR; An unexpected error occurred |
+
+No partial 206 or per-item dependency diagnostics. The unchanged reader has one
+monotonic 30-second budget, bounded five-second discovery/activity/final phases,
+at most five enrichments, and existing F039 ten-second proof budgets/reserves.
+Late authorization, proof, disposal or deadline uncertainty fails closed. HTTP
+does not reset deadlines, cache results or propagate unsupported cancellation;
+abandoned responses do not authorize disclosure. Logs/errors contain no private
+answers, credentials or driver details.
+
+Slice 2's disposable integration entrypoint is import-inert. Its explicit export
+requires the approved retained-handle/Job initializer and private credential
+channel; import alone cannot run it. Nine records (parent plus T01..T08) have a
+180-second suite cap. Its approved isolated target has 19 collections: 11 in the
+index manifest plus eight explicit fixture collections, with 21 existing canonical
+indexes and no new schema/index definitions. The subsequently approved F040
+temporary adapter requires an exact authenticated nine-record RESULT and matching
+digest ACK before channel closure; the F039 launcher's fixed manifest cannot
+authorize this suite. The owner-operated masked console flow was used for the
+separately authorized 2026-10-23 invocation. Run
+`f040-slice2-run-8ce1152dc6354332a557c42c7e374247` records authenticated 9/9 PASS,
+supervisor RESULT validation, matching ACK receipt in owned-host diagnostics and
+complete ownership-safe cleanup. Parent send-delivery observation fields remain
+UNKNOWN; local write completion is not treated as acknowledgement. See feature
+plan Section 12 for exact evidence, historical refusals and remaining limitations.
+Intermediate IMPROVING remains offline-only. No production, real-failover,
+multi-process or browser verification is inferred. Existing 153 browser scenarios
+remain NOT_RUN, zero added here; production readiness remains NOT_VERIFIED.

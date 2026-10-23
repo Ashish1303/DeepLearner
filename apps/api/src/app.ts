@@ -1,5 +1,8 @@
 import { createPracticeRouter } from './modules/practice/practice.routes.js';
 import { createProgressRouter } from './modules/progress/progress.routes.js';
+import { createDashboardRouter } from './modules/progress/dashboard.routes.js';
+import type { DashboardService } from './modules/progress/dashboard.controller.js';
+import type { DashboardLimits } from './modules/progress/dashboard-rate-limit.js';
 import type { ProgressService } from './modules/progress/progress.service.js';
 import type { ProgressLimits } from './modules/progress/progress-rate-limit.js';
 import type { CompletionService } from './modules/progress/completion.service.js';
@@ -71,6 +74,8 @@ export function createApp(
   progressService?: ProgressService,
   progressLimits?: ProgressLimits,
   completionService?: CompletionService,
+  dashboardService?: DashboardService,
+  dashboardLimits?: DashboardLimits,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -81,6 +86,7 @@ export function createApp(
   // Invalid identifiers still receive no-store; validation remains in the router.
   app.use((req, res, next) => {
     if (
+      /^\/api\/v1\/dashboard(?:\/|$)/i.test(req.path) ||
       (req.method === 'POST' &&
         /^\/api\/v1\/practice-questions\/[^/]+\/unlock\/?$/i.test(req.path)) ||
       (req.method === 'GET' &&
@@ -164,6 +170,11 @@ export function createApp(
     '/api/v1/progress',
     createProgressRouter(progressService, progressLimits, completionService),
   );
+  if (env.APP_ENV === 'LOCAL')
+    app.use(
+      '/api/v1/dashboard',
+      createDashboardRouter(dashboardService, dashboardLimits),
+    );
   app.use(notFound);
   app.use(errorHandler);
   return app;

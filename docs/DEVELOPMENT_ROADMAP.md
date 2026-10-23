@@ -1316,9 +1316,9 @@ authorized by this delivery gate.
 
 ### F040 — Dashboard API
 **Dependencies:** F037, F039  
-**Status:** `IN_PROGRESS`
+**Status:** `APPROVED_COMPLETE` - LOCAL DEVELOPMENT ONLY
 
-**Owner-approved Slice 1 — 2026-10-22:** Internal LOCAL-only saved Concept
+**Historical owner-approved Slice 1 — 2026-10-22:** Internal LOCAL-only saved Concept
 activity/classification reader and offline verification within the exact eight
 paths in features/F040-dashboard-api.md. Offline implementation is ready for
 owner review, not accepted. Slice 2 is NOT_STARTED and separately gated. No mounted
@@ -1326,7 +1326,7 @@ endpoint, UI/F041, mutations, new indexes/migrations, MongoDB/browser execution
 or Git delivery. F001-F039 remain APPROVED_COMPLETE locally. Existing 153 browser
 scenarios remain NOT_RUN; zero added. Production readiness NOT_VERIFIED.
 
-**Slice 1 offline verification — 2026-10-22:** Internal reader implemented;
+**Historical Slice 1 offline verification — 2026-10-22:** Internal reader implemented;
 51 focused + 209 relevant regressions PASS (260 distinct selected tests, no repeat
 inflation). API build, source/test TypeScript, targeted lint/formatting, UTF-8/LF,
 scope/security and diff checks PASS. Separate source review resolved the live
@@ -1337,6 +1337,101 @@ plan for historical pre-assertion harness/static failures and exact evidence.
 No MongoDB/browser execution or Git writes. Owner acceptance/checkpoint and all
 Slice 2 implementation/integration remain separate gates. F001-F039 statuses,
 F041 NOT_STARTED and all 153 browser scenarios NOT_RUN are preserved.
+
+**Historical standing F040 gate — 2026-10-23:** Slice 1 ACCEPTED_LOCAL at unchanged checkpoint
+1971903e79ebd0e6dbc2494a34515e882ab9ef1c; Slice 2 READY_FOR_REVIEW **offline only**.
+The owner approved bounded F040 troubleshooting, verification and review, with
+an absolute prohibition on staging, commit or push until separate authorization.
+Current selected offline tests: 92 Dashboard + 209 relevant regressions = 301/301
+PASS. API build, source/test TypeScript and targeted lint PASS. Separate source/
+security review: Critical/High/Medium/Low zero unresolved findings. The earlier
+sandbox loopback EACCES failures and historical guarded/managed-launch failures
+are preserved in the feature plan, not converted into passing live evidence.
+
+The unchanged private-input contract requires human participation; no prompt,
+runner, fixture or MongoDB was invoked in the earlier unattended standing-approval gate. Integration
+remains 0 PASS / 0 FAIL / 9 NOT_RUN; authenticated RESULT/digest ACK and fresh live
+protected-baseline verification remain NOT_RUN. Owner availability for the masked
+prompts is required before proceeding through fresh readiness/isolation checks.
+Preserve 19 disposable collections/21 canonical indexes, all ownership/deadline/
+cleanup guarantees, F001-F039 APPROVED_COMPLETE locally and F041 NOT_STARTED.
+F040 remains IN_PROGRESS, all 153 browser scenarios NOT_RUN, production readiness
+NOT_VERIFIED. Final acceptance and Git delivery remain separately owner-gated.
+
+**Later owner-present managed gate — 2026-10-23:** Fresh retained-handle-owned
+PowerShell PID 20008 passed native/CIM/owner/console, executable, child-only PATH,
+529-source-pin and resource preflight. The owner acknowledged window activation,
+but the captured HWND was not verified foreground during the bounded wait.
+Stopped before runner/private input: 0 invocations, 0 PASS / 0 FAIL / 9 NOT_RUN;
+RESULT/ACK and database baseline capture/provisioning NOT_RUN. Child exit 1,
+handles/pipe/window disposed, no forced cleanup; final read-only process/port/
+storage absence PASS. No application defect or exact focus-loss cause established.
+No retry, test rerun or source/launcher change. Retain 301/301 offline PASS and
+zero unresolved source/security findings; live acceptance remains blocked pending
+bounded HWND/foreground-host reconciliation. See feature-plan Section 10.
+
+**Later direct-console gate — 2026-10-23:** Further managed active-pane work was
+ended by owner decision. Read-only source/Git, executable-hash, 529-pin inventory
+and resource preparation PASS. The owner reported `F040 STOP at CONSOLE` from
+the direct pasted command, before runner invocation; the particular console
+prerequisite remains UNKNOWN. No new runner evidence, masked entry or integration
+was established. Final port/process/storage absence PASS; live protected baseline,
+provisioning and authenticated RESULT/ACK NOT_RUN. Retain 0 PASS / 0 FAIL / 9
+NOT_RUN, 301/301 prior offline PASS and zero unresolved source/security findings.
+No retry, source/launcher correction, test rerun or Git write. See feature-plan
+Section 11. F040 stays IN_PROGRESS; Slice 2 READY_FOR_REVIEW offline only.
+
+**Historical F040 gate — verified integration and final review, 2026-10-23:** The
+owner's verified PowerShell 7.6.8 console (PID 6128) performed one explicitly
+approved invocation after revalidation and hidden local input. Retained run
+`f040-slice2-run-8ce1152dc6354332a557c42c7e374247` reports authenticated exact
+PARENT/T01-T08 **9 PASS / 0 FAIL / 0 NOT_RUN**, CountsStatus VERIFIED. Approved
+19 collections/21 canonical indexes, disposable isolation and ownership PASS.
+Supervisor validated RESULT; owned host verified the matching digest ACK before
+normal disposal. Parent send-delivery observation fields remain UNKNOWN; they
+are not relabeled as authenticated receipt. See feature-plan Section 12 for
+corroborating host receipt and intentional post-finalization DISPOSED diagnostics.
+
+All observed child exits 0; no forced cleanup/errors; Job empty, handles closed,
+port released, storage removed, protected/parent-environment/source baselines
+unchanged. Final read-only resource-absence verification PASS. Runner elapsed
+73.839 seconds. Retain 301/301 offline PASS and build/TypeScript/lint/format checks;
+no unnecessary passing-suite rerun. Final source/security/architecture review:
+Critical 0 / High 0 / Medium 0 / Low 0 unresolved. Historical failures and
+UNKNOWN observations remain preserved. Only F040 documentation changed in this
+acceptance-evidence gate; index empty, unchanged Slice 1 checkpoint, no Git writes.
+
+Readiness annotation **READY_FOR_FINAL_ACCEPTANCE**, LOCAL DEVELOPMENT ONLY;
+F040 remains **IN_PROGRESS**, Slice 1 ACCEPTED_LOCAL, Slice 2 READY_FOR_REVIEW
+with offline and integration evidence. Owner final acceptance and scoped Git
+delivery remain separate gates. Intermediate IMPROVING scores remain offline-only;
+no stored mastery or F041 UI. Real failover, multi-process behavior, persistent
+provisioning/migrations, production privacy/security/operations and full browser
+acceptance remain unverified. All 153 browser scenarios NOT_RUN, zero added;
+production readiness NOT_VERIFIED. F001-F039 remain APPROVED_COMPLETE locally
+and F041 NOT_STARTED. Do not start F041 or stage/commit/push.
+
+**Current F040 gate — explicit owner final approval, 2026-10-23:** F040 is
+**APPROVED_COMPLETE for LOCAL DEVELOPMENT ONLY**. The owner authorized only final
+status/documentation reconciliation, with no staging, commit or push. Slice 1
+checkpoint 1971903e79ebd0e6dbc2494a34515e882ab9ef1c remains unchanged; Slice 2 is
+accepted within the exact approved API scope. See feature-plan Section 13.
+
+Retain 301 offline PASS; authenticated integration 9 PASS / 0 FAIL / 0 NOT_RUN;
+RESULT validation and matching host digest ACK PASS; parent delivery-observation
+fields UNKNOWN; 19 collections/21 indexes; isolation/graceful cleanup and unchanged
+protected baselines PASS; final review zero unresolved Critical/High/Medium/Low
+findings. Preserve historical failures/corrections; no passing-suite rerun.
+All 153 browser scenarios remain NOT_RUN, zero added. Intermediate IMPROVING
+remains offline-only; no stored mastery or F041 UI. Real failover, multi-process,
+persistent provisioning/migrations, production enrollment, privacy/security/
+operations and full browser/release acceptance remain separate gates. Production
+readiness NOT_VERIFIED; no transferred browser exception or production approval.
+
+Only the feature plan and this F040 status are reconciled. Exactly nine approved
+F040 paths remain uncommitted, index empty, no Git writes. F001-F039 remain
+APPROVED_COMPLETE locally; F041 NOT_STARTED. Separate owner approval is required
+for Git delivery or any F041 work. Stop after final status verification.
 
 ### F041 — Student Dashboard Real Data
 **Dependencies:** F040  
@@ -1771,8 +1866,8 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F040 - Dashboard API (LOCAL-only Slice 1 implementation/offline verification authorized)
-**Current Status:** `IN_PROGRESS`
+**Current Feature:** F040 - Dashboard API (APPROVED_COMPLETE for LOCAL DEVELOPMENT ONLY; Git delivery not authorized)
+**Current Status:** `APPROVED_COMPLETE` - LOCAL DEVELOPMENT ONLY
 **Next Feature:** F041 - Student Dashboard Real Data (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
