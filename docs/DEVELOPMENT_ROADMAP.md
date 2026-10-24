@@ -1435,7 +1435,7 @@ for Git delivery or any F041 work. Stop after final status verification.
 
 ### F041 — Student Dashboard Real Data
 **Dependencies:** F040  
-**Status:** `IN_PROGRESS`
+**Status:** `APPROVED_COMPLETE` — LOCAL DEVELOPMENT ONLY
 
 **Owner-approved plan and Slice 1 — 2026-10-24:** Frontend-only Saved Concept
 practice consumer of accepted F040 GET data. Exact 13-path/two-slice plan in
@@ -1506,6 +1506,68 @@ F042 NOT_STARTED. No push authorized; fresh origin/dev remains the F040 commit
 24fdc61e4fd09a69b8e7e2e8447b696fa9b0c27c. Final F041 review/browser decision,
 owner completion approval and remote delivery remain separate gates.
 Production readiness NOT_VERIFIED. See feature-plan Section 8.
+
+**F041-specific browser exception — explicit owner approval, 2026-10-24:** Owner
+approves verification deferral for F041 only, exclusively for LOCAL DEVELOPMENT
+acceptance under AGENTS.md. This is not a test pass, security waiver, production
+approval or final feature-completion approval. It does not transfer to F042 or any
+other feature. The earlier unapproved-deferral gate is superseded only by this
+named decision; historical evidence, failures/corrections and results remain.
+
+Twenty F041 browser scenarios remain NOT_RUN; existing 153 remain NOT_RUN;
+combined **173 NOT_RUN**, never PASS/SKIPPED/VERIFIED. Real-browser layout,
+accessibility, keyboard/focus, responsiveness, authentication/account races,
+cancellation, navigation/retry/network and Concept/Practice compatibility remain
+unverified and explicitly owner-accepted as LOCAL-only risks. Mocked browser
+tests would not establish live frontend-to-API integration even if executed later.
+Live F041 frontend-to-API integration remains **NOT_VERIFIED**. F040's nine
+authenticated backend records/host ACK and cleanup are prerequisite evidence only;
+parent delivery observations remain UNKNOWN. Retain 211 offline PASS and all
+build/static/security evidence; no passing suites rerun.
+
+Primary-host Playwright remains prohibited; no browser execution or infrastructure
+change is authorized. Future qualification requires separate owner approval of an
+ownership-safe isolated runtime/configuration, bounded execution, synthetic data,
+network/privacy protections, sanitized evidence and complete cleanup/protected
+baselines. Genuine live frontend/API qualification needs its own approved Auth
+and disposable-backend lifecycle; mocks do not replace it. Failover, multi-process,
+privacy/retention/erasure/backups, migrations/provisioning, operational security,
+full browser regression and production-release gates remain outstanding.
+
+F041 **IN_PROGRESS**; both slices **ACCEPTED_LOCAL**, Slice 2 **offline only**.
+F001-F040 remain APPROVED_COMPLETE for LOCAL DEVELOPMENT ONLY; F042 NOT_STARTED.
+Production readiness **NOT_VERIFIED**. Only the feature plan and roadmap change;
+no staging, commit, push or browser/live API/MongoDB execution. Separate final
+F041 owner acceptance is the next gate; this exception does not authorize
+completion or delivery. See Section 9 of
+features/F041-student-dashboard-real-data.md.
+
+**Final F041 owner acceptance — 2026-10-24:** Owner explicitly approves F041 as
+**APPROVED_COMPLETE — LOCAL DEVELOPMENT ONLY**, based on both accepted slices,
+211 distinct offline tests PASS, web build/TypeScript/lint/format PASS, final
+source/security review with zero unresolved Critical/High/Medium/Low findings,
+and the named F041-only LOCAL browser exception dated 2026-10-24. Slice 1 remains
+ACCEPTED_LOCAL; Slice 2 ACCEPTED_LOCAL - offline only. This supersedes only the
+pending final-acceptance status; historical failures, corrections and earlier
+gates remain unchanged. See feature-plan Section 10.
+
+Twenty F041 plus 153 pre-existing browser scenarios remain **173 NOT_RUN**.
+Real-browser accessibility, responsiveness, focus and interaction/authentication
+races remain NOT_VERIFIED. Live F041 frontend-to-API integration **NOT_VERIFIED**;
+F040's authenticated backend 9/9 PASS is prerequisite evidence only, not live
+F041 integration, and its parent delivery-observation uncertainty is unchanged.
+The exception does not transfer to F042 or production and grants no primary-host
+Playwright execution. Failover, multi-process, privacy/security, operational and
+full browser/release gates remain outstanding; production readiness NOT_VERIFIED.
+
+Preconditions PASS: dev at unchanged Slice 2
+a2a76655ef2e01b148baba9c1689c1301c61d74a, preserving Slice 1
+7c03570441ff5d0fb47aa28858b302d13cbe9dc0; exactly two local commits ahead of
+origin/dev, only the two approved documentation paths pending and empty index.
+F001-F040 remain APPROVED_COMPLETE for LOCAL DEVELOPMENT ONLY; F042 NOT_STARTED.
+Only final documentation/status reconciliation is authorized; no test reruns or
+browser/MongoDB/live API execution. No staging, commit, push or history rewriting.
+Keep changes uncommitted and STOP for separate scoped Git-delivery approval.
 
 ---
 
@@ -1937,7 +1999,7 @@ Stop after updating the roadmap and report the blocker.
 # 15. Current Feature Pointer
 
 **Current Feature:** F041 - Student Dashboard Real Data (both slices ACCEPTED_LOCAL; Slice 2 offline only)
-**Current Status:** `IN_PROGRESS`
+**Current Status:** `APPROVED_COMPLETE` — LOCAL DEVELOPMENT ONLY
 **Next Feature:** F042 - Admin Route Protection (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.

@@ -1,6 +1,6 @@
 # F041 - Student Dashboard Real Data
 
-**Status:** IN_PROGRESS - LOCAL DEVELOPMENT ONLY
+**Status:** APPROVED_COMPLETE — LOCAL DEVELOPMENT ONLY
 **Dependency:** F040, APPROVED_COMPLETE locally.
 **Owner approval:** 2026-10-24; approved frontend-only plan, exact 13-path feature
 inventory and two slices; later explicit Slice 2 implementation/offline approval
@@ -8,6 +8,8 @@ is recorded in Section 7.
 **Slice 1:** ACCEPTED_LOCAL - explicit owner acceptance, 2026-10-24; offline PASS.
 **Slice 2:** ACCEPTED_LOCAL - offline only; explicit owner acceptance, 2026-10-24;
 exact eight-path scope, 20 browser scenarios prepared and NOT_RUN.
+**Browser exception:** Explicit owner approval, 2026-10-24; F041 only, LOCAL
+DEVELOPMENT ONLY. Verification deferred, not passed; see Section 9.
 **Git:** Separate scoped local checkpoints authorized for both slices; no push.
 Preserve F040 checkpoint
 `24fdc61e4fd09a69b8e7e2e8447b696fa9b0c27c`.
@@ -418,3 +420,140 @@ remain unchanged; all production limitations in Sections 4 and 7.4 remain.
 After the scoped local checkpoint, STOP. F041 final review, named browser-
 verification decision, explicit owner feature-completion approval and any remote
 delivery remain separate gates. Production readiness NOT_VERIFIED.
+
+## 9. Owner-approved F041 LOCAL-only browser exception - 2026-10-24
+
+The owner explicitly approves the named-feature browser-verification exception
+for **F041 - Student Dashboard Real Data only**, under AGENTS.md's exception
+provision, exclusively for **LOCAL DEVELOPMENT acceptance**. The owner accepts
+that F041 browser tests and live frontend-to-API integration have not executed.
+This is a **verification deferral**, not a test pass, security waiver, production
+approval or independent authorization of final F041 completion. It does not
+transfer to F042 or any other feature and does not inherit earlier exceptions.
+
+This later owner decision resolves the previously unapproved browser-deferral
+gate recorded in Sections 4-8; all historical evidence, failed attempts,
+corrections, earlier gate outcomes and uncertainty remain unchanged. The bounded
+read-only feasibility review found no established approved isolated runtime;
+existing configurations do not select F041. Primary-host Playwright remains
+prohibited, and the custom teardown prototype is not a verified execution
+solution. Historical ownership/PID-reuse, EPERM and browser/worker/server cleanup
+concerns are not waived or repaired by this exception. No primary-host Playwright
+execution, new runtime, configuration change or infrastructure work is authorized.
+
+### 9.1 Exact deferred coverage and accepted consequences
+
+- **20 F041 browser scenarios remain NOT_RUN**: F041-B01 through F041-B20 in
+  tests/browser/dashboard.spec.ts, exactly the manifest in Sections 4 and 7.4.
+- Existing **153 browser scenarios remain NOT_RUN**. Combined backlog remains
+  **173 NOT_RUN**. None is relabelled PASS, SKIPPED or VERIFIED.
+- No real-browser layout, responsiveness, keyboard/focus, screen-reader or
+  accessibility acceptance has been obtained. Source semantics, static contrast
+  and offline rendering evidence do not establish mounted-browser behavior.
+- Real-browser authentication/account-change races, stale responses,
+  cancellation, pagination/navigation, retries/network interruption and earlier
+  Concept/Practice compatibility remain unverified. The owner accepts these
+  outstanding functionality and compatibility risks for LOCAL DEVELOPMENT only.
+- The prepared browser suite uses mocked HTTP/authentication responses. Even a
+  future passing mocked run would not prove genuine backend authentication,
+  publication/assessment authority or live frontend-to-API integration.
+- **Live F041 frontend-to-API integration remains NOT_VERIFIED**. F040's nine
+  authenticated backend integration records, RESULT validation/host digest ACK,
+  isolation and cleanup are prerequisite backend evidence only. Parent delivery-
+  observation fields remain UNKNOWN. No new F041 end-to-end PASS is inferred.
+
+Retain **211 distinct offline PASS** (27 focused + 184 regressions), build,
+TypeScript, lint, formatting, encoding/scope/secrecy/diff evidence and the separate
+source/security review with zero unresolved Critical/High/Medium/Low findings.
+No suite is rerun for this documentation gate. Authentication/authorization,
+security, API and applicable database verification requirements are unchanged;
+no authority, assertion, deadline or safety check is weakened.
+
+### 9.2 Required future qualification and production gates
+
+Future browser execution requires separate explicit owner approval of the runtime,
+exact configuration/file scope and ownership-safe lifecycle/cleanup procedure.
+Prefer a qualified disposable isolated environment; primary-host execution is
+not authorized by this exception. Verify source/tool identities, disposable
+profiles, synthetic data, permitted network access, bounded execution, sanitized
+per-case evidence and complete owned-resource cleanup/protected baselines. Execute
+the exact approved manifest without automatic retries; retain actual failures,
+UNKNOWN evidence and NOT_RUN cases. Full browser regression and release-readiness
+review remain separate requirements before production.
+
+Live F041 frontend-to-API qualification needs a separately approved genuine-Auth,
+LOCAL backend/disposable-fixture and frontend execution plan with original F040
+ownership, publication, qualification, deadline, privacy and cleanup safeguards.
+Mocked browser fixtures and the fixed F040 nine-record runner are not a substitute
+for that approved end-to-end lifecycle. Do not use production/persistent data or
+client-controlled qualification authority. LOCAL synthetic-origin qualification
+remains restricted; ordinary login is not general production enrollment.
+
+Real failover, multi-process behavior, persistent provisioning/migrations,
+privacy/retention/erasure/backups, operational security, full browser acceptance
+and production release requirements remain outstanding. **Production readiness
+NOT_VERIFIED**; no deployment approval is granted.
+
+### 9.3 Status and next gate
+
+F041 remains **IN_PROGRESS**; Slice 1 **ACCEPTED_LOCAL** and Slice 2
+**ACCEPTED_LOCAL - offline only**. F001-F040 remain **APPROVED_COMPLETE for LOCAL
+DEVELOPMENT ONLY**; F042 **NOT_STARTED**. Accepted Slice 1 checkpoint
+`7c03570441ff5d0fb47aa28858b302d13cbe9dc0` and Slice 2 checkpoint
+`a2a76655ef2e01b148baba9c1689c1301c61d74a` remain unchanged. Preflight: dev,
+exactly two local commits ahead of origin/dev, clean working tree and empty index.
+
+Only this feature document and docs/DEVELOPMENT_ROADMAP.md change in this gate.
+No source/test/configuration edits, browser/live API/MongoDB execution, staging,
+commit, push or history rewriting. STOP for **separate final F041 owner acceptance**;
+the exception alone does not set APPROVED_COMPLETE or authorize Git delivery.
+
+## 10. Final owner LOCAL-development acceptance - 2026-10-24
+
+The owner explicitly approves **F041 - Student Dashboard Real Data as
+APPROVED_COMPLETE — LOCAL DEVELOPMENT ONLY**, based on the two accepted slices,
+retained offline verification, final source/security review and the explicitly
+documented F041-only browser exception dated 2026-10-24. This separate final
+approval satisfies the pending owner-acceptance gate in Section 9.3. It does not
+change earlier results or turn the exception itself into completion authority.
+All historical IN_PROGRESS/READY_FOR_REVIEW gates, failures, corrections and
+limitations remain preserved as history.
+
+Slice 1 remains **ACCEPTED_LOCAL**; Slice 2 **ACCEPTED_LOCAL - offline only**.
+Retain **211 distinct offline tests PASS** (27 focused + 184 regressions), web
+build, TypeScript, targeted lint and formatting PASS, and zero unresolved
+Critical/High/Medium/Low source/security findings. No passing suite is rerun and
+no new runtime-verification result is claimed in this documentation gate.
+
+Mandatory limitations remain:
+
+- **20 F041 browser scenarios NOT_RUN**, **153 pre-existing browser scenarios
+  NOT_RUN**, combined **173 NOT_RUN**. None is relabelled PASS or VERIFIED.
+- Real-browser accessibility, responsiveness, focus and interaction behavior
+  remain **NOT_VERIFIED**, including authentication/account races, navigation,
+  cancellation, retry/network and earlier Concept/Practice compatibility risks.
+- **Live F041 frontend-to-API integration NOT_VERIFIED**. F040's authenticated
+  backend integration **9/9 PASS** is prerequisite evidence only and does not
+  establish live F041 integration. F040's parent delivery-observation uncertainty
+  remains documented and unchanged; host digest ACK evidence is not expanded.
+- The Section 9 exception applies exclusively to F041 LOCAL DEVELOPMENT
+  acceptance. It authorizes neither primary-host Playwright nor a transfer to
+  F042, any other feature or production. Future browser/live integration
+  qualification still requires the separately approved safeguards in Section 9.2.
+- Production failover, multi-process behavior, privacy/security, retention,
+  erasure/backups, migrations/provisioning, operational verification and full
+  browser/release gates remain outstanding. **Production readiness NOT_VERIFIED**.
+
+Preconditions PASS: dev, HEAD/Slice 2
+`a2a76655ef2e01b148baba9c1689c1301c61d74a`, unchanged Slice 1
+`7c03570441ff5d0fb47aa28858b302d13cbe9dc0`, exactly two local commits ahead of
+origin/dev, only the two approved documentation files modified and empty index.
+Both slices were ACCEPTED_LOCAL and F041 IN_PROGRESS before this reconciliation.
+F001-F040 remain APPROVED_COMPLETE for LOCAL DEVELOPMENT ONLY; F042 NOT_STARTED.
+
+Only this feature document and docs/DEVELOPMENT_ROADMAP.md are reconciled. No
+implementation, test, API, authentication, dependency or configuration change;
+no browser, MongoDB or live API execution. This owner approval authorizes **no
+staging, commit, push, amend, rebase or history rewrite**. Both accepted checkpoints
+remain unchanged locally, and documentation stays uncommitted. STOP for separate
+explicit owner approval of scoped Git delivery. Do not begin F042.
