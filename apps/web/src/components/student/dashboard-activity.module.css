@@ -1,0 +1,148 @@
+.panel {
+  min-width: 0;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--teal);
+  border-radius: 0.6rem;
+  background: white;
+  overflow-wrap: anywhere;
+}
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.eyebrow {
+  color: var(--ink-secondary);
+  font:
+    0.7rem var(--font-mono),
+    monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.panel h2 {
+  margin: 0.5rem 0;
+  font-size: 1.3rem;
+  line-height: 1.4;
+}
+.note,
+.difficulty,
+.status,
+.record dt {
+  color: var(--ink-secondary);
+}
+.note {
+  max-width: 55rem;
+}
+.status {
+  min-height: 1.5rem;
+}
+.results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0;
+  margin: 1.25rem 0;
+  list-style: none;
+}
+.results > li {
+  min-width: 0;
+}
+.record {
+  height: 100%;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface-subtle);
+}
+.record h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+.record a,
+.empty a {
+  color: var(--teal);
+  text-underline-offset: 0.2em;
+}
+.record dl {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0;
+}
+.record dt {
+  font-size: 0.8rem;
+}
+.record dd {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+}
+.badge {
+  display: inline-block;
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.35rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.weak {
+  background: #fff1f2;
+  color: #9f1239;
+}
+.improving {
+  background: #fffbeb;
+  color: #854d0e;
+}
+.strong {
+  background: #effcfa;
+  color: #086a61;
+}
+.neutral {
+  background: #f1f5f9;
+  color: #334155;
+}
+.notice {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+}
+.notice p {
+  margin-top: 0;
+}
+.empty {
+  padding: 1rem 0;
+}
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+.panel button {
+  min-height: 44px;
+  padding: 0.6rem 0.9rem;
+  max-width: 100%;
+  border: 1px solid var(--teal);
+  border-radius: 0.35rem;
+  color: var(--teal);
+  background: white;
+  font: inherit;
+  cursor: pointer;
+}
+.panel button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.panel :is(a, button, h2):focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .results {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .record {
+    padding: 1rem;
+  }
+}

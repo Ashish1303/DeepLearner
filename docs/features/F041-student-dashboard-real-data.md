@@ -3,10 +3,12 @@
 **Status:** IN_PROGRESS - LOCAL DEVELOPMENT ONLY
 **Dependency:** F040, APPROVED_COMPLETE locally.
 **Owner approval:** 2026-10-24; approved frontend-only plan, exact 13-path feature
-inventory and two slices; implementation/offline verification of Slice 1 only.
+inventory and two slices; later explicit Slice 2 implementation/offline approval
+is recorded in Section 7.
 **Slice 1:** ACCEPTED_LOCAL - explicit owner acceptance, 2026-10-24; offline PASS.
-**Slice 2:** NOT_STARTED; requires separate owner approval.
-**Git:** One scoped Slice 1 local checkpoint authorized on 2026-10-24; no push.
+**Slice 2:** ACCEPTED_LOCAL - offline only; explicit owner acceptance, 2026-10-24;
+exact eight-path scope, 20 browser scenarios prepared and NOT_RUN.
+**Git:** Separate scoped local checkpoints authorized for both slices; no push.
 Preserve F040 checkpoint
 `24fdc61e4fd09a69b8e7e2e8447b696fa9b0c27c`.
 
@@ -100,7 +102,7 @@ Slice 1 CREATE:
 Slice 1 MODIFY:
 7. docs/DEVELOPMENT_ROADMAP.md
 
-Slice 2 CREATE, NOT_STARTED:
+Slice 2 CREATE (authorized 2026-10-24):
 8. apps/web/src/hooks/use-dashboard.ts
 9. apps/web/src/components/student/dashboard-activity.tsx
 10. apps/web/src/components/student/dashboard-activity.module.css
@@ -261,3 +263,158 @@ F001-F040 remain approved locally. Existing 153 browser scenarios NOT_RUN;
 The authorization permits no remote push, feature completion or Slice 2 work.
 After the local checkpoint and clean-index/working-tree verification, STOP for
 separate owner approval of Slice 2. Any later remote delivery is separately gated.
+
+## 7. Owner-approved Slice 2 implementation - 2026-10-24
+
+Owner approved exactly the five Slice 2 creations and three modifications in
+Section 3. Preconditions PASS: dev, clean working tree/index, unchanged accepted
+Slice 1 checkpoint `7c03570441ff5d0fb47aa28858b302d13cbe9dc0`. No Slice 1,
+Auth, API, database, configuration, dependency or shared-package changes.
+Slice 2 IN_PROGRESS; verification and review pending. Agent estimate 30-50 minutes;
+owner estimate 40-75 minutes. Browser execution and all Git writes prohibited.
+
+### 7.1 Implemented presentation and lifecycle
+
+The Saved Concept practice panel mounts only for an authenticated, nonpending,
+ACTIVE, verified STUDENT. Its inner component is keyed to the current account;
+the hook reuses the accepted authenticated controller and cancels/disposes it on
+unmount. Auth invalidation, account change and request supersession retain the
+accepted abort/generation/data-erasure behavior. No Auth, API, Slice 1, route,
+configuration or dependency changes; no response persistence or logging.
+
+Five entries per page show escaped titles, existing ID-based Concept links
+(prefetch disabled), difficulty, saved-attempt counts, semantic UTC timestamps
+and server-returned classification. Missing, stale, revoked and ordinary
+unavailable evidence have separate labels. No scoring, completion inference,
+improvement-over-time claim, totals, XP, streaks or recommendation is introduced.
+Refresh and Back to first reset the page; Next uses the validated continuation.
+Pages replace rather than accumulate. Loading hides earlier entries; errors are
+fixed safe notices with manual Retry, never empty/zero-score fallbacks. No polling,
+automatic retry or pagination, token refresh/replay or Retry-After countdown.
+
+The card hierarchy and teal styles adapt the inspected Stitch reference using
+existing tokens. Account details, preferences, navigation and branding remain.
+Native controls, a labelled region, polite status/alert semantics, text badges,
+responsive wrapping and explicit-success heading focus are implemented. These
+are source/offline facts; real keyboard, screen-reader, focus and layout behavior
+remain NOT_VERIFIED until approved browser execution.
+
+### 7.2 Executed offline verification
+
+- New UI/rendering/hook tests: **27 distinct PASS**, zero failed/cancelled/skipped.
+  Coverage includes eligibility/account keys, every classification/absence state,
+  strict malformed/private projection refusal, fixed API/rate-limit notices,
+  escaped titles/safe links, timestamps, five-entry page controls, native action
+  wiring and focus-effect decisions, effect-only initial reads, unmount abort and
+  late-response refusal, auth-state erasure, configuration refusal and lifecycle
+  cleanup/setup replay. React static rendering and controlled hook/effect adapters
+  are offline tests, not a mounted browser, live Auth or actual assistive technology.
+- Relevant regressions: **184 distinct PASS** from the web package working
+  directory: accepted dashboard-client (51) and dashboard-controller (27), plus
+  the 106 existing Auth/API/redirect/coordination, Progress, Completion, Concept
+  and Student-shell/navigation tests listed in Section 5.1. Selected distinct
+  total this gate: **211 PASS** (27 + 184). Repeated new-suite execution after the
+  test-only lint correction is not added to the distinct count.
+- Web build PASS, including route prerendering and Next TypeScript checks.
+  Preserve the initial sandbox failure: EPERM while creating generated
+  `.next/server/app/_not-found.segments/_not-found` storage. The identical build
+  outside the sandbox passed; no source/configuration/font workaround was used.
+- Web source/test TypeScript with `--noEmit --incremental false` PASS. The new
+  browser spec separately passed TypeScript static compilation without importing
+  a browser runner or executing/listing browser cases.
+- Targeted ESLint, zero warnings, PASS on the five affected TS/TSX files. Preserve
+  the initial lint failure: the new offline hook harness used the reserved local
+  name `module` (`@next/next/no-assign-module-variable`); renamed to `hookModule`
+  inside the authorized test path. Focused tests and lint then PASS.
+- Prettier PASS on all six affected TS/TSX/CSS files. Docs retain the existing
+  formatting exclusion. UTF-8 without BOM/LF, final newline, exact eight-path
+  scope, added-line whitespace, git diff --check and empty-index checks PASS.
+  Targeted sensitive-pattern/sink checks and source inspection found no secret,
+  response logging, browser persistence or unsafe HTML sink. Static foreground/
+  background text contrast calculations pass 4.5:1 for the four badges, teal
+  controls and muted metadata (minimum 5.47:1); this is not browser/visual QA.
+
+### 7.3 Separate source/security review
+
+A distinct final review phase inspected the hook, panel, CSS, complete foundation
+diff, offline test harness, 20 prepared browser cases, documentation and accepted
+Auth/controller/schema integration. **Critical 0 / High 0 / Medium 0 / Low 0
+unresolved findings.** This is a separate review phase by the implementing agent,
+not a claim of a second agent/human reviewer or browser acceptance.
+
+Verified source boundaries: account-keyed eligibility and cancellation, original
+401 behavior, no refresh/replay change, strict DTO revalidation before rendering,
+canonical links and escaped strings, fixed failure messages, no answer/rubric/
+numeric-score access, no database/mutation or persistent cache, bounded page
+replacement, manual actions, stable hook disposal and preserved account/profile
+markup. No server publication, assessment authenticity or production capability
+is inferred from client validation or synthetic fixtures. Browser preparation
+also checks blocked background requests and sanitizes fixture diagnostics; a
+tablet scenario scrolls its control into view before asserting viewport presence.
+
+### 7.4 Browser preparation and remaining gates
+
+Exactly **20** individually named `F041-B01` through `F041-B20` cases are prepared
+in tests/browser/dashboard.spec.ts, matching Section 4's approved manifest.
+All **20 NOT_RUN**; existing **153 NOT_RUN** remain unchanged; combined backlog
+**173 NOT_RUN**. No browser launch, Playwright execution/listing, configuration or
+infrastructure change. No browser exception is granted or transferred. These are
+synthetic HTTP fixtures and cannot prove live authentication, published ancestry
+or F039 qualification. Navigation coverage prepares route/unmount checks, not full
+earlier Concept/Practice compatibility acceptance.
+
+No fresh MongoDB/API integration in this frontend gate. Historical F040 evidence
+and its limitations remain intact. Real-browser responsive layout, keyboard/focus,
+screen readers, navigation/account races and network interruptions remain
+unverified. Intermediate IMPROVING presentation uses offline synthetic data only;
+normal startup does not supply F040's LOCAL synthetic authority. Real failover,
+multi-process, production privacy/retention/erasure/backups, migrations and
+operational/security/release gates remain outstanding. Production readiness
+NOT_VERIFIED.
+
+### 7.5 Final Slice 2 status
+
+Slice 2 **READY_FOR_REVIEW (offline only)**; F041 **IN_PROGRESS**; Slice 1
+**ACCEPTED_LOCAL** at unchanged `7c03570441ff5d0fb47aa28858b302d13cbe9dc0`.
+Exactly the five creations and three modifications in Section 3; no deviations,
+dependencies or unrelated changes. F001-F040 remain approved locally; F042
+NOT_STARTED. Git index empty, eight expected paths uncommitted; no staging,
+commit, push, database or browser execution. Actual approximately 18 minutes
+against the initial 30-50 minute estimate; no overrun.
+
+STOP for owner Slice 2 review/acceptance and separately approved local checkpoint.
+Feature completion remains a separate owner gate, including the named F041
+browser-verification decision required by AGENTS.md; no implicit exception.
+
+## 8. Owner Slice 2 acceptance and local checkpoint - 2026-10-24
+
+The owner explicitly accepted Slice 2 for **LOCAL DEVELOPMENT ONLY, offline
+only**, conditional on final Git scope/integrity verification, and authorized
+exactly one eight-path local commit:
+`feat(dashboard): integrate F041 student activity panel`.
+This supersedes the pending Slice 2 acceptance/checkpoint gate in Section 7.5;
+all earlier implementation evidence, failures, corrections and limitations remain.
+
+Retain **27 focused + 184 regressions = 211 distinct PASS**, web build, TypeScript,
+targeted lint/format, UTF-8/LF, scope/secrecy/diff checks PASS and zero unresolved
+Critical/High/Medium/Low findings. No passing test suite is rerun in this Git gate.
+No implementation, dependency or authentication change accompanies acceptance;
+only this feature plan and the roadmap reconcile the approved status.
+
+Preflight PASS: dev at unchanged Slice 1 checkpoint
+`7c03570441ff5d0fb47aa28858b302d13cbe9dc0`, exactly the five Slice 2 creations and
+three modifications in Section 3, empty index, no merge/rebase/cherry-pick or
+concurrent Git-operation markers. Fresh read-only remote inspection confirms
+origin/dev remains `24fdc61e4fd09a69b8e7e2e8447b696fa9b0c27c`; no push is authorized.
+No unrelated, sensitive, generated or disposable artifact is included.
+
+Both slices are **ACCEPTED_LOCAL**, Slice 2 **offline only**; F041 **IN_PROGRESS**.
+F001-F040 remain approved locally; F042 NOT_STARTED. Existing 153 and new 20
+browser scenarios remain **173 NOT_RUN**. No browser accessibility/responsiveness,
+fresh live F041 API acceptance, feature completion or production readiness is
+implied. Historical F040 integration/ACK evidence and UNKNOWN delivery fields
+remain unchanged; all production limitations in Sections 4 and 7.4 remain.
+
+After the scoped local checkpoint, STOP. F041 final review, named browser-
+verification decision, explicit owner feature-completion approval and any remote
+delivery remain separate gates. Production readiness NOT_VERIFIED.

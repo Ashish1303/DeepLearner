@@ -1,5 +1,6 @@
 'use client';
 import { useAuth } from '../../hooks/use-auth';
+import { DashboardActivity } from './dashboard-activity';
 import styles from './student-shell.module.css';
 const labels: Record<string, string> = {
   BEGINNER: 'Beginner',
@@ -23,8 +24,8 @@ export function DashboardFoundation() {
         <span className={styles.label}>DeepLearner workspace</span>
         <h1>Welcome back, {user.firstName}.</h1>
         <p>
-          Your account is ready. Learning content and activity will become
-          available here as the student experience develops.
+          Review your saved Concept practice below, or explore published
+          learning content.
         </p>
       </section>
       <div className={styles.grid}>
@@ -117,17 +118,7 @@ export function DashboardFoundation() {
           )}
         </section>
       </div>
-      <section
-        className={`${styles.card} ${styles.empty}`}
-        aria-labelledby="learning-title"
-      >
-        <span className={styles.label}>Learning</span>
-        <h2 id="learning-title">Room for what comes next</h2>
-        <p>
-          Learning paths, practice and progress are not available yet. No
-          learning activity is shown here.
-        </p>
-      </section>
+      <DashboardActivity />
     </>
   );
 }

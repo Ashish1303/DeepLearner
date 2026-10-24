@@ -1466,6 +1466,47 @@ Slice 1 ACCEPTED_LOCAL, Slice 2 NOT_STARTED; F001-F040 approved locally and F042
 untouched. Existing 153 browser scenarios NOT_RUN; production readiness
 NOT_VERIFIED. No remote push or Slice 2 approval. See feature-plan Section 6.
 
+**Later Slice 2 implementation approval — 2026-10-24:** Owner authorizes the exact
+eight-path frontend UI/hook/rendering-test/browser-preparation scope in the F041
+plan, preserving accepted Slice 1 checkpoint
+7c03570441ff5d0fb47aa28858b302d13cbe9dc0. Slice 2 IN_PROGRESS; F041 IN_PROGRESS.
+Account/profile/navigation/branding preserved; F040 remains authoritative.
+No backend/Auth/configuration/dependency changes or Git writes. Prepare 20 browser
+scenarios but do not execute; 153 historical scenarios remain NOT_RUN.
+Verification/review pending. F001-F040 approved locally; F042 NOT_STARTED;
+production readiness NOT_VERIFIED.
+
+**Later Slice 2 offline verification — 2026-10-24:** Saved Concept practice panel
+and account-keyed hook implemented within the approved eight paths; account,
+preferences, navigation and Auth/Slice 1 contracts preserved. New UI/lifecycle
+tests 27 PASS plus 184 relevant regressions PASS = 211 distinct PASS. Web build,
+source/test and prepared-browser-spec TypeScript, targeted lint/format, UTF-8/LF,
+scope/secrecy/diff checks PASS; separate source/security review has zero unresolved
+Critical/High/Medium/Low findings. Initial sandbox generated-directory EPERM and
+new test-local reserved-name lint failure are preserved with corrections in
+feature-plan Section 7. No application workaround or unapproved scope change.
+Twenty F041 browser cases prepared, NOT_RUN; prior 153 NOT_RUN unchanged, combined
+173 NOT_RUN. No browser exception, fresh MongoDB/API execution or Git writes.
+Slice 2 READY_FOR_REVIEW (offline only); F041 IN_PROGRESS; Slice 1 ACCEPTED_LOCAL
+at unchanged 7c03570441ff5d0fb47aa28858b302d13cbe9dc0. Owner acceptance/local
+checkpoint and named browser-verification decision remain separate gates.
+F001-F040 remain approved locally; F042 NOT_STARTED; production NOT_VERIFIED.
+
+**Slice 2 owner acceptance/local checkpoint — 2026-10-24:** Owner explicitly
+accepts Slice 2 for LOCAL DEVELOPMENT ONLY, offline only, subject to clean Git
+scope/integrity checks, and authorizes one eight-path local commit. Both slices
+ACCEPTED_LOCAL; F041 IN_PROGRESS. Preserve unchanged Slice 1 checkpoint
+7c03570441ff5d0fb47aa28858b302d13cbe9dc0 and 27 focused + 184 regressions = 211
+distinct PASS, all build/static/security evidence and historical corrections.
+No passing-suite rerun, implementation/Auth/dependency change, browser or live
+API/MongoDB execution in this gate. Existing 153 plus 20 new browser scenarios
+remain 173 NOT_RUN. No exception or browser accessibility/responsiveness PASS
+is implied. F040 evidence/limitations and F001-F040 local approvals preserved;
+F042 NOT_STARTED. No push authorized; fresh origin/dev remains the F040 commit
+24fdc61e4fd09a69b8e7e2e8447b696fa9b0c27c. Final F041 review/browser decision,
+owner completion approval and remote delivery remain separate gates.
+Production readiness NOT_VERIFIED. See feature-plan Section 8.
+
 ---
 
 ## Phase K — Admin Content Management
@@ -1895,7 +1936,7 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F041 - Student Dashboard Real Data (Slice 1 ACCEPTED_LOCAL; local checkpoint authorized; Slice 2 NOT_STARTED)
+**Current Feature:** F041 - Student Dashboard Real Data (both slices ACCEPTED_LOCAL; Slice 2 offline only)
 **Current Status:** `IN_PROGRESS`
 **Next Feature:** F042 - Admin Route Protection (not authorized)
 
