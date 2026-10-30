@@ -16,6 +16,16 @@ import {
   type AdminControl,
   type AdminCoordination,
 } from './browser-coordination';
+import {
+  technologyRequest,
+  type TechnologyRequest,
+  type TechnologyResult,
+} from '../technologies/contracts';
+import {
+  createTechnologyClient,
+  TechnologyError,
+  type TechnologyClient,
+} from '../technologies/technology-client';
 
 export type AdminState = Readonly<{
   status:
@@ -47,6 +57,7 @@ export function createAdminController(
   api: AdminClient,
   coordination: AdminCoordination,
   now: () => number = () => performance.now(),
+  technologies?: TechnologyClient,
 ) {
   let state = initial;
   let token: string | undefined;
@@ -60,6 +71,9 @@ export function createAdminController(
   let flight: Promise<void> | undefined;
   let loggingOut = false;
   let operationAbort: AbortController | undefined;
+  const business = new Map<AbortController, Promise<unknown>>();
+  let technologyClient = technologies;
+  let technologyRecoveryRequired = false;
   const listeners = new Set<() => void>();
   const update = (next: AdminState) => {
     state = Object.freeze(next);
@@ -73,6 +87,7 @@ export function createAdminController(
     }
   };
   function clearAuthority() {
+    for (const abort of business.keys()) abort.abort();
     token = undefined;
     accountId = undefined;
     expiresAt = 0;
@@ -235,7 +250,148 @@ export function createAdminController(
           : '',
     );
   };
+  /** Fixed Technology operations only. Tokens and transport never reach UI callbacks. */
+  async function requestTechnology(
+    account: string,
+    raw: TechnologyRequest,
+    external?: AbortSignal,
+    reconcile = false,
+  ): Promise<TechnologyResult> {
+    if (!ready()) throw new TechnologyError('FORBIDDEN', 403);
+    expireIfNeeded();
+    const parsed = technologyRequest.safeParse(raw);
+    if (!parsed.success) throw new TechnologyError('VALIDATION_ERROR', 400);
+    if (
+      state.status !== 'eligible' ||
+      state.pending ||
+      accountId !== account ||
+      state.user?.id !== account ||
+      !token ||
+      flight ||
+      loggingOut
+    )
+      throw new TechnologyError('FORBIDDEN', 403);
+    const request = parsed.data,
+      version = generation,
+      start = now(),
+      abort = new AbortController();
+    const mutation = request.kind === 'create' || request.kind === 'patch';
+    if (mutation && technologyRecoveryRequired)
+      throw new TechnologyError('CONFLICT', 409);
+    let dispatched = false;
+    let timedOut = false;
+    const cancel = () => abort.abort();
+    const checkBusiness = () => {
+      const elapsed = now() - start;
+      if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed >= 15000) {
+        timedOut = true;
+        abort.abort();
+      }
+      expireIfNeeded();
+      if (
+        disposed ||
+        !connected ||
+        generation !== version ||
+        accountId !== account ||
+        !token ||
+        state.status !== 'eligible' ||
+        !coordination.supported() ||
+        abort.signal.aborted
+      )
+        throw new TechnologyError(timedOut ? 'TIMEOUT' : 'CANCELLED');
+    };
+    const timer = setTimeout(() => {
+      timedOut = true;
+      abort.abort();
+    }, 15000);
+    external?.addEventListener('abort', cancel, { once: true });
+    if (external?.aborted) cancel();
+    let rejectAbort = () => {};
+    const lost = new Promise<never>((_, reject) => {
+      rejectAbort = () =>
+        reject(new TechnologyError(timedOut ? 'TIMEOUT' : 'CANCELLED'));
+      abort.signal.addEventListener('abort', rejectAbort, { once: true });
+      if (abort.signal.aborted) rejectAbort();
+    });
+    void lost.catch(() => {});
+    // Admission is deferred so the entry exists before any operation can run.
+    const pending = Promise.resolve().then(() =>
+      coordination.run(async () => {
+        checkBusiness();
+        if (!technologyClient) {
+          const { env } = await import('../env');
+          checkBusiness();
+          technologyClient = createTechnologyClient(env.VITE_API_BASE_URL);
+        }
+        checkBusiness();
+        if (mutation && technologyRecoveryRequired)
+          throw new TechnologyError('CONFLICT', 409);
+        if (mutation) {
+          technologyRecoveryRequired = true;
+          dispatched = true;
+        }
+        const value = await technologyClient.execute(
+          request,
+          token!,
+          abort.signal,
+        );
+        checkBusiness();
+        if (mutation || reconcile) technologyRecoveryRequired = false;
+        return value;
+      }, abort.signal),
+    );
+    business.set(abort, pending);
+    void pending.finally(() => business.delete(abort)).catch(() => {});
+    try {
+      return await Promise.race([pending, lost]);
+    } catch (error) {
+      if (
+        dispatched &&
+        error instanceof TechnologyError &&
+        [400, 401, 403, 404, 409, 413, 415, 429].includes(error.status)
+      )
+        technologyRecoveryRequired = false;
+      if (generation === version && !disposed) {
+        if (
+          error instanceof TechnologyError &&
+          [401, 403].includes(error.status)
+        )
+          invalidate(
+            error.status === 403 ? 'denied' : 'expired',
+            new AdminApiError(
+              error.status === 403
+                ? 'AUTH_FORBIDDEN'
+                : 'AUTH_ACCESS_TOKEN_EXPIRED',
+            ).message,
+          );
+        else if (error instanceof AdminCoordinationError)
+          invalidate('unsupported', new AdminCoordinationError().message);
+      }
+      if (error instanceof TechnologyError) throw error;
+      throw new TechnologyError('UNAVAILABLE');
+    } finally {
+      clearTimeout(timer);
+      external?.removeEventListener('abort', cancel);
+      abort.signal.removeEventListener('abort', rejectAbort);
+      abort.abort();
+    }
+  }
   return {
+    requestTechnology: (
+      account: string,
+      request: TechnologyRequest,
+      signal?: AbortSignal,
+    ) => requestTechnology(account, request, signal),
+    hasTechnologyUncertainty: () => technologyRecoveryRequired,
+    reconcileTechnology(
+      account: string,
+      request: Extract<TechnologyRequest, { kind: 'list' | 'detail' }>,
+      signal?: AbortSignal,
+    ) {
+      if (request.kind !== 'list' && request.kind !== 'detail')
+        return Promise.reject(new TechnologyError('VALIDATION_ERROR', 400));
+      return requestTechnology(account, request, signal, true);
+    },
     getSnapshot() {
       expireIfNeeded();
       return state;
@@ -341,6 +497,7 @@ export function createAdminController(
       if (!token || !accountId) return Promise.resolve();
       const expectedId = accountId;
       const version = generation;
+      for (const abort of business.keys()) abort.abort();
       operationAbort?.abort();
       operationAbort = new AbortController();
       update({ status: 'checking', user: null, pending: true, message: '' });
@@ -368,6 +525,7 @@ export function createAdminController(
         }
       } else if (state.status === 'eligible') {
         generation++;
+        for (const abort of business.keys()) abort.abort();
         operationAbort?.abort();
         update({ status: 'checking', user: null, pending: false, message: '' });
       }
@@ -391,6 +549,7 @@ export function createAdminController(
       if (!ready()) return Promise.resolve();
       loggingOut = true;
       const previous = flight;
+      const previousBusiness = [...business.values()];
       const version = begin();
       // Remove authority in other tabs before waiting for an admitted mutation.
       try {
@@ -402,6 +561,7 @@ export function createAdminController(
       const next = Promise.resolve().then(async () => {
         try {
           await previous;
+          await Promise.allSettled(previousBusiness);
           check(version);
           await coordination.run(async () => {
             check(version);

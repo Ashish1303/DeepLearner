@@ -1,0 +1,363 @@
+.workspace {
+  width: 100%;
+  min-width: 0;
+  max-width: 90rem;
+  margin-inline: auto;
+  color: #18362d;
+}
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+.header h1 {
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  margin: 0.65rem 0;
+}
+.header button {
+  flex-shrink: 0;
+  margin-top: 1rem;
+}
+.intro {
+  color: #52655b;
+  line-height: 1.7;
+  max-width: 46rem;
+  margin: 0;
+}
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #fff;
+  border: 1px solid #dce3d9;
+  border-radius: 0.6rem 0.6rem 0 0;
+}
+.toolbar > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.sectionLabel {
+  font-weight: 700;
+}
+.count {
+  font-size: 0.8rem;
+  border-radius: 2rem;
+  background: #edf4ee;
+  padding: 0.35rem 0.65rem;
+  color: #285b43;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+.inventory {
+  background: #fff;
+  border: 1px solid #dce3d9;
+  border-top: 0;
+  border-radius: 0 0 0.6rem 0.6rem;
+  min-width: 0;
+  overflow: hidden;
+}
+.tableWrap {
+  overflow-x: auto;
+}
+.tableWrap table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.88rem;
+  text-align: left;
+}
+.tableWrap thead {
+  background: #f0f5f1;
+  color: #52655b;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.tableWrap th,
+.tableWrap td {
+  padding: 1.1rem 1.25rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #e4eae2;
+}
+.tableWrap tbody th {
+  font-weight: 500;
+  min-width: 12rem;
+  overflow-wrap: anywhere;
+}
+.tableWrap tbody tr:hover {
+  background: #fafcf9;
+}
+.name {
+  display: block;
+  max-width: 100%;
+  padding: 0.25rem 0;
+  border: 0;
+  color: #174e3a;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  min-height: 44px;
+}
+.slug {
+  display: block;
+  font-size: 0.78rem;
+  color: #52655b;
+  font-family: ui-monospace, monospace;
+  margin-top: 0.15rem;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.4rem 0.6rem;
+  white-space: nowrap;
+}
+.badge::before {
+  content: '';
+  height: 0.35rem;
+  width: 0.35rem;
+  background: currentColor;
+  border-radius: 50%;
+}
+.draft {
+  background: #fff4d8;
+  color: #755000;
+}
+.published {
+  background: #e6f4eb;
+  color: #185638;
+}
+.archived {
+  background: #edf0f2;
+  color: #475365;
+}
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  color: #52655b;
+  font-size: 0.85rem;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+.empty {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: #52655b;
+}
+.empty h2 {
+  color: #18362d;
+  font-size: 1.2rem;
+}
+.editor {
+  background: #fff;
+  border: 1px solid #dce3d9;
+  border-radius: 0.6rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  min-width: 0;
+  box-shadow: 0 0.25rem 1.5rem rgb(24 54 45 / 4%);
+}
+.editorHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.editorHeading h2 {
+  font-size: 1.5rem;
+  margin: 0.65rem 0 1rem;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+.close {
+  height: 44px;
+  width: 44px;
+  flex-shrink: 0;
+  background: #f3f7f2;
+  border: 1px solid #dce3d9;
+  border-radius: 0.3rem;
+  font-size: 1.6rem;
+  color: #18362d;
+  cursor: pointer;
+}
+.form {
+  margin-top: 1.5rem;
+}
+.form fieldset {
+  display: grid;
+  gap: 0.65rem;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.form label {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.form input,
+.form textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #788b81;
+  border-radius: 0.3rem;
+  padding: 0.75rem;
+  font: inherit;
+  color: #18362d;
+  background: #fff;
+}
+.form textarea {
+  resize: vertical;
+}
+.form input[readonly] {
+  background: #f3f6f2;
+  color: #52655b;
+}
+.form [aria-invalid='true'] {
+  border-color: #a62d35;
+}
+.form label:not(:first-of-type) {
+  margin-top: 0.6rem;
+}
+.help,
+.fieldError {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+.help {
+  color: #52655b;
+}
+.fieldError {
+  color: #801f25;
+}
+.notice,
+.error,
+.reconcile {
+  padding: 1rem 1.25rem;
+  border-radius: 0.4rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+  overflow-wrap: anywhere;
+}
+.notice {
+  background: #e6f4eb;
+  color: #185638;
+}
+.error {
+  background: #fff1ef;
+  color: #801f25;
+  border-left: 3px solid #a62d35;
+}
+.reconcile {
+  background: #fff7e5;
+  color: #664a0a;
+}
+.metadata {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  margin: 1.2rem 0;
+}
+.metadata dt {
+  color: #52655b;
+}
+.metadata dd {
+  margin: 0.35rem 0 0;
+  font-weight: 600;
+}
+.readonly {
+  padding-top: 1rem;
+  color: #52655b;
+  line-height: 1.6;
+}
+.readonly h3 {
+  color: #18362d;
+  font-size: 1rem;
+}
+.readonly dd {
+  margin: 0.4rem 0 1rem;
+  overflow-wrap: anywhere;
+}
+.readonly dt {
+  font-weight: 700;
+  color: #18362d;
+}
+.description {
+  white-space: pre-wrap;
+}
+.footnote {
+  font-size: 0.78rem;
+  color: #52655b;
+  line-height: 1.7;
+  margin-top: 1.5rem;
+  max-width: 60rem;
+}
+.workspace :is(button, input, textarea, h1, h2):focus-visible {
+  outline: 3px solid #0d6348;
+  outline-offset: 4px;
+}
+.workspace :is(h1, h2):focus {
+  outline: 3px solid #0d6348;
+  outline-offset: 4px;
+}
+@media (min-width: 72rem) {
+  .layout:has(.editor) {
+    grid-template-columns: minmax(0, 1.25fr) minmax(22rem, 1fr);
+  }
+}
+@media (max-width: 48rem) {
+  .header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .header button {
+    margin: 0;
+  }
+  .toolbar {
+    flex-wrap: wrap;
+  }
+  .pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .tableWrap th,
+  .tableWrap td {
+    padding: 0.8rem;
+  }
+  .tableWrap td:nth-child(4),
+  .tableWrap thead th:nth-child(4) {
+    display: none;
+  }
+  .tableWrap tbody th {
+    min-width: 8rem;
+  }
+  .form .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

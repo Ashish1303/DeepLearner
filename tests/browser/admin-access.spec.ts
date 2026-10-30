@@ -73,6 +73,35 @@ async function mock(context: BrowserContext) {
       return;
     }
     const path = url.pathname.slice('/api/v1'.length);
+    // The F043 workspace makes one initial read after eligibility. Keep this
+    // separate from the F042 auth-call ledger and retain the Bearer/no-cookie gate.
+    if (
+      path === '/admin/technologies' &&
+      request.method() === 'GET' &&
+      url.search === '?page=1&limit=20'
+    ) {
+      const h = await request.allHeaders();
+      if (h.authorization !== 'Bearer synthetic-access' || 'cookie' in h) {
+        state.unexpected.push('TECHNOLOGY_CREDENTIAL_CONTRACT');
+        await route.abort();
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        headers,
+        json: {
+          ...envelope([]),
+          meta: {
+            requestId: 'f042-synthetic',
+            page: 1,
+            limit: 20,
+            total: 0,
+            totalPages: 0,
+          },
+        },
+      });
+      return;
+    }
     const allowed = [
       '/auth/login',
       '/auth/refresh',
@@ -194,7 +223,7 @@ test.setTimeout(30000);
 const signIn = (page: Page) =>
   page.getByRole('heading', { name: 'Admin sign in', exact: true });
 const welcome = (page: Page) =>
-  page.getByRole('heading', { name: /^Welcome,/ });
+  page.getByRole('heading', { name: 'Technologies', exact: true });
 async function open(page: Page, path = '/') {
   await page.goto(APP + path);
   await expect(signIn(page)).toBeVisible();
@@ -238,7 +267,7 @@ test('F042-B01 mount is passive and restoration is explicit', async ({
     })),
   ).toEqual({ local: 0, session: 0 });
 });
-test('F042-B02 sign-in requires current Admin eligibility before the welcome scaffold', async ({
+test('F042-B02 sign-in requires current Admin eligibility before the Technology workspace', async ({
   page,
   admin,
 }) => {
@@ -568,7 +597,7 @@ test('F042-B20 labelled fields and loading success error announcements retain se
   await release(admin);
   await expect(welcome(page)).toBeVisible();
   await expect(page.getByRole('status')).toContainText(
-    'eligibility has been checked',
+    'No Technologies on this page.',
   );
   admin.fault = 503;
   await page.getByRole('button', { name: 'Check current access' }).click();

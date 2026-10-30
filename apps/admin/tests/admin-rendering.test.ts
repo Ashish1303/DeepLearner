@@ -177,6 +177,15 @@ function app(
     if (name === '../components/layout/admin-shell') return shell;
     if (name === '../components/auth/admin-access')
       return { AdminAccess: Access };
+    if (name === '../components/technologies/technology-manager')
+      return {
+        TechnologyManager: ({ accountId }: { accountId: string }) =>
+          createElement(
+            'section',
+            { 'aria-label': 'Technology workspace', 'data-account': accountId },
+            'Technologies',
+          ),
+      };
     if (name === '../hooks/use-admin-auth')
       return {
         ...helpers,
@@ -279,12 +288,12 @@ function host() {
   };
 }
 
-test('only a complete current active verified Admin projection exposes the scaffold', () => {
+test('only a complete current active verified Admin projection exposes the Technology workspace', () => {
   assert(helpers.isEligibleAdminState(eligible));
   const html = app(eligible).html();
   for (const text of [
-    'Welcome, Fixture.',
-    user.email,
+    'Technologies',
+    user.id,
     'Sign out of this device',
     'Skip to content',
     'Administration',
@@ -424,9 +433,9 @@ test('uncertain mutation disables restoration and exposes explicit sign-out reco
   assert(html.includes('Retry sign-out of this device'));
   assert(!html.includes('Retry session check'));
 });
-test('scaffold contains no unsupported metrics, management links or account claims', () => {
+test('Technology workspace integration contains no unsupported metrics, links or account claims', () => {
   const html = app(eligible).html();
-  assert(html.includes('not available in this scaffold'));
+  assert(html.includes('Technology workspace'));
   assert(
     !/Total Users|System Status|Live production|Revenue|href="\/admin/.test(
       html,

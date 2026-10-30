@@ -4,6 +4,12 @@ import { createAdminController } from '../src/lib/auth/admin-controller';
 import { AdminApiError, type AdminClient } from '../src/lib/auth/admin-client';
 import type { CurrentUser } from '../src/lib/auth/contracts';
 import {
+  TechnologyError,
+  createTechnologyClient,
+  type TechnologyClient,
+} from '../src/lib/technologies/technology-client';
+import { createTechnologyController } from '../src/lib/technologies/technology-controller';
+import {
   createAdminBrowserCoordination,
   AdminCoordinationError,
   type AdminControl,
@@ -57,6 +63,7 @@ function fixture(
     supported?: boolean;
     now?: () => number;
     coordination?: AdminCoordination;
+    technologies?: TechnologyClient;
   } = {},
 ) {
   const calls: string[] = [];
@@ -107,7 +114,12 @@ function fixture(
     },
     ...overrides,
   };
-  const controller = createAdminController(api, coordination, options.now);
+  const controller = createAdminController(
+    api,
+    coordination,
+    options.now,
+    options.technologies,
+  );
   const disconnect = controller.connect();
   t.after(() => controller.dispose());
   return {
@@ -791,4 +803,294 @@ test('lock acquisition deadline and cancellation refuse delayed admission', asyn
   );
   assert(!called);
   stop();
+});
+
+const technologyRecord = {
+  id: 'd'.repeat(24),
+  name: 'Draft',
+  slug: 'draft',
+  description: null,
+  iconAssetId: null,
+  status: 'DRAFT' as const,
+  order: 0,
+  revision: 0,
+  createdAt: '2026-10-30T00:00:00.000Z',
+  updatedAt: '2026-10-30T00:00:00.000Z',
+};
+const technologyOperation = {
+  kind: 'detail' as const,
+  id: technologyRecord.id,
+};
+test('restricted business capability keeps token private and rejects caller-controlled transport', async (t) => {
+  let calls = 0;
+  const f = fixture(
+    t,
+    {},
+    {
+      technologies: {
+        async execute(request, bearer, signal) {
+          calls++;
+          assert.deepEqual(request, technologyOperation);
+          assert.equal(bearer, token);
+          assert(!signal.aborted);
+          return technologyRecord;
+        },
+      },
+    },
+  );
+  await f.controller.login(user.email, 'synthetic-password');
+  await f.controller.requestTechnology(user.id, technologyOperation);
+  await assert.rejects(
+    f.controller.requestTechnology(user.id, {
+      ...technologyOperation,
+      url: 'https://evil.test',
+    } as never),
+    TechnologyError,
+  );
+  await assert.rejects(
+    f.controller.requestTechnology('b'.repeat(24), technologyOperation),
+    TechnologyError,
+  );
+  assert.equal(calls, 1);
+  assert(!JSON.stringify(f.controller.getSnapshot()).includes(token));
+  assert(!('getAccessToken' in f.controller));
+});
+for (const code of [401, 403])
+  test('business ' + code + ' removes Admin authority', async (t) => {
+    const f = fixture(
+      t,
+      {},
+      {
+        technologies: {
+          async execute() {
+            throw new TechnologyError(
+              code === 401 ? 'AUTH_REQUIRED' : 'FORBIDDEN',
+              code,
+            );
+          },
+        },
+      },
+    );
+    await f.controller.login(user.email, 'synthetic-password');
+    await assert.rejects(
+      f.controller.requestTechnology(user.id, technologyOperation),
+      TechnologyError,
+    );
+    assert.equal(
+      f.controller.getSnapshot().status,
+      code === 401 ? 'expired' : 'denied',
+    );
+    assert.equal(f.controller.getSnapshot().user, null);
+  });
+for (const action of [
+  'suspend',
+  'cancel',
+  'cross-account',
+  'disconnect',
+] as const)
+  test('business response refused after ' + action, async (t) => {
+    const wait = deferred<typeof technologyRecord>();
+    let signal: AbortSignal | undefined;
+    const f = fixture(
+      t,
+      {},
+      {
+        technologies: {
+          async execute(_r, _t, s) {
+            signal = s;
+            return wait.promise;
+          },
+        },
+      },
+    );
+    await f.controller.login(user.email, 'synthetic-password');
+    const pending = f.controller.requestTechnology(
+      user.id,
+      technologyOperation,
+    );
+    const checked = assert.rejects(pending, TechnologyError);
+    await flush();
+    if (action === 'cross-account') f.emit('identity-changed');
+    else if (action === 'disconnect') f.disconnect();
+    else f.controller[action]();
+    assert(signal?.aborted);
+    wait.resolve(technologyRecord);
+    await checked;
+    assert.notEqual(f.controller.getSnapshot().status, 'eligible');
+  });
+test('whole-operation monotonic budget includes coordination queueing without deadline renewal', async (t) => {
+  let now = 0,
+    held = false;
+  const queue = deferred<void>();
+  let calls = 0;
+  const coordination: AdminCoordination = {
+    supported: () => true,
+    listen: () => () => {},
+    publish() {},
+    async run(work, signal) {
+      if (held) await queue.promise;
+      if (signal?.aborted) throw new AdminCoordinationError();
+      return work();
+    },
+  };
+  const f = fixture(
+    t,
+    {},
+    {
+      now: () => now,
+      coordination,
+      technologies: {
+        async execute() {
+          calls++;
+          return technologyRecord;
+        },
+      },
+    },
+  );
+  await f.controller.login(user.email, 'synthetic-password');
+  held = true;
+  const pending = f.controller.requestTechnology(user.id, technologyOperation);
+  const checked = assert.rejects(
+    pending,
+    (e: unknown) => e instanceof TechnologyError && e.code === 'TIMEOUT',
+  );
+  await flush();
+  now = 15001;
+  queue.resolve();
+  await checked;
+  assert.equal(calls, 0);
+});
+test('business timeout cannot dispatch after a delayed lock callback', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let held = false,
+    calls = 0;
+  const queue = deferred<void>();
+  const coordination: AdminCoordination = {
+    supported: () => true,
+    listen: () => () => {},
+    publish() {},
+    async run(work) {
+      if (held) await queue.promise;
+      return work();
+    },
+  };
+  const f = fixture(
+    t,
+    {},
+    {
+      coordination,
+      technologies: {
+        async execute() {
+          calls++;
+          return technologyRecord;
+        },
+      },
+    },
+  );
+  await f.controller.login(user.email, 'synthetic-password');
+  held = true;
+  const pending = f.controller.requestTechnology(user.id, technologyOperation);
+  const checked = assert.rejects(pending, TechnologyError);
+  await flush();
+  t.mock.timers.tick(15000);
+  await checked;
+  queue.resolve();
+  await flush();
+  assert.equal(calls, 0);
+});
+test('logout invalidates a business request immediately but waits for admitted transport settlement', async (t) => {
+  const wait = deferred<typeof technologyRecord>();
+  const f = fixture(
+    t,
+    {},
+    {
+      technologies: {
+        async execute() {
+          return wait.promise;
+        },
+      },
+    },
+  );
+  await f.controller.login(user.email, 'synthetic-password');
+  const pending = f.controller.requestTechnology(user.id, technologyOperation);
+  const checked = assert.rejects(pending, TechnologyError);
+  await flush();
+  const logout = f.controller.logout();
+  await flush();
+  assert(!f.calls.includes('logout'));
+  assert.equal(f.controller.getSnapshot().user, null);
+  wait.resolve(technologyRecord);
+  await checked;
+  await logout;
+  assert(f.calls.includes('logout'));
+});
+
+for (const status of [401, 403])
+  test(
+    'malformed HTTP ' + status + ' body still removes authority',
+    async (t) => {
+      const technologies = createTechnologyClient(
+        'http://localhost:4000/api/v1',
+        async () => new Response('SYNTHETIC_PRIVATE_NOT_JSON', { status }),
+      );
+      const f = fixture(t, {}, { technologies });
+      await f.controller.login(user.email, 'synthetic-password');
+      await assert.rejects(
+        f.controller.requestTechnology(user.id, technologyOperation),
+        TechnologyError,
+      );
+      assert.equal(f.controller.getSnapshot().user, null);
+      assert.equal(
+        f.controller.getSnapshot().status,
+        status === 401 ? 'expired' : 'denied',
+      );
+    },
+  );
+test('suspend during mutation retains only uncertainty through revalidation and Technology-controller remount', async (t) => {
+  const wait = deferred<typeof technologyRecord>();
+  let writes = 0,
+    reads = 0;
+  const f = fixture(
+    t,
+    {},
+    {
+      technologies: {
+        async execute(request) {
+          if (request.kind === 'create') {
+            writes++;
+            return wait.promise;
+          }
+          reads++;
+          return {
+            items: [technologyRecord],
+            pagination: { page: 1, limit: 20, total: 1, totalPages: 1 },
+          };
+        },
+      },
+    },
+  );
+  await f.controller.login(user.email, 'synthetic-password');
+  const first = createTechnologyController(f.controller, user.id);
+  first.connect();
+  const pending = first.create({ name: 'Draft', slug: 'draft' });
+  await flush();
+  f.controller.suspend();
+  first.dispose();
+  wait.resolve(technologyRecord);
+  await pending;
+  await flush();
+  await f.controller.revalidate();
+  const second = createTechnologyController(f.controller, user.id);
+  second.connect();
+  t.after(() => second.dispose());
+  assert(second.getSnapshot().needsReconciliation);
+  assert.equal(second.getSnapshot().detail, null);
+  assert.equal(reads, 0);
+  assert.equal(writes, 1);
+  await second.create({ name: 'Other', slug: 'other' });
+  assert.equal(writes, 1);
+  await second.list();
+  assert.equal(reads, 1);
+  assert(!second.getSnapshot().needsReconciliation);
+  assert(!f.controller.hasTechnologyUncertainty());
 });

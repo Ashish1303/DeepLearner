@@ -4,9 +4,11 @@
 
 Feature: **IN_PROGRESS**. Slice 1: **READY_FOR_REVIEW — offline only**;
 acceptance **BLOCKED** pending mandatory real integration. Backend implementation
-was authorized on 2026-10-30. Slice 2 remains NOT_STARTED.
-The separate owner authorization covers exactly the 18 backend paths and
-canonical contract transfer; no frontend, live MongoDB/browser or Git delivery.
+was authorized on 2026-10-30. Slice 2 is **READY_FOR_REVIEW — offline only** under
+the separate 2026-10-30 frontend authorization; its offline outcome is recorded below.
+The earlier backend authorization covered exactly the 18 backend paths and
+canonical contract transfer. Frontend authority is now separately granted;
+live MongoDB/browser execution and Git delivery are not authorized by this pass.
 The following planning/finalization records are historical where superseded.
 Planning and documentation-only contract-finalization
 authorization: **2026-10-30**. The owner approved the named F043-only sequencing
@@ -856,3 +858,186 @@ fresh complete preflight; it does not declare runtime readiness or acceptance.
 F043 final acceptance also requires the outstanding F042 prerequisite gate.
 All **193 inherited browser scenarios remain NOT_RUN**; live frontend-to-API and
 production readiness remain **NOT_VERIFIED**. No Git staging, commit or push.
+
+## Slice 2 frontend implementation and offline verification — 2026-10-30
+
+The owner separately authorized frontend implementation at backend checkpoint
+`bb2c3838e2f7a40502cd7d25a25dee94c926da9e`, under the enacted F043-only exception.
+Slice 2 transitioned from NOT_STARTED to IN_PROGRESS. No F042 acceptance, backend
+production change, new dependency, live HTTP/MongoDB/browser execution or Git
+delivery is included. The original 13 frontend paths plus the two evidence
+documents were reconciled before editing. The owner additionally approved
+`apps/admin/tests/admin-rendering.test.ts` and
+`tests/browser/admin-access.spec.ts`, including its strictly bounded synthetic
+initial-inventory read fixture, to retain the existing authentication regressions.
+The complete change boundary is therefore **17 paths**, not a silent scope expansion.
+
+### Exact frontend change inventory
+
+CREATE:
+
+```text
+apps/admin/src/lib/technologies/contracts.ts
+apps/admin/src/lib/technologies/technology-client.ts
+apps/admin/src/lib/technologies/technology-controller.ts
+apps/admin/src/hooks/use-technologies.ts
+apps/admin/src/components/technologies/technology-manager.tsx
+apps/admin/src/components/technologies/technology-manager.module.css
+apps/admin/tests/technology-client.test.ts
+apps/admin/tests/technology-controller.test.ts
+apps/admin/tests/technology-rendering.test.ts
+tests/browser/admin-technologies.spec.ts
+```
+
+MODIFY:
+
+```text
+apps/admin/src/lib/auth/admin-controller.ts
+apps/admin/tests/admin-controller.test.ts
+apps/admin/src/app/app.tsx
+apps/admin/tests/admin-rendering.test.ts
+tests/browser/admin-access.spec.ts
+docs/features/F043-admin-technology-management.md
+docs/DEVELOPMENT_ROADMAP.md
+```
+
+### Implemented behavior and security boundary
+
+The eligible Admin workspace now presents the protected Technology inventory,
+bounded slug-ordered pagination, detail, DRAFT creation and DRAFT-only editing of
+name/description/order. Existing slugs are immutable. PUBLISHED/ARCHIVED records
+have a read-only detail view; icon references are never turned into arbitrary URL
+fetches. Actual API counts, loading/empty/error/save states, explicit refresh,
+revision-conflict recovery and uncertain-outcome reconciliation replace the
+scaffold. There are no publish/archive/delete/upload/bulk controls or fake metrics.
+Existing sign-in, explicit restore, current-access revalidation and shell logout
+remain available. The approved Stitch hierarchy is adapted to existing Admin
+colors and layout, without copying unrelated navigation or adding dependencies.
+
+The existing Admin controller exposes four strict Technology descriptors, not a
+token getter or caller-provided transport. It privately binds token, account,
+generation and eligibility to dispatch and completion. Requests use only the
+existing approved API origin, omit cookies, use Bearer authorization, no-store
+and redirect refusal. The whole operation has a nonrenewing 15-second monotonic
+budget including coordination queue time. Existing cookie-operation coordination
+and admitted-work draining are preserved; no background refresh or mutation replay
+is added. The known F042 cross-origin refresh-cookie race remains unverified.
+
+Strict nested envelopes/DTOs reject private or unknown fields, contradictory
+pagination, wrong IDs/revisions and invalid status/timestamps. Response input is
+limited to 1 MiB of actual streamed UTF-8 bytes, using fixed bounded storage even
+for adversarial tiny/empty chunks. Serialized mutation bodies are limited to
+4,096 UTF-8 bytes before dispatch, with form feedback for multibyte descriptions.
+Canonical 413/415 refusals are sanitized. HTTP 401/403 removes authority even if
+its body is malformed; raw server errors are never rendered or logged.
+
+Inventory, detail and forms are account-bound and memory-only. Suspend, expiry,
+logout, account changes and unmount cancel/refuse late responses and clear data.
+A long-lived, nonsensitive boolean retains mutation uncertainty across eligible
+view remounts. Such a remount does not automatically load or clear that warning;
+an explicit successful inventory/detail reconciliation is required before another
+submission. This is not durable idempotency or proof of a lost commit outcome.
+Full page/process termination cannot preserve an in-memory warning; operators
+must reconcile any unconfirmed change rather than resubmit blindly.
+
+Source includes labelled fields, field-level validation, escaped text, semantic
+timestamps, status announcements, disabled duplicate submissions, intentional
+editor/inventory focus handling, contained table scrolling and responsive CSS.
+Offline server rendering and focus doubles do not prove browser accessibility,
+focus order, contrast, layout or responsiveness.
+
+### Executed offline evidence and historical corrections
+
+The six focused/relevant Admin files executed with the existing Node/tsx tooling:
+
+```text
+apps/admin/tests/technology-client.test.ts
+apps/admin/tests/technology-controller.test.ts
+apps/admin/tests/technology-rendering.test.ts
+apps/admin/tests/admin-client.test.ts
+apps/admin/tests/admin-controller.test.ts
+apps/admin/tests/admin-rendering.test.ts
+```
+
+**254 distinct tests PASS / 0 FAIL / 0 cancelled / 0 skipped**. This includes
+fixed request contracts, raw/private response refusal, actual stream caps,
+monotonic delayed-timeout checks, account/generation cancellation, 401/403
+invalidation, coordination queue deadlines, logout draining, duplicate prevention,
+conflict/uncertainty recovery, a real controller-to-controller remount scenario,
+inert React server rendering, focus intent and hook cleanup. All transports and
+browser hosts in these offline checks are synthetic; no network listener,
+database, credential generation or browser was used. After the final fixed-memory
+reader/focus-test refinement, the affected two suites were rerun: **62/62 PASS**,
+a subset of the same 254 records, not additional distinct tests.
+
+The first combined run retained **243 PASS / 2 FAIL**: obsolete scaffold wording
+and a case-sensitive readonly attribute assertion. They were corrected within
+approved test scope. A subsequent request-size correction introduced temporary
+request/response variable shadowing, causing client test failures; the binding
+was corrected and the later complete runs passed. These failures are historical,
+not real integration evidence. The previous backend **313 PASS**, adapter
+**107 protocol PASS / 33 PowerShell PASS** are retained, not rerun here and not
+converted to frontend/live database acceptance.
+
+Admin production build, source-and-test-inclusive TypeScript and targeted
+zero-warning lint pass with existing tooling. Formatting, UTF-8/LF, exact scope,
+diff and sensitive-data checks accompany the final review. The build reports a
+nonfatal ineffective-dynamic-import notice: the validated environment module is
+also statically imported by the existing application, so its lazy use in the
+controller does not create a separate bundle chunk. It is not a runtime failure
+or an environment/configuration change.
+
+Fresh-context independent reviewer `f043_frontend_review` inspected the actual
+source read-only. Two Medium findings (uncertainty lost on remount and malformed
+401/403 retaining authority) and three Low findings (UTF-8 request bound,
+newline slug feedback and editor focus restoration) were corrected and covered
+by focused offline checks. Critical/High findings: zero. Final consistency review
+reports **0 / 0 / 0 / 0 unresolved Critical / High / Medium / Low findings**. The
+reviewer also inspected final tests, prepared browser specifications and
+documentation, without independently executing them. Source review does not
+establish browser or live backend behavior. Slice 2 is **READY_FOR_REVIEW — offline
+only**; it is not owner-accepted.
+
+### Prepared browser scenarios — all NOT_RUN
+
+`tests/browser/admin-technologies.spec.ts` contains exactly F043-B01–B20:
+
+| IDs     | Prepared coverage                                                                     |
+| ------- | ------------------------------------------------------------------------------------- |
+| B01–B04 | Authenticated inventory, empty state, pagination, DRAFT detail/revision               |
+| B05–B07 | Create, revision-controlled edit, field validation                                    |
+| B08–B11 | Published/archived read-only, conflict, uncertain write/no replay                     |
+| B12–B16 | 401/403 invalidation, 404, 429/503, private response refusal                          |
+| B17–B20 | Stale/account-change refusal, logout/storage, keyboard focus, responsive/escaped text |
+
+These require separately qualified isolated browser infrastructure and an already
+available approved Admin runtime. API routes are intercepted with synthetic
+fixtures, unexpected external network is refused, service workers are blocked,
+and trace/video/screenshots are off. Mocked browser execution would still not
+prove live frontend-to-API integration. The prepared F042 spec preserves its
+authentication/lifecycle/logout assertions while recognizing the new workspace
+and one narrow, Bearer/no-cookie initial empty-inventory mock.
+
+All **193 inherited browser scenarios remain NOT_RUN**. The **20 newly prepared
+F043 scenarios remain NOT_RUN**: combined prepared backlog **213 NOT_RUN**. No
+browser exception is granted or inherited. Real-browser layout, accessibility,
+focus, interaction and responsiveness remain NOT_VERIFIED. Live F043
+frontend-to-API integration remains NOT_VERIFIED.
+
+### Open acceptance gates
+
+F042 remains IN_PROGRESS, acceptance BLOCKED, with historical HTTP/MongoDB
+failures, UNKNOWN authenticated counters, incomplete RESULT/digest ACK and
+protected-baseline discrepancy retained. F043 Slice 1 remains READY_FOR_REVIEW —
+offline only; all real PARENT + T01–T14 records remain **15 NOT_RUN**. The latest
+protected MongoDB process executable/owner identity remains **UNKNOWN**; no
+database connection or guarded invocation is authorized by this frontend pass.
+Real transactions, concurrency, protected baselines and process/Job cleanup are
+not established by these frontend tests. Forced real timeout/unknown commit
+behavior remains NOT_VERIFIED. Source changes invalidate prior relevant frozen
+integration pins; reconcile/review them before any separately approved execution.
+
+F043 remains IN_PROGRESS and final acceptance BLOCKED. Production readiness is
+NOT_VERIFIED; F044 remains NOT_STARTED. Local development checkpoint, push,
+qualified browser/live integration and feature acceptance require their separate
+owner gates. No Git staging, commit, push, history rewrite or automatic progression.

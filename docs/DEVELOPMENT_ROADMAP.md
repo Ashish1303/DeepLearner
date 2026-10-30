@@ -1942,6 +1942,68 @@ NOT_VERIFIED. No frontend, F044, Git staging/commit/push or live MongoDB/browser
 Next gate: owner review of offline Slice 1 evidence and separate real-integration
 preparation/execution approval; no automatic Slice 2 or Git progression.
 
+**Slice 2 frontend authorization and offline implementation — 2026-10-30:**
+The owner separately authorized the 13-path frontend inventory and the two
+evidence documents under the enacted F043-only exception, starting at pushed
+backend checkpoint `bb2c3838e2f7a40502cd7d25a25dee94c926da9e`. The additional
+Admin rendering-test and existing F042 browser-spec paths, including a bounded
+synthetic initial-inventory read mock, received separate explicit owner approval.
+The exact frontend pass is **17 paths**. Slice 2 transitioned to IN_PROGRESS and
+is now **READY_FOR_REVIEW — offline only**, not owner-accepted.
+
+Implemented protected Technology inventory/detail and bounded pagination;
+DRAFT creation/editing, immutable slug, revision-aware conflict recovery and
+read-only PUBLISHED/ARCHIVED views. The existing Admin lifecycle supplies only
+four strict request descriptors with a private token, account/generation checks,
+same-origin coordination, nonrenewing 15-second queue/network budget, cookie
+omission, no-store and redirect refusal. Response input has a fixed-memory
+1 MiB streamed byte cap; mutation JSON is bounded to 4,096 UTF-8 bytes. UI includes
+labelled validation, loading/empty/error/save states, explicit refresh/current-
+access checks, escaped text and semantic timestamps, focus intent and responsive
+CSS. Account/lifecycle changes clear data and refuse late responses; only a
+nonsensitive uncertainty flag survives remounts until explicit read reconciliation.
+No uncertain mutation is automatically replayed. Public F015/backend behavior and
+the existing authentication architecture remain unchanged.
+
+Executed offline evidence: **254 distinct PASS / 0 FAIL / 0 cancelled / 0 skipped**
+across new Technology client/controller/rendering checks and existing relevant
+Admin client/controller/rendering regressions. A final affected-subset rerun was
+**62/62 PASS**, included in the same 254. Source-and-test-inclusive TypeScript,
+Admin build and targeted zero-warning lint pass; formatting, UTF-8/LF, scope,
+diff and sensitive-data checks accompany final review. A nonfatal Vite dynamic-
+import chunking notice is retained in the feature record. Preserve the initial
+243 PASS / 2 rendering FAIL and temporary client variable-shadowing failures;
+later corrections do not erase them. Retain earlier **313 backend PASS** and
+**107 protocol / 33 PowerShell PASS** as historical evidence, not rerun or real
+frontend/database acceptance.
+
+Independent read-only source reviewer `f043_frontend_review` identified two
+Medium and three Low issues; remount uncertainty, malformed 401/403 refusal,
+UTF-8 body bounds, newline slug validation and focus restoration were corrected
+with focused checks. No Critical/High finding was identified. Final independent
+source/test/document consistency review reports **0 / 0 / 0 / 0 unresolved
+Critical / High / Medium / Low findings**. Tests were executed by the implementation
+agent, not independently rerun by the source reviewer. Browser/live behavior
+remains unverified. Slice 2 is **READY_FOR_REVIEW — offline only**; final F043
+acceptance remains BLOCKED.
+
+Exactly **20 F043 browser scenarios are prepared, all NOT_RUN**. The inherited
+**193 remain NOT_RUN**: combined prepared browser backlog **213 NOT_RUN**.
+No browser execution or exception is authorized/transferred. Mocked browser
+fixtures would not prove live F043 frontend-to-API integration. Browser layout,
+accessibility, focus, responsiveness and interactions remain NOT_VERIFIED.
+
+F042 remains IN_PROGRESS, acceptance BLOCKED; its HTTP/MongoDB failures, UNKNOWN
+authenticated counters, incomplete RESULT/digest ACK and protected-baseline
+discrepancy remain preserved. F043 Slice 1 remains READY_FOR_REVIEW — offline
+only, with all **15 real PARENT + T01–T14 NOT_RUN**, protected MongoDB process
+executable/owner identity UNKNOWN and acceptance BLOCKED. Real concurrency,
+transactions, forced timeout/unknown commit, live Admin frontend-to-API
+integration and runtime cleanup remain NOT_VERIFIED. Reconcile/review invalidated
+integration pins before separate execution approval. F043 stays IN_PROGRESS;
+production readiness NOT_VERIFIED; F044 NOT_STARTED. No Git staging/commit/push.
+See the [exact change/evidence record](features/F043-admin-technology-management.md).
+
 ### F044 — Admin Learning Path Management
 Status: `NOT_STARTED`
 
@@ -2360,14 +2422,14 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F043 - Admin Technology Management (Slice 1 backend implementation)
+**Current Feature:** F043 - Admin Technology Management (Slice 2 frontend implementation)
 **Current Status:** `IN_PROGRESS`
 **Next Feature:** F044 - Admin Learning Path Management (not authorized)
 
 **Open verification feature:** F042 remains IN_PROGRESS, acceptance BLOCKED,
 HTTP/MongoDB verification incomplete. The owner-approved F043-only exception
-permits this named implementation sequence without accepting F042. Slice 2 is
-not authorized, and F044 receives no sequencing exception. The following named
+permits this named implementation sequence without accepting F042. Slice 2 was
+separately authorized on 2026-10-30; F044 receives no sequencing exception. The following named
 decision paragraph is the historical documentation-only gate preceding Slice 1.
 
 **Named sequencing decision, 2026-10-30:** F042 remains the open verification
