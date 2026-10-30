@@ -1,6 +1,9 @@
 import { createPracticeRouter } from './modules/practice/practice.routes.js';
 import { createProgressRouter } from './modules/progress/progress.routes.js';
 import { createDashboardRouter } from './modules/progress/dashboard.routes.js';
+import { createAdminRouter } from './modules/admin/admin.routes.js';
+import type { AdminAccessService } from './modules/admin/admin-access.service.js';
+import type { AdminLimits } from './modules/admin/admin-rate-limit.js';
 import type { DashboardService } from './modules/progress/dashboard.controller.js';
 import type { DashboardLimits } from './modules/progress/dashboard-rate-limit.js';
 import type { ProgressService } from './modules/progress/progress.service.js';
@@ -76,6 +79,8 @@ export function createApp(
   completionService?: CompletionService,
   dashboardService?: DashboardService,
   dashboardLimits?: DashboardLimits,
+  adminService?: AdminAccessService,
+  adminLimits?: AdminLimits,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -87,6 +92,7 @@ export function createApp(
   app.use((req, res, next) => {
     if (
       /^\/api\/v1\/dashboard(?:\/|$)/i.test(req.path) ||
+      /^\/api\/v1\/admin(?:\/|$)/i.test(req.path) ||
       (req.method === 'POST' &&
         /^\/api\/v1\/practice-questions\/[^/]+\/unlock\/?$/i.test(req.path)) ||
       (req.method === 'GET' &&
@@ -148,6 +154,7 @@ export function createApp(
     ),
   );
   app.use('/api/v1/users', createUserRouter(userService, userLimits));
+  app.use('/api/v1/admin', createAdminRouter(adminService, adminLimits));
   app.use(
     '/api/v1/technologies',
     createTechnologyRouter(technologyService, technologyLimits),

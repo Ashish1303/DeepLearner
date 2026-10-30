@@ -288,6 +288,44 @@ Primary-host Playwright remains prohibited until separately approved ownership-s
 execution is established. The existing custom teardown prototype is not a verified
 Playwright solution; its synthetic results do not authorize browser execution.
 
+## Development progress while external verification is blocked
+
+Implementation, offline verification, integration/browser verification, owner
+acceptance, local development Git checkpoints, remote delivery and production
+readiness are separate gates. Keep existing official feature statuses; record
+these distinctions as secondary evidence fields, not replacement statuses.
+
+The owner may explicitly authorize named slices of the current active feature to
+proceed before a blocked verification gate is completed when:
+
+- The execution-environment blocker is evidenced and the dependent interface
+  contract is sufficiently stable.
+- Relevant offline tests, build, TypeScript, lint, formatting and scope checks pass.
+- No known unresolved application security defect invalidates the dependent work.
+  Unresolved Critical or High findings block this exception.
+- The authorization records exact scope, dependencies, deferred verification,
+  risks and conditions requiring reassessment.
+- Mandatory verification and final acceptance remain outstanding.
+
+A failed or inconclusive run retains its actual outcome independently of any
+environment blocker. Mocks, environment failures and development checkpoints do
+not prove real database behavior. NOT_RUN and UNKNOWN never become PASS merely
+because development is permitted to continue.
+
+After offline verification and security review, the owner may separately approve
+an explicitly scoped local development commit labelled with incomplete
+verification. Unresolved review findings must be resolved before that checkpoint.
+It does not establish slice or feature acceptance, authorize a push, or unlock
+another feature. Remote Git delivery requires its own explicit owner approval.
+
+Final feature acceptance still requires all mandatory verification and explicit
+owner approval. Authentication/authorization, real database verification, process
+ownership, fixture isolation, cleanup, secret/privacy protection, authenticated
+RESULT/ACK and existing deadlines are not weakened by this sequencing rule.
+Existing named-feature browser-exception rules remain unchanged and do not
+transfer between features. This rule authorizes no deployment, production
+readiness, security bypass or automatic next-feature progression.
+
 ---
 
 # Feature Completion

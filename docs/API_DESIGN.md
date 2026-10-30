@@ -1111,6 +1111,43 @@ requestId
   -> response
 ```
 
+### F042 — additive Admin namespace protection (Slice 1)
+
+`/api/v1/admin` and its descendants use existing Bearer authentication and a
+current-account Admin gate on all methods. Existing global CORS/preflight and
+body/security middleware remain unchanged. No Admin business endpoint is added;
+an eligible Admin reaches the existing sanitized `404 ROUTE_NOT_FOUND` for an
+unimplemented route. Future Admin handlers must mount below this boundary.
+
+Require JWT role ADMIN and the account identified exclusively by JWT sub to exist
+with stored role ADMIN, status ACTIVE and a valid verification timestamp. Check
+stored eligibility on every protected dispatch. An old Student JWT cannot gain
+Admin access after promotion; demotion is refused on the next eligibility read.
+Deleted, non-Admin, disabled, suspended and unverified accounts all receive generic
+`403 AUTH_FORBIDDEN`. Do not reactivate accounts or disclose eligibility details.
+Preserve existing missing/invalid/expired JWT `401` codes. Dependency uncertainty,
+corrupt account evidence, disconnect, cancellation or timeout returns sanitized
+`503 DEPENDENCY_UNAVAILABLE`.
+
+Authorization reads project only `_id`, role, status and emailVerifiedAt from the
+existing User collection on the primary. A five-second wall-clock read budget,
+driver timeout/cancellation and final deadline check prevent late authorization.
+No authorization writes, schema/index changes or session lookups are introduced.
+Existing JWTs retain their expiry semantics after session revocation. This gate
+does not lock account state through future business mutations; those operations
+must enforce their own transactional authority.
+
+Injectable process-local defaults: 300/IP/15 minutes and 120/authenticated
+account/15 minutes, both before account reads. Keys are HMAC-obscured; client IP
+uses existing IPv6 /56 grouping and unchanged proxy trust. Each store is bounded
+to 10,000 live keys; exhaustion refuses with 503 without evicting live counters.
+Limit exhaustion returns `429 RATE_LIMIT_EXCEEDED`. Account quotas also count
+authenticated requests subsequently refused by the eligibility gate.
+All protected Admin responses, including CORS/parser/auth/limit/404 errors, use
+`Cache-Control: no-store` and retain existing envelopes and request IDs. Preflight
+does not authorize or execute an Admin handler. Existing Auth, Users, Practice,
+Progress, Completion and Dashboard contracts remain unchanged.
+
 # 20. Rate-Limit Baseline
 
 Thresholds are configuration, not hard-coded business logic.
