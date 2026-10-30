@@ -86,3 +86,165 @@ footer {
   outline: 3px solid #19775b;
   outline-offset: 3px;
 }
+
+/* F042 access states: retain the existing Admin palette and landmarks. */
+main > section {
+  width: 100%;
+  margin-inline: auto;
+}
+.admin-access,
+.admin-welcome {
+  width: 100%;
+  max-width: 44rem;
+  min-width: 0;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  background: #fff;
+  border: 1px solid #dce3d9;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.25rem 1.5rem rgb(24 54 45 / 4%);
+  overflow-wrap: anywhere;
+}
+.admin-access h1,
+.admin-welcome h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin: 1rem 0;
+}
+.access-intro > p,
+.admin-welcome > p {
+  line-height: 1.6;
+}
+.admin-access fieldset {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  border: 0;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  min-width: 0;
+}
+.admin-access label {
+  font-weight: 600;
+}
+.admin-access input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #788b81;
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  font: inherit;
+  color: #18362d;
+  background: #fff;
+  box-sizing: border-box;
+}
+.admin-access input + label {
+  margin-top: 0.5rem;
+}
+.primary-action,
+.secondary-action {
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #1b5a45;
+  border-radius: 0.25rem;
+  font: inherit;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.primary-action {
+  color: #fff;
+  background: #1b5a45;
+  margin-top: 0.75rem;
+}
+.secondary-action {
+  color: #184d3b;
+  background: #fff;
+}
+button:not(:disabled):hover {
+  box-shadow: inset 0 0 0 1px #184d3b;
+}
+button:disabled,
+fieldset:disabled input {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+button:focus-visible,
+input:focus-visible,
+a:focus-visible,
+h1:focus,
+main:focus {
+  outline: 3px solid #0d6348;
+  outline-offset: 4px;
+}
+.access-status {
+  padding: 0.75rem;
+  background: #f0f5f1;
+  border-left: 3px solid #287959;
+  line-height: 1.5;
+}
+.access-error {
+  color: #801f25;
+  background: #fff4f4;
+  border-left-color: #a62d35;
+}
+.access-actions,
+.admin-session {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.access-actions {
+  margin-top: 1rem;
+}
+.admin-session {
+  margin-left: auto;
+  overflow-wrap: anywhere;
+}
+.admin-session > span {
+  max-width: 24rem;
+}
+.session-note {
+  font-size: 0.875rem;
+  color: #52655b;
+  line-height: 1.6;
+  margin: 1.5rem 0 0;
+}
+.account-email {
+  overflow-wrap: anywhere;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 42rem) {
+  main {
+    padding: 1.5rem 1rem;
+    align-items: start;
+  }
+  .admin-header {
+    padding: 1rem;
+  }
+  .admin-session {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+  .access-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .admin-access,
+  .admin-welcome {
+    padding: 1.25rem;
+  }
+}

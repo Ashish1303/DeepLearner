@@ -1,13 +1,28 @@
 import { AdminShell } from '../components/layout/admin-shell';
+import { AdminAccess } from '../components/auth/admin-access';
+import { isEligibleAdminState, useAdminAuth } from '../hooks/use-admin-auth';
 
 export function App() {
+  const { state, controller, available } = useAdminAuth();
+  const eligible = available && isEligibleAdminState(state);
   return (
-    <AdminShell>
-      <section className="welcome" aria-labelledby="welcome-title">
-        <p className="eyebrow">DeepLearner Admin</p>
-        <h1 id="welcome-title">A home for thoughtful learning content.</h1>
-        <p>The administration workspace is taking shape.</p>
-      </section>
+    <AdminShell
+      session={
+        eligible && state.user
+          ? {
+              user: state.user,
+              onLogout: () => {
+                void controller.logout();
+              },
+            }
+          : null
+      }
+    >
+      <AdminAccess
+        state={state}
+        controller={controller}
+        available={available}
+      />
     </AdminShell>
   );
 }

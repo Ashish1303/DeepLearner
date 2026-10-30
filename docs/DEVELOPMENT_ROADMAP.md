@@ -1575,7 +1575,253 @@ Keep changes uncommitted and STOP for separate scoped Git-delivery approval.
 
 ### F042 — Admin Route Protection
 **Dependencies:** F008  
-**Status:** `NOT_STARTED`
+**Status:** `IN_PROGRESS`
+
+Owner approved the F042 contract and Slice 1 backend implementation only on
+2026-10-24, starting from `04efeebce3f81b6b5e4e31f2da11112ed13317d9`.
+Slice 1 READY_FOR_REVIEW — offline only; Slice 2 NOT_STARTED and unapproved for implementation.
+Exact scope: twelve paths, no Admin business endpoint/frontend/dependencies or
+authentication/schema/index changes. Current ADMIN eligibility, five-second
+read cap, no-store, IP/account limits and fail-closed errors are required.
+Offline evidence: 72 focused plus 156 relevant Auth/User/API regression tests PASS
+(228 distinct); API build, TypeScript, targeted lint/format and separate source/
+security review PASS, zero unresolved Critical/High/Medium/Low findings. Historical
+sandbox and test-typing failures are retained in the feature plan. Nine guarded
+MongoDB records are prepared but NOT_RUN; launcher/fixture reconciliation and
+execution require separate owner approval. MongoDB/browser execution and Git writes
+are not authorized. Existing 173 browser scenarios remain NOT_RUN; no exception
+transfers to F042. F001–F041 retain LOCAL DEVELOPMENT approval; production
+readiness NOT_VERIFIED. See [F042 plan](features/F042-admin-route-protection.md).
+
+**F042 blocker preservation and read-only Slice 2 plan — owner authorization,
+2026-10-24:** F042 remains IN_PROGRESS. Slice 1 remains READY_FOR_REVIEW — offline
+only; its acceptance and local Git checkpoint are **BLOCKED** until mandatory
+MongoDB verification is satisfied. Slice 2A/2B remain NOT_STARTED and unapproved
+for implementation. F001–F041 remain APPROVED_COMPLETE for LOCAL DEVELOPMENT ONLY;
+F043 remains NOT_STARTED.
+
+Retain 228 distinct offline tests PASS (72 focused + 156 regressions), build/static
+evidence and zero unresolved Critical/High/Medium/Low source/security findings.
+Retain 201 separate adapter checks PASS (122 protocol/lifecycle + 79 PowerShell
+harness), including synthetic timing evidence only. All nine prepared MongoDB
+records remain **0 PASS / 0 FAIL / 9 NOT_RUN**; no authenticated F042 RESULT/digest
+ACK exists. Forced real MongoDB timeout remains NOT_VERIFIED. F042 ownership and
+isolation infrastructure is verified offline only; non-database process
+diagnostics are not guarded database acceptance. Earlier gate descriptions,
+failures and corrections remain historical evidence.
+
+Confirmed blocker: **SECURE_INPUT_CAPABILITY_UNAVAILABLE_OR_UNVERIFIED**. Codex
+can launch/verify PowerShell 7 but has not established supported secure binding
+between human keyboard input, the intended active console pane and its retained
+shell process. Unattended execution is unavailable under the current contract;
+no bypass, retry, marker reset or manual terminal procedure is required now.
+Stop repeated PowerShell/HWND/focus investigations unless a genuinely new supported
+capability becomes available and is separately approved. Preserve the twelve
+pending Slice 1 paths, five ignored adapters, source pins and all ownership,
+one-attempt, deadline, authenticated RESULT/ACK and cleanup requirements.
+
+Future 2A plans an Admin-local strict Auth/User client, memory-only identity,
+explicit restoration, same-origin coordination, stale-response refusal and
+fail-closed logout/errors. Future 2B plans an accessible responsive login/boundary
+and protected scaffold without business-management features or fabricated Stitch
+metrics. Exact proposed inventories (15 unique Slice 2 paths across two separately
+gated checkpoints) and verification criteria are in the F042 plan. No new API,
+database/index, dependency, shared-package or configuration change is approved.
+The UI must never treat an Admin 404 as authorization proof.
+
+Recommend separately approved independent browser profiles for Student/Admin
+LOCAL use. Different origins cannot serialize the API refresh cookie through
+same-origin locks/channels; strict reuse detection remains unchanged and
+same-profile races may invalidate the shared session. Cookie/session architecture
+changes require separate approval. Profile policy, explicit restoration/recovery,
+minimal UI and exact implementation inventories remain owner decisions.
+
+Only this roadmap and the F042 plan change now. No implementation, suites,
+credentials, runner, MongoDB/browser or Git writes. The 20 future browser cases
+are a proposal, not prepared/executed coverage; existing **173 NOT_RUN** remains.
+No F041 exception transfers. Browser execution and live Admin frontend-to-API
+qualification each require separate approval; mocked UI tests prove neither.
+Keep production readiness NOT_VERIFIED. Planning does not unlock implementation,
+Slice 1 acceptance, its Git checkpoint or final feature completion.
+
+**F042 owner design decisions and next-gate preparation — 2026-10-24:** The owner
+approves LOCAL DEVELOPMENT planning for separate Student/Admin browser profiles,
+existing Auth/User APIs with current verified ACTIVE Admin eligibility, memory-only
+identity, fail-closed recovery and the minimum accessible responsive sign-in/
+protected welcome/logout interface. These choices supersede only the earlier
+pending design decisions. Same-profile cross-origin refresh coordination remains
+unresolved; strict reuse detection is unchanged and production session architecture
+is not approved. No implementation or browser-profile setup is authorized.
+
+The F042 plan now validates every proposed path, action, purpose and checkpoint:
+2A has six CREATE paths plus the two documentation MODIFY paths; 2B has four
+CREATE and five MODIFY paths. The shared documentation pair gives **15 unique
+Slice 2 paths**. Ten CREATE targets are absent and five MODIFY targets exist;
+there are no file collisions or scope additions. Existing TypeScript-test and
+Playwright selection limitations are explicit; no hidden configuration change,
+shared-package extraction, dependency or new authentication endpoint is approved.
+
+Required order remains: supported secure-input resolution and separate guarded
+execution approval; authenticated nine-record Slice 1 integration with complete
+cleanup/baselines; separate Slice 1 acceptance; separately authorized local Git
+checkpoint; separate 2A implementation/verification/acceptance; separate 2B
+implementation/verification and browser/live gates; final F042 owner acceptance
+and separate Git delivery. Each later local checkpoint also requires explicit
+Git approval. No automatic advancement, retry or manual PowerShell procedure.
+
+**SECURE_INPUT_CAPABILITY_UNAVAILABLE_OR_UNVERIFIED** persists. Preserve 228
+offline PASS, 201 adapter/protocol PASS and zero unresolved implementation/security
+findings without claiming new runs. MongoDB remains **0 PASS / 0 FAIL / 9 NOT_RUN**;
+no authenticated F042 RESULT/ACK, forced real timeout NOT_VERIFIED. Slice 1 remains
+READY_FOR_REVIEW — offline only, acceptance/checkpoint BLOCKED; Slice 2A/2B
+NOT_STARTED; F042 IN_PROGRESS; F001–F041 approved locally and F043 NOT_STARTED.
+All **173 browser scenarios NOT_RUN**, production readiness NOT_VERIFIED. The
+twenty future browser cases remain proposed only. Preserve all historical evidence
+and reconcile future source pins with these documentation updates. Only the plan
+and roadmap change now; no suites, credentials, runner, MongoDB/browser, source/
+adapter/configuration changes or Git staging/commit/push are authorized. The next
+safe execution proposal requires a genuinely new supported secure-input capability
+and separate owner approval; do not repeat terminal-focus investigations.
+
+**Owner-approved workflow amendment and F042-only sequencing exception —
+2026-10-29:** Implementation, verification, owner acceptance, local development
+checkpoints, remote delivery and production readiness are separate gates under
+the additive AGENTS.md rule. Earlier F042 records remain historical. Only the
+requirement to finish Slice 1 integration/acceptance/original checkpoint before
+starting separately authorized Slice 2 offline development is superseded.
+
+Slice 2A may be implemented offline before Slice 1 MongoDB acceptance **only after
+separate owner implementation authorization**. Slice 2B requires Slice 2A offline
+verification, independent review with resolved findings, owner review and separate
+implementation authorization. Preserve the exact 15-path inventory, existing
+Auth/User contracts, separate Student/Admin profile guidance and unresolved
+cross-origin refresh-cookie limitation. No frontend implementation is authorized
+by this documentation gate.
+
+Current status: F042 **IN_PROGRESS**; Slice 1 **READY_FOR_REVIEW — offline only**;
+Slice 1 acceptance and original acceptance checkpoint **BLOCKED**; Slice 2A and
+2B **NOT_STARTED**; F043 **NOT_STARTED**. F001–F041 remain APPROVED_COMPLETE for
+LOCAL DEVELOPMENT ONLY; their histories and feature-specific exceptions are
+unchanged.
+
+Retain 228 offline API tests PASS and historical reviewed adapter/protocol
+evidence. The later guarded attempt timed out: authenticated counters **UNKNOWN**,
+nine-record MongoDB verification incomplete, RESULT/digest ACK incomplete and
+protected-process baseline comparison failed. Owned-resource cleanup passed in
+that historical attempt; it is not current environment qualification. Windows
+execution remains unqualified and the performance bottleneck is not conclusively
+isolated. Earlier secure-human-input limitations are historical following the
+separately approved synthetic-credential design; no new credentials are generated.
+
+The [F042 verification ledger](features/F042-admin-route-protection.md#durable-verification-ledger)
+records requirements, actual status, blocker, evidence, acceptance impact, next
+action and owner approvals. Real database-backed Admin authorization, exact
+RESULT/digest ACK, ownership/isolation/deadline/cleanup and protected-baseline
+requirements remain mandatory before final acceptance. No mock or environment
+failure is integration PASS. Preserve **173 browser scenarios NOT_RUN**, no
+inherited F041 exception, live Admin frontend-to-API and forced real MongoDB
+timeout **NOT_VERIFIED**, and production readiness **NOT_VERIFIED**. Any offline
+development commit, final acceptance and remote delivery require separate owner
+authorization. No staging, commit, push or execution is authorized here. The next
+development gate is separate exact-scope Slice 2A implementation approval.
+
+**F042 Slice 2A implementation authorization — 2026-10-29:** The owner approved
+the eight-path Admin Authentication Foundation scope for implementation, offline
+verification and independent review. Slice 2A is **IN_PROGRESS**; F042 remains
+IN_PROGRESS, Slice 1 READY_FOR_REVIEW — offline only with acceptance/original
+checkpoint BLOCKED, and Slice 2B NOT_STARTED. No Git, MongoDB, browser or F043
+work is authorized. Historical evidence and all mandatory acceptance gates remain.
+
+**F042 Slice 2A offline outcome — 2026-10-29:** Admin Authentication Foundation
+implementation is complete within the six CREATE/two-document scope. Slice 2A
+remains **IN_PROGRESS** because regression qualification is **BLOCKED**; it is not
+READY_FOR_REVIEW or accepted. Retain **113 focused PASS** and regression **79 PASS /
+44 FAIL**, exit 1, separately: 43 cases reported loopback EACCES and one HTTP
+cancellation case timed out. No retry, permission investigation or passing-result
+substitution occurred. Admin build, strict TypeScript including tests, targeted
+lint and formatting PASS. Independent review: **0 unresolved Critical/High/
+Medium/Low**; the generation-coupled expiry issue is corrected and covered by a
+subscriber-notification regression.
+
+The client/controller validates existing Auth/User contracts, projects only
+currently verified ACTIVE Admin identity, keeps authority in memory, serializes
+same-origin session actions and refuses stale/ambiguous results. No UI wiring,
+backend/API change, dependency or configuration change occurred. Source review
+does not prove live integration. Same-profile cross-origin refresh races remain
+unresolved. The plan records exact scope, failures, verification ledger and
+historical corrections.
+
+F042 remains IN_PROGRESS, Slice 1 READY_FOR_REVIEW — offline only with acceptance/
+original checkpoint BLOCKED, and Slice 2B/F043 NOT_STARTED. Mandatory nine-record
+MongoDB evidence remains incomplete with authenticated counters UNKNOWN; no
+RESULT/ACK acceptance is inferred. Preserve **173 browser scenarios NOT_RUN**,
+live Admin frontend-to-API and production **NOT_VERIFIED**, all prior evidence and
+separate acceptance/Git approvals. The next gate is owner review and separately
+qualified execution of the failed HTTP regressions, not automatic Slice 2B work.
+
+**F042 Slice 2B named development continuation — owner approval 2026-10-29:**
+The owner approves the existing nine-path Admin UI/Protected Scaffold scope,
+offline checks and independent review despite blocked Slice 1 MongoDB and
+Slice 2A external HTTP verification. Slice 2A evidence is the development
+dependency basis, not full acceptance; this changes development order only.
+F042 remains IN_PROGRESS, Slice 1 READY_FOR_REVIEW — offline only with acceptance
+BLOCKED, Slice 2A IMPLEMENTED — external HTTP verification pending, and Slice 2B
+IN_PROGRESS. F043 remains NOT_STARTED. All historical failures, the qualified
+HTTP rerun NOT_RUN, mandatory verification/final acceptance and separate Git
+approvals remain. Existing 173 browser scenarios NOT_RUN; any newly prepared
+F042 cases are counted separately. No HTTP, MongoDB or browser execution,
+permission investigation or Git writes are authorized here.
+
+**F042 Slice 2B implementation/offline outcome — 2026-10-29:** The nine-path
+Admin UI/Protected Scaffold is implemented under the named development-only
+continuation above. Email/password sign-in, explicit restoration, current-device
+logout, safe denial/expiry/error/recovery states, current verified ACTIVE Admin
+presentation gating and cancellation/account invalidation reuse unchanged Slice
+2A contracts. Existing branding, semantic form/landmarks, focus styles, live
+announcements and responsive CSS remain source-level implementations, not real
+browser evidence. Backend authorization remains authoritative; no F043 controls,
+fake metrics, storage tokens, automatic refresh replay or new dependencies.
+
+Final focused run: **42 offline rendering/lifecycle PASS**. Permitted regressions:
+**192 PASS** (113 Slice 2A plus 79 non-network Auth/User/Admin/Student cases), giving
+**234 distinct offline PASS** for this gate. Initial 36-case focused verification
+expanded by six uncertainty/lifecycle cases; count each case once. Admin build and
+strict TypeScript including prepared spec PASS. Final static/scope/review results
+are recorded in the feature plan. One Low prepared-scenario expectation mismatch
+was corrected; no application contract was weakened. Historical 43 EACCES failures,
+one inconclusive HTTP cancellation timeout, seven inert cancellation PASS and
+qualified eight-file HTTP rerun NOT_RUN are retained. No blocked HTTP rerun occurs.
+
+Exactly **20 F042 browser cases are now prepared, all NOT_RUN**. Existing 173 remain
+NOT_RUN; combined backlog **193 NOT_RUN**. Browser layout/accessibility/focus/races
+and live Admin frontend-to-API remain NOT_VERIFIED. Mocked cases cannot prove real
+JWT/database authorization. No primary-host browser execution or inherited F041
+exception is approved. The nine-record MongoDB suite is still incomplete with
+authenticated counters UNKNOWN; historical RESULT/ACK, baseline discrepancy and
+forced real-timeout limitations remain. Production readiness NOT_VERIFIED.
+
+Current F042 IN_PROGRESS; Slice 1 READY_FOR_REVIEW — offline only, acceptance/
+original checkpoint BLOCKED; Slice 2A IMPLEMENTED — external HTTP verification
+pending, not accepted; Slice 2B READY_FOR_REVIEW — offline only; F043
+NOT_STARTED. The initial 19 pending paths become 26 (four new plus three newly
+modified existing Admin files; both documents were already pending). Branch/head
+and index must remain unchanged/empty. Owner review, mandatory external verification,
+acceptance and any scoped local checkpoint/remote delivery require separate gates.
+No staging, commit, push, service/browser execution or permission investigation.
+
+**Final Slice 2B offline review — 2026-10-29:** Admin build, strict TypeScript,
+zero-warning targeted lint, seven-file source/test/style formatting, UTF-8/LF,
+exact nine-path task scope, diff/secrecy and historical-preservation checks PASS.
+Independent fresh-context source/security/test review: Critical 0 / High 0 / Medium 0 /
+Low 0 unresolved; one prepared-test Low finding corrected and re-reviewed. Actual
+42 focused and 192 regression records give 234 distinct offline PASS; no browser,
+HTTP or MongoDB suite was run. New 20 plus existing 173 = 193 browser NOT_RUN.
+Current Slice 2B READY_FOR_REVIEW — offline only, F042 IN_PROGRESS; Slice 1
+acceptance BLOCKED and Slice 2A external HTTP verification pending. No acceptance,
+Git checkpoint/delivery or F043 implementation is authorized. Final repository:
+dev at 04efeebce3f81b6b5e4e31f2da11112ed13317d9, 26 pending paths, empty index,
+unchanged Slice 1/2A/adapter sources, no staging/commit/push. Mandatory database,
+RESULT/ACK, protected-baseline, browser/live and production gates remain open.
 
 ### F043 — Admin Technology Management
 Status: `NOT_STARTED`
@@ -1998,9 +2244,9 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F041 - Student Dashboard Real Data (both slices ACCEPTED_LOCAL; Slice 2 offline only)
-**Current Status:** `APPROVED_COMPLETE` — LOCAL DEVELOPMENT ONLY
-**Next Feature:** F042 - Admin Route Protection (not authorized)
+**Current Feature:** F042 - Admin Route Protection (Slice 2B development-only continuation)
+**Current Status:** `IN_PROGRESS`
+**Next Feature:** F043 - Admin Technology Management (not authorized)
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---
@@ -2022,6 +2268,12 @@ Production requires a separate approved browser-regression/release-readiness gat
 F032 alone has the explicitly approved exception below; neither the general
 policy nor F031's previous exception grants any future feature a deferral.
 
+
+The following checklist governs final feature acceptance. A separately authorized
+offline implementation review or local development checkpoint under AGENTS.md's
+blocked-verification rule does not satisfy unchecked verification requirements or
+grant final acceptance. Named sequencing permission does not waive security,
+database or browser gates and does not authorize another feature or remote push.
 
 A feature is ready for owner approval only when:
 
