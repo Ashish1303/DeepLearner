@@ -1824,7 +1824,123 @@ unchanged Slice 1/2A/adapter sources, no staging/commit/push. Mandatory database
 RESULT/ACK, protected-baseline, browser/live and production gates remain open.
 
 ### F043 — Admin Technology Management
-Status: `NOT_STARTED`
+Status: `IN_PROGRESS`
+
+**Detailed contract and sequencing proposal — owner planning approval,
+2026-10-30:** The owner authorized documentation-only preparation and the draft-only
+product direction in principle, not implementation. See the
+[F043 detailed proposal](features/F043-admin-technology-management.md).
+Proposed dependencies: F015 Technology persistence/public contract and F042 Admin
+authorization/session foundations; the original entry had no formal dependencies.
+Scope: authenticated inventory/detail, create DRAFT, revision-controlled DRAFT
+name/description/order edits, immutable unique slug, read-only existing icons and
+PUBLISHED/ARCHIVED records, atomic audit. No publication/archive/delete/uploads,
+bulk/import/AI/descendant work or F044 functionality.
+
+The current AGENTS.md amendment allows slices of the current active feature only;
+it does not unlock F043 while F042 remains open. The plan contains exact proposed
+F043-only sequencing wording, **not an effective policy change**. Separate owner
+approval is required before editing AGENTS.md and adding a matching F042 record.
+The current feature pointer remains F042; F043 stays NOT_STARTED until separately
+authorized implementation. F042 remains IN_PROGRESS, final acceptance BLOCKED;
+its pushed development checkpoints do not prove Admin authorization or acceptance.
+F044 remains NOT_STARTED. No non-overridable security requirement is waived.
+
+Reconciled implementation boundary: **31 unique paths**, originally 21 CREATE /
+10 MODIFY, split into backend (18) and frontend (13 additional, plus two shared
+evidence documents). The plan file is created during planning, so it will be an
+existing file at implementation start. Additional sequencing-policy paths are
+separate, not silently included. Canonical API/database wording and all code
+remain unchanged pending exact owner approval. Proposed mutation security uses a
+real transactional fence on the current Admin User version, DRAFT revision CAS and
+an additive Technology audit event committed atomically; the User-version side
+effect, concurrency semantics, deadlines/retries and audit extension require
+explicit ratification. No snapshot-read-only authority shortcut is accepted.
+
+Each slice requires focused offline checks, relevant regressions, build/TypeScript/
+lint/format/scope/privacy checks, independent severity review and separately approved
+development Git checkpoint. Real isolated transaction/index/concurrent-eligibility
+verification and authenticated RESULT/ACK remain final-acceptance gates, together
+with F042's mandatory verification. No new adapter, configuration or execution is
+authorized. The same-profile Student/Admin cross-origin refresh-cookie risk remains
+unresolved; no session-architecture change is proposed.
+
+Existing **193 browser scenarios remain NOT_RUN**. Twenty F043 browser scenarios
+are proposed only, not prepared/executed or added to the existing prepared count.
+No browser exception transfers. Live F043 frontend-to-API integration remains
+NOT_VERIFIED; production readiness NOT_VERIFIED. Preserve all F042 historical
+HTTP failures, incomplete nine-record MongoDB verification, UNKNOWN authenticated
+counters, incomplete RESULT/ACK, baseline discrepancy and forced-timeout limitation.
+Next gate: contract and exact sequencing-document approval, then separate Slice 1
+implementation authorization. This planning record authorizes no Git writes,
+feature acceptance or automatic next-feature progression.
+
+**F043-only sequencing enacted and contract finalized — owner decision,
+2026-10-30:** This later record supersedes the preceding proposal's pending-policy
+statements only; the planning record remains historical. The named exception is
+now effective in AGENTS.md and cross-recorded in F042. Separately approved F043
+development slices may proceed while F042 remains IN_PROGRESS with acceptance
+BLOCKED. The default one-feature-at-a-time workflow remains in force outside
+this exception. F043 must use the F042 Admin boundary without treating it as
+verified. F043 remains NOT_STARTED; separate Slice 1 implementation approval is
+still required. F044/other features receive no inherited exception.
+
+The [finalized F043 contract](features/F043-admin-technology-management.md) specifies
+protected inventory/detail, DRAFT create/edit, immutable slug, revision CAS,
+read-only PUBLISHED/ARCHIVED/icon references, atomic Technology/audit writes, and
+transactional current-Admin eligibility with a real User `__v` write fence. It
+documents the actor-version side effect, conflict/rollback/audit implications,
+no unsafe mutation replay, bounded same-transaction commit behavior and uncertain
+outcome recovery. F015 public behavior and existing authentication/session
+architecture remain unchanged. The 31-path implementation boundary and two
+separately reviewed/checkpointed slices are retained; no code is authorized here.
+
+F043 acceptance requires its own real integration and completion of F042's
+prerequisite verification, not development checkpoint evidence. Preserve all
+HTTP/MongoDB failures, UNKNOWN authenticated results, incomplete RESULT/ACK,
+baseline and timeout limitations. Every commit and push needs separate owner
+approval. Existing 193 browser scenarios remain NOT_RUN; live F043 integration
+and production readiness remain NOT_VERIFIED. No tests or services executed.
+Next gate: separate exact-scope F043 Slice 1 implementation authorization.
+
+**Slice 1 backend implementation authorization — 2026-10-30:** The owner has now
+separately authorized the exact 18-path backend inventory, offline tests/static
+verification and independent security review under the enacted exception. F043
+transitions through owner approval to IN_PROGRESS; Slice 2 remains NOT_STARTED.
+Only the documented backend routes, transaction/fence/audit implementation,
+prepared integration assertions and API/database contract transfer are authorized.
+No frontend, live database/browser execution, Git writes or acceptance. Earlier
+planning/authorization records retain their historical meaning. F042 remains
+IN_PROGRESS with acceptance BLOCKED and all HTTP/MongoDB gates open. Existing
+193 browser scenarios remain NOT_RUN; production readiness NOT_VERIFIED.
+
+**F043 Slice 1 backend offline outcome — 2026-10-30:** F043 remains IN_PROGRESS;
+Slice 1 **READY_FOR_REVIEW — offline only**, acceptance BLOCKED pending real
+integration. Slice 2 NOT_STARTED. The exact 18-path backend implementation mounts
+protected Technology inventory/detail/create/PATCH, enforces DRAFT/revision/read-
+only rules, current signed-token/stored Admin eligibility, real transactional User
+version fencing and atomic append-only audit. Public F015 behavior is unchanged.
+
+Executed distinct evidence: 91 focused/audit tests (including 16 route/parser
+checks and one real app HTTP test with fake services), 102 selected offline
+regressions, 41 audit-dependent grading regressions and 79 existing relevant
+loopback HTTP regressions PASS: **313 distinct records**. The cancellation case
+specifically PASS. New HTTP evidence does not overwrite F042's historical failures
+or close its acceptance/verification ledger automatically. Initial env/test-fixture/
+TypeScript/lint failures and corrections are retained in the feature record.
+Independent source/security review: zero unresolved Critical/High/Medium/Low;
+one Medium and four Low findings corrected/re-reviewed. Compilation, targeted
+lint/format, UTF-8/LF, exact scope, diff and secrecy checks accompany offline review.
+
+Prepared F043 PARENT + T01–T14 integration assertions are all NOT_RUN, with no
+authenticated RESULT/ACK. The adapter/complete fixture-index inventory, fresh
+source pins, real transaction/concurrency/timeout behavior, protected baselines
+and owned process/Job cleanup require separate qualification/approval. F042 remains
+IN_PROGRESS with acceptance BLOCKED and mandatory verification incomplete. Existing
+193 browser scenarios remain NOT_RUN; live frontend-to-API/production readiness
+NOT_VERIFIED. No frontend, F044, Git staging/commit/push or live MongoDB/browser run.
+Next gate: owner review of offline Slice 1 evidence and separate real-integration
+preparation/execution approval; no automatic Slice 2 or Git progression.
 
 ### F044 — Admin Learning Path Management
 Status: `NOT_STARTED`
@@ -2244,9 +2360,22 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F042 - Admin Route Protection (Slice 2B development-only continuation)
+**Current Feature:** F043 - Admin Technology Management (Slice 1 backend implementation)
 **Current Status:** `IN_PROGRESS`
-**Next Feature:** F043 - Admin Technology Management (not authorized)
+**Next Feature:** F044 - Admin Learning Path Management (not authorized)
+
+**Open verification feature:** F042 remains IN_PROGRESS, acceptance BLOCKED,
+HTTP/MongoDB verification incomplete. The owner-approved F043-only exception
+permits this named implementation sequence without accepting F042. Slice 2 is
+not authorized, and F044 receives no sequencing exception. The following named
+decision paragraph is the historical documentation-only gate preceding Slice 1.
+
+**Named sequencing decision, 2026-10-30:** F042 remains the open verification
+feature, IN_PROGRESS with acceptance BLOCKED. Under the F043-only AGENTS.md
+exception, F043 development is eligible for separate exact-scope Slice 1 approval;
+F043 remains NOT_STARTED and no implementation is yet authorized. This secondary
+field qualifies the earlier next-feature restriction without marking F042 complete
+or switching the implementation pointer automatically. No F044 exception exists.
 
 **Rule:** F005-F009 are APPROVED_COMPLETE. F009 owner completion approval is dated 2026-10-01 and preserves its backend-only scope and documented limitations. F010 is APPROVED_COMPLETE following owner approval dated 2026-10-03; approved scope, verification evidence and limitations remain unchanged. F011 is APPROVED_COMPLETE following owner approval dated 2026-10-05; F012 is APPROVED_COMPLETE following owner approval dated 2026-10-06 within its backend-only scope; F013 is APPROVED_COMPLETE following owner approval dated 2026-10-07 with the live-verification deferral preserved; F014 is APPROVED_COMPLETE following owner approval dated 2026-10-08 within its frontend-only scope, with verification limitations preserved; F015 is APPROVED_COMPLETE following owner completion approval dated 2026-10-09; isolated integration passed, while real JavaScript provisioning and normal Atlas startup remain NOT_VERIFIED. F016 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10; approved frontend-only scope and documented verification limitations remain preserved. F017 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10 within its approved backend-only scope; verification limitations remain preserved, further database execution remains separately gated, and F018 is APPROVED_COMPLETE following owner completion approval dated 2026-10-10, after implementation, isolated verification and resolved P3 re-review; verification limitations remain preserved and further database execution remains separately gated. F019 is APPROVED_COMPLETE following owner approval dated 2026-10-10 after offline/integration verification and resolved P3 re-review; approved scope and limitations are preserved, further database execution is separately gated. F020 is APPROVED_COMPLETE for development closure following final owner approval dated 2026-10-11. Accepted live-verification deferrals and the disposable web graceful-shutdown failure remain documented. Production release is not authorized; automated browser acceptance is required before release, with Playwright setup separately gated.
 ---

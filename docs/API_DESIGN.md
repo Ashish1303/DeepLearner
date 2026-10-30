@@ -2383,3 +2383,75 @@ plan Section 12 for exact evidence, historical refusals and remaining limitation
 Intermediate IMPROVING remains offline-only. No production, real-failover,
 multi-process or browser verification is inferred. Existing 153 browser scenarios
 remain NOT_RUN, zero added here; production readiness remains NOT_VERIFIED.
+# F043 — Admin Technology Management (Slice 1 backend)
+
+Owner-authorized backend implementation, 2026-10-30, under the named F043-only
+development sequencing exception. F043 is IN_PROGRESS; this is not runtime or
+final acceptance evidence. F042 remains IN_PROGRESS with acceptance BLOCKED and
+mandatory HTTP/MongoDB verification incomplete. The earlier F042 no-business-
+endpoint statement describes F042's own scope; F043 mounts the following business
+router below that unchanged protected namespace boundary.
+
+| Method | Path                             | Contract                                         |
+| ------ | -------------------------------- | ------------------------------------------------ |
+| GET    | `/api/v1/admin/technologies`     | page/limit inventory of DRAFT/PUBLISHED/ARCHIVED |
+| GET    | `/api/v1/admin/technologies/:id` | detail for a 24-hex ID                           |
+| POST   | `/api/v1/admin/technologies`     | create DRAFT; 201                                |
+| PATCH  | `/api/v1/admin/technologies/:id` | DRAFT-only name/description/order change; 200    |
+
+Require the existing verified Bearer JWT ADMIN and current stored ACTIVE,
+verified ADMIN gate. Mutations additionally reverify the same original signed
+token/context at mutation/commit admission and enforce transactional current
+account eligibility using the User-version write fence described in DATABASE_DESIGN.
+Do not treat F042's unverified dispatch gate as permanent mutation authority.
+
+List accepts only positive decimal page/limit (defaults 1/20, max limit 100,
+safe offset at most 10,000); order is slug ASC. No filters/search/sort. Empty valid
+pages return 200 with an empty list; separate list/count may drift. Detail accepts
+no query. POST/PATCH accept no query, require uncompressed JSON of at most 4096
+streamed bytes and reject unknown/dotted/operator keys. GET accepts no body.
+
+Create requires trimmed name 1–80 and immutable lowercase ASCII kebab-case slug
+1–100. Optional description is plain text up to 2000 characters or null; optional
+order defaults to 0 and must be a nonnegative safe integer. PATCH requires a safe
+nonnegative revision below MAX_SAFE_INTEGER and at least one editable field.
+Omitted fields preserve values; null description clears it. No caller-supplied
+actor, status, timestamps, icon or provenance. New icon is null; existing icons,
+creator, slug and PUBLISHED/ARCHIVED records are read-only. A no-op valid PATCH
+still increments one revision and creates one audit event.
+
+Exact Admin DTO: id/name/slug/description/iconAssetId/status/order/revision/
+createdAt/updatedAt; nullable description/icon, validated revision from internal
+__v, UTC ISO timestamps. Never expose raw persistence/provenance/user/private fields.
+Use existing success envelopes; list meta adds page/limit/total/totalPages (0 for
+empty); detail/create/PATCH retain requestId meta. All responses including parser,
+auth, limit and error cases use Cache-Control: no-store. Existing CORS and stateless
+token/session semantics remain unchanged.
+
+Preserve existing 400 VALIDATION_ERROR, 401 AUTH_ACCESS_TOKEN_*, generic 403
+AUTH_FORBIDDEN/ORIGIN_NOT_ALLOWED, 413 PAYLOAD_TOO_LARGE, 415
+UNSUPPORTED_MEDIA_TYPE, 429 RATE_LIMIT_EXCEEDED and sanitized 503
+DEPENDENCY_UNAVAILABLE. F043 adds 404 TECHNOLOGY_NOT_FOUND and 409
+TECHNOLOGY_SLUG_CONFLICT / TECHNOLOGY_REVISION_CONFLICT / TECHNOLOGY_READ_ONLY.
+Check stored status before revision. Only verified slug-index duplicate errors
+become slug conflicts. Driver, authority, write-conflict, late result and unknown
+commit failures must not expose raw messages or imply rollback. Unexpected errors
+retain sanitized INTERNAL_ERROR. No automatic mutation replay or compensating write.
+
+Retain namespace 300/IP/15-minute and 120/account/15-minute limits; additionally
+share 120 reads/minute/Admin across GETs and 60 mutations/minute/Admin across writes.
+Stores are process-local, HMAC-keyed, at most 10,000 live keys; capacity refusal
+is 503 without evicting live counters. Existing proxy/IPv6 policy is unchanged.
+Technology work shares one 10-second monotonic budget after the unchanged
+five-second F042 eligibility budget. Commit uses at most two seconds and remaining
+budget; driver-internal same-transaction commit retries share that timeout context.
+No withTransaction callback replay or new logical transaction retry. Cleanup is
+awaited with bounded two-second abort/endSession operations; failure cannot yield
+success. A timed-out/cancelled/unknown write requires explicit read reconciliation.
+
+F015 public published-only catalog, DTO and limits remain unchanged. No publication,
+archive/delete, uploads, imports, bulk/AI, descendants or frontend code is included.
+See [F043 contract](features/F043-admin-technology-management.md) for exact inventory,
+audit/fence semantics and mandatory independent/offline/real-integration gates.
+Browser/live/production qualification remains NOT_VERIFIED; 193 existing browser
+scenarios remain NOT_RUN. No F042 acceptance or inherited browser exception.

@@ -326,6 +326,41 @@ Existing named-feature browser-exception rules remain unchanged and do not
 transfer between features. This rule authorizes no deployment, production
 readiness, security bypass or automatic next-feature progression.
 
+## Named F043 development-only sequencing exception
+
+Owner-approved on 2026-10-30, exclusively for F043 Admin Technology Management.
+The owner may separately authorize an explicitly inventoried F043 development
+slice while F042 remains IN_PROGRESS with mandatory verification incomplete.
+This exception changes only the normal next-feature implementation sequencing
+rule for F043; the default one-feature-at-a-time policy applies everywhere else.
+F042 remains the open verification feature. F043 remains NOT_STARTED until
+separate exact-scope Slice 1 implementation approval; no implementation is
+authorized by this documentation amendment. Do not start Slice 2 automatically.
+
+F043 must reuse the F042 Admin security boundary without treating it as verified.
+Before each slice require a stable dependent contract, retained applicable
+prerequisite offline evidence, and no unresolved Critical/High finding invalidating
+the dependent work. After each slice require applicable offline checks and a fresh
+independent review, with all findings resolved before checkpoint eligibility.
+A newly discovered F042 security defect that invalidates dependent work suspends
+this exception pending owner review.
+
+F042 remains IN_PROGRESS with acceptance BLOCKED. Preserve its historical HTTP
+and MongoDB failures, incomplete suite, UNKNOWN authenticated results, incomplete
+RESULT/digest ACK and protected-baseline discrepancy. Development checkpoints,
+including remotely delivered checkpoints, establish neither acceptance nor
+production readiness. F043 acceptance requires its own mandatory real database
+integration and completion of the F042 prerequisite verification gate, plus all
+applicable authentication/authorization, regression, process/Job ownership,
+isolation, deadlines, authenticated RESULT/ACK and cleanup requirements. Nothing
+here waives an existing security or acceptance gate.
+
+Every Git commit and every push requires separate explicit owner approval.
+No browser exception transfers; existing browser restrictions remain unchanged.
+This exception authorizes no F044/other-feature progression, production readiness
+or deployment. Scope, deferred evidence, risks and slice boundaries are recorded
+in docs/features/F043-admin-technology-management.md and the F042/roadmap records.
+
 ---
 
 # Feature Completion

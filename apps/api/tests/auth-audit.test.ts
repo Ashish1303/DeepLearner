@@ -4,6 +4,91 @@ import { Types } from 'mongoose';
 import { Audit, auditSchema } from '../src/modules/audit/audit.model.js';
 import * as repository from '../src/modules/audit/audit.repository.js';
 
+test('F043 Technology audit tuples accept exact revisions and do not broaden legacy events', async () => {
+  const actorId = new Types.ObjectId();
+  const resourceId = new Types.ObjectId();
+  const created = {
+    category: 'CONTENT_MANAGEMENT',
+    action: 'TECHNOLOGY_CREATED',
+    actorId,
+    resourceId,
+    resourceType: 'TECHNOLOGY',
+    requestId: 'request',
+    metadata: {
+      revisionBefore: null,
+      revisionAfter: 0,
+      changedFields: ['name', 'order', 'slug'],
+    },
+  };
+  const updated = {
+    ...created,
+    action: 'TECHNOLOGY_UPDATED',
+    metadata: { revisionBefore: 0, revisionAfter: 1, changedFields: ['name'] },
+  };
+  await new Audit(created).validate();
+  await new Audit(updated).validate();
+  for (const change of [
+    { category: 'AUTH' },
+    { resourceType: 'USER' },
+    { action: 'USER_PROFILE_UPDATED' },
+    { metadata: { ...created.metadata, token: 'SYNTHETIC_PRIVATE' } },
+    { metadata: { ...created.metadata, source: 'ACCESS_TOKEN' } },
+    { metadata: { ...created.metadata, rubricVersion: 1 } },
+    { metadata: { ...created.metadata, revisionBefore: 0 } },
+    { metadata: { ...created.metadata, revisionAfter: 1 } },
+    {
+      metadata: {
+        ...created.metadata,
+        changedFields: ['name', 'name', 'slug'],
+      },
+    },
+    { metadata: { ...created.metadata, changedFields: ['slug', 'name'] } },
+    {
+      metadata: {
+        ...created.metadata,
+        changedFields: ['profile.experienceLevel'],
+      },
+    },
+  ])
+    await assert.rejects(new Audit({ ...created, ...change }).validate());
+  for (const metadata of [
+    { revisionBefore: 0, revisionAfter: 2, changedFields: ['name'] },
+    { revisionBefore: null, revisionAfter: 1, changedFields: ['name'] },
+    { revisionBefore: 0, revisionAfter: 1, changedFields: ['slug'] },
+    { revisionBefore: 0, revisionAfter: 1, changedFields: [] },
+  ])
+    await assert.rejects(new Audit({ ...updated, metadata }).validate());
+  for (const changedFields of [['name'], ['slug'], ['order']])
+    await assert.rejects(
+      new Audit({
+        category: 'USER_ADMIN',
+        action: 'USER_PROFILE_UPDATED',
+        actorId,
+        resourceId: actorId,
+        resourceType: 'USER',
+        requestId: 'request',
+        metadata: { changedFields },
+      }).validate(),
+    );
+  await assert.rejects(
+    new Audit({
+      category: 'AUTH',
+      action: 'AUTH_REGISTERED',
+      actorId,
+      resourceId: actorId,
+      resourceType: 'USER',
+      requestId: 'request',
+      metadata: { source: 'EMAIL_PASSWORD', revisionAfter: 0 },
+    }).validate(),
+  );
+  assert.equal(
+    auditSchema
+      .path('resourceId')
+      .options.ref.call({ resourceType: 'TECHNOLOGY' }),
+    'Technology',
+  );
+});
+
 test('audit schema accepts only bounded F007 actions and metadata offline', async () => {
   const id = new Types.ObjectId();
   const input = {

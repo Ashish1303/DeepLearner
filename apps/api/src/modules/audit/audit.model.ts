@@ -6,13 +6,15 @@ export const auditSchema = new Schema(
   {
     category: {
       type: String,
-      enum: ['AUTH', 'USER_ADMIN', 'CONTENT_APPROVAL'],
+      enum: ['AUTH', 'USER_ADMIN', 'CONTENT_APPROVAL', 'CONTENT_MANAGEMENT'],
       required: true,
       immutable: true,
     },
     action: {
       type: String,
       enum: [
+        'TECHNOLOGY_CREATED',
+        'TECHNOLOGY_UPDATED',
         'PRACTICE_RUBRIC_AUTHORED',
         'PRACTICE_RUBRIC_APPROVED',
         'PRACTICE_RUBRIC_REVOKED',
@@ -44,13 +46,14 @@ export const auditSchema = new Schema(
     },
     resourceType: {
       type: String,
-      enum: ['USER', 'PRACTICE_RUBRIC'],
+      enum: ['USER', 'PRACTICE_RUBRIC', 'TECHNOLOGY'],
       required: true,
       immutable: true,
     },
     resourceId: {
       type: Schema.Types.ObjectId,
       ref: function (this: { resourceType: string }) {
+        if (this.resourceType === 'TECHNOLOGY') return 'Technology';
         return this.resourceType === 'PRACTICE_RUBRIC'
           ? 'PracticeRubricVersion'
           : 'User';
@@ -86,6 +89,8 @@ export const auditSchema = new Schema(
               return (
                 action !== 'USER_PROFILE_UPDATED' &&
                 ![
+                  'TECHNOLOGY_CREATED',
+                  'TECHNOLOGY_UPDATED',
                   'PRACTICE_RUBRIC_AUTHORED',
                   'PRACTICE_RUBRIC_APPROVED',
                   'PRACTICE_RUBRIC_REVOKED',
@@ -94,7 +99,19 @@ export const auditSchema = new Schema(
             },
           },
           changedFields: {
-            type: [{ type: String, enum: profileFieldNames, required: true }],
+            type: [
+              {
+                type: String,
+                enum: [
+                  ...profileFieldNames,
+                  'name',
+                  'slug',
+                  'description',
+                  'order',
+                ],
+                required: true,
+              },
+            ],
             default: undefined,
           },
           provider: { type: String, enum: ['GOOGLE'] },
@@ -121,6 +138,21 @@ export const auditSchema = new Schema(
             min: 1,
             validate: Number.isSafeInteger,
           },
+          revisionBefore: {
+            type: Number,
+            cast: false,
+            min: 0,
+            validate: (value: number | null) =>
+              value === null || Number.isSafeInteger(value),
+            default: undefined,
+          },
+          revisionAfter: {
+            type: Number,
+            cast: false,
+            min: 0,
+            validate: Number.isSafeInteger,
+            default: undefined,
+          },
         },
         { _id: false, strict: 'throw' },
       ),
@@ -146,6 +178,55 @@ export const auditSchema = new Schema(
 auditSchema.pre('validate', function () {
   const action = this.action;
   const meta = this.metadata;
+  if (action === 'TECHNOLOGY_CREATED' || action === 'TECHNOLOGY_UPDATED') {
+    const create = action === 'TECHNOLOGY_CREATED';
+    const fields = meta?.changedFields;
+    const allowed = create
+      ? ['description', 'name', 'order', 'slug']
+      : ['description', 'name', 'order'];
+    if (
+      this.category !== 'CONTENT_MANAGEMENT' ||
+      this.resourceType !== 'TECHNOLOGY' ||
+      !this.actorId ||
+      !this.resourceId
+    )
+      this.invalidate('category', 'Invalid technology audit identity');
+    if (
+      !meta ||
+      !fields?.length ||
+      fields.length > allowed.length ||
+      fields.some((field) => !allowed.includes(field)) ||
+      new Set(fields).size !== fields.length ||
+      fields.join(',') !== [...fields].sort().join(',') ||
+      (create && (!fields.includes('name') || !fields.includes('slug'))) ||
+      !Number.isSafeInteger(meta.revisionAfter) ||
+      meta.revisionAfter! < 0 ||
+      meta.revisionAfter! > Number.MAX_SAFE_INTEGER ||
+      (create
+        ? meta.revisionBefore !== null || meta.revisionAfter !== 0
+        : !Number.isSafeInteger(meta.revisionBefore) ||
+          meta.revisionBefore! < 0 ||
+          meta.revisionBefore! >= Number.MAX_SAFE_INTEGER ||
+          meta.revisionAfter !== meta.revisionBefore! + 1)
+    )
+      this.invalidate('metadata', 'Invalid technology revision audit');
+    if (
+      meta &&
+      [
+        meta.source,
+        meta.provider,
+        meta.sessionId,
+        meta.revokedSessions,
+        meta.failureReason,
+        meta.reactivatedFromExpiredSuspension,
+        meta.rubricVersion,
+      ].some((value) => value !== undefined)
+    )
+      this.invalidate('metadata', 'Prohibited technology audit metadata');
+    return;
+  }
+  if (meta?.revisionBefore !== undefined || meta?.revisionAfter !== undefined)
+    this.invalidate('metadata', 'Technology revision metadata prohibited');
   if (
     [
       'PRACTICE_RUBRIC_AUTHORED',
@@ -200,7 +281,13 @@ auditSchema.pre('validate', function () {
     if (
       !meta.changedFields?.length ||
       meta.changedFields.length > profileFieldNames.length ||
-      new Set(meta.changedFields).size !== meta.changedFields.length
+      new Set(meta.changedFields).size !== meta.changedFields.length ||
+      meta.changedFields.some(
+        (field) =>
+          !profileFieldNames.includes(
+            field as (typeof profileFieldNames)[number],
+          ),
+      )
     )
       this.invalidate(
         'metadata.changedFields',

@@ -1189,3 +1189,31 @@ Branch dev and HEAD 04efeebce3f81b6b5e4e31f2da11112ed13317d9 remain unchanged,
 execution or infrastructure investigation occurred. The next gate is owner review
 of Slice 2B's offline evidence and a separate decision on qualified mandatory
 verification or an explicitly scoped development checkpoint under AGENTS.md.
+
+### Named F043 development-only sequencing decision — 2026-10-30
+
+The owner explicitly approved the F043-only exception now enacted in AGENTS.md.
+This later decision supersedes only earlier statements preventing separately
+approved F043 development before F042 closes; it does not change any historical
+outcome, feature status, acceptance requirement or F042 verification ledger row.
+F042 remains **IN_PROGRESS**, with Slice 1 acceptance and final acceptance
+**BLOCKED**. Slice 2A is IMPLEMENTED — external HTTP verification pending, not
+accepted; Slice 2B is READY_FOR_REVIEW — offline only. Its delivered development
+checkpoints are not evidence of verified Admin authorization or final acceptance.
+
+F043 remains **NOT_STARTED** until separate Slice 1 implementation approval. It
+must reuse this feature's Admin security boundary while treating mandatory real
+verification as incomplete. Its own real integration, authenticated RESULT/digest
+ACK, ownership/isolation/deadline/cleanup checks and the F042 prerequisite
+verification gate remain acceptance requirements. The finalized F043 contract is
+in [F043 Admin Technology Management](F043-admin-technology-management.md).
+
+Preserve F042's historical timeout, incomplete nine-record MongoDB manifest,
+UNKNOWN authenticated counters, incomplete RESULT/ACK, protected-baseline
+discrepancy, unverified forced real timeout, historical HTTP failures and pending
+qualified regression rerun. No verification exception is granted. Existing **193
+browser scenarios remain NOT_RUN**; live Admin integration and production
+readiness remain NOT_VERIFIED. No browser exception transfers. No F044/other
+feature work or automatic Slice 2 implementation is permitted by this decision.
+Every commit and every push requires separate explicit owner approval. No F042
+acceptance, source, test, adapter or security control changes in this task.

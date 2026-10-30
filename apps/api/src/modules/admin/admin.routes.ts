@@ -9,13 +9,19 @@ import {
   type AdminAccessService,
 } from './admin-access.service.js';
 import { createAdminRateLimits, type AdminLimits } from './admin-rate-limit.js';
+import { createAdminTechnologyRouter } from './technologies/admin-technology.routes.js';
+import type { AdminTechnologyService } from './technologies/admin-technology.service.js';
+import type { TechnologyLimits } from './technologies/admin-technology-rate-limit.js';
 
 export function createAdminRouter(
   service: AdminAccessService = createAdminAccessService(),
   limits?: AdminLimits,
+  technologies?: AdminTechnologyService,
+  technologyLimits?: TechnologyLimits,
 ) {
   const router = Router();
   const limit = createAdminRateLimits(limits);
+  const tokens = createAccessTokens(env);
   router.use(
     (_req, res, next) => {
       res.setHeader('Cache-Control', 'no-store');
@@ -23,10 +29,13 @@ export function createAdminRouter(
     },
     routeLabel('/api/v1/admin/*'),
     limit.ip,
-    authenticate(createAccessTokens(env)),
+    authenticate(tokens),
     limit.account,
     requireAdmin(service),
   );
-  // No business endpoint. Future Admin handlers belong below this boundary.
+  router.use(
+    '/technologies',
+    createAdminTechnologyRouter(tokens, technologies, technologyLimits),
+  );
   return router;
 }

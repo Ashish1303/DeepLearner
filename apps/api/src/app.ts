@@ -4,6 +4,9 @@ import { createDashboardRouter } from './modules/progress/dashboard.routes.js';
 import { createAdminRouter } from './modules/admin/admin.routes.js';
 import type { AdminAccessService } from './modules/admin/admin-access.service.js';
 import type { AdminLimits } from './modules/admin/admin-rate-limit.js';
+import { technologyBodyParser } from './modules/admin/technologies/admin-technology.routes.js';
+import type { AdminTechnologyService } from './modules/admin/technologies/admin-technology.service.js';
+import type { TechnologyLimits } from './modules/admin/technologies/admin-technology-rate-limit.js';
 import type { DashboardService } from './modules/progress/dashboard.controller.js';
 import type { DashboardLimits } from './modules/progress/dashboard-rate-limit.js';
 import type { ProgressService } from './modules/progress/progress.service.js';
@@ -81,6 +84,8 @@ export function createApp(
   dashboardLimits?: DashboardLimits,
   adminService?: AdminAccessService,
   adminLimits?: AdminLimits,
+  adminTechnologies?: AdminTechnologyService,
+  adminTechnologyLimits?: TechnologyLimits,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -137,6 +142,7 @@ export function createApp(
       return completionJson(req, res, next);
     next();
   });
+  app.use(technologyBodyParser);
   app.use(express.json({ limit: '256kb' }));
   app.use('/api/v1/health', healthRouter);
   app.use(
@@ -154,7 +160,15 @@ export function createApp(
     ),
   );
   app.use('/api/v1/users', createUserRouter(userService, userLimits));
-  app.use('/api/v1/admin', createAdminRouter(adminService, adminLimits));
+  app.use(
+    '/api/v1/admin',
+    createAdminRouter(
+      adminService,
+      adminLimits,
+      adminTechnologies,
+      adminTechnologyLimits,
+    ),
+  );
   app.use(
     '/api/v1/technologies',
     createTechnologyRouter(technologyService, technologyLimits),

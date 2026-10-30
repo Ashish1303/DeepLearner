@@ -1552,3 +1552,69 @@ owned assessment proof. No stored mastery, assessment-selection change, mutation
 new schema/collection/index, migration, TTL or provisioning is authorized.
 Existing canonical index names/options/collation and F039 readiness stay intact.
 See features/F040-dashboard-api.md for the exact supported subset and bounds.
+# F043 — Draft Technology management and transactional Admin fence
+
+Owner-authorized Slice 1 backend design/implementation, 2026-10-30. F043 remains
+IN_PROGRESS; real transaction/ownership verification is not implied by source or
+offline tests. F042 acceptance and mandatory verification remain blocked/open.
+
+Reuse technologies/users/auditLogs without new collections, model fields or
+automatic provisioning. Technology's existing unique slug index reserves all
+statuses; preserve status/order and audit actor/time/resource/time indexes. The
+application verifies PRIMARY/replica-set qualification before operations and
+required exact nonpartial/nonsparse indexes before writes. No autoCreate/autoIndex
+or migration. A separately approved F043 fixture/index reconciliation must account
+for these indexes rather than assuming F042's fixture footprint covers them.
+
+Each mutation uses one explicit session and snapshot transaction, primary reads,
+majority+journaled commit, no transaction callback replay. Reverify the original
+signed JWT context, then read actor _id/role/status/emailVerifiedAt/__v. Require
+current ADMIN, ACTIVE, a valid verified Date and safe incrementable version.
+Conditionally increment **only that User document's existing \__v** matching all
+observed eligibility/version fields; require one matched and modified row. This
+is a real write fence, not a no-op or cached authorization read. No User role,
+status, profile, credential, token/session or updatedAt change is permitted.
+
+The same transaction inserts a DRAFT Technology (revision 0, null icon, server
+createdBy/updatedBy/time) or performs ID+DRAFT+revision CAS, increments Technology
+__v once and updates only the allowed fields/updatedBy/updatedAt. Slug, creator,
+icon and createdAt remain immutable. PUBLISHED/ARCHIVED edits refuse before revision
+checking. Known slug duplicates, stale revisions and audit failure abort fence
+and business work together. A valid no-op edit is still one audited revision.
+
+Concurrent demotion, suspension, deletion or eligibility writes conflict on the
+same fenced User document. If they commit first, stale mutation must abort; if
+the authorized mutation commits first, later demotion does not undo it. Unrelated
+User-version/profile or same-Admin operations can also cause safe contention
+refusal; never claim such a conflict proves demotion. Do not change User schema
+or silently initialize corrupt versions. Successful fixture expectations may
+include the exact actor __v increment and atomic audit only; protected accounts,
+other fields and protected process/storage baselines are not broadened.
+
+Add audit category CONTENT_MANAGEMENT, resourceType TECHNOLOGY referring to the
+Technology, actions TECHNOLOGY_CREATED / TECHNOLOGY_UPDATED. Metadata is exactly
+revisionBefore (null on create), revisionAfter (0 on create; before+1 on update),
+and sorted unique changedFields. Allowed create fields: name/slug/description/order
+(name/slug required; optional fields reflect supplied input); update permits only
+name/description/order. No values, credentials, private payload or raw errors.
+Actor/resource/requestId/server UTC timestamp are mandatory. The Technology
+repository validates and inserts the event in the same session. The fence's
+authorization purpose is evidenced by that event; do not fabricate profile/auth
+events for the User-version increment. Preserve all existing AUTH, USER_ADMIN,
+CONTENT_APPROVAL tuple constraints and append-only guards.
+
+One shared 10-second monotonic business budget, remaining-time driver options,
+signal cancellation and final deadline checks prevent late authorization/commit
+admission. Commit is one application call bounded by min(2000ms, remaining budget).
+Installed MongoDB 7.6.0 source uses the same CSOT context for same-transaction
+commit retries; no domain callback or new transaction may replay. Lost commit
+acknowledgement is UNKNOWN even when a write may be durable: return sanitized
+503, never compensate or assert rollback. Explicitly reconcile before resubmission.
+Always attempt bounded endSession even after abort failure; client release is
+not proof of server rollback, storage/process cleanup or authenticated acceptance.
+
+F015's public PUBLISHED predicate/DTO/order and descendant publication rules are
+unchanged. Draft-only F043 supplies no publish, archive, delete, asset or descendant
+workflow. Real concurrent transaction/index/audit rollback qualification and
+authenticated RESULT/digest ACK remain required before final acceptance. Forced
+real MongoDB timeout remains NOT_VERIFIED; no live database run is authorized here.
