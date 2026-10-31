@@ -6,6 +6,11 @@
 **Primary application architecture:** Node.js/Express modular monolith with Next.js student app and React admin app  
 **Target initial scale:** ~1,000 users
 
+**2026-10-31 documentation amendment:** The final dated section records approved
+Studio/Interview design intent and the PROPOSED / NOT ACTIVE named persistent
+development provisioning policy. Earlier implementation refinements/evidence are
+preserved. No model change, database connection, DDL, migration or write is authorized.
+
 ## 1. Purpose
 This document defines the MongoDB data model for DeepLearner. It turns the approved PRD and System Architecture into concrete collection boundaries, relationships, indexing rules, security conventions, lifecycle rules, and transaction boundaries. The design intentionally favors a balanced MongoDB model: reference independently growing data; embed bounded editorial data that belongs to a single aggregate.
 
@@ -1618,3 +1623,133 @@ unchanged. Draft-only F043 supplies no publish, archive, delete, asset or descen
 workflow. Real concurrent transaction/index/audit rollback qualification and
 authenticated RESULT/digest ACK remain required before final acceptance. Forced
 real MongoDB timeout remains NOT_VERIFIED; no live database run is authorized here.
+
+## Owner-approved design and pending LOCAL provisioning policy — 2026-10-31
+
+### Authority, history and existing behavior
+
+The owner approved documentation only. Product/LOCAL target design is approved;
+physical schemas, migrations, implementation, connections, provisioning and runtime
+acceptance are not. Existing F021-F043 refinements above are preserved with their
+historical meanings. F042/F043 remain IN_PROGRESS, acceptance BLOCKED; F043 MongoDB
+15 NOT_RUN, browser 213 NOT_RUN, live integration/production NOT_VERIFIED, F044
+NOT_STARTED. No FAIL/UNKNOWN result, incomplete RESULT/digest ACK or ownership/
+protected-baseline discrepancy is relabelled by this amendment.
+
+### Studio and Interview data responsibilities — future contracts
+
+Retain Technology -> LearningPath -> Module -> Topic -> Concept identities and the
+existing Student projections. Private authoring should own briefs, bounded outline
+revisions, prerequisites/objectives, audience/depth/runtime/version, immutable mode
+payloads, claim/source evidence and review decisions. Separate generation jobs,
+dispatch attempts, leases, cost reservations/settlements and publication manifests
+from authored content. These are design responsibilities, not newly created models.
+
+Source evidence includes URL/title, relevant section/claim, applicable version,
+actual retrieval/verification date, content digest, status and reviewer. URL format
+validation alone remains the existing F025 behavior, not factual/source verification.
+Keep the single-source public DTO compatible; richer evidence is private authoring
+data unless a separately approved contract adds public fields.
+
+Learning publishes by immutable module release manifests. A controlled adapter
+materializes compatible reviewed data into existing read collections. Promotion,
+current-Admin fencing, revision CAS, required approval/audit and operation receipt
+must commit atomically. Bound payload/transaction size; refuse oversized publication
+rather than split public visibility. Unknown commits require read reconciliation.
+No arbitrary raw AI payload/status/provenance enters published collections.
+
+Preserve attempts and progress IDs/history. Existing digests bind Concept fields,
+question answers/ancestry and qualification policy. Replacing content can invalidate
+effective qualification; stable IDs alone do not preserve completion authority.
+No reset, backfill, regrading, persistent-origin enrolment or F038 migration is
+authorized. Single-Admin editorial approval does not waive independent rubric/policy
+review, the LOCAL synthetic scope or memory-only origin/lifecycle requirements.
+
+InterviewQuestion is separate from Concept modes: one Technology-owned identity,
+optional bounded Topic/Concept links, working/published revision pointers and
+immutable revisions carrying type, difficulty, experience applicability, statement,
+optional code, prepared answer/explanation, alternate solutions, follow-ups,
+sources, applicable tests/rubric and review/publication provenance. One question may
+link to multiple Concepts without record duplication. Types are THEORY, SCENARIO,
+OUTPUT_PREDICTION, DEBUGGING and CODING as proposed contract names, not deployed
+enums. No Student interview submission/grade collection is required for non-coding
+MVP. Curated sets and F060 personal-state UI are deferred roadmap decisions.
+
+One/selected/all-eligible publication freezes exact question/revision pairs, bounds
+operations, rechecks each item's individual approval and records per-item atomic
+publication/audit receipts. Partial success is explicit; no bulk action approves
+unreviewed questions. Published payloads remain immutable across replacement.
+
+Budget periods use Asia/Kolkata calendar months and share INR 1,000 across both
+Studios. Fixed-point conservative monetary accounting, unique reservation/dispatch/
+settlement identities and transactional admission protect concurrent spending.
+Reserve worst-case bounded token/tool exposure before external dispatch; settle
+actual usage afterward. Retain uncertain liabilities, including across rollover;
+warn at 80%, refuse over-cap/unbounded work and freeze on price uncertainty/overrun.
+Do not assume an external bill and database transaction can commit atomically.
+
+### Named provisioning policy proposal: DEV-PERSISTENT-27019
+
+**Status: PROPOSED / NOT ACTIVE. Documentation approval is not policy activation
+or execution approval.** Existing persistent-index prohibitions in F036 and later
+contracts remain in force. Proposed exact wording for a future owner decision:
+
+> Only after the owner separately activates DEV-PERSISTENT-27019, approves the
+> exact setup source revision, target/credential profile and collection/index/seed
+> inventory, and authorizes the particular provisioning execution, may the named
+> development setup create approved missing collections and indexes in database
+> deeplearner-dev on 127.0.0.1:27019, single-member replica set deeplearner-dev-rs,
+> using its separately approved private persistent storage and scoped credentials.
+> Existing incompatible or ambiguous state must refuse without repair. Ordinary
+> application startup may verify but must never create accounts, indexes or seed
+> content. No reset, dropDatabase, index removal/rebuild, destructive schema
+> reconciliation, blanket upsert, account promotion/password reset, alteration of
+> existing activity or implicit migration is permitted. Every later reconciliation
+> requires its own approved inventory/execution. This authority is exclusive to
+> this named profile; production, 27017, local-demo/test 27018, all other databases,
+> existing data/credentials/receipts and disposable qualification remain protected.
+> No F042/F043 acceptance, qualification origin, feature sequencing, browser
+> exception, Git delivery or production permission follows from this policy.
+
+The design target reuses installed MongoDB 8.2.7 software, not protected data paths.
+Service registration/account/ACLs, replica initialization, connections and port
+availability require separate review/approval. Neither a free port nor a matching
+stored receipt proves runtime ownership. No existing service is to be reconfigured.
+
+### Prospective collection/index inventory — not DDL permission
+
+| Purpose                             | Exact prospective collections                                                                                                                                                      |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identity                            | users, sessions, auditLogs, emailVerificationTokens, passwordResetTokens                                                                                                           |
+| Hierarchy                           | technologies, learningPaths, modules, topics, concepts                                                                                                                             |
+| Content                             | visualizations, practiceQuestions                                                                                                                                                  |
+| Actual Student activity             | practiceAttempts, studentProgress                                                                                                                                                  |
+| Existing readiness prerequisites    | practiceAssessments, practiceRubricVersions, practiceRubricAuthorities, sectionEvidenceChallenges, sectionActivityReceipts, visualizationCheckpointDefinitions, completionRequests |
+| Developer-only bootstrap provenance | devBootstrapReceipts (proposed, separately inventoried)                                                                                                                            |
+
+Freeze exact names, key order, uniqueness, TTL and other options from current model
+declarations and repository readiness checks before execution approval. This table
+alone is not the final index manifest. Never call syncIndexes or silently repair,
+drop or create future indexes discovered by importing additional models. Authentication
+TTL behavior remains intact; no new expiry/purge policy for attempts is invented.
+
+Setup may create approved prerequisite collections empty, but must not insert fake
+attempts, progress, scores, rubric/policy authority, assessments, receipts or mastery.
+Real ungraded submissions and activity use existing Student APIs only. Merely
+creating qualification indexes does not enrol persistent content as trusted origin.
+
+The initial fixture is one published JavaScript Technology, Path and Module,
+representative Read/Example/Revise Concepts and one OUTPUT question. Derive actual
+parent references, use async model validation, require owner-reviewed manifest
+bytes/hash and eligible Admin provenance, and insert missing/exact-match reuse only.
+Track stable fixture-key-to-ID mappings in proposed bootstrap receipts rather than
+injecting fixture fields into product models. Commit content and its bootstrap
+provenance together; preserve partial account-creation outcomes and UNKNOWN commit
+outcomes honestly. Never reinterpret bootstrap receipts as product publication or
+qualification approval. Four modules/eight Topics need a separate fixture revision.
+
+No public bootstrap endpoint or unfinished AI Studio is required. Genuine accounts
+use existing Argon2id validation and ordinary JWT/refresh-cookie login; private
+password input must not enter argv, environment, Git or logs. Existing eligible
+accounts remain unchanged; conflicts stop. See LOCAL_DEVELOPMENT.md for staged
+paths, manual evidence and runtime prerequisites. All execution remains unapproved.

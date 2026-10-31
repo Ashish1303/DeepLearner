@@ -5,6 +5,11 @@
 **Parent document:** DeepLearner PRD v1.0  
 **Database detail:** Deliberately deferred to the next Database Architecture document
 
+**2026-10-31 documentation amendment:** Section 32 records the owner-approved
+Studio/Interview and persistent LOCAL design targets. It qualifies earlier manual
+authoring and synchronous-only product assumptions, not existing implemented
+contracts, evidence or execution permissions. No application/runtime work is authorized.
+
 ---
 
 ## 1. Purpose
@@ -989,3 +994,121 @@ Redis/Queue:    Not initially
 ```
 
 This baseline is stable enough to proceed to **DeepLearner Database Architecture** without revisiting the major system boundaries unless new product requirements materially change them.
+
+## 32. Owner-approved design amendment — 2026-10-31
+
+### 32.1 Authority and preserved boundaries
+
+Documentation-only approval covers the Admin AI Content Studio, separate Interview
+Preparation and persistent LOCAL development design. Retain Next.js Student,
+React/Vite Admin, Express modular monolith, Mongoose/MongoDB, existing authentication
+and versioned REST conventions. The baseline's library list describes intent, not
+proof of installed or qualified functionality. No new dependency is selected here.
+
+F042/F043 remain IN_PROGRESS, acceptance BLOCKED; F043 MongoDB 15 NOT_RUN, browser
+213 NOT_RUN, live integration and production NOT_VERIFIED, and F044 NOT_STARTED.
+Historical contracts, FAIL/UNKNOWN evidence, primary-host Playwright restrictions,
+process/Job ownership, fixture isolation, authenticated RESULT/digest ACK, deadlines
+and cleanup requirements remain binding. No new sequencing exception is created.
+
+### 32.2 Authoring, generation and publication
+
+Private authoring owns briefs, outline/content revisions, prerequisites, learning
+objectives, version targeting, source evidence and review decisions. AI creates
+material; Admin supplies correction instructions and approves/rejects exact revisions.
+Preserve existing F043 Technology controls until an accepted replacement exists.
+
+Generation services call a provider adapter compatible with OpenAI and future
+alternatives; no model is permanently chosen. Validate bounded structured outputs
+before draft admission. The provider receives neither Student personal data nor
+credentials, database access or publishing capability. Treat retrieved material
+and model output as untrusted data, not instructions or approval evidence.
+
+Source retrieval requires a reviewed HTTPS host/path policy, bounded time/bytes and
+connection-time destination checks. Deny loopback/private/link-local/metadata targets
+and DNS-rebinding bypasses; disable redirects or revalidate every destination.
+Do not give the model arbitrary URL fetch, network, credentials or database tools.
+Record actual source/claim/version evidence; successful fetch or model confidence
+does not establish factual correctness or human approval.
+
+Resumable batches motivate a durable job design; a MongoDB-backed queue with one
+supervised executor is the initial proposal, not an implemented worker or automatic
+amendment of ADR-010. Keep external calls outside transactions. A later exact-scope
+implementation approval must define leases/fencing, bounded job authorization,
+current-account checks, expiry/resume, cancellation, dispatch uncertainty and cost
+reconciliation. Never persist bearer/refresh tokens as job credentials. Usage
+accounting may settle incurred charges without granting content/publishing authority.
+Redis, a distributed queue platform and microservices are not required by this design.
+
+Curriculum and Interview share the PRD's INR 1,000 monthly cap: transactional
+reservations, bounded exposure, actual settlement, concurrent admission, 80% warning
+and hard stop. Unknown charges retain reservations; no automatic cap/model-cost
+increase. Rate/FX/tax assumptions require review before any paid call.
+
+Publishing is an explicit Admin service, not a job/provider side effect. It validates
+exact approvals, source/quality evidence and immutable revision manifests, then
+normalizes content into existing Student read models. A module's promotion and
+required audit commit atomically with current-Admin authority fencing and revision
+preconditions. Oversized modules refuse rather than partially promote. Unknown
+commits require explicit read reconciliation, not blind replay or compensation.
+Read-side snapshot/release consistency must also be qualified; multi-request page
+consistency is not created merely by transactional writes. Preserve public DTOs,
+stable IDs and stored Student history; assess revision-bound qualification before
+replacing existing content. No progress migration or general F038 origin is granted.
+
+### 32.3 Separate Interview domain and safe presentation
+
+Technology owns independent InterviewQuestion identities and immutable revisions,
+optionally linked to multiple Topics/Concepts. Student browsing/search/filtering,
+prepared-answer reveal and published learning links are additive features. No
+non-coding submissions, timed mocks or AI grading. Coding alone has planned editor
+and Run/Test behavior, gated by a separately reviewed isolation design. No runner
+or Interview UI is claimed to exist; arbitrary code must never run in Express or
+with internal credentials. Public browser feedback cannot become trusted grades.
+
+Publish one question, selected questions or a frozen all-eligible manifest. Every
+question retains individual review; bound operations, revalidate eligibility and
+report per-item conflicts, failures and unknown outcomes. This is not a sixth mode.
+
+Admin Student Preview must reuse trusted presentation without real Student writes.
+The minimal shared-renderer extraction and any new routes/packages remain future
+approval decisions. Existing Student guards stay intact. Only ANIMATED_FLOW v1
+and four existing Practice types may be presumed supported; additional renderers,
+interactive MCQs and general persistent qualification need separate scoped work.
+
+### 32.4 Permanent LOCAL design target and tooling separation
+
+| Component         | Approved design target; not a running environment                 |
+| ----------------- | ----------------------------------------------------------------- |
+| Student           | http://127.0.0.1:3000                                             |
+| Admin             | http://127.0.0.1:5173                                             |
+| API               | http://127.0.0.1:4000/api/v1                                      |
+| MongoDB software  | Existing 8.2.7 installation                                       |
+| Distinct instance | Loopback 127.0.0.1:27019, deeplearner-dev-rs, deeplearner-dev     |
+| Storage           | Private persistent Windows-user DeepLearner/dev directory         |
+| Credentials       | Separate scoped DB credentials; private stable API signing secret |
+
+Installation/service identity, startup policy, ACLs, replica initialization, database
+connections and writes require separate owner approvals. Port availability remains
+UNKNOWN. Never alter/adopt protected 27017 or legacy local-demo/test 27018, their
+data or ownership receipts. A matching stored receipt is not live process ownership.
+
+Proposed dev:local starts only owned foreground applications/package watchers, with
+hot reload, stable ports, bounded readiness and no runtime expiry. MongoDB remains
+separate. Refuse unidentified occupied ports; never adopt listeners or kill by name.
+Reuse existing retained-handle/native Job primitives for application cleanup, not
+the disposable test runner or its CIM/RESULT/ACK apparatus. Qualify Ctrl+C/watcher
+shutdown; forced containment is not graceful success. Startup performs no account,
+index or seed provisioning and never loads an unreconciled API .env into this profile.
+Provide API secrets only to the API/check helper, never frontends or package watchers.
+
+Proposed dev:setup is an explicit one-time/reconciliation operation. The narrow named
+persistent-index proposal in DATABASE_DESIGN.md is NOT ACTIVE; existing provisioning
+prohibitions still apply. Detailed staged file inventories, secret handling, genuine
+authentication, seed limits and manual QA are in LOCAL_DEVELOPMENT.md. No service
+manager is introduced for the apps. Native MongoDB service management itself remains
+separately reviewed, including startup policy and privileges.
+
+Persistent developer data and disposable automated qualification are separate modes.
+Manual Chrome demonstrations are required supplemental evidence for future UI work,
+not replacements for formal database/security/browser acceptance or release review.

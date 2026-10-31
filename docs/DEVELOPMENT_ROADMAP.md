@@ -6,6 +6,12 @@
 **Owner:** Project Owner  
 **Rule:** Codex must implement only one approved feature at a time.
 
+**2026-10-31 documentation-only direction approval:** Section 18 reconciles the
+AI Content Studio, separate Interview Preparation and persistent LOCAL prerequisite.
+Existing feature IDs, statuses, current pointer and historical evidence are retained.
+No tooling/feature implementation, provisioning, runtime execution or Git delivery
+is authorized by this update. F044 remains NOT_STARTED and not authorized.
+
 ---
 
 # 1. Mandatory Rules for Codex
@@ -2516,3 +2522,132 @@ Next capability
 ```
 
 Do not build the advanced version of a feature before the simple version works end-to-end.
+
+---
+
+# 18. Owner-approved design reconciliation — 2026-10-31
+
+## Authority and unchanged feature ledger
+
+The owner explicitly approved documentation updates in PRD.md, LOCAL_DEVELOPMENT.md,
+SYSTEM_ARCHITECTURE.md, DATABASE_DESIGN.md, API_DESIGN.md, this roadmap and AGENTS.md
+at dev / expected HEAD 45bce961c4da05c8d6302e0e0124dcebacc99a6e. Only those seven
+existing files may change in this pass. No new document, package/script/test/fixture,
+application implementation, database connection/write, service/ACL operation, paid
+AI call, staging/commit/push or history change is approved.
+
+| Record               | Preserved current state                                                  |
+| -------------------- | ------------------------------------------------------------------------ |
+| F042                 | IN_PROGRESS; acceptance BLOCKED                                          |
+| F043                 | IN_PROGRESS; acceptance BLOCKED; offline slice evidence remains distinct |
+| F043 MongoDB         | PARENT + T01-T14: 15 NOT_RUN                                             |
+| Browser scenarios    | 193 inherited + 20 F043 = 213 NOT_RUN                                    |
+| Live integration     | NOT_VERIFIED                                                             |
+| Production readiness | NOT_VERIFIED                                                             |
+| F044                 | NOT_STARTED; implementation not authorized                               |
+
+Preserve original HTTP/MongoDB failures, UNKNOWN authenticated/ownership results,
+incomplete authenticated RESULT/digest ACK and protected-baseline discrepancies.
+Documentation, local demonstrations or developer checkpoints do not close those
+gates. Section 15's current feature pointer is unchanged. The named F043 exception
+does not transfer; no new sequencing exception is created by this reconciliation.
+
+## Product direction mapped to existing IDs — prospective scope only
+
+AI creates curriculum/content; Admin selects the brief, reviews, requests AI
+corrections, approves/rejects exact revisions, previews and publishes. Routine
+manual lesson/question editing is no longer the intended new workflow. Existing
+F043 Technology controls remain until an implemented replacement is accepted.
+
+| Existing ID | Reconciled future intent; existing NOT_STARTED status retained                                                                                                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F044        | Learning Path proposal structures/review; bounded objectives, audience/version and prerequisites.                                                                                                                   |
+| F045        | Module proposals/review and later module-release membership.                                                                                                                                                        |
+| F046        | Topic proposals/review, coverage and duplicate findings.                                                                                                                                                            |
+| F047        | Private Concept/mode revisions, source evidence and controlled authoring services.                                                                                                                                  |
+| F048        | Replace the planned routine manual Concept Editor with Lesson Review Studio and safe Student Preview; sharing/rendering paths need exact approval.                                                                  |
+| F049        | Preserve seven editorial states; bind review to exact revisions/digests, separately from job state. Existing dependency F047 remains.                                                                               |
+| F050        | Review queue for outlines/lessons with approve/reject/targeted AI revision.                                                                                                                                         |
+| F051        | Module-level publication, immutable release manifests, stable IDs/history, atomic audit and unknown-commit reconciliation. Separate interview per-item publication uses these approved invariants when implemented. |
+| F052        | Provider abstraction compatible with OpenAI/future providers, no permanently chosen model. Existing dependency F049 remains.                                                                                        |
+| F053        | Job bounds, resumability/cancellation, source/privacy controls, concurrent reservations/settlements, shared INR 1,000 cap, 80% warning and hard stop. Existing dependency F052 remains.                             |
+| F054        | Proposed bounded curriculum outline generation and Read/Example drafting after exact outline approval. Additional scope requires separate implementation approval.                                                  |
+| F055        | Generate suitable structured visualization proposals/specifications only for reviewed supported renderers.                                                                                                          |
+| F056        | Generate validated Practice drafts compatible with existing four types; MCQs require separate approved work.                                                                                                        |
+| F057        | Generate reviewed revision summaries/flashcards/memory material.                                                                                                                                                    |
+| F058        | Technology-owned InterviewQuestion bank, immutable revisions, optional multi-Concept links and separate list/detail/reveal contracts.                                                                               |
+| F059        | Simple Student interview browse/filter/search/page/reveal/learning links; Coding Run/Test remains gated by isolated-runner qualification.                                                                           |
+| F060        | Personal Know/Need Revision/Important state remains a separate backlog item; deferral from the narrowed Interview MVP needs explicit prioritization approval.                                                       |
+| F061        | AI interview drafts/grouping, individual review/corrections and one/selected/all-eligible reviewed-question publication.                                                                                            |
+
+The table changes design intent, not feature approval or executed dependencies.
+Before any feature starts, finalize its acceptance criteria, exact file/dependency
+inventory, approved contract changes and verification gates. Do not rename/renumber
+IDs, advance the pointer or silently rewrite completed feature contracts.
+
+Additional renderer support, interactive MCQs, persistent/general completion origin
+and the isolated JavaScript runner lack approved sufficient scope. The owner must
+allocate IDs or approve explicit scope extensions before implementation. No number
+is invented here; F029/F034 do not establish general visualization delivery/execution.
+
+Requested capability milestones remain: A contracts; B bounded AI planner; C outline
+review; D five-mode generation; E quality/preview; F module publication/versioning;
+G interview generation; H individual review/multi-publish; I Student bank; J isolated
+JavaScript runner; K JavaScript pilot/full qualification. These labels are not
+feature IDs or literal authority to bypass dependencies. A proposed future order
+may put F049/F052/F053 before paid F054 work and F058/F061 before F059 rollout;
+the owner must approve any changed execution order separately. Existing feature
+sequencing remains controlling until that decision and prerequisite acceptance.
+
+## Persistent LOCAL prerequisite — named tooling plan, not implementation
+
+The approved target is Student 127.0.0.1:3000, Admin 127.0.0.1:5173, API
+127.0.0.1:4000/api/v1, and separate persistent MongoDB 8.2.7 on 127.0.0.1:27019 /
+deeplearner-dev-rs / deeplearner-dev, with private storage and scoped credentials.
+Do not alter protected 27017 or legacy local-demo/test 27018/data/credentials/receipts.
+Availability, service ownership and runtime compatibility remain unverified.
+
+Proposed npm run dev:setup/dev:local are NOT IMPLEMENTED. Daily startup targets
+foreground apps/hot reload, no short timeout, no provisioning, and owned-app-only
+Ctrl+C cleanup; MongoDB remains separately managed/persistent. Reuse existing
+workspace/process helpers rather than the disposable qualification runner.
+
+LOCAL_DEVELOPMENT.md contains exact prospective CREATE/MODIFY paths for A profile/
+startup, B separately approved instance/service, C safe index reconciliation,
+D genuine Student/Admin auth, E minimal JavaScript fixture and F manual/restart
+demonstration. These local A-F stages are distinct from the Studio milestone labels.
+Each needs separate source-scope/implementation approval, applicable execution
+approval, offline/security checks and owner review. They do not approve F044 or
+waive F042/F043 verification. No application bug fix is silently included in tooling.
+
+DEV-PERSISTENT-27019 is PROPOSED / NOT ACTIVE. Its exact wording is in the dated
+DATABASE_DESIGN.md amendment and AGENTS.md cross-reference. Existing persistent-index
+restrictions remain effective until explicit activation plus approved source/profile/
+collection/index/fixture inventory and particular execution. No destructive schema
+repair, reset, index removal, blanket upsert or generalization to another DB is allowed.
+
+Initial fixture: one published JavaScript Technology, Path and Module, representative
+Read/Example/Revise Concepts and one OUTPUT question. Normal Student interaction
+creates actual activity; no attempts/progress/mastery are fabricated. General
+visualization delivery, coding execution and persistent completion/mastery remain
+separate application prerequisites. Expand to four Modules/eight Topics only after
+the first demo succeeds and a new fixture revision is separately approved.
+
+## Future manual UI checkpoint and acceptance separation
+
+Require implementation -> offline tests -> genuine local demonstration -> manual
+Chrome UI testing -> approved fixes -> security/regression review -> owner checkpoint
+review -> separately approved Git commit -> separately approved push. Record actual
+route/role/authentication, interactions, applicable API/database effects, desktop/
+mobile viewport checks, errors/validation, sanitized diagnostics, PASS/FAIL/BLOCKED
+and owner review. Mocks cannot satisfy live integration. A blocked demonstration
+needs an explicit named exception; do not silently mark UI complete or relabel old
+results. These new workflow expectations are prospective, not retroactive evidence.
+
+Manual QA does not replace focused/regression/build/lint/TypeScript/format checks,
+independent security review or mandatory real database/HTTP/automated browser
+acceptance. Disposable tests retain process/Job ownership, fixture isolation,
+protected baselines, authenticated RESULT/digest ACK, deadlines and cleanup.
+Primary-host Playwright remains prohibited pending separately approved qualification;
+browser exceptions do not transfer. Local acceptance is not production release
+approval. F080-F088 consolidation never postpones required per-feature checks.

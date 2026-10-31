@@ -1,3 +1,283 @@
+# Persistent LOCAL development — design approved 2026-10-31
+
+## Current authority and history boundary
+
+The owner approved documentation only: the permanent LOCAL design and prospective
+A-F implementation plan below. No tooling/application implementation, dependency
+installation, MongoDB connection/write, service/ACL change, account creation, seed,
+browser execution, paid AI call or Git staging/commit/push is authorized by it.
+
+The original local-demo document is preserved verbatim after the historical-record
+boundary below. Its earlier F023 pointer, placeholder-Admin statements, execution
+approvals and PASS/NOT_VERIFIED results describe that period/profile, not the current
+feature state or permission to operate the new profile. Existing contracts remain
+binding. The proposed commands in this current guide are NOT IMPLEMENTED.
+
+Preserve F042/F043 IN_PROGRESS with acceptance BLOCKED, F043 MongoDB 15 NOT_RUN,
+browser 213 NOT_RUN, live integration/production NOT_VERIFIED and F044 NOT_STARTED.
+Do not relabel historical HTTP/MongoDB FAIL, UNKNOWN ownership/results, incomplete
+authenticated RESULT/digest ACK or protected-baseline discrepancies.
+
+## Approved permanent design target — execution unapproved
+
+| Component                 | Target                                                                     |
+| ------------------------- | -------------------------------------------------------------------------- |
+| Student                   | http://127.0.0.1:3000/login                                                |
+| Admin                     | http://127.0.0.1:5173                                                      |
+| API                       | http://127.0.0.1:4000/api/v1                                               |
+| MongoDB software          | Reuse installed 8.2.7 binary                                               |
+| Distinct MongoDB instance | 127.0.0.1:27019; loopback only                                             |
+| Replica set               | deeplearner-dev-rs; one member                                             |
+| Database                  | deeplearner-dev                                                            |
+| Private root              | Normal Windows-user LOCALAPPDATA/DeepLearner/dev                           |
+| Persistent data           | Private root/mongodb; distinct from all earlier storage                    |
+| Credentials               | Separate scoped database credentials and stable private API signing secret |
+
+The instance is a design target, not an installed/running/qualified service. Port
+27019 availability is UNKNOWN. Service identity, private paths/ACLs, startup policy,
+replica initialization, authentication and database access need separate approval.
+Prefer a separately managed native MongoDB service; decide automatic/manual startup
+in the instance-provisioning contract. Application startup remains manual. No app
+background-service manager or new npm dependency is proposed.
+
+Protect the existing 27017 service/data and 27018 local-demo/test profiles, data,
+credentials and receipts. Do not convert the protected service to a replica set,
+adopt its listeners, migrate its data or retarget legacy tooling. A different DB
+name does not give a standalone server transactional capability. Verify the approved
+new replica set/PRIMARY/session support before authorized setup or app startup.
+
+## Reconciled assessment evidence — read-only, not runtime verification
+
+Assessment at branch dev / HEAD 45bce961c4da05c8d6302e0e0124dcebacc99a6e found a
+clean tree/index, installed MongoDB 8.2.7, and an INITIALIZED legacy receipt under
+the normal user's DeepLearner/local-dev root. Stored repository/user identity and
+recorded Node 24.15.0/MongoDB hashes matched. A second Node 24 installation was also
+available; resolve one explicit executable, not an ambiguous PATH enumeration.
+
+The legacy approved manifest matched its recorded hash and described 2 Technologies,
+2 Paths, 4 Modules, 4 Topics and 20 Concepts. This was file inspection, not current
+database readback. The latest retained legacy run reported success=false,
+shutdownMode=FAILED, API exit 3221226505, shutdown helper 0, jobEmpty=true and
+portsReleased=true. Preserve this failure independently of earlier successes;
+neither its cause nor current runtime health was established.
+
+The agent environment redirected LOCALAPPDATA; the normal Windows-user receipt
+was present outside that redirected root. Do not initialize a replacement root
+merely because a sandbox cannot see the normal profile. Service/listener queries
+were restricted; no current ownership, availability or topology was inferred.
+Do not repeat broad CIM/process-owner investigations or bypass permissions.
+
+The existing service config at 27017 had no active replica-set entry; its runtime
+topology was not queried. Existing 27018 is a recorded replica profile but overlaps
+disposable fixture port assumptions and has a guarded lifecycle. Reuse installed
+software for the new isolated profile rather than silently adopting either target.
+
+## Proposed commands and daily behavior
+
+The following interfaces are PROPOSED until separately implemented and verified:
+
+```powershell
+Set-Location -LiteralPath 'E:\AI\DeepLearner'
+npm run dev:setup
+npm run dev:local
+```
+
+Proposed dev:setup defaults to showing a file-based setup plan, not connecting or
+writing. Particular write/install flags must be defined and approved with the setup
+implementation; possession of a flag is not owner authorization. Separate instance
+installation from DB/schema/account/fixture execution and confirm exact source and
+manifest hashes before the applicable approval. Do not run these commands today.
+
+Once authorized, dev:local should validate the fixed profile and existing schema,
+build existing shared packages, start package watchers/API/Next/Vite in the
+foreground and wait for bounded readiness. Reuse existing build/watch scripts and
+process helpers. Next/Vite hot reload and Node/tsx API watch behavior must be qualified
+on Windows. Keep services running until developer interruption or an actual failure;
+startup/shutdown deadlines are not an arbitrary 15-minute demo expiry.
+
+Ordinary startup creates no accounts, collections, indexes, seed content or services.
+Do not load the ordinary unreconciled API .env for this controlled profile. Provide
+allowlisted per-child environments: API/check helpers alone receive DB/signing
+credentials; frontends/watchers receive only appropriate public configuration.
+Refuse conflicting frontend .env files rather than mixing targets silently.
+
+Use 127.0.0.1 consistently for browser origins/API, existing exact CORS and explicit
+LOCAL TLS/cookie configuration. Preserve host/peer/role/session checks and do not
+relax production security. The health endpoint proves liveness only; readiness
+also needs the intended target, indexes and owned app startup. HTTP 200 alone does
+not establish process ownership, successful login or feature acceptance.
+
+Use an exclusive local run lock and retained owned application handles. A second
+known active supervisor refuses; otherwise occupied ports are unidentified and
+must refuse without adoption, port substitution or termination. Prefer strict
+binding/readiness from the spawned children over privileged process enumeration.
+If this cannot be established, report the blocker instead of guessing ownership.
+
+The installed concurrently dependency is reusable tooling, but its Windows default
+tree-kill path forcibly terminates PID trees. It is not graceful/ownership evidence.
+Reuse the existing native Job/retained-child primitives for the app cleanup boundary;
+do not import the disposable runner's CIM, fixture lifecycle or RESULT/ACK apparatus.
+Ctrl+C requests supported normal shutdown, then bounds cleanup of owned app children
+only. Qualify watcher descendants and interruption behavior; forced cleanup must
+remain explicitly labelled. Never kill by process name or adopt an unknown PID.
+MongoDB is outside that app Job and continues running, preserving its data. Unknown
+mutation outcomes require read reconciliation, not automatic replay after restart.
+
+## Genuine development accounts and credentials
+
+Propose one verified ACTIVE STUDENT (demo.student@deeplearner.test) and one verified
+ACTIVE ADMIN (demo.admin@deeplearner.test). Reuse existing account metadata/Argon2id
+validation where compatible, secure interactive password confirmation/private stdin
+and insert-only account behavior. No plaintext passwords in argv, environment,
+logs, fixtures or Git; no public Admin registration, Student promotion or auth bypass.
+An eligible existing account is unchanged; role/status/password conflicts require
+review, never silent reset. One successful insert may remain if a later account
+fails; report stage/partial outcomes honestly rather than replay automatically.
+
+Store account passwords in the developer's password manager. Keep stable profile
+signing/DB secrets private, preferably current-user DPAPI, outside Git; never request
+passwords in chat or copy credentials from protected databases. Use ordinary login,
+JWT, refresh rotation, restoration and logout APIs. Preserve existing rate limits.
+
+Use separate regular Chrome profiles for Student and Admin: different ports/tabs
+share the API refresh-cookie host, while frontend locks/channels are origin-scoped.
+Do not solve the collision by changing cookie names, role checks or session strategy.
+A second Admin is a separate fixture only for independently reviewed policy/rubric
+work; ordinary F043 draft testing requires no second Admin.
+
+## Minimal fixture and non-destructive reconciliation
+
+Initial owner-reviewed fixture: one PUBLISHED JavaScript Technology, one JavaScript
+Fundamentals Path, one Variables and Data Types Module, one or more representative
+Concepts with Read/Example/Revise and one OUTPUT question. Use valid current model
+fields, actual parent IDs, bounded original content and relevant clickable sources.
+No generated/fake attempts, activity, scores, assessments, completion or mastery.
+Real practice activity comes from normal authenticated Student interaction.
+
+Bootstrap is a separately authorized local CLI operation, not a public HTTP endpoint
+or dependency on the unfinished AI Studio. Validate exact manifest bytes/hash and
+eligible Admin provenance, preflight all references/conflicts, and atomically insert
+content with its proposed developer bootstrap receipt. Reuse exact matches and
+stable fixture-key-to-ID mappings; refuse ambiguous/different content. Do not inject
+fixture fields into production models, overwrite published records, reset passwords,
+or modify prior attempts/progress. DDL/account stages are not one globally atomic
+transaction: preserve partial state and reconcile UNKNOWN commits before any retry.
+
+Only after a successful first demonstration and separate fixture approval expand
+to four Modules/eight Topics, preserving existing IDs and exact matching content:
+
+| Module                   | Proposed Topics                             |
+| ------------------------ | ------------------------------------------- |
+| Variables and Data Types | Variable declarations; values and coercion  |
+| Functions and Scope      | Functions/scope; closures                   |
+| Arrays and Objects       | Array methods; object properties/references |
+| Asynchronous JavaScript  | Promises; tasks/microtasks/event loop       |
+
+Any later CODING fixture uses the implemented submission/prepared-answer contracts,
+not an assumed Run/Test engine. Additional Technology DRAFT/ARCHIVED seed records
+need separate manifest approval; do not add them implicitly to the minimal fixture.
+
+The existing ten-model initializer and Read-only manifest cannot establish current
+Practice/dashboard readiness or full five-mode content. Freeze the exact prospective
+collection/index inventory from DATABASE_DESIGN.md before setup approval. Empty
+readiness collections do not create grading/qualification authority. No syncIndexes,
+dropDatabase, destructive reconciliation, index removal/rebuild or blanket upsert.
+
+DEV-PERSISTENT-27019 remains PROPOSED / NOT ACTIVE, with exact wording in the dated
+DATABASE_DESIGN.md amendment. Existing F036/later persistent provisioning restrictions
+continue until explicit activation, source/profile/inventory approval and execution
+approval. Ordinary startup may verify only. This does not transfer to another DB.
+
+## Honest current application limits
+
+Read/Example/Revise, current Practice retrieval/submission and saved ungraded activity
+are implementation foundations, not proof of this new runtime. General visualization
+delivery, coding execution and persistent completion/mastery are not enabled by
+seeding. ANIMATED_FLOW v1 exists, but F029's gated fixture is not general Student
+delivery. F038 origins are memory-only, synthetic and restricted to its own target;
+never adopt persistent users/content or persist fake receipts to bypass that boundary.
+Dashboard unavailability/LOCAL_QUALIFICATION_UNAVAILABLE must remain honest.
+
+F043 already implements protected Technology inventory/detail, DRAFT creation and
+revision-controlled editing, with PUBLISHED/ARCHIVED read-only. After separately
+approved setup/runtime, manually create/edit a unique draft through the real Admin
+UI and confirm published Student content is unaffected. This is manual evidence,
+not F043 acceptance. Any discovered app defect needs its own applicable scope approval.
+
+## Prospective staged implementation inventory — no files created now
+
+All paths below are repository-relative and prospective only. The current task may
+modify only AGENTS.md and the six approved existing docs. No package/script/test/
+fixture is created or changed by documentation approval. Each A-F stage requires
+separate exact-scope implementation/execution approval; a stage is not a new feature ID.
+
+| Stage                                 | Exact prospective CREATE/MODIFY paths and gate                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A — profile/startup                   | MODIFY package.json, docs/LOCAL_DEVELOPMENT.md, docs/SYSTEM_ARCHITECTURE.md, docs/DEVELOPMENT_ROADMAP.md. CREATE scripts/Start-DeepLearnerDev.ps1, scripts/dev-local.example.json, apps/api/scripts/dev-local.ts, apps/api/tests/dev-local.test.ts, scripts/tests/DevLocal.Tests.ps1. Profile/read-only preflight and owned foreground startup; no DB/service provisioning. Runtime waits for separately approved B-E prerequisites. |
+| B — distinct MongoDB instance/service | CREATE scripts/Setup-DeepLearnerDev.ps1; MODIFY package.json, scripts/dev-local.example.json, apps/api/scripts/dev-local.ts, scripts/tests/DevLocal.Tests.ps1, docs/LOCAL_DEVELOPMENT.md, docs/SYSTEM_ARCHITECTURE.md. Separate approval for service account/startup policy, private ACLs/config/storage/key material, installation, replica initialization and connections; no protected-service changes.                           |
+| C — collection/index reconciliation   | MODIFY scripts/Setup-DeepLearnerDev.ps1, apps/api/scripts/dev-local.ts, apps/api/tests/dev-local.test.ts, docs/DATABASE_DESIGN.md, docs/API_DESIGN.md, AGENTS.md, docs/LOCAL_DEVELOPMENT.md. CREATE apps/api/tests/dev-local.integration.ts (import-safe; no automatic invocation). Activate the named policy separately and approve the exact index manifest before persistent execution. No destructive operations.                |
+| D — genuine accounts/auth             | MODIFY scripts/Setup-DeepLearnerDev.ps1, apps/api/scripts/dev-local.ts, apps/api/tests/dev-local.test.ts, apps/api/tests/dev-local.integration.ts, docs/LOCAL_DEVELOPMENT.md. Secure account bootstrap/unchanged reuse; real normal API/Chrome authentication needs separate runtime approval. No auth strategy/API/UI change.                                                                                                       |
+| E — minimal JavaScript fixture        | CREATE apps/api/scripts/fixtures/javascript-dev-v1.json. MODIFY apps/api/scripts/dev-local.ts, apps/api/tests/dev-local.test.ts, apps/api/tests/dev-local.integration.ts, docs/LOCAL_DEVELOPMENT.md, docs/DATABASE_DESIGN.md. Exact reviewed bytes/hash and bootstrap provenance; no activity fabrication. Four-module expansion is a later approved fixture revision.                                                               |
+| F — first Chrome/restart demo         | MODIFY docs/LOCAL_DEVELOPMENT.md and docs/DEVELOPMENT_ROADMAP.md for exact evidence only. Separately authorized startup/login/interaction/stop/restart verifies persistence; defects or extra source paths require new approval. No automatic feature-status/Git change.                                                                                                                                                             |
+
+Aggregate prospective new files are the three scripts/template, apps/api/scripts/
+dev-local.ts, its fixture JSON, two API test files and one PowerShell test file.
+Existing workspace scripts, Argon2id/model validation, safe account/content helpers
+and scripts/LocalProcessOwner.cs are reuse candidates, not authorization to alter
+their legacy target contracts. No external dependency, lockfile, ordinary .env,
+Student/Admin source or production configuration change is included. Reconfirm
+actual file dependencies before each slice; additional paths require approval.
+
+Private future runtime artifacts are confined to the separately approved new
+Windows-user DeepLearner/dev root (profile, service config, secrets, data, logs and
+receipts). They are not repository files or currently authorized writes. Never
+delete or move legacy roots/receipts to implement the new profile.
+
+## Manual Chrome demonstration and verification gates
+
+Future UI workflow: implementation -> offline tests -> accessible local demonstration
+-> manual Chrome interaction -> approved fixes -> security/regression review
+-> owner checkpoint review -> separately approved Git commit -> separately approved
+push. Manual QA is an additional future gate; old records are not retroactively changed.
+
+Record feature/HEAD/date, exact route, Chrome profile and genuine authenticated role,
+actual interactions/navigation/validation/error states, relevant API/database effects,
+desktop and mobile viewport dimensions, sanitized console/network observations,
+PASS/FAIL/BLOCKED, remaining risks and owner review. Screenshots are supplemental;
+never include passwords, tokens, private headers, raw HARs or Student answers.
+Emulation is not physical-device compatibility. Mock previews are not live integration.
+
+First demo should prove both role logins, published JavaScript Read/Example/Revise,
+one real saved Practice submission, F043 DRAFT create/edit, unchanged published
+Student content, app-only stop, restart with the same identities/data, and existing
+session-restoration behavior where applicable. No fake completion/mastery score is
+allowed. Blocked demonstration requires an explicit named owner exception before
+claiming UI complete; it never silently converts UNKNOWN/NOT_RUN into PASS.
+
+Applicable focused/regression tests, build, lint, TypeScript, formatting, privacy/
+scope review and independent security review remain required. Destructive/isolation-
+sensitive tests use separately authorized disposable targets, never persistent
+developer data. Preserve formal real DB/HTTP/browser, process/Job ownership,
+fixture isolation, protected baselines, authenticated RESULT/digest ACK, deadlines
+and cleanup gates. Existing test runners do not become day-to-day dependencies.
+Primary-host Playwright remains prohibited until separately qualified/approved;
+manual Chrome does not waive that restriction or transfer a browser exception.
+
+The next smallest useful implementation proposal is the A-E bounded mechanism with
+one Concept/OUTPUT fixture, followed by separately approved F execution. Contract/
+source approvals, policy activation, instance provisioning, schema/accounts/content,
+runtime demo, feature acceptance, commits and pushes are distinct gates. Nothing
+here implements the proposed commands, starts F044 or establishes production readiness.
+
+---
+
+# Historical local-demo record — retained verbatim
+
+The following original document concerns the earlier 27018/deeplearner-local-demo
+profile only. Its commands require their own applicable approvals and are not the
+proposed dev:setup/dev:local interfaces. Historical statuses/results are preserved;
+the current authority, feature ledger and prospective plan are defined above.
+
 # Persistent Windows local development
 
 This owner-approved tooling task is separate from the feature roadmap. F001–F022

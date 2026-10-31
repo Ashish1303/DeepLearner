@@ -10,6 +10,13 @@
 **Primary Language:** English  
 **Primary Audience:** Engineering/IT students and working professionals preparing for technical interviews
 
+**Owner-approved direction amendment — 2026-10-31:** Admin AI Content Studio,
+separate Interview Preparation, and persistent LOCAL development are approved
+design targets. This documentation approval authorizes no application implementation,
+AI calls, database connection/provisioning, service operation, or feature acceptance.
+Section 107 distinguishes target behavior from implemented capabilities. Existing
+feature contracts and historical verification evidence remain binding.
+
 ---
 
 ## 1. Executive Summary
@@ -46,24 +53,30 @@ It is designed around:
 Read → Visualize → Example → Practice → Revise
 ```
 
-Artificial intelligence will assist administrators in generating draft learning material, questions, revision material, and visualization suggestions.
+Artificial intelligence will propose bounded curricula and generate draft learning
+material, examples, practice questions, revision material, source evidence and
+appropriate structured visualizations. Admin is the content reviewer and publisher.
 
 AI-generated content will never be automatically published in Version 1.
 
 The workflow will be:
 
 ```text
-Admin selects topic
+Admin selects Technology, audience, level, version and goals
         ↓
-AI generates draft
+AI proposes curriculum outline
+        ↓
+Admin reviews and approves exact outline revision
+        ↓
+AI generates selected modules in bounded batches
         ↓
 Admin reviews
         ↓
-Admin edits if required
+Admin requests targeted AI corrections if required
         ↓
 Admin approves
         ↓
-Content published
+Approved module published
         ↓
 Student learns
 ```
@@ -133,8 +146,8 @@ DeepLearner Version 1 should allow users to:
 
 For administrators, DeepLearner should allow:
 
-1. Manual content creation.
-2. AI-assisted content generation.
+1. AI curriculum planning and targeted correction instructions.
+2. AI-generated learning and separate interview drafts.
 3. Content review and approval.
 4. Visualization selection.
 5. Learning-path management.
@@ -226,6 +239,9 @@ Version 1 content will focus on:
 - CI/CD
 
 More technologies can later be added through Admin without changing the application architecture.
+
+JavaScript is the first AI Studio and persistent development pilot. This is a
+delivery priority, not a claim that the full catalog or Studio is implemented.
 
 ---
 
@@ -384,9 +400,12 @@ JavaScript Fundamentals
 
 ## 13. Learning Paths
 
-Admins create learning paths manually.
-
-AI may suggest improvements but does not automatically modify published learning paths.
+AI proposes Learning Paths, Modules, Topics and Concepts from a Technology/Subject
+brief containing audience, learning level/depth, goals and applicable runtime/version.
+Admin reviews prerequisites, objectives, duplicate candidates and coverage gaps,
+then approves the exact outline before detailed generation. Targeted instructions
+produce a new reviewable revision. Do not generate an unbounded curriculum in one
+request or automatically modify published paths.
 
 Example:
 
@@ -763,23 +782,17 @@ The thresholds remain configurable.
 
 Interview Preparation is separate from the learning tabs.
 
-Structure:
+Technology owns an InterviewQuestion Bank. Each question has one stable identity
+and may link to multiple relevant Topics/Concepts without duplicating the question.
+These links are optional; an interview question is not a mandatory Concept section.
 
-```text
-Technology
- ↓
-Topic
- ↓
-Difficulty
- ↓
-Question
- ↓
-Answer
- ↓
-Explanation
- ↓
-Follow-Up Questions
-```
+MVP types are conceptual/theory, scenario-based, output prediction, debugging and
+coding. Students select a Technology, browse/search paginated questions, filter by
+Topic, Difficulty, Experience and Type, reveal prepared answers, and follow eligible
+published learning links. Non-coding questions have no written-answer submission.
+Only coding questions provide an editor and Run/Test behavior, dependent on a
+separately reviewed and qualified isolation design. No timed mock interviews,
+AI interview grading, voice/video interviews or scheduling are included.
 
 Difficulty levels:
 
@@ -788,11 +801,19 @@ Difficulty levels:
 - Advanced
 - Interview Ready
 
-Students can classify interview questions as:
+Personal question classifications remain the separate F060 backlog:
 
 - Know
 - Need Revision
 - Important
+
+AI generates grouped question drafts. Admin reviews each question, requests AI
+corrections and approves its exact revision. Publication supports one question,
+selected questions or all eligible reviewed questions for a Technology. Every item
+must individually pass review; bulk publication never approves drafts. Freeze exact
+revision selections, bound batches, recheck eligibility and report partial/unknown
+outcomes. Curated Interview Sets are deferred. F058-F061 and a coding runner are
+not implied to be implemented by this product direction.
 
 ---
 
@@ -827,6 +848,11 @@ Students can:
 Secure browser-based execution is preferred.
 
 Node.js server execution is outside Version 1.
+
+Interview Coding Run/Test requires a separately reviewed isolation contract. Never
+execute arbitrary Student or AI code in Express or with application credentials.
+Browser/public-test feedback is not trusted grading or completion evidence; hidden
+tests and hard resource limits would need separately approved infrastructure.
 
 ---
 
@@ -946,6 +972,16 @@ Source links appear at the bottom of the concept.
 
 Admin approval should fail if required source information is missing.
 
+JavaScript prioritizes MDN, the applicable published TC39/ECMAScript specification,
+and official runtime documentation. Admin manages the trusted-source policy; AI
+cannot add trusted domains. Authoring provenance records source title/URL, relevant
+section or claim, applicable version, actual retrieval/verification timestamps,
+content digest, verification status and reviewer decision. Validate claim support,
+freshness and relevance, not only URL syntax or HTTP reachability. Source/model
+content is untrusted input; respect licensing and avoid copying complete pages.
+Provide clickable references at the end of Student lessons. Rich authoring evidence
+must not silently change the existing single-source public DTO.
+
 ---
 
 ## 38. Report Incorrect Content
@@ -1018,14 +1054,16 @@ No Teacher role.
 
 Main Admin navigation:
 
-- Overview
+- AI Studio Overview
+- Curriculum and contextual outline/lesson review
+- Generation Queue
+- Interview Question Bank and review
+- Publishing Center
+- AI Usage & Budget
+- Trusted Sources & Settings
+- Audit History
+- Operational administration, including existing Technology Management
 - Students
-- Content
-- AI Drafts
-- Approval Queue
-- Learning Paths
-- Interview Questions
-- Visualizations
 - Analytics
 - Content Performance
 - Subscriptions
@@ -1034,6 +1072,10 @@ Main Admin navigation:
 - System Settings
 
 Detailed individual student analytics are excluded from Version 1 Admin Analytics.
+
+These are target destinations, not claims of implemented screens. Preserve F043
+Technology Management until a replacement is fully implemented, reviewed and
+explicitly accepted. Authorized account and operational controls remain available.
 
 ---
 
@@ -1058,49 +1100,33 @@ Admin cannot directly read or reset user passwords.
 
 ## 44. Content Creation
 
-Admins may create content in two ways.
-
-### Manual
-
-```text
-Admin
- ↓
-Create Concept
- ↓
-Write Content
- ↓
-Add Visualization
- ↓
-Add Practice
- ↓
-Add Source
- ↓
-Approve
- ↓
-Publish
-```
-
-### AI Assisted
+The intended workflow is AI creation with human review, not routine manual lesson,
+Topic or interview-answer editing. Admin supplies a brief and targeted correction
+instructions; AI produces new reviewable revisions. Existing F043 draft Technology
+metadata controls and separately authorized operational controls are preserved.
 
 ```text
 Admin
  ↓
-Enter Topic
+Select Technology, audience, level, version and goals
  ↓
-Generate with AI
+Generate and review curriculum outline
+ ↓
+Approve exact outline
+ ↓
+Generate selected content in resumable, budget-controlled batches
  ↓
 Review
  ↓
-Edit
+Request AI correction; review the new revision
  ↓
 Approve
  ↓
-Publish
+Publish approved module or eligible interview questions
 ```
 
-AI is optional.
-
-Admins must always be able to create content without AI.
+If AI or budget is unavailable, pause generation and retain drafts; do not silently
+introduce an unreviewed/manual authoring or publication bypass.
 
 ---
 
@@ -1108,6 +1134,8 @@ Admins must always be able to create content without AI.
 
 Admin can request:
 
+- Curriculum outlines, prerequisites and learning objectives
+- Duplicate detection and curriculum gap analysis
 - Read Explanation
 - Visualization Suggestion
 - Examples
@@ -1118,6 +1146,11 @@ Admin can request:
 - Interview Questions
 
 Admin may choose one or multiple options.
+
+Interview generation is a separate bank workflow. Every core Concept targets Read,
+Visualize, Example, Practice and Revise. Choose a suitable visualization rather
+than requiring irrelevant chart types. Validate generated code and answer keys
+where practical; missing required validation remains a blocker, never a PASS.
 
 ---
 
@@ -1136,6 +1169,11 @@ ARCHIVED
 ```
 
 Only `PUBLISHED` content appears to students.
+
+Keep editorial state separate from job execution state. Approval binds an exact
+authored revision/digest and source/validation evidence. A correction creates a new
+candidate; it cannot edit an immutable published payload or inherit approval for
+changed content.
 
 ---
 
@@ -1157,26 +1195,31 @@ PUBLISHED
 
 An Admin must perform the approval.
 
+AI may neither approve nor publish. One authorized Admin may review and publish
+editorial content for MVP. This does not waive existing independent-review rules
+for grading rubrics/completion policies or qualify persistent content automatically.
+
 ---
 
 ## 48. Content Versioning
 
-Full version-control functionality is outside MVP.
+Learning publication is at MODULE granularity. Keep authored and published payload
+revisions immutable, with a release manifest pinning all included content, evidence
+and approvals. Publish only when all required Concepts and all five modes pass
+review. Question-bank publication is separately revisioned per InterviewQuestion.
 
-Version 1 maintains:
+Preserve stable content identifiers and existing attempts/progress history. New
+content creates new revisions; it never overwrites immutable attempts, fabricates
+grades, backfills activity or resets progress. Existing evidence is revision-bound:
+even source/title/order changes may invalidate effective qualification. Replacement
+of progress-bound content requires explicit compatibility analysis and any separately
+approved migration policy; preserving history does not prove current completion.
 
-- Audit history
-- Updated timestamp
-- Updated-by Admin
-- Last published content snapshot
-
-The system does not require:
-
-- Version comparison
-- Multiple rollback versions
-- Git-style history
-
-These may be introduced later.
+Use bounded atomic publication/audit operations, revision preconditions and explicit
+unknown-commit reconciliation. A module must not become partially visible through
+separate promotion commits. Full Git-style editing, arbitrary rollback and a general
+history-comparison product remain outside MVP. Retention must preserve referenced
+published evidence; no automatic destructive cleanup is authorized.
 
 ---
 
@@ -1246,9 +1289,9 @@ Examples:
 ```text
 Admin A created topic
 Admin A generated AI draft
-Admin A edited draft
+Admin A requested an AI correction revision
 Admin B approved concept
-Admin A published concept
+Admin A published a reviewed module
 Admin A archived concept
 ```
 
@@ -1259,6 +1302,10 @@ Audit information should include:
 - Resource
 - Timestamp
 - Optional metadata
+
+Required review/publication audits bind exact resource revisions/digests, operation
+identity, decision and server timestamp. Mutations and their required audit records
+commit atomically. Do not put credentials, Student answers or raw prompts in logs.
 
 ---
 
@@ -1344,7 +1391,7 @@ Payment processing is outside MVP.
 
 ## 56. Artificial Intelligence Strategy
 
-AI primarily assists Admin in Version 1.
+AI is the curriculum/content producer; Admin is the reviewer and publisher in V1.
 
 AI should not be the system of record.
 
@@ -1370,6 +1417,11 @@ Students do not trigger AI API requests when viewing normal published lessons.
 
 This controls AI cost.
 
+Keep private authoring revisions and jobs separate from published learning read
+models. A controlled publishing adapter normalizes reviewed material into existing
+Student contracts. Durable bounded work must be resumable and cancellable; changing
+the synchronous baseline needs separately approved implementation contracts.
+
 ---
 
 ## 57. AI Provider Abstraction
@@ -1380,6 +1432,7 @@ Conceptual interface:
 
 ```typescript
 interface AIProvider {
+  proposeCurriculum(): Promise<unknown>;
   generateLesson(): Promise<unknown>;
   generatePracticeQuestions(): Promise<unknown>;
   generateFlashcards(): Promise<unknown>;
@@ -1399,6 +1452,10 @@ AI Provider
 ```
 
 This allows future provider replacement without rewriting the learning platform.
+
+OpenAI is the initial integration candidate behind this abstraction; no particular
+model is permanently selected. Provider capability, bounded cost, structured output
+and actual usage contracts must be approved before implementation or paid calls.
 
 ---
 
@@ -1478,6 +1535,9 @@ AI endpoints must include:
 - Model restriction
 - Audit logging
 - Spending monitoring
+- Atomic server-side cost reservations and actual-usage reconciliation
+- Per-job input/output/tool/cost bounds and concurrent spending control
+- Hard shared monthly budget admission and an 80% warning
 
 Students do not have direct access to AI-generation APIs in Version 1.
 
@@ -1506,6 +1566,21 @@ Development should use:
 - Restricted permissions
 - Regular key rotation
 
+Curriculum Studio and Interview Studio share a monthly AI testing budget of
+**INR 1,000 (₹1,000)**, measured by calendar month in Asia/Kolkata. Recommend an
+all-in envelope including conservative FX/tax/fee allowances; confirm the rate and
+billing policy before calls. Before dispatch, atomically require settled cost plus
+outstanding reservations plus the new worst-case charge to fit within the cap.
+Warn at 80% of settled plus reserved exposure. Refuse unaffordable or unbounded
+jobs; never automatically increase the cap or fall back to a costlier model.
+
+Cancellation/timeouts can still incur charges. Retain unknown reservations until
+reconciled; month rollover must not erase liabilities. Disable unsafe automatic
+dispatch retries; price uncertainty or overrun freezes further generation. Provider
+alerts supplement, not replace, application enforcement. No paid AI call is
+authorized by this documentation update; lesson-count/cost claims need a separately
+approved measured pilot. Runner hosting is a separate infrastructure decision.
+
 ---
 
 ## 62. AI Usage Logging
@@ -1521,6 +1596,11 @@ Store:
 - Estimated usage
 - Timestamp
 - Status
+
+Also record reservation/dispatch/settlement identities, versioned price assumptions,
+actual usage and unresolved charge status. Reconciliation is append-only and
+idempotent. Keep Student personal data, credentials, private tokens and secret keys
+out of provider requests and logs; send only the necessary brief and public sources.
 
 Do not store secret keys in logs.
 
@@ -1987,7 +2067,7 @@ Future components may include:
 
 ## 82. Content Quality Requirements
 
-Before publishing a concept, Admin should verify:
+Before publishing a module, Admin must verify every included required Concept:
 
 - Title exists
 - Technology exists
@@ -1996,11 +2076,17 @@ Before publishing a concept, Admin should verify:
 - Required visualization exists
 - Examples exist
 - Required practice exists
+- Revise content exists and all five modes have review evidence
 - Source link exists
 - Difficulty configured
 - Completion requirement configured
 
 AI content must receive human review.
+
+Required source/claim support, freshness, appropriate renderer compatibility and
+applicable answer/code validation must pass. AI confidence is not verification.
+Preserve existing completion/qualification restrictions; editorial acceptance alone
+does not create trusted grading or completion authority.
 
 ---
 
@@ -2374,10 +2460,15 @@ AI generation is complete when:
 - AI API key remains backend-only.
 - Admin can choose content types to generate.
 - Generated content enters `AI_GENERATED` state.
-- Admin can edit content.
+- Admin can request targeted AI corrections and review the resulting new revision.
 - Admin can approve content.
 - Content cannot auto-publish.
 - Required source validation occurs before publishing.
+- Exact outlines are approved before detailed generation.
+- Generation is resumable, bounded, private and subject to the shared hard budget.
+- All required Concept modes pass review before module publication.
+- Interview questions are individually reviewed before one/selected/all-eligible publication.
+- Published revisions and Student attempt/progress history remain protected.
 
 ---
 
@@ -2587,6 +2678,10 @@ Secure HttpOnly refresh cookie
 AI:
 Admin-side generation only
 Human approval mandatory
+AI cannot approve or publish
+Admin requests AI corrections instead of routine manual lesson editing
+Learning publishes by reviewed module; published revisions are immutable
+Shared monthly AI testing cap: INR 1000
 
 Visualization:
 Core product feature
@@ -2600,6 +2695,8 @@ Answers unlock after attempt
 Interview:
 Separate feature
 Show Answer supported
+No non-coding written submissions or AI interview grading
+Coding Run/Test requires separately qualified isolation
 
 Gamification:
 XP
@@ -2668,51 +2765,140 @@ These documents should derive their requirements from this PRD rather than redef
 ## 105. Final Product Flow
 
 ```text
-                    DEEPLEARNER
+Admin: select Technology/Subject, audience, level, version and goals
+  -> AI proposes bounded outline
+  -> Admin reviews / requests AI revisions / approves exact outline
+  -> AI generates selected five-mode and separate interview drafts
+  -> Validation + Admin review + Student preview
+  -> Targeted AI correction creates a new revision when required
+  -> Admin approves exact eligible revisions
+  -> Publish reviewed MODULE / one, selected or all eligible interview questions
 
-                         │
-              ┌──────────┴──────────┐
-              │                     │
-           STUDENT                ADMIN
-              │                     │
-              ▼                     ▼
+Student learning:
+  Published Technology -> Path -> Module -> Topic -> Concept
+  -> Read / Visualize / Example / Practice / Revise
+  -> Actual activity and separately qualified completion/mastery
 
-       Choose Technology       Create Content
-              │                     │
-       Learning Path             Manual / AI
-              │                     │
-           Module                 Review
-              │                     │
-            Topic                  Edit
-              │                     │
-           Concept                Approve
-              │                     │
-     ┌────────┼─────────┐          Publish
-     │        │         │             │
-    Read   Visualize  Example          │
-     │        │         │             │
-     └────────┼─────────┘             │
-              │                       │
-           Practice ◄─────────────────┘
-              │
-           Score
-              │
-        Weak / Improving
-            / Strong
-              │
-           Revise
-              │
-       Complete Topic
-              │
-        Update Progress
-              │
-        XP / Streak / Badge
-              │
-      Recommended Next Topic
+Student Interview Preparation (separate):
+  Technology -> filter/search question bank -> reveal prepared answer
+  -> Optional published learning links
+  -> Coding only: editor + Run/Test after isolated runner qualification
 ```
+
+This is the target product flow, not current runtime evidence. Preserve existing
+Practice attempts and qualification rules; no fabricated progress/grades or general
+completion authority follows from generation, seeding or editorial approval.
 
 ---
 
 ## 106. PRD Status
 
 **Approved product direction:** Ready for technical design and implementation planning.
+
+## 107. Owner-approved Studio and LOCAL design — 2026-10-31
+
+### Authority and implementation boundary
+
+The owner approved documentation of the AI Content Studio, separate Interview
+Preparation and persistent LOCAL development direction. Implementation, dependency
+changes, MongoDB connections/writes, service/permission changes, AI calls, Git
+delivery and acceptance each require their applicable separate approvals. This is
+not an approval of the earlier proposals in their entirety or a new sequencing
+exception. Existing implemented contracts prevail until explicitly amended.
+
+F042 and F043 remain IN_PROGRESS with acceptance BLOCKED. Preserve F043's 15
+MongoDB NOT_RUN records, the combined 213 NOT_RUN browser scenarios, live integration
+NOT_VERIFIED, production readiness NOT_VERIFIED and F044 NOT_STARTED. Historical
+FAIL/UNKNOWN results and incomplete authenticated RESULT/digest ACK remain unchanged.
+
+The hierarchy and Student Read/Example/Revise, Practice and activity foundations
+exist. The current Concept UI has three content tabs, a separate Practice route and
+restricted visualization/completion interfaces. Only ANIMATED_FLOW v1 is implemented
+as a visualization contract. Practice supports OUTPUT, DESCRIPTIVE, SCENARIO and
+CODING; interactive MCQs require a separately approved extension. General persistent
+visualization delivery, general completion/mastery qualification, interview UI,
+interview Run/Test and the AI Studio are not established by these checkpoints.
+
+### Studio user journey and design
+
+Select Technology/Subject -> enter audience, level/depth, goals and runtime/version
+-> generate bounded outline -> review prerequisites/objectives/duplicates/gaps
+-> approve exact outline -> generate selected batches -> validate -> review modes
+and sources -> request AI corrections if needed -> preview Student presentation
+-> approve exact revisions -> publish an eligible module or interview selection.
+
+Use warm off-white/cream surfaces, navy/charcoal typography, restrained teal,
+spacious layout, accessible controls and clear hierarchy. Avoid neon, excessive
+gradients, decorative metrics, stock imagery and invented confidence percentages.
+Screens are target specifications, not implemented navigation:
+
+| Screen                     | Main content and action                                                                        |
+| -------------------------- | ---------------------------------------------------------------------------------------------- |
+| AI Studio Overview         | Resume curricula, review work and real job/budget summaries.                                   |
+| Create Curriculum          | Technology, audience, depth, version, goals, source policy and bounded estimate.               |
+| Outline Review             | Hierarchy, prerequisites, objectives, coverage findings; approve/reject/request AI revision.   |
+| Generation Queue           | Actual stages/counts, reservations, cancellation, resume and uncertain-outcome reconciliation. |
+| Lesson Review Studio       | Five-mode presentation, source/validation evidence and targeted correction instructions.       |
+| Student Preview            | Reuse trusted Student renderers without attempts, progress writes or authentication bypass.    |
+| Interview Bank             | Technology-specific search, filters, pagination, draft grouping and reviewed selections.       |
+| Interview Review           | Prepared answer, related learning, sources and applicable tests; individual review.            |
+| Publishing Center          | Exact module/question manifests, blockers, revision conflicts and per-item outcomes.           |
+| AI Usage & Budget          | Settled/reserved/uncertain/available costs; no automatic cap override.                         |
+| Trusted Sources & Settings | Reviewed source/version policy and bounded generation settings, with audit history.            |
+
+Every screen needs loading, empty, error and applicable conflict/uncertain states;
+desktop/tablet/mobile layouts; semantic landmarks; keyboard/focus behavior; contrast
+and reduced-motion checks; and real authorized API integration before acceptance.
+Read-only screens link to review rather than granting approval from summaries.
+Small screens use sequential panes/drawers; do not hide required review evidence.
+Reuse shared presentation only through an explicitly approved package/refactoring
+plan. Keep existing Student authentication, routes, attempts and mastery calculations.
+An additive Interview dashboard/navigation entry is sufficient for its first UI.
+
+### Interview publication and execution
+
+InterviewQuestion belongs to Technology, with optional bounded Topic/Concept links,
+type, difficulty, experience applicability, statement, optional code, prepared
+answer/explanation, alternate solutions, follow-ups, sources, applicable test cases
+or rubric, revision/digest, validation, review and publishing metadata. Separate
+identity, working revision and published revision; do not store it as a sixth mode.
+
+A one/selected/all-eligible publication action freezes question/revision pairs.
+Bound operations, enforce individual review and revision preconditions, recheck
+current authority/eligibility, atomically record each publication/audit result,
+and report partial failure. Unknown commits need read reconciliation before retry.
+Replacing a published question requires a newly reviewed immutable revision.
+
+Coding Run/Test is a target, not an implemented feature. Decide browser/public-test
+feedback versus a separately isolated server runner in a dedicated security review;
+never execute arbitrary code in Express or expose internal resources. Non-coding
+questions never submit written answers, create Practice attempts or affect mastery.
+
+### Persistent LOCAL development prerequisite
+
+The approved design target reuses MongoDB 8.2.7 software in a distinct loopback-only
+instance on 27019, replica set deeplearner-dev-rs, database deeplearner-dev, private
+persistent storage and separately scoped credentials. Preserve protected 27017,
+legacy local-demo 27018, their data, credentials and receipts. Availability and
+runtime safety of 27019 remain unverified. No connection/provisioning is authorized.
+
+The proposed interfaces npm run dev:setup and npm run dev:local do not yet exist.
+Normal startup targets foreground Student 127.0.0.1:3000, Admin 127.0.0.1:5173 and
+API 127.0.0.1:4000/api/v1, hot reload, no short demo expiry, no automatic provisioning
+and cleanup of owned application children only. MongoDB is managed separately and
+retains data. See LOCAL_DEVELOPMENT.md for exact staged prospective file inventories,
+approval boundaries and manual QA. The named persistent-index proposal remains
+PROPOSED / NOT ACTIVE; all existing restrictions apply until separately activated.
+
+The first fixture is deliberately smaller than the full five-mode Studio target:
+one published JavaScript Technology, Path and Module, representative Concepts with
+Read/Example/Revise and one OUTPUT question; no invented attempts, progress or
+mastery. A reviewed four-module/eight-topic expansion needs separate fixture approval.
+The development fixture must not depend on an unfinished or unapproved AI Studio.
+
+For UI work require implementation -> offline checks -> genuine local demonstration
+-> manual Chrome interaction -> approved fixes -> security/regression review
+-> owner checkpoint review -> separately approved commit and push. A blocked demo
+requires an explicit named exception; mock previews are not live integration.
+Manual evidence supplements, never replaces, automated security/database/browser
+acceptance. Do not retroactively relabel earlier results or unlock F044.

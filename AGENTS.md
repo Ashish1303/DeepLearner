@@ -363,6 +363,59 @@ in docs/features/F043-admin-technology-management.md and the F042/roadmap record
 
 ---
 
+## Documentation-approved persistent LOCAL workflow — 2026-10-31
+
+The owner approved documentation of the Admin AI Content Studio, separate Interview
+Preparation and permanent LOCAL development design, plus a prospective tooling plan.
+This is documentation authority only. It authorizes no application/tooling code,
+MongoDB installation/configuration/connection/write, service/ACL operation, paid AI
+call, Git staging/commit/push, feature acceptance or F044 progression.
+
+The approved design target is Student 127.0.0.1:3000, Admin 127.0.0.1:5173, API
+127.0.0.1:4000/api/v1, and a distinct MongoDB 8.2.7 instance on 127.0.0.1:27019,
+replica set deeplearner-dev-rs, database deeplearner-dev, private persistent storage
+and scoped credentials. Availability/safety is not verified. Protect existing
+27017, local-demo/test 27018, all other databases/data/credentials/receipts and
+production. Do not reinterpret stored ownership receipts as current runtime proof.
+
+**DEV-PERSISTENT-27019 is a PROPOSED / NOT ACTIVE provisioning policy.** Its exact
+wording and prospective inventory are in docs/DATABASE_DESIGN.md, under the dated
+2026-10-31 amendment. Existing F036/later persistent-index restrictions remain in
+force. Separate explicit policy activation, approved setup source/profile/index/
+fixture inventory and particular execution approval are required before any writes.
+Service installation/initialization and permission changes need their own approval.
+Never generalize this proposal to another database or qualification feature.
+
+Once separately implemented and authorized, proposed npm run dev:local is foreground
+application startup only: hot reload, stable ports, no short demo expiry, no account/
+index/seed provisioning, no unidentified listener adoption/termination, and cleanup
+of only owned application children. MongoDB is managed separately and retains data.
+Proposed npm run dev:setup handles only explicitly approved initial/reconciliation
+work. Neither command currently exists. Reuse repository helpers/workspace scripts;
+do not make the disposable integration runner the ordinary development launcher.
+
+For future UI changes, require implementation -> offline tests -> genuine local
+demonstration -> manual Chrome UI testing -> approved fixes -> security/regression
+review -> owner checkpoint review -> separately approved Git commit and push.
+Record exact accessible route, actual authentication/role, interactions, applicable
+API/database behavior, desktop/mobile viewport checks, validation/error states,
+sanitized console/network evidence and PASS/FAIL/BLOCKED with owner review. Mocks
+do not prove live integration. If demonstration is blocked, report the exact blocker
+and obtain an explicit named exception before claiming UI completion. This is an
+additional future workflow gate, not a retroactive alteration of earlier records.
+
+Manual QA supplements rather than replaces automated authentication/security,
+database/HTTP/browser acceptance. Preserve disposable ownership/isolation, protected
+baselines, authenticated RESULT/digest ACK, deadlines and cleanup requirements.
+Primary-host Playwright remains prohibited until separately qualified/approved;
+no existing browser exception transfers. F042/F043 remain IN_PROGRESS, acceptance
+BLOCKED; F043 MongoDB 15 NOT_RUN, browser 213 NOT_RUN, live integration/production
+NOT_VERIFIED, F044 NOT_STARTED. Historical FAIL/UNKNOWN results remain unchanged.
+
+The prospective A-F inventories in docs/LOCAL_DEVELOPMENT.md require separate
+exact-scope implementation approvals, runtime approvals and review. This amendment
+does not approve any implementation slice or create a new sequencing exception.
+
 # Feature Completion
 
 When implementation is complete:

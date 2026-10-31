@@ -1,5 +1,10 @@
 # DeepLearner API Design v1.0
 
+**2026-10-31 documentation amendment:** The final dated section describes future
+Studio/Interview boundaries and proposed LOCAL tooling. Existing route contracts
+and historical evidence are unchanged. No endpoint, authentication relaxation,
+database connection/provisioning or runtime execution is authorized here.
+
 **Status:** Implementation-ready baseline  
 **Scope:** Authentication + Users domain  
 **API style:** REST  
@@ -2455,3 +2460,104 @@ See [F043 contract](features/F043-admin-technology-management.md) for exact inve
 audit/fence semantics and mandatory independent/offline/real-integration gates.
 Browser/live/production qualification remains NOT_VERIFIED; 193 existing browser
 scenarios remain NOT_RUN. No F042 acceptance or inherited browser exception.
+
+## Owner-approved Studio and persistent LOCAL design — 2026-10-31
+
+### Authority and current API boundary
+
+This is documentation-only design approval. Existing endpoints, DTOs, middleware,
+JWT/cookie behavior, role/status checks, request limits, deadlines and current-Admin
+transactional fencing remain unchanged. F042/F043 are IN_PROGRESS, acceptance
+BLOCKED; F043 MongoDB 15 NOT_RUN, browser 213 NOT_RUN, live integration/production
+NOT_VERIFIED, F044 NOT_STARTED. Earlier counts/FAIL/UNKNOWN records remain historical,
+not contradictory results to overwrite. No new sequencing exception or execution
+permission is created. Future handlers must mount beneath the existing protected
+Admin namespace and preserve standard envelopes, request IDs and safe errors.
+
+### Future Studio operations — not implemented route contracts
+
+The API design must later inventory authenticated curriculum briefs, outline and
+mode generation, private revisions, correction requests, review decisions, source
+policies/evidence, job status/cancellation/resume/reconciliation, protected preview,
+usage/budget, module preflight/publication and interview-bank review/publication.
+Concrete routes/payloads and any new enum/audit tuple require separate approval.
+
+Reject caller-supplied actor/approval/publishing authority. Review decisions bind
+exact revisions/digests and current evidence. Enforce mutation-time authority and
+concurrency; a dispatch eligibility read is not permanent authority. Job delegation,
+lease expiry and resume must be separately contracted; never persist bearer tokens
+for background impersonation. AI output can enter validated drafts only.
+
+Module preflight freezes a bounded candidate manifest but is not publish permission:
+commit must recheck all approvals, five-mode completeness, source/renderer/code
+validation, current authority and revision preconditions. Promote an entire eligible
+module with required audit/receipt atomically; no partially visible multi-commit
+promotion. Unknown commit/proof refuses success and requires explicit reconciliation.
+Preserve Student read shapes and ancestry filters; qualify read-side release
+consistency and existing revision-bound attempt/progress compatibility separately.
+
+Interview publication supports one/selected/all-eligible question manifests, with
+individual review and bounded per-item commits/audits. A frozen all-eligible request
+must not pick up later drafts or revised content. Return itemized partial failure,
+conflict and unknown outcomes; do not silently approve, replay or compensate.
+
+Cost admission is server-side and concurrent: settled plus reserved plus new bounded
+worst-case exposure must fit the shared INR 1,000 monthly cap. Warn at 80%, retain
+unknown liabilities and reconcile actual usage idempotently. No paid AI calls,
+automatic increases or browser API keys are authorized by this documentation.
+
+### Separate Student Interview API — future implementation
+
+Technology-scoped list/search/filter/page and question/detail/prepared-answer
+operations are additive, with publication/Technology checks applied before counts
+and projections. Related Topic/Concept links expose only eligible published targets.
+One question can reference several Concepts. Keep answer/private evaluation material
+out of list projections; reveal the prepared answer for the expected published
+revision without requiring a non-coding attempt. Preserve current Student account
+eligibility and safe cache/error conventions; do not reuse Practice unlock semantics.
+
+Only CODING questions target editor and Run/Test behavior. A separately reviewed
+runner contract must establish isolation, runtime/resource limits, message/result
+validation and privacy. Neither Express code execution nor AI interview grading is
+allowed. Interview UI/runner are not implemented by this design; interview browsing
+and running must not create Practice attempts, completion or mastery evidence.
+
+### Persistent LOCAL interfaces and genuine authentication
+
+The approved design target is Student http://127.0.0.1:3000, Admin
+http://127.0.0.1:5173 and API http://127.0.0.1:4000/api/v1, with distinct private
+MongoDB 8.2.7 on 127.0.0.1:27019 / deeplearner-dev-rs / deeplearner-dev. Runtime
+availability and safety are unverified. Protect existing 27017, 27018 profiles,
+their data/credentials/receipts and all production targets. No connection is approved.
+
+npm run dev:setup and npm run dev:local are PROPOSED, not existing commands. Setup
+uses a local CLI bootstrap, not a public registration/seed/admin-promotion endpoint.
+The named DEV-PERSISTENT-27019 provisioning proposal in DATABASE_DESIGN.md remains
+PROPOSED / NOT ACTIVE. All current persistent-write/index restrictions still apply.
+Activation, exact source/index/fixture approval and execution are separate gates.
+
+After separate implementation/runtime approval, login must use existing normal
+password/JWT/refresh-cookie APIs, with verified ACTIVE Student/Admin fixtures,
+Argon2id hashes and no public Admin enrollment. Preserve rotation, logout and
+restoration. Use separate Chrome profiles because both frontends share the API
+cookie host and cross-origin browser coordination does not isolate that cookie.
+Use consistent 127.0.0.1 origins with existing explicit LOCAL loopback/TLS/cookie
+policy; do not mix localhost, relax CORS/proxy rules or bypass account checks.
+
+Controlled startup must not load an unreconciled ordinary API .env. Supply backend
+secrets only to API/check children; frontends/package watchers receive no signing
+or DB credentials. The current health endpoint is liveness, not proof of target,
+indexes, login, publication, process ownership or live feature acceptance.
+
+Persistent ordinary submissions may demonstrate actual saved ungraded activity
+after approved schema setup. General visualization delivery, coding execution and
+synthetic-origin completion/mastery do not become available by seeding/index creation.
+Do not broaden qualification guards, fabricate activity or return invented PASS.
+
+Future manual Chrome QA records exact routes, genuine role authentication,
+interaction, relevant actual API/database effects, desktop/mobile viewport checks,
+validation/errors, sanitized diagnostics and PASS/FAIL/BLOCKED with owner review.
+Mocks cannot prove live integration. Formal automated/security/database/browser,
+ownership/isolation, RESULT/digest ACK, deadlines, cleanup and release gates remain
+mandatory. A blocked demonstration needs an explicit named owner exception; it
+does not authorize UI completion. See LOCAL_DEVELOPMENT.md for prospective stages.
