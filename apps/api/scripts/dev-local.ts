@@ -1,0 +1,225 @@
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { z } from 'zod';
+
+export const localTarget = Object.freeze({
+  host: '127.0.0.1',
+  port: 27019,
+  name: 'deeplearner-dev',
+  replicaSet: 'deeplearner-dev-rs',
+});
+
+export class DevLocalError extends Error {
+  constructor() {
+    super('DEV_CONFIGURATION_REJECTED');
+  }
+}
+
+const profileSchema = z.strictObject({
+  revision: z.literal(1),
+  repository: z.string().min(1).max(1024),
+  ownerSid: z.string().regex(/^S-1-5-21-(?:\d+-){2}\d+-\d+$/),
+  database: z.strictObject({
+    host: z.literal(localTarget.host),
+    port: z.literal(localTarget.port),
+    name: z.literal(localTarget.name),
+    replicaSet: z.literal(localTarget.replicaSet),
+  }),
+  prerequisites: z.strictObject({
+    instance: z.literal('APPROVED_READY'),
+    schema: z.literal('APPROVED_READY'),
+  }),
+});
+
+export function validateProfile(
+  input: unknown,
+  repository: string,
+  ownerSid: string,
+) {
+  const parsed = profileSchema.safeParse(input);
+  if (
+    !parsed.success ||
+    path.win32.resolve(parsed.data.repository).toLowerCase() !==
+      path.win32.resolve(repository).toLowerCase() ||
+    parsed.data.ownerSid !== ownerSid
+  )
+    throw new DevLocalError();
+  return parsed.data;
+}
+
+export function validateSecrets(input: unknown) {
+  const parsed = z
+    .strictObject({
+      mongodbUri: z.string().min(1).max(4096),
+      signingSecret: z.string().min(1).max(256),
+    })
+    .safeParse(input);
+  if (!parsed.success) throw new DevLocalError();
+  const { mongodbUri, signingSecret } = parsed.data;
+  try {
+    const uri = new URL(mongodbUri);
+    const required = new Map([
+      ['replicaSet', localTarget.replicaSet],
+      ['directConnection', 'true'],
+      ['authSource', localTarget.name],
+    ]);
+    const entries = [...uri.searchParams];
+    if (
+      !/^mongodb:\/\/[^\s/?#@]+:[^\s/?#@]+@127\.0\.0\.1:27019\//.test(
+        mongodbUri,
+      ) ||
+      uri.protocol !== 'mongodb:' ||
+      uri.host !== '127.0.0.1:27019' ||
+      uri.pathname !== '/deeplearner-dev' ||
+      uri.hash ||
+      !uri.username ||
+      !uri.password ||
+      entries.length !== required.size ||
+      new Set(entries.map(([key]) => key)).size !== required.size ||
+      entries.some(([key, value]) => required.get(key) !== value)
+    )
+      throw new DevLocalError();
+    const bytes = Buffer.from(signingSecret, 'base64');
+    if (
+      bytes.length < 32 ||
+      bytes.toString('base64') !== signingSecret ||
+      new Set(bytes).size < 16
+    )
+      throw new DevLocalError();
+  } catch {
+    throw new DevLocalError();
+  }
+  return parsed.data;
+}
+
+const expectedScripts = {
+  root: {
+    'build:packages':
+      'npm run build --workspace=@deeplearner/shared-types && npm run build --workspace=@deeplearner/validation',
+  },
+  web: { dev: 'next dev --port 3000' },
+  admin: { dev: 'vite --port 5173 --strictPort' },
+  api: { 'dev:local': 'node --watch --import tsx src/server.ts' },
+  types: {
+    build: 'tsc -p tsconfig.json',
+    dev: 'tsc -p tsconfig.json --watch --preserveWatchOutput',
+  },
+  validation: {
+    build: 'tsc -p tsconfig.json',
+    dev: 'tsc -p tsconfig.json --watch --preserveWatchOutput',
+  },
+} as const;
+
+export function workspacePlan(input: unknown) {
+  const manifests = z.record(z.string(), z.unknown()).safeParse(input);
+  if (!manifests.success) throw new DevLocalError();
+  for (const [name, scripts] of Object.entries(expectedScripts)) {
+    const manifest = z
+      .object({ scripts: z.record(z.string(), z.string()) })
+      .safeParse(manifests.data[name]);
+    if (!manifest.success) throw new DevLocalError();
+    for (const [key, command] of Object.entries(scripts))
+      if (manifest.data.scripts[key] !== command) throw new DevLocalError();
+  }
+  return {
+    build: { label: 'build', args: ['run', 'build:packages'] },
+    watchers: [
+      {
+        label: 'types',
+        args: ['run', 'dev', '--workspace=@deeplearner/shared-types'],
+      },
+      {
+        label: 'validation',
+        args: ['run', 'dev', '--workspace=@deeplearner/validation'],
+      },
+    ],
+    services: [
+      {
+        label: 'api',
+        port: 4000,
+        args: ['run', 'dev:local', '--workspace=@deeplearner/api'],
+      },
+      {
+        label: 'web',
+        port: 3000,
+        args: [
+          'run',
+          'dev',
+          '--workspace=@deeplearner/web',
+          '--',
+          '--hostname',
+          '127.0.0.1',
+        ],
+      },
+      {
+        label: 'admin',
+        port: 5173,
+        args: [
+          'run',
+          'dev',
+          '--workspace=@deeplearner/admin',
+          '--',
+          '--host',
+          '127.0.0.1',
+        ],
+      },
+    ],
+  };
+}
+
+export function validateRequest(input: unknown) {
+  const parsed = z
+    .strictObject({
+      profile: z.unknown(),
+      repository: z.string().min(1).max(1024),
+      ownerSid: z.string(),
+      secrets: z.unknown(),
+      manifests: z.unknown(),
+    })
+    .safeParse(input);
+  if (!parsed.success) throw new DevLocalError();
+  validateProfile(
+    parsed.data.profile,
+    parsed.data.repository,
+    parsed.data.ownerSid,
+  );
+  validateSecrets(parsed.data.secrets);
+  // Return only the fixed public command plan, never credentials/profile values.
+  return workspacePlan(parsed.data.manifests);
+}
+
+export async function readRequest(input: AsyncIterable<Buffer | string>) {
+  const chunks: Buffer[] = [];
+  let bytes = 0;
+  for await (const chunk of input) {
+    bytes += Buffer.byteLength(chunk);
+    if (bytes > 16384) throw new DevLocalError();
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  try {
+    const text = new TextDecoder('utf-8', { fatal: true }).decode(
+      Buffer.concat(chunks),
+    );
+    return JSON.parse(text) as unknown;
+  } catch {
+    throw new DevLocalError();
+  }
+}
+
+if (
+  process.argv[1] &&
+  pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url
+) {
+  try {
+    if (
+      process.argv.length !== 2 ||
+      Number(process.versions.node.split('.')[0]) !== 24
+    )
+      throw new DevLocalError();
+    const plan = validateRequest(await readRequest(process.stdin));
+    process.stdout.write(JSON.stringify(plan) + '\n');
+  } catch {
+    process.stderr.write('DEV_CONFIGURATION_REJECTED\n');
+    process.exitCode = 1;
+  }
+}

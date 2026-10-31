@@ -1,0 +1,15 @@
+{
+  "revision": 1,
+  "repository": "E:\\AI\\DeepLearner",
+  "ownerSid": "REPLACE_WITH_CURRENT_WINDOWS_SID",
+  "database": {
+    "host": "127.0.0.1",
+    "port": 27019,
+    "name": "deeplearner-dev",
+    "replicaSet": "deeplearner-dev-rs"
+  },
+  "prerequisites": {
+    "instance": "PENDING",
+    "schema": "PENDING"
+  }
+}

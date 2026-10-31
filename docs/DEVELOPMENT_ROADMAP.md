@@ -2651,3 +2651,38 @@ protected baselines, authenticated RESULT/digest ACK, deadlines and cleanup.
 Primary-host Playwright remains prohibited pending separately approved qualification;
 browser exceptions do not transfer. Local acceptance is not production release
 approval. F080-F088 consolidation never postpones required per-feature checks.
+
+# 19. Local Development Slice A checkpoint — 2026-10-31
+
+Secondary tooling evidence only; no feature ID, pointer or historical result changes.
+The owner approved implementation of root `npm run dev` at dev /
+41d78aae50715f6ad3b1deac1587cc215918aa9f using the documented Slice A paths, then
+explicitly added `apps/api/package.json` for a dotenv-free API dev:local script.
+The earlier proposed root dev:local/dev:setup commands remain unimplemented.
+
+Source scope is ten paths: root/API package.json; LOCAL_DEVELOPMENT.md,
+SYSTEM_ARCHITECTURE.md and this roadmap; new Start-DeepLearnerDev.ps1,
+dev-local.example.json, API scripts/dev-local.ts, API tests/dev-local.test.ts and
+scripts/tests/DevLocal.Tests.ps1. No dependencies, application/authentication logic,
+environment files or persistent configuration change. The twelve original untracked
+Stitch exports remain preserved and excluded from source delivery.
+
+Implementation adds fail-closed private profile/script/credential validation,
+sanitized child environments, existing workspace builds/watchers, loopback bindings,
+exclusive lock, occupied-port refusal, native Job ownership checks and bounded
+reload recovery. Ctrl+C cleanup is explicitly forced owned-Job containment, not
+qualified graceful shutdown. It never starts/stops MongoDB or provisions anything.
+
+Operational qualification is BLOCKED: the private profile and separate instance/
+schema setup are pending. Observed npm run dev exits 1 at DEV_PROFILE_MISSING before
+apps, database connections or run artifacts. This negative check does not prove
+positive startup, hot reload, real listener ownership, Ctrl+C, authentication or UI
+integration. Genuine accounts/JavaScript content remain later separate prerequisites.
+Offline evidence/review is recorded in LOCAL_DEVELOPMENT.md; no local commit or push
+is authorized by implementation approval. Do not start Slice B automatically.
+
+Keep F042/F043 IN_PROGRESS with acceptance BLOCKED, F043 MongoDB 15 NOT_RUN, browser
+213 NOT_RUN, live integration/production NOT_VERIFIED and F044 NOT_STARTED.
+DEV-PERSISTENT-27019 remains PROPOSED / NOT ACTIVE. Existing FAIL/UNKNOWN evidence,
+ownership/isolation/cleanup, browser restrictions and mandatory acceptance gates
+remain unchanged. This tooling checkpoint establishes no production readiness.

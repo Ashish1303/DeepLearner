@@ -1112,3 +1112,40 @@ separately reviewed, including startup policy and privileges.
 Persistent developer data and disposable automated qualification are separate modes.
 Manual Chrome demonstrations are required supplemental evidence for future UI work,
 not replacements for formal database/security/browser acceptance or release review.
+
+## 33. Local Development Slice A startup checkpoint — 2026-10-31
+
+Owner-approved startup-tooling implementation at HEAD 41d78aae50715f6ad3b1deac1587cc215918aa9f
+uses root `npm run dev`, replacing the root concurrently orchestration with the
+guarded `scripts/Start-DeepLearnerDev.ps1`. This is the approved current command;
+the earlier proposed root dev:local/dev:setup interfaces remain unimplemented.
+The owner explicitly extended Slice A to `apps/api/package.json`: new API-only
+dev:local preserves watch/tsx/server startup without automatic `.env` loading.
+Existing API dev and all application/authentication contracts remain unchanged.
+
+The launcher reuses current package builds/watchers and Next/Vite workspace scripts,
+with fixed loopback ports 3000/5173/4000 and independent child environments. Its
+import-safe TypeScript helper validates the private fixed-target profile, scripts
+and private credentials through a bounded stdin pipe; it imports no product/database
+code and returns only a public process plan. Current-user DPAPI/private profile
+creation, MongoDB instance/schema provisioning, accounts and sample content remain
+future separately approved stages. Metadata does not prove current database ownership,
+topology or indexes. The named provisioning policy remains PROPOSED / NOT ACTIVE.
+
+Reuse the existing native Windows Job/retained handles unchanged. Retain an exclusive
+startup lock through cleanup, refuse unknown occupied ports, require post-spawn
+loopback/Job membership and fail if ownership inspection is unavailable. No listener
+adoption or external-service termination is permitted. Initial startup is bounded;
+normal owned-listener gaps during hot reload get a bounded 60-second recovery window.
+Steady-state lifetime has no demo expiry. Listener presence alone is not readiness
+or acceptance. Ambient frontend dotenv/npm configuration and preload options refuse
+or are isolated; backend secrets reach only the validator/API child.
+
+Slice A intentionally reports Windows stop as FORCED_CONTAINMENT of only its Job.
+The existing workspace CLI watchers expose no qualified graceful stop channel here;
+do not label this graceful or reinterpret the earlier graceful target as achieved.
+Interactive Ctrl+C, full watcher recovery and real API/UI startup qualification are
+outstanding. Observed root startup fails closed at DEV_PROFILE_MISSING, before any
+app or database execution. See LOCAL_DEVELOPMENT.md for source scope/evidence.
+No service, .env, persistent configuration, database or application source changes
+are included; all existing feature statuses and acceptance restrictions remain.

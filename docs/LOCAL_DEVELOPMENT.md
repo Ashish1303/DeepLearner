@@ -1,3 +1,209 @@
+# Local Development Slice A — implementation checkpoint, 2026-10-31
+
+## Current startup command and scope
+
+The owner approved Slice A startup tooling at `dev` /
+`41d78aae50715f6ad3b1deac1587cc215918aa9f`, plus a specific extension to modify
+`apps/api/package.json` for an environment-file-free workspace script. This dated
+record supersedes the earlier design record's statements about the root startup
+command only. Historical documents/results below remain unchanged.
+
+```powershell
+npm run dev
+npm run dev:local
+```
+
+Both supported root commands invoke `scripts/Start-DeepLearnerDev.ps1` in PowerShell 7.
+The owner clarified the command-alignment approval to add `dev:local` as an alias.
+Its script is `npm run dev --`: it delegates to the unchanged `dev` command and
+forwards arguments without a second launcher implementation. Existing launcher
+behavior, configuration validation, ownership and cleanup are unchanged.
+It implements guarded startup, not environment setup. Student targets
+`127.0.0.1:3000`, Admin `127.0.0.1:5173`, API `127.0.0.1:4000`. The launcher uses
+existing shared-package build/watch scripts and frontend development scripts;
+Next receives `--hostname 127.0.0.1`, Vite receives `--host 127.0.0.1` with its
+existing strict port. The new API workspace `dev:local` retains Node watch/tsx/server
+startup and omits the `.env` loader; the existing API `dev` script is unchanged.
+The root `dev:local` alias is distinct from the API workspace's `dev:local` script.
+Root `dev:setup` remains unimplemented. Earlier dated documents stating that the
+root alias did not exist describe the preceding checkpoint; they are not an alias
+prohibition or permission to activate the persistent environment.
+
+**Operational qualification: BLOCKED.** The private persistent profile and approved
+MongoDB setup are pending. Both root commands were checked and retain exit 1 with
+`DEV_PROFILE_MISSING`, before building packages, creating run artifacts, opening a
+database connection, inspecting ports or starting applications. This is a successful
+fail-closed negative check, not a successful API/application startup demonstration.
+No browser or database integration result is upgraded by it.
+
+## Private prerequisite contract — no provisioning authority
+
+The launcher reads the current Windows user's known LocalApplicationData folder,
+then `DeepLearner/dev/profile.json`; it does not create that profile or choose a
+replacement root from a redirected environment variable. It requires separately
+provisioned current-user DPAPI files named `mongodb-uri.dpapi` and
+`signing-secret.dpapi` beside the profile. It neither reads nor writes API `.env`.
+No plaintext credential belongs in a repository template, argv, chat or run log.
+
+`scripts/dev-local.example.json` is a non-operational contract example with PENDING
+prerequisites, not an automatically installed profile. Future approved setup must
+provide revision 1, the exact repository/current Windows SID, fixed
+127.0.0.1:27019 / deeplearner-dev / deeplearner-dev-rs target and separately reviewed
+instance/schema prerequisites. The validator rejects unknown fields and wrong
+owner/repository/target. APPROVED_READY metadata is an offline prerequisite assertion,
+not policy activation, live MongoDB ownership/topology/index proof or execution
+permission. Only later B/C approvals can establish the real prerequisites.
+
+The private URI requires credentials, that literal host/port/database, and exactly
+`replicaSet=deeplearner-dev-rs`, `directConnection=true`,
+`authSource=deeplearner-dev`; extra/duplicate options, aliases, SRV and protected
+targets refuse. Signing bytes must satisfy the existing API's strong base64
+requirements. Validation uses a bounded private stdin pipe and returns only a
+fixed public command plan. It imports no application/database models and never
+connects. Errors expose fixed codes, not supplied values.
+
+After valid configuration, only the API child environment receives MongoDB/signing
+credentials. Frontends, builders and package watchers get an explicit sanitized
+environment, public API origins and no inherited NODE_OPTIONS or backend secrets.
+Frontend/root real `.env*` files and workspace `.npmrc` conflicts refuse; `.env.example`
+is permitted. Child npm lifecycle hooks and ambient user/global npm configuration
+are disabled/isolated; the existing Windows command shell is explicitly selected.
+No dependency, lockfile, authentication implementation or persistent configuration
+change is included.
+
+MongoDB installation/service/account/ACLs, schema/index inventory and activation,
+genuine Student/Admin accounts and the minimal JavaScript fixture are still pending
+their separate B-E approvals. `DEV-PERSISTENT-27019` remains **PROPOSED / NOT ACTIVE**.
+Do not edit metadata to bypass those decisions. Preserve protected 27017/27018,
+existing data/credentials/receipts and disposable qualification. Ordinary startup
+never starts/stops MongoDB, provisions indexes/accounts, seeds data or repairs state.
+
+## Foreground lifetime, ownership and known limitations
+
+When prerequisites are eventually provided and execution authorized, retain an
+exclusive startup lock until cleanup. Runs/logs are under the existing private
+`DeepLearner/dev/runs/<unique-id>` directory; these are transient operational artifacts,
+not setup/configuration writes. The native existing Windows Job helper creates
+application/build/watcher children atomically inside the retained Job. No process is
+adopted by name, PID receipt, free port or HTTP response. Build has a 120-second
+deadline; initial listener startup has a 120-second deadline. The apps otherwise
+run indefinitely until Ctrl+C, a child failure or failed ownership checks.
+
+Port preflight refuses occupied ports. Scoped post-spawn TCP queries must confirm
+literal loopback listeners whose PIDs belong to this Job; query/permission failure
+refuses. A foreign/wildcard listener fails immediately, including a startup race.
+Normal watch reloads may temporarily remove an owned listener: each service has a
+60-second recovery deadline after initial startup. A missing listener does not
+silently switch ports. Listener presence is not authenticated UI readiness, real
+database qualification or feature acceptance. Unknown services are never stopped.
+
+This first Windows implementation requires an interactive terminal and intercepts
+Ctrl+C for bounded owned-Job cleanup. Existing workspace watchers have no isolated
+graceful stop channel exposed to this launcher. Cleanup therefore explicitly reports
+**FORCED_CONTAINMENT**, not graceful shutdown, and verifies the Job becomes empty.
+This is a documented Slice A limitation against the earlier graceful-shutdown design
+target; no unsafe console-wide signal or guessed-PID termination is substituted.
+MongoDB remains outside the Job. Real Ctrl+C, watcher descendants, reload/recovery,
+listener races and end-to-end app shutdown are not yet qualified.
+
+`npm run dev -- -Check` and `npm run dev:local -- -Check` perform the same
+configuration validation only, with no app/build/
+database startup. For a valid profile it uses the same exclusive lock and transient
+validator logs; it is not a pure filesystem-only command. Cleanup failure still
+returns failure in Check mode. Neither Check nor a profile receipt proves live
+database ownership, schema readiness, account eligibility or safe product behavior.
+
+## Slice A evidence and acceptance boundary
+
+Exact source inventory: MODIFY `package.json`, `apps/api/package.json`, this file,
+`docs/SYSTEM_ARCHITECTURE.md`, `docs/DEVELOPMENT_ROADMAP.md`; CREATE
+`scripts/Start-DeepLearnerDev.ps1`, `scripts/dev-local.example.json`,
+`apps/api/scripts/dev-local.ts`, `apps/api/tests/dev-local.test.ts`,
+`scripts/tests/DevLocal.Tests.ps1`. No other tracked source changes are authorized.
+The twelve untracked original Stitch exports remain untouched and unstaged.
+
+| Check                                                                               | Actual outcome                                                                                                                                                                                      |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Startup helper, lifecycle, database-configuration and environment regressions       | 32/32 PASS: `dev-local.test.ts`, `bootstrap.test.ts`, `database.test.ts`, `env.test.ts`; no real DB connections                                                                                     |
+| PowerShell unit/inert checks                                                        | 13/13 PASS, including parser, Windows dotenv casing, query denial/no-match, listener race/recovery, exclusive lock, bounded private transport, cleanup-failure propagation and native Job isolation |
+| Full root build                                                                     | First attempt FAIL fetching existing Google Fonts; separately approved network-enabled retry PASS. Existing Vite ineffective-dynamic-import warning remains                                         |
+| Full workspace TypeScript                                                           | PASS; separate API TypeScript also PASS                                                                                                                                                             |
+| Broad `npm run lint`                                                                | FAIL: 563 errors in 24 pre-existing `.cache` artifacts; zero new-source findings. This failure is retained, not relabelled PASS                                                                     |
+| Source lint with explicit `.cache/**` exclusion                                     | PASS, zero errors/warnings; no lint configuration or cached artifact was changed                                                                                                                    |
+| Changed JSON/TypeScript formatting, new Markdown sections, PowerShell syntax        | PASS; original historical document bytes retained                                                                                                                                                   |
+| Exact scope, sensitive-data scan, UTF-8/LF and diff checks                          | PASS; ten approved source paths only, empty index, original Stitch hashes retained                                                                                                                  |
+| Root `npm run dev`                                                                  | BLOCKED at missing private profile; exit 1; no app/DB startup                                                                                                                                       |
+| Real app/browser/DB startup, hot reload, Ctrl+C, authentication and persistent data | NOT_RUN / NOT_VERIFIED                                                                                                                                                                              |
+
+The native test starts only harmless Node processes: an owned parent/descendant and
+a separate test-retained process. Owned Job termination and preservation of the
+other process passed. The private transport test validates a synthetic in-memory
+profile only. These are not real watcher, listener, database or UI qualification.
+The cleanup-failure test deliberately simulates a failed query and asserts a failing
+result; its synthetic NOT_VERIFIED message is expected negative-test evidence.
+
+Independent implementation/security review findings about reload recovery, cleanup
+failure propagation, private pipe deadlines and Windows dotenv casing were corrected
+within scope. Final review has no unresolved Critical/High/Medium/Low findings.
+
+**Slice A status: BLOCKED for operational acceptance.** The offline implementation
+is reviewable, but prerequisites, real runtime qualification and the recorded broad
+lint failure remain outstanding. No mandatory gate is waived. No Git checkpoint/
+delivery, next slice or production approval follows automatically.
+
+### Command-alignment offline review — 2026-10-31
+
+This correction changes only root `package.json` and this current record. The
+launcher, API workspace script, validator, tests, architecture/roadmap records and
+other pending Slice A files retain their preceding checkpoint bytes. Historical
+evidence in the table above remains that checkpoint's evidence; current command
+alignment results are recorded below after verification. No root/API command
+ambiguity grants a new service, setup, database or feature capability.
+
+The smallest proposed lint follow-up is to add only `.cache/**` to the existing
+`globalIgnores` array in root `eslint.config.mjs`. That would exclude repository-root
+generated artifacts while leaving application, test, script and package source
+rules intact. It is a recommendation requiring separate owner approval; no lint
+configuration, lint script, rule or cached file is changed here. Preserve the
+recorded broad lint failure separately from source lint using an explicit temporary
+exclusion. An offline checkpoint does not establish operational/feature acceptance.
+
+Current alignment verification:
+
+- Startup TypeScript tests: 9/9 PASS. PowerShell unit/inert tests: 13/13 PASS.
+- API TypeScript: PASS. Source lint excluding `.cache/**`: PASS, zero findings.
+  A fresh broad ESLint diagnostic retains exactly 563 errors in 24 existing cache
+  files; every finding is under `.cache`. The broad lint failure is not waived.
+- `npm run dev`, `npm run dev:local` and `npm run dev:local -- -Check` each exit 1
+  with DEV_PROFILE_MISSING before app/database startup. The nested npm output
+  confirms `-Check` reaches the unchanged PowerShell launcher. No private profile
+  was created, and no operational readiness is inferred from these negative checks.
+- Formatting, whitespace, exact scope, sensitive-data and baseline-hash checks
+  PASS. Only root package.json and this document differ from the beginning of
+  the alignment review; all other pending Slice A source bytes and the twelve
+  original Stitch files are unchanged. Earlier full build/workspace TypeScript
+  results remain historical evidence; the alias-only correction does not rerun or
+  relabel them as fresh checks.
+- Independent review: zero unresolved Critical/High/Medium/Low findings.
+
+**READY_FOR_OFFLINE_CHECKPOINT: YES — secondary review readiness only.** The source
+and offline evidence are ready for owner review of an explicitly scoped development
+checkpoint with incomplete verification recorded. This is not a replacement feature
+status, full lint PASS, operational acceptance, policy exception, commit approval or
+production readiness. Preserve operational BLOCKED, the broad cache-lint failure
+and all mandatory deferred verification. Every commit/push still requires separate
+explicit owner approval; no next slice is unlocked.
+
+F042/F043 remain IN_PROGRESS, acceptance BLOCKED; F043 MongoDB 15 NOT_RUN, browser
+213 NOT_RUN, live integration/production NOT_VERIFIED, F044 NOT_STARTED. General
+persistent completion/mastery, account/fixture creation and product/UI changes remain
+outside Slice A. Later runtime verification must use the approved process/isolation,
+authentication and manual/automated acceptance gates; no browser exception is granted.
+
+---
+
+# Earlier persistent LOCAL design record — retained
+
 # Persistent LOCAL development — design approved 2026-10-31
 
 ## Current authority and history boundary
