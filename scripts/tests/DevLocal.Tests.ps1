@@ -259,7 +259,7 @@ Check 'two exact transport configurations preserve access control and disable no
 }
 Check 'bootstrap crypto, DPAPI, helper, service permissions and transition refuse before effects' {
     $plan=Get-DevMongoPlan
-    foreach($body in @({New-DevMongoPassword},{Protect-DevMongoValue 'synthetic-only'},{Initialize-DevMongoPrivateMaterial $plan},{Set-DevMongoOwnerServiceRights $plan},{Write-DevMongoStage $plan 'complete' 'NORMAL_AUTHENTICATION_VERIFIED'},{Invoke-DevMongoNodeStep $plan 'administrator'},{Set-DevMongoNormalConfiguration $plan},{Assert-DevMongoAuthenticatedBootstrap})){
+    foreach($body in @({New-DevMongoPassword},{Protect-DevMongoValue 'synthetic-only'},{Initialize-DevMongoPrivateMaterial $plan},{Assert-DevMongoServiceCreationSecurity $plan},{Assert-DevMongoInstallAdministrator},{Write-DevMongoStage $plan 'complete' 'NORMAL_AUTHENTICATION_VERIFIED'},{Invoke-DevMongoNodeStep $plan 'administrator'},{Set-DevMongoNormalConfiguration $plan},{Assert-DevMongoAuthenticatedBootstrap})){
         $refused=$false;try{& $body | Out-Null}catch{$refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'};Assert $refused 'Bootstrap primitive bypassed inactive policy'
     }
 }
@@ -355,5 +355,120 @@ Check 'service security rejects foreign owners and controlling ACEs without touc
     }
     Import-DevMongoServiceSecurityReader
     Assert ($null -ne ('DeepLearnerMongoServiceSecurity' -as [type]).GetMethod('Read')) 'Read-only service-security native helper did not compile'
+}
+Check 'documented Windows default service ACL conflicts with strict controls; approved creation descriptor is exact' {
+    $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+    $default=[Security.AccessControl.RawSecurityDescriptor]::new('O:BAG:BAD:(A;;GA;;;SY)(A;;GA;;;BA)(A;;0x2018D;;;AU)')
+    $refused=$false;try{Assert-DevMongoServiceSecurity $default $sid}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_FOREIGN_SERVICE_CONTROL_REFUSED'}
+    Assert $refused 'Documented default local-user 0x100 control right was accepted'
+    $sddl=Get-DevMongoServiceSecurityDescriptor $sid
+    $approved=[Security.AccessControl.RawSecurityDescriptor]::new(('O:'+$sid+$sddl))
+    Assert-DevMongoApprovedServiceSecurity $approved $sid
+    Assert (($approved.ControlFlags -band [Security.AccessControl.ControlFlags]::DiscretionaryAclProtected) -ne 0) 'Service DACL is not protected'
+    Assert ($approved.DiscretionaryAcl.Count -eq 3) 'Unexpected service trustee'
+    $masks=@{};foreach($ace in $approved.DiscretionaryAcl){$masks[$ace.SecurityIdentifier.Value]=$ace.AccessMask}
+    Assert ($masks['S-1-5-18'] -eq 0xF01FF -and $masks['S-1-5-32-544'] -eq 0xF01FF -and $masks[$sid] -eq 0x1200B5) 'Service rights differ from approved descriptor'
+    Assert (-not $masks.ContainsKey('S-1-5-11') -and -not $masks.ContainsKey('S-1-1-0')) 'Broad local-user service rights present'
+    foreach($bad in @('not-a-sid','S-1-5-18','S-1-5-32-544')){
+        $refused=$false;try{Get-DevMongoServiceSecurityDescriptor $bad}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_SERVICE_OWNER_REJECTED'};Assert $refused 'Invalid/overlapping owner SID accepted'
+    }
+}
+Check 'creation readback requires exact effective ACE allowlist while tolerating canonical order' {
+    $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+    $reordered=[Security.AccessControl.RawSecurityDescriptor]::new("O:BAG:BAD:P(A;;0x1200B5;;;${sid})(A;;0xF01FF;;;BA)(A;;0xF01FF;;;SY)")
+    Assert-DevMongoApprovedServiceSecurity $reordered $sid
+    $base='O:'+$sid+(Get-DevMongoServiceSecurityDescriptor $sid)
+    $invalid=@(
+        $base.Replace("(A;;0x1200B5;;;${sid})",''),
+        $base.Replace('D:P','D:'),
+        $base.Replace('0x1200B5','0x1200B7'),
+        ($base+'(A;;0x20005;;;AU)'),
+        ($base+'(A;;0x100;;;AU)'),
+        ($base+'(D;;0x10;;;WD)'),
+        ($base+"(A;;0x1200B5;;;${sid})"),
+        $base.Replace(('O:'+$sid),'O:WD')
+    )
+    foreach($sddl in $invalid){$refused=$false;try{Assert-DevMongoApprovedServiceSecurity ([Security.AccessControl.RawSecurityDescriptor]::new($sddl)) $sid}catch{$refused=$_.Exception.Message -match '^DEV_MONGO_(SERVICE_ACL_MISMATCH|SERVICE_PERMISSIONS_UNKNOWN|FOREIGN_SERVICE_CONTROL_REFUSED)$'};Assert $refused 'Unapproved readback accepted'}
+    $refused=$false;try{Assert-DevMongoApprovedServiceSecurity $null $sid}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_SERVICE_PERMISSIONS_UNKNOWN'};Assert $refused 'Missing service-security readback accepted'
+    $callback=[Security.AccessControl.RawSecurityDescriptor]::new($base)
+    $callback.DiscretionaryAcl.RemoveAce(2)
+    $callback.DiscretionaryAcl.InsertAce(2,[Security.AccessControl.CommonAce]::new([Security.AccessControl.AceFlags]::None,[Security.AccessControl.AceQualifier]::AccessAllowed,0x1200B5,[Security.Principal.SecurityIdentifier]::new($sid),$true,$null))
+    $refused=$false;try{Assert-DevMongoApprovedServiceSecurity $callback $sid}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_SERVICE_ACL_MISMATCH'};Assert $refused 'Conditional/callback grant accepted'
+}
+Check 'installer supplies creation descriptor, validates readback and receipts only complete registrations with all host effects mocked' {
+    # Test-only local overrides. There is no real New-Service, privilege elevation,
+    # registry/native service call, private-file write, service start or ACL change.
+    $plan=Get-DevMongoPlan;$sid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+    $simulation=@{Mode='success';Created=$false;Receipted=$false;Disposed=$false;Descriptor=$null;Calls=[Collections.Generic.List[string]]::new()}
+    function Assert-DevMongoExecutionPolicy {}
+    function Assert-DevMongoPrepared {param($Plan) $simulation.Calls.Add('prepared')}
+    function Assert-DevMongoPortFree {$simulation.Calls.Add('port')}
+    function Assert-DevMongoInstallAdministrator {$simulation.Calls.Add('administrator')}
+    $controller=[pscustomobject]@{Simulation=$simulation}
+    $controller | Add-Member ScriptMethod Dispose {$this.Simulation.Disposed=$true;$this.Simulation.Calls.Add('dispose')}
+    function Get-DevMongoService {param($Plan)
+        $simulation.Calls.Add('existing-check')
+        if($simulation.Mode -eq 'unknown'){throw 'DEV_MONGO_UNKNOWN_SERVICE'}
+        if($simulation.Mode -eq 'existing'){return $controller}
+        return $null
+    }
+    function New-Service {param($Name,$BinaryPathName,$StartupType,$Credential,$SecurityDescriptorSddl,$ErrorAction)
+        $simulation.Calls.Add('create')
+        Assert ($Name -eq 'DeepLearnerDevMongo27019' -and $Name -eq $plan.serviceName) 'Wrong service name'
+        Assert ($BinaryPathName -ceq ('"'+$plan.executable+'" --config "'+$plan.configuration+'" --service')) 'Wrong service command'
+        Assert ($StartupType -eq 'Manual' -and $Credential.UserName -eq $plan.serviceAccount -and $Credential.Password.Length -eq 0) 'Wrong service identity/startup'
+        Assert ($ErrorAction -eq 'Stop') 'Creation/application failure could continue'
+        Assert ($SecurityDescriptorSddl -ceq (Get-DevMongoServiceSecurityDescriptor $sid)) 'Approved descriptor not supplied at creation'
+        $simulation.Created=$true
+        $simulation.Descriptor=[Security.AccessControl.RawSecurityDescriptor]::new(('O:'+$sid+$SecurityDescriptorSddl))
+        if($simulation.Mode -eq 'creation-interrupted'){throw 'SYNTHETIC_DESCRIPTOR_APPLICATION_INTERRUPTED'}
+        return $controller
+    }
+    function Read-DevMongoServiceSecurity {param($Plan)
+        $simulation.Calls.Add('readback')
+        Assert $simulation.Created 'Readback happened before creation'
+        switch($simulation.Mode){
+            'missing'{return $null}
+            'readback-interrupted'{throw 'SYNTHETIC_READBACK_INTERRUPTED'}
+            'mismatch'{return [Security.AccessControl.RawSecurityDescriptor]::new(('O:'+$sid+(Get-DevMongoServiceSecurityDescriptor $sid).Replace('0x1200B5','0x1200B7')))}
+            'unexpected'{return [Security.AccessControl.RawSecurityDescriptor]::new(('O:'+$sid+(Get-DevMongoServiceSecurityDescriptor $sid)+'(A;;0x100;;;AU)'))}
+            default{return $simulation.Descriptor}
+        }
+    }
+    function Write-DevMongoPrivateFile {param($Path,$Bytes,$Kind)
+        $simulation.Calls.Add('receipt')
+        Assert ($Path -ceq $plan.serviceReceipt -and $Kind -eq 'OwnerOnly') 'Wrong receipt path/ACL'
+        Assert ($simulation.Calls.Contains('readback')) 'Receipt preceded validation'
+        $record=([Text.Encoding]::UTF8.GetString($Bytes)) | ConvertFrom-Json -AsHashtable
+        Assert ($record.ownerSid -ceq $sid -and $record.target -ceq ($plan | ConvertTo-Json -Compress -Depth 5) -and $record.revision -eq 2) 'Wrong registration receipt'
+        if($simulation.Mode -eq 'receipt-interrupted'){throw 'SYNTHETIC_RECEIPT_INTERRUPTED'}
+        $simulation.Receipted=$true
+    }
+    function Start-Service {throw 'UNEXPECTED_SERVICE_START'}
+    function Stop-Service {throw 'UNEXPECTED_SERVICE_STOP'}
+    function Set-Service {throw 'UNEXPECTED_SERVICE_CHANGE'}
+    function Remove-Service {throw 'UNEXPECTED_SERVICE_DELETE'}
+    Invoke-DevMongoInstall $plan
+    Assert ($simulation.Created -and $simulation.Receipted -and $simulation.Disposed) 'Valid registration did not complete'
+    Assert (($simulation.Calls -join ',') -ceq 'prepared,port,existing-check,administrator,create,readback,receipt,dispose') 'Creation/readback/receipt order changed'
+    foreach($mode in @('creation-interrupted','missing','readback-interrupted','mismatch','unexpected','receipt-interrupted','unknown','existing')){
+        $simulation.Mode=$mode;$simulation.Created=$false;$simulation.Receipted=$false;$simulation.Disposed=$false;$simulation.Calls.Clear()
+        $refused=$false;try{Invoke-DevMongoInstall $plan}catch{$refused=$true}
+        Assert ($refused -and -not $simulation.Receipted) 'Failed/unknown registration received a receipt'
+        if($mode -in @('unknown','existing')){Assert (-not $simulation.Created -and -not $simulation.Calls.Contains('create')) 'Existing service was modified/adopted'}
+        elseif($mode -ne 'creation-interrupted'){Assert $simulation.Disposed 'Returned controller not disposed after failure'}
+        if($mode -ne 'receipt-interrupted'){Assert (-not $simulation.Calls.Contains('receipt')) 'Validation failure reached receipt creation'}
+    }
+    foreach($change in @(@('port',27017),@('port',27018),@('serviceName','MongoDB'),@('storage','C:\Program Files\MongoDB\Server\8.2\data'),@('storage','C:\Users\Shreeji\AppData\Local\DeepLearner\local-dev\mongodb'))){
+        $copy=Get-DevMongoPlan;$copy[$change[0]]=$change[1];$simulation.Calls.Clear()
+        $refused=$false;try{Invoke-DevMongoInstall $copy}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_TARGET_REJECTED'}
+        Assert ($refused -and $simulation.Calls.Count -eq 0) 'Protected target reached installation'
+    }
+}
+Check 'service creation and installer guards remain inactive after local test mocks leave scope' {
+    $plan=Get-DevMongoPlan
+    foreach($body in @({Invoke-DevMongoInstall $plan},{Assert-DevMongoServiceCreationSecurity $plan},{Assert-DevMongoInstallAdministrator})){
+        $refused=$false;try{& $body}catch{$refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'};Assert $refused 'Real inactive guard was replaced or bypassed'
+    }
 }
 Write-Host "$passed inert/unit checks passed. No MongoDB/service/database/ACL operation or application startup was performed. Runtime qualification remains NOT_RUN."

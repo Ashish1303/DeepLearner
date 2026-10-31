@@ -1,3 +1,93 @@
+# Slice B Windows service ACL correction — offline, 2026-10-31
+
+Owner-approved correction at dev/e5fbd8c50e86c179b22fd5549aba0d4d7d3749d0,
+limited to Setup-DeepLearnerDev.ps1, DevLocal.Tests.ps1 and these current LOCAL/
+ROADMAP sections. No policy activation or runtime execution is authorized.
+All historical records below remain byte-for-byte unchanged.
+
+## Default-service permission incompatibility and corrected contract
+
+Windows documents local authenticated-user default SERVICE_USER_DEFINED_CONTROL
+(0x100) service access. The prior installer registered the service, then rejected
+that default while attempting to add owner rights, before writing its registration
+receipt. This was reproduced in memory during readiness review; no actual service
+installation failed or ran. The earlier 29/22 offline results are historical
+evidence and do not establish Windows install/readback qualification.
+
+The installer now supplies SecurityDescriptorSddl to New-Service with ErrorAction
+Stop, so the supported creation command receives the explicit protected DACL:
+
+`D:P(A;;0xF01FF;;;SY)(A;;0xF01FF;;;BA)(A;;0x1200B5;;;<original-owner-SID>)`
+
+SYSTEM and Builtin Administrators retain full control over only this service.
+The original Windows owner gets only the previously reviewed query/start/stop/
+interrogate/synchronize/read-control mask. No broad authenticated-user/Everyone
+grant, owner ChangeConfig/WriteDac/WriteOwner/delete grant, global Administrator
+permission or machine-wide policy is introduced. The descriptor does not force
+service-object ownership to change; its actual owner must be original owner,
+SYSTEM or Builtin Administrators.
+
+After creation, the existing bounded exact-service native reader obtains OWNER+
+DACL. Validation requires a protected non-null DACL and exactly the three approved
+allow trustees/masks, with no callback, deny, inherited or extra ACEs. Equivalent
+canonical ACE order is accepted. Numeric service masks avoid generic-right mapping
+ambiguity. Missing readback, unknown owner, absent owner rights, broadened rights
+or descriptor mismatch refuses. Reuse of a registered service applies this same
+exact allowlist as well as existing identity/configuration/receipt checks.
+
+The registration receipt is created only after successful readback validation.
+Creation/descriptor-application/readback/receipt interruptions preserve partial
+state for owner review; the installer does not start, stop, delete, adopt, repair
+or retry an existing service. The old post-creation ACL-append/write path is removed.
+The returned creation controller is disposed on success or failure. Any existing
+unknown service or protected-target mutation refuses before creation.
+
+## Offline evidence and remaining prerequisites
+
+Final focused offline evidence:
+
+| Check                                    | Result                                                                                                                                                                                                      |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PowerShell parse/inert suite             | 33/33 PASS: 29 retained checks and 4 new grouped descriptor/install/guard regressions                                                                                                                       |
+| Startup/bootstrap TypeScript regressions | 22/22 PASS: unchanged 13 bootstrap and 9 startup/private-validation tests                                                                                                                                   |
+| Descriptor regression coverage           | Documented default conflict; literal three-trustee/mask fixture; canonical readback; missing/mismatched/unexpected permissions; unknown service; creation/readback/receipt interruptions; protected targets |
+| Scope/privacy/integrity                  | Exact four paths; empty index; no conflicts; no detected secrets; 12 ignored Stitch hashes and unchanged bootstrap/startup/dependency contracts                                                             |
+| Formatting/encoding/whitespace           | Two new Markdown sections Prettier PASS; four paths UTF-8/no BOM/LF/final newline; added-source whitespace and git diff --check PASS                                                                        |
+| Independent security review              | Critical 0 / High 0 / Medium 0 / Low 0 unresolved; source, persisted fixtures and in-memory/mocked installation paths reviewed                                                                              |
+| Runtime service permissions              | NOT_RUN / NOT_VERIFIED; no real service/ACL or provisioning operation performed                                                                                                                             |
+
+Secondary tooling status: **READY_FOR_OFFLINE_CHECKPOINT** for a separate owner
+review decision. This is not activation, execution, feature acceptance or Git
+permission. Existing full-root lint cache failures and all previous verification
+limitations remain historical evidence; no lint configuration is changed.
+
+The descriptor defines explicit DACL grants; the existing Windows owner and
+SYSTEM/Administrator trust boundary remains unchanged.
+Regression fixtures represent the documented Windows default and actual installer
+control flow, but all service creation/readback/file writes are mocked and all
+descriptors are in memory. No SCM query, Windows permission change, credential or
+certificate generation, database operation or application startup occurs in them.
+Mocks are local to individual checks; real inactive refusals are rechecked afterward.
+
+Real New-Service descriptor application and canonical readback, virtual-account
+logon, normal-user query/start/stop/process-path visibility, private DPAPI/TLS/ACL
+behavior, MongoDB PRIMARY/authentication, controlled transport transition and
+persistence remain NOT_RUN / NOT_VERIFIED. Source activation needs a separately
+approved exact diff covering both existing guards and safe active-policy tests,
+then explicit policy and particular provisioning execution approvals. No guard
+was enabled by this correction. Index/schema, product accounts/fixtures and
+application profile activation remain separately scoped future work.
+
+Preserve MongoDB **NOT_PROVISIONED**; DEV-PERSISTENT-27019 **PROPOSED / NOT ACTIVE**;
+application startup/shutdown **NOT_VERIFIED**; F042/F043 acceptance **BLOCKED**;
+F043 MongoDB **15 NOT_RUN**; browser **213 NOT_RUN**; F044 **NOT_STARTED**; production
+**NOT_VERIFIED**. No Git staging/commit/push or provisioning permission is implied.
+
+References: [Windows service permissions](https://learn.microsoft.com/en-us/windows/win32/services/service-security-and-access-rights),
+[New-Service descriptor parameter](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-service).
+
+---
+
 # First-user bootstrap — offline implementation, 2026-10-31
 
 This current record supersedes the earlier statement that authenticated bootstrap

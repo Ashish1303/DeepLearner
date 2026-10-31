@@ -153,7 +153,7 @@ function Get-DevMongoService($Plan) {
     if ((Get-Acl -LiteralPath $Plan.serviceReceipt).GetSecurityDescriptorSddlForm('Access,Owner') -cne (Get-DevMongoAcl 'OwnerOnly' $true).GetSecurityDescriptorSddlForm('Access,Owner')) { throw 'DEV_MONGO_PRIVATE_ACL_MISMATCH' }
     $expected='"' + $Plan.executable + '" --config "' + $Plan.configuration + '" --service'
     if ($entry.ImagePath -cne $expected -or $entry.ObjectName -ne $Plan.serviceAccount -or $entry.Start -ne 3) { throw 'DEV_MONGO_UNKNOWN_SERVICE' }
-    Assert-DevMongoServiceSecurity (Read-DevMongoServiceSecurity $Plan) ([Security.Principal.WindowsIdentity]::GetCurrent().User.Value)
+    Assert-DevMongoApprovedServiceSecurity (Read-DevMongoServiceSecurity $Plan) ([Security.Principal.WindowsIdentity]::GetCurrent().User.Value)
     return Get-Service -Name $Plan.serviceName -ErrorAction Stop
 }
 
@@ -360,17 +360,39 @@ function Assert-DevMongoServiceSecurity([Security.AccessControl.RawSecurityDescr
     }
 }
 
-function Set-DevMongoOwnerServiceRights($Plan) {
+function Get-DevMongoServiceSecurityDescriptor([string]$OwnerSid) {
+    try { $sid=[Security.Principal.SecurityIdentifier]::new($OwnerSid) } catch { throw 'DEV_MONGO_SERVICE_OWNER_REJECTED' }
+    if($sid.Value -cne $OwnerSid -or $OwnerSid -in @('S-1-5-18','S-1-5-32-544')){throw 'DEV_MONGO_SERVICE_OWNER_REJECTED'}
+    # Explicit service masks avoid generic-right mapping differences on readback.
+    # SYSTEM/Administrators retain control of this service only; the original
+    # owner gets the reviewed query/start/stop mask, without change-config rights.
+    return 'D:P(A;;0xF01FF;;;SY)(A;;0xF01FF;;;BA)(A;;0x'+(Get-DevMongoServiceOwnerMask).ToString('X')+';;;'+$sid.Value+')'
+}
+
+function Assert-DevMongoApprovedServiceSecurity([Security.AccessControl.RawSecurityDescriptor]$Descriptor,[string]$OwnerSid) {
+    if($null -eq $Descriptor){throw 'DEV_MONGO_SERVICE_PERMISSIONS_UNKNOWN'}
+    Assert-DevMongoServiceSecurity $Descriptor $OwnerSid
+    $expected=[Security.AccessControl.RawSecurityDescriptor]::new((Get-DevMongoServiceSecurityDescriptor $OwnerSid))
+    if(-not ($Descriptor.ControlFlags -band [Security.AccessControl.ControlFlags]::DiscretionaryAclProtected) -or $Descriptor.DiscretionaryAcl.Count -ne $expected.DiscretionaryAcl.Count){throw 'DEV_MONGO_SERVICE_ACL_MISMATCH'}
+    $actualEntries=@()
+    foreach($ace in $Descriptor.DiscretionaryAcl){
+        if($ace -isnot [Security.AccessControl.CommonAce] -or $ace.IsCallback -or $ace.AceQualifier -ne [Security.AccessControl.AceQualifier]::AccessAllowed -or $ace.AceFlags -ne [Security.AccessControl.AceFlags]::None){throw 'DEV_MONGO_SERVICE_ACL_MISMATCH'}
+        $actualEntries+=($ace.SecurityIdentifier.Value+'='+([long]$ace.AccessMask -band 4294967295L))
+    }
+    $expectedEntries=@($expected.DiscretionaryAcl | ForEach-Object { $_.SecurityIdentifier.Value+'='+([long]$_.AccessMask -band 4294967295L) })
+    if((($actualEntries | Sort-Object) -join ';') -cne (($expectedEntries | Sort-Object) -join ';')){throw 'DEV_MONGO_SERVICE_ACL_MISMATCH'}
+}
+
+function Assert-DevMongoServiceCreationSecurity($Plan) {
     Assert-DevMongoExecutionPolicy
     Assert-DevMongoPlan $Plan
-    $sc=Join-Path ([Environment]::GetFolderPath('System')) 'sc.exe'
-    $descriptor=Read-DevMongoServiceSecurity $Plan
-    Assert-DevMongoServiceSecurity $descriptor ([Security.Principal.WindowsIdentity]::GetCurrent().User.Value)
-    $ace=[Security.AccessControl.CommonAce]::new([Security.AccessControl.AceFlags]::None,[Security.AccessControl.AceQualifier]::AccessAllowed,(Get-DevMongoServiceOwnerMask),[Security.Principal.WindowsIdentity]::GetCurrent().User,$false,$null)
-    $descriptor.DiscretionaryAcl.InsertAce(0,$ace)
-    & $sc sdset $Plan.serviceName $descriptor.GetSddlForm('Access') | Out-Null
-    if($LASTEXITCODE -ne 0){throw 'DEV_MONGO_SERVICE_PERMISSIONS_UNKNOWN'}
-    Assert-DevMongoServiceSecurity (Read-DevMongoServiceSecurity $Plan) ([Security.Principal.WindowsIdentity]::GetCurrent().User.Value)
+    Assert-DevMongoApprovedServiceSecurity (Read-DevMongoServiceSecurity $Plan) ([Security.Principal.WindowsIdentity]::GetCurrent().User.Value)
+}
+
+function Assert-DevMongoInstallAdministrator {
+    Assert-DevMongoExecutionPolicy
+    $principal=[Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
+    if(-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){throw 'DEV_MONGO_SEPARATE_ADMIN_INSTALL_REQUIRED'}
 }
 
 function Write-DevMongoStage($Plan,[string]$Stage,[string]$Status) {
@@ -522,18 +544,28 @@ function Invoke-DevMongoPrepare($Plan) {
 
 function Invoke-DevMongoInstall($Plan) {
     Assert-DevMongoExecutionPolicy
+    Assert-DevMongoPlan $Plan
     Assert-DevMongoPrepared $Plan; Assert-DevMongoPortFree
     $existing=Get-DevMongoService $Plan
     if ($existing) { $existing.Dispose(); throw 'DEV_MONGO_EXISTING_SERVICE_REFUSED' }
-    $principal=[Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
-    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'DEV_MONGO_SEPARATE_ADMIN_INSTALL_REQUIRED' }
+    Assert-DevMongoInstallAdministrator
     $command='"' + $Plan.executable + '" --config "' + $Plan.configuration + '" --service'
     $empty=[Security.SecureString]::new()
-    try { New-Service -Name $Plan.serviceName -BinaryPathName $command -StartupType Manual -Credential ([Management.Automation.PSCredential]::new($Plan.serviceAccount,$empty)) | Out-Null }
-    finally { $empty.Dispose() }
-    Set-DevMongoOwnerServiceRights $Plan
-    $registration=@{revision=2; ownerSid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value; target=($Plan | ConvertTo-Json -Compress -Depth 5)}
-    Write-DevMongoPrivateFile $Plan.serviceReceipt ([Text.Encoding]::UTF8.GetBytes(($registration | ConvertTo-Json -Compress))) 'OwnerOnly'
+    $created=$null
+    try {
+        $ownerSid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+        $sddl=Get-DevMongoServiceSecurityDescriptor $ownerSid
+        $created=New-Service -Name $Plan.serviceName -BinaryPathName $command -StartupType Manual -Credential ([Management.Automation.PSCredential]::new($Plan.serviceAccount,$empty)) -SecurityDescriptorSddl $sddl -ErrorAction Stop
+        # Creation failures, unavailable readback and any permission mismatch stop
+        # before the receipt. Preserve a partial registration for owner review;
+        # never adopt, retry, rewrite its ACL, start or delete it automatically.
+        Assert-DevMongoServiceCreationSecurity $Plan
+        $registration=@{revision=2; ownerSid=$ownerSid; target=($Plan | ConvertTo-Json -Compress -Depth 5)}
+        Write-DevMongoPrivateFile $Plan.serviceReceipt ([Text.Encoding]::UTF8.GetBytes(($registration | ConvertTo-Json -Compress))) 'OwnerOnly'
+    } finally {
+        if($null -ne $created){$created.Dispose()}
+        $empty.Dispose()
+    }
 }
 
 function Invoke-DevMongoStart($Plan) {

@@ -2757,3 +2757,30 @@ separately approved checkpoint; runtime execution requires a separate approval.
 Preserve MongoDB NOT_PROVISIONED; DEV-PERSISTENT-27019 PROPOSED / NOT ACTIVE;
 application startup/shutdown NOT_VERIFIED; F042/F043 acceptance BLOCKED;
 F043 MongoDB 15 NOT_RUN; browser 213 NOT_RUN; F044 NOT_STARTED; production NOT_VERIFIED.
+
+# 22. Slice B creation-time Windows service ACL correction — 2026-10-31
+
+Owner-approved four-path offline correction only. The documented default local-user
+0x100 service-control grant conflicts with the prior post-registration validation.
+No real installation was attempted; the compatibility failure was confirmed using
+an in-memory default descriptor. Historical 29 PowerShell/22 TypeScript evidence
+and the earlier review record remain unchanged.
+
+The future creation command now receives the exact protected SYSTEM/Admin service-
+full-control and narrow original-owner descriptor through SecurityDescriptorSddl.
+Actual OWNER+DACL readback must match the exact semantic ACE allowlist before a
+registration receipt is written. Missing/mismatched/unexpected permissions or an
+interruption refuses without automatic adoption, retry, ACL repair or service/data
+removal. The unknown-service and 27017/27018 exclusions remain unchanged.
+
+Final offline checks: 33/33 PowerShell parse/inert checks and 22/22 retained
+startup/bootstrap TypeScript regressions PASS. Scope/privacy, formatting, UTF-8/LF
+and whitespace checks PASS. Independent Critical 0 / High 0 / Medium 0 / Low 0
+unresolved. Exact evidence is in LOCAL_DEVELOPMENT.md. Secondary tooling status is
+READY_FOR_OFFLINE_CHECKPOINT for a separate owner review decision. Real Windows descriptor application,
+SCM permissions, TLS/authentication, transactions and persistence are unqualified.
+This correction changes no activation/execution authority and no product feature.
+
+Keep MongoDB NOT_PROVISIONED; policy PROPOSED / NOT ACTIVE; app startup/shutdown
+NOT_VERIFIED; F042/F043 acceptance BLOCKED; F043 MongoDB 15 NOT_RUN; browser 213
+NOT_RUN; F044 NOT_STARTED; production NOT_VERIFIED. No Git staging/commit/push.
