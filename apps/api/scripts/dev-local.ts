@@ -206,20 +206,54 @@ export async function readRequest(input: AsyncIterable<Buffer | string>) {
   }
 }
 
+export function devReplicaPlan() {
+  return {
+    _id: localTarget.replicaSet,
+    members: [{ _id: 0, host: 'localhost:27019' }],
+  };
+}
+
+export function assertDevMongoExecutionPolicy(): never {
+  // No input, CLI switch or receipt can activate persistent execution.
+  throw new Error('DEV_PERSISTENT_POLICY_NOT_ACTIVE');
+}
+
+async function initializeDevReplica() {
+  assertDevMongoExecutionPolicy();
+  // A separate authenticated, connection-bound bootstrap contract is required.
+  // No driver import, connection or unauthenticated initialization is provided.
+  throw new Error('DEV_MONGO_AUTHENTICATED_BOOTSTRAP_REQUIRED');
+}
+
 if (
   process.argv[1] &&
   pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url
 ) {
   try {
-    if (
-      process.argv.length !== 2 ||
-      Number(process.versions.node.split('.')[0]) !== 24
-    )
+    if (Number(process.versions.node.split('.')[0]) !== 24)
       throw new DevLocalError();
-    const plan = validateRequest(await readRequest(process.stdin));
-    process.stdout.write(JSON.stringify(plan) + '\n');
-  } catch {
-    process.stderr.write('DEV_CONFIGURATION_REJECTED\n');
+    if (process.argv.length === 3 && process.argv[2] === 'mongo-plan')
+      process.stdout.write(JSON.stringify(devReplicaPlan()) + '\n');
+    else if (
+      process.argv.length === 3 &&
+      process.argv[2] === 'mongo-initialize'
+    )
+      process.stdout.write(JSON.stringify(await initializeDevReplica()) + '\n');
+    else if (process.argv.length === 2)
+      process.stdout.write(
+        JSON.stringify(validateRequest(await readRequest(process.stdin))) +
+          '\n',
+      );
+    else throw new DevLocalError();
+  } catch (error) {
+    process.stderr.write(
+      process.argv[2] === 'mongo-initialize'
+        ? error instanceof Error &&
+          error.message === 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'
+          ? 'DEV_PERSISTENT_POLICY_NOT_ACTIVE\n'
+          : 'DEV_MONGO_INITIALIZATION_UNKNOWN_RECONCILE\n'
+        : 'DEV_CONFIGURATION_REJECTED\n',
+    );
     process.exitCode = 1;
   }
 }

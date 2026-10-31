@@ -1753,3 +1753,48 @@ use existing Argon2id validation and ordinary JWT/refresh-cookie login; private
 password input must not enter argv, environment, Git or logs. Existing eligible
 accounts remain unchanged; conflicts stop. See LOCAL_DEVELOPMENT.md for staged
 paths, manual evidence and runtime prerequisites. All execution remains unapproved.
+
+## Slice B setup-tooling preparation — 2026-10-31
+
+This amendment records source preparation only. **DEV-PERSISTENT-27019 remains
+PROPOSED / NOT ACTIVE**, with the exact policy wording above unchanged. No connection,
+DDL, record/user/index creation, replica initialization or application-profile
+activation is authorized or performed. Existing feature/qualification boundaries
+and F042/F043 BLOCKED acceptance remain intact; F044 remains NOT_STARTED.
+
+The fixed plan uses 127.0.0.1:27019 / deeplearner-dev-rs / deeplearner-dev and the
+dedicated owner root C:\Users\Shreeji\AppData\Local\DeepLearner\dev. Data stays in
+mongodb; private configuration/internal key/ownership and service-registration
+receipts stay in mongo-control; logs stay in mongo-logs. These are private OS files,
+not new MongoDB collections or product provenance. Existing 27017 installation
+storage and 27018 local-dev storage are excluded. No data migration/adoption exists.
+
+The owner separately approved localhost:27019 as the advertised single replica
+member while preserving literal 127.0.0.1 binding/client URI. No split-horizon IP
+validation bypass is added. The Node and PowerShell helpers expose that exact
+replica plan; actual initialization and fresh-service start remain unavailable
+pending an authenticated, connection-bound bootstrap contract. An old PID/receipt
+check followed by an unauthenticated connection is not sufficient endpoint identity.
+No unauthenticated initialization actuator is shipped.
+
+Future filesystem preparation is exclusive, insert-only and separately gated. An
+unknown/non-empty/existing root refuses; partial outcomes are preserved for review.
+Atomic native directory creation fails rather than adopting an existing directory.
+Parent owner and effective applicable Allow ACEs must exclude unrelated write/
+delete-child/change-permissions authority, including raw generic write/all masks.
+In-memory protected ACL descriptors isolate the proposed virtual service identity
+NT SERVICE\DeepLearnerDevMongo27019 from API credentials. Neither descriptor tests
+nor the previous FREE-port snapshot prove runtime ACL, SCM or MongoDB behavior.
+
+Application credentials remain future scoped database privileges, separate from
+operator/bootstrap administration and the internal replica key. Exact allowed
+collections/actions and credential bootstrap require their own reviewed inventory.
+No database is created by merely naming it in a plan. Slice C index reconciliation,
+genuine accounts and JavaScript content remain unimplemented. No persistent index
+prohibition is weakened by this preparation or by a later development checkpoint.
+
+Final offline completion: 22 PowerShell inert checks and 9 startup-validation tests
+PASS, API TypeScript/source lint/format/integrity checks PASS, independent review
+Critical 0 / High 0 / Medium 0 / Low 0 unresolved. Detailed evidence and the separate
+root lint cache limitation are recorded in LOCAL_DEVELOPMENT.md. Persistent MongoDB
+remains NOT_PROVISIONED; no runtime database, service or ACL qualification is claimed.

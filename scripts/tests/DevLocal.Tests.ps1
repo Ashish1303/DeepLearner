@@ -154,4 +154,97 @@ Check 'real private validator returns a public plan without launching applicatio
         Assert ($owner.WaitEmpty(1000)) 'Validator stayed alive'
     } finally { $owner.Dispose() }
 }
-Write-Host "$passed inert/unit checks passed. Real applications, MongoDB, listener integration and Ctrl+C qualification NOT_RUN."
+. "$PSScriptRoot/../Setup-DeepLearnerDev.ps1"
+Check 'MongoDB setup parses and defaults to a non-mutating exact plan' {
+    $tokens=$null; $errors=$null
+    [Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot '../Setup-DeepLearnerDev.ps1'),[ref]$tokens,[ref]$errors) | Out-Null
+    Assert ($errors.Count -eq 0) 'Setup syntax invalid'
+    $result=Invoke-DevMongoSetup
+    Assert ($result.operation -eq 'PLAN_ONLY') 'Default would execute'
+    Assert ($result.target.port -eq 27019 -and $result.target.member -eq 'localhost:27019') 'Wrong target/member'
+    Assert ($result.target.policy -eq 'PROPOSED / NOT ACTIVE') 'Policy activated'
+}
+Check 'changed protected ports, paths, services and network exposure refuse' {
+    $plan=Get-DevMongoPlan
+    foreach ($change in @(@('port',27017),@('port',27018),@('host','0.0.0.0'),@('storage','C:\Program Files\MongoDB\Server\8.2\data'),@('storage','C:\Users\Shreeji\AppData\Local\DeepLearner\local-dev\mongodb'),@('serviceName','MongoDB'),@('database','admin'),@('replicaSet','other'))) {
+        $copy=[ordered]@{}; foreach($key in $plan.Keys){$copy[$key]=$plan[$key]}; $copy[$change[0]]=$change[1]
+        $refused=$false; try { Assert-DevMongoPlan $copy } catch { $refused=$_.Exception.Message -eq 'DEV_MONGO_TARGET_REJECTED' }
+        Assert $refused 'Altered target accepted'
+    }
+}
+Check 'configuration is authenticated loopback with keys outside writable data' {
+    $plan=Get-DevMongoPlan; $config=Get-DevMongoConfiguration $plan
+    Assert ($config.Contains('bindIp: 127.0.0.1') -and $config.Contains('port: 27019')) 'Wrong network exposure'
+    Assert ($config.Contains('authorization: enabled') -and $config.Contains('keyFile:')) 'Authentication omitted'
+    Assert (-not $plan.keyFile.StartsWith($plan.storage+'\') -and -not $plan.configuration.StartsWith($plan.storage+'\')) 'Control files in writable data'
+    Assert ($plan.serviceAccount -eq 'NT SERVICE\DeepLearnerDevMongo27019') 'Shared/privileged service identity'
+    Assert (-not $config.Contains('disableSplitHorizonIPCheck')) 'Unapproved IP bypass'
+}
+Check 'all effectful setup actions refuse before probes, credentials or writes' {
+    function Get-DevMongoPortRows { throw 'UNEXPECTED_PORT_PROBE' }
+    foreach ($operation in @('PrepareStorage','InstallService','StartService','StopService','InitializeReplica')) {
+        $refused=$false; try { Invoke-DevMongoSetup $operation } catch { $refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE' }
+        Assert $refused "Execution unexpectedly reached $operation"
+    }
+    $refused=$false; try { Invoke-DevMongoSetup 'Activate' } catch { $refused=$_.Exception.Message -eq 'DEV_MONGO_ACTION_REJECTED' }
+    Assert $refused 'Activation operation accepted'
+}
+Check 'filesystem primitives reject foreign paths and cannot bypass policy' {
+    $plan=Get-DevMongoPlan
+    foreach ($body in @({New-DevMongoDirectory 'C:\foreign' 'Modify'},{Write-DevMongoPrivateFile 'C:\foreign.key' ([byte[]]::new(0)) 'Read'})) {
+        $refused=$false; try { & $body } catch { $refused=$_.Exception.Message -eq 'DEV_MONGO_TARGET_REJECTED' }; Assert $refused 'Foreign write accepted'
+    }
+    foreach ($body in @({New-DevMongoDirectory $plan.storage 'Modify'},{Write-DevMongoPrivateFile $plan.configuration ([byte[]]::new(0)) 'Read'},{Open-DevMongoLifecycleLock $plan})) {
+        $refused=$false; try { & $body } catch { $refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE' }; Assert $refused 'Primitive bypassed inactive policy'
+    }
+}
+Check 'ACL descriptors isolate service rights without changing any Windows ACL' {
+    $plan=Get-DevMongoPlan
+    foreach ($kind in @('Traverse','Read','Modify','OwnerOnly')) {
+        $acl=Get-DevMongoAcl $kind
+        Assert $acl.AreAccessRulesProtected 'Inherited permissions retained'
+        $rules=@($acl.GetAccessRules($true,$false,[Security.Principal.SecurityIdentifier]) | Where-Object { $_.IdentityReference.Value -eq $plan.serviceSid })
+        if ($kind -eq 'OwnerOnly') { Assert ($rules.Count -eq 0) 'Service can read owner-only receipt' }
+        else {
+            Assert ($rules.Count -eq 1) 'Missing service-specific rule'
+            if ($kind -eq 'Read' -or $kind -eq 'Traverse') { Assert (-not ($rules[0].FileSystemRights -band [Security.AccessControl.FileSystemRights]::WriteData)) 'Service writable control configuration' }
+            if ($kind -eq 'Traverse') { Assert ($rules[0].InheritanceFlags -eq 'None') 'Service inherits API secret access' }
+        }
+    }
+    Import-DevMongoAtomicDirectory
+    Assert ($null -ne ('DeepLearnerMongoIO' -as [type]).GetMethod('CreateExclusive')) 'Atomic exclusive-create primitive did not compile'
+}
+Check 'TCP parser refuses unknown output and conservatively treats target bindings as occupied' {
+    $header='Proto Local Address Foreign Address State PID'
+    Assert (@(ConvertFrom-DevMongoListeners @($header,'TCP 127.0.0.1:4000 0.0.0.0:0 LISTENING 5')).Count -eq 0) 'Unrelated binding treated as target'
+    foreach ($row in @('TCP 127.0.0.1:27019 0.0.0.0:0 LISTENING 12','TCP [::]:27019 [::]:0 LISTENING 12','TCP 127.0.0.1:27019 0.0.0.0:0 TIME_WAIT 0')) { Assert (@(ConvertFrom-DevMongoListeners @($header,$row)).Count -eq 1) 'Occupied target treated as free' }
+    foreach ($rows in @(@($header,'TCP 127.0.0.1:27019 0.0.0.0:0 UNKNOWN 12'),@($header,'TCP 127.0.0.1:27019 malformed'),@('unrecognized output'))) {
+        $refused=$false; try { ConvertFrom-DevMongoListeners $rows | Out-Null } catch { $refused=$_.Exception.Message -eq 'DEV_MONGO_PORT_UNKNOWN' }; Assert $refused 'Unknown TCP result treated as free'
+    }
+    $live=@(ConvertFrom-DevMongoListeners @($header,'TCP 127.0.0.1:27019 0.0.0.0:0 LISTENING 12','TCP 127.0.0.1:27019 127.0.0.1:50000 ESTABLISHED 12','TCP 127.0.0.1:27019 127.0.0.1:50001 TIME_WAIT 0'))
+    Assert-DevMongoListenerRows $live 12
+    $refused=$false; try { Assert-DevMongoListenerRows $live 99 } catch { $refused=$_.Exception.Message -eq 'DEV_MONGO_LISTENER_IDENTITY_UNKNOWN' }; Assert $refused 'Foreign listener accepted'
+}
+Check 'owner-matching parent ACL rejects unrelated write and delete-child authority' {
+    $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+    $acl=Get-DevMongoAcl 'OwnerOnly'
+    Assert-DevMongoParentAcl $acl $sid
+    $acl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new([Security.Principal.SecurityIdentifier]::new('S-1-1-0'),'Read','Allow'))
+    Assert-DevMongoParentAcl $acl $sid
+    $acl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new([Security.Principal.SecurityIdentifier]::new('S-1-1-0'),'DeleteSubdirectoriesAndFiles','Allow'))
+    $refused=$false; try { Assert-DevMongoParentAcl $acl $sid } catch { $refused=$_.Exception.Message -eq 'DEV_MONGO_PARENT_SHARED_WRITE_REFUSED' }; Assert $refused 'Shared writable parent accepted'
+    foreach ($generic in @('GA','GW')) {
+        $genericAcl=[Security.AccessControl.DirectorySecurity]::new()
+        $genericAcl.SetSecurityDescriptorSddlForm("O:${sid}D:(A;;FA;;;${sid})(A;;${generic};;;WD)")
+        $refused=$false; try { Assert-DevMongoParentAcl $genericAcl $sid } catch { $refused=$_.Exception.Message -eq 'DEV_MONGO_PARENT_SHARED_WRITE_REFUSED' }; Assert $refused 'Generic shared write capability accepted'
+    }
+}
+Check 'replica helper emits only exact public plan and blocks initialization before driver imports' {
+    $tool=Join-Path $script:DevRepo 'apps/api/scripts/dev-local.ts'
+    $json=@(& $node --import tsx $tool mongo-plan); Assert ($LASTEXITCODE -eq 0) 'Replica plan failed'
+    $replica=($json -join '') | ConvertFrom-Json
+    Assert ($replica._id -eq 'deeplearner-dev-rs' -and $replica.members.Count -eq 1 -and $replica.members[0].host -eq 'localhost:27019') 'Replica target changed'
+    $message=@(& $node --import tsx $tool mongo-initialize 2>&1); $code=$LASTEXITCODE
+    Assert ($code -eq 1 -and ($message -join '') -match 'DEV_PERSISTENT_POLICY_NOT_ACTIVE') 'Replica execution bypassed policy'
+}
+Write-Host "$passed inert/unit checks passed. No MongoDB/service/database/ACL operation or application startup was performed. Runtime qualification remains NOT_RUN."

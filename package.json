@@ -17,6 +17,7 @@
     "watch:packages": "concurrently --kill-others -n types,validation \"npm run dev --workspace=@deeplearner/shared-types\" \"npm run dev --workspace=@deeplearner/validation\"",
     "dev": "pwsh -NoLogo -NoProfile -File scripts/Start-DeepLearnerDev.ps1",
     "dev:local": "npm run dev --",
+    "dev:setup": "pwsh -NoLogo -NoProfile -File scripts/Setup-DeepLearnerDev.ps1",
     "dev:web": "npm run build:packages && concurrently --kill-others -n packages,web \"npm run watch:packages\" \"npm run dev --workspace=@deeplearner/web\"",
     "dev:admin": "npm run build:packages && concurrently --kill-others -n packages,admin \"npm run watch:packages\" \"npm run dev --workspace=@deeplearner/admin\"",
     "dev:api": "npm run build:packages && concurrently --kill-others -n packages,api \"npm run watch:packages\" \"npm run dev --workspace=@deeplearner/api\"",

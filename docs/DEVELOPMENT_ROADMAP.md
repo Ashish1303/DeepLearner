@@ -2686,3 +2686,45 @@ Keep F042/F043 IN_PROGRESS with acceptance BLOCKED, F043 MongoDB 15 NOT_RUN, bro
 DEV-PERSISTENT-27019 remains PROPOSED / NOT ACTIVE. Existing FAIL/UNKNOWN evidence,
 ownership/isolation/cleanup, browser restrictions and mandatory acceptance gates
 remain unchanged. This tooling checkpoint establishes no production readiness.
+
+# 20. Slice B persistent MongoDB preparation — 2026-10-31
+
+Secondary tooling evidence, not a new feature ID/status or sequencing exception.
+Owner-approved preparation at dev / 23636ad13209d11b84da49484eddf60788a30fd6 covers
+the new Setup-DeepLearnerDev.ps1, root dev:setup Plan command, existing Node helper/
+PowerShell tests and current LOCAL/DATABASE/roadmap sections. The pending narrow
+Stitch-source .gitignore entry is preserved; the twelve originals remain unchanged.
+No architecture, application/authentication, dependency, lint configuration or
+private profile change is included.
+
+The prior separately approved normal-token qualification found no 27019 listener,
+an absent proposed private directory and a current-user-owned existing parent.
+That snapshot is not a reservation, operational qualification or service adoption.
+The owner approved advertised replica member localhost:27019 while keeping network
+binding/client URI 127.0.0.1:27019. The fixed plan excludes protected 27017/27018.
+
+Implemented: non-mutating default Plan and configuration templates; exact target/
+binary/service/private path checks; inactive-policy guards; exclusive creation and
+private ACL descriptors; separate guarded preparation/install/start/stop candidates;
+registration/live identity checks and lifecycle lock; exact replica plan. Actual
+start/initialization retain an independent authenticated-bootstrap prerequisite.
+No unauthenticated initialization actuator is provided or claimed complete.
+
+Offline evidence/final review is recorded in LOCAL_DEVELOPMENT.md. It is not a real
+MongoDB, service, ACL, transaction, restart-persistence or application startup PASS.
+No service/config/storage/key/user/database was provisioned; no Admin access was
+requested. Service installation, account logon rights, private ACL/source inventory,
+policy activation and particular execution each need explicit future approval.
+Authenticated connection-bound bootstrap must be separately contracted before
+start/initialization can be enabled. Do not start Slice C automatically.
+
+Preparation is **READY_FOR_OFFLINE_CHECKPOINT** for separate owner review only;
+**not ready for blanket provisioning approval**. The final source review has zero
+unresolved Critical/High/Medium/Low findings; 22 inert and 9 startup-validation tests,
+API TypeScript, source lint, section formatting and integrity checks PASS. The known
+root lint cache limitation remains separate. Persistent MongoDB is NOT_PROVISIONED;
+application startup/shutdown remains NOT_VERIFIED. Preserve
+DEV-PERSISTENT-27019 PROPOSED / NOT ACTIVE; F042/F043 IN_PROGRESS with acceptance
+BLOCKED; F043 MongoDB 15 NOT_RUN, browser 213 NOT_RUN, live integration/production
+NOT_VERIFIED and F044 NOT_STARTED. No Git commit/push or production permission is
+granted by this preparation.

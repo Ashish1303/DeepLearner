@@ -24,3 +24,6 @@ Thumbs.db
 /.vscode/
 /AGENTS.md
 /docs/designs/
+
+# Original local Stitch import; organized references live in docs/design/stitch/.
+/docs/design-imports/stitch_deeplearner_platform_design_system/

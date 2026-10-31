@@ -1,3 +1,176 @@
+# Slice B — persistent MongoDB tooling preparation, 2026-10-31
+
+## Authority and commands
+
+Owner-approved preparation at `dev` / `23636ad13209d11b84da49484eddf60788a30fd6`.
+This section supersedes earlier statements that root dev:setup does not exist;
+all historical Slice A/design evidence below remains unchanged.
+
+```powershell
+npm run dev:setup
+```
+
+The new command invokes `scripts/Setup-DeepLearnerDev.ps1` and defaults to **Plan**.
+It returns a non-secret target/configuration/replica plan without filesystem
+changes, service operations, port probes, credential generation or database operations. Existing npm run dev/dev:local
+and the Slice A profile schema/launcher are unchanged.
+
+Separate named operations are PrepareStorage, InstallService, StartService,
+StopService and InitializeReplica. **All effectful entry points and filesystem
+primitives currently refuse with DEV_PERSISTENT_POLICY_NOT_ACTIVE.** There is no
+activation CLI switch, approval boolean or profile/receipt-based activation.
+The PowerShell and Node guards require a separately approved source amendment,
+policy activation and particular execution authorization before any effect.
+Do not run effectful commands as an installation procedure from this record.
+
+## Exact target, paths and qualified evidence
+
+- Binding/application URI host: 127.0.0.1; port 27019.
+- Replica set: deeplearner-dev-rs; application database: deeplearner-dev.
+- Owner-approved advertised member: **localhost:27019**. This does not change the
+  literal network binding or client URI; no IP-validation bypass is added.
+- Binary: C:\Program Files\MongoDB\Server\8.2\bin\mongod.exe, file version 8.2.7,
+  SHA-256 89C1F5664DA621A6AD8A0B26DF880BAC8265BFA921F430520A1DB158CAF2F8FE.
+- Private root: C:\Users\Shreeji\AppData\Local\DeepLearner\dev.
+- Data: private root/mongodb. Control/config/key/receipts: private root/mongo-control.
+  Logs: private root/mongo-logs. Lifecycle lock: mongo-control/lifecycle.lock.
+- Proposed unique service: DeepLearnerDevMongo27019; manual startup; virtual account
+  NT SERVICE\DeepLearnerDevMongo27019. Its name-derived SID is recorded in the plan;
+  a read-only sc.exe showsid check returned it without installing a service.
+
+The preceding separately approved normal/non-administrator Windows qualification
+observed 27019 FREE, absent private root/data directory, current-user ownership of
+the nearest existing parent and no reparse ancestors. This was a snapshot, not a
+port reservation, storage claim or current service ownership proof. Future prepare/
+install/start rechecks the TCP table; failures or ambiguous output refuse. Any
+target TCP binding is conservatively occupied, including IPv6 or non-listening
+states; unrecognized target states are UNKNOWN, never FREE.
+
+Protect existing 27017/C:\Program Files\MongoDB\Server\8.2\data and legacy
+27018/C:\Users\Shreeji\AppData\Local\DeepLearner\local-dev\mongodb. No target,
+configuration or helper is retargeted to either. No new private directory/file,
+service registration, replica set, database, account or application profile was
+created or activated by this task. These paths remain outside the repository;
+the pending narrow Stitch-source ignore entry needs no additional expansion.
+
+## Guarded filesystem and service preparation
+
+PrepareStorage is creation-only. It rejects an existing root, unknown services,
+binary changes, links, target changes and an owner-matching parent with unrelated
+write/delete-child/change-permissions authority, including generic write/all ACEs.
+Native exclusive directory creation applies its security descriptor atomically and
+fails if another creator wins; no existing directory is silently adopted. Private
+files use CreateNew with security at creation. On partial failure retain state for
+explicit reconciliation; no delete, reset, repair, rollback or blanket retry.
+
+ACL descriptors give the current owner, SYSTEM and Administrators control. Only
+the service-specific virtual identity gets data/log Modify, control-directory
+traverse/read and configuration/key-file Read. Parent/root service access does not
+inherit onto API profile or DPAPI files. Config/key material is outside service-
+writable data. Future generation writes a strong random internal key only to the
+private key file, not argv, Git or logs. No key generation/ACL application ran here.
+
+InstallService is a distinct future administrator operation; it neither requests
+elevation nor starts the service. Existing service names/configurations are not
+reconfigured. A registration receipt is created only after new registration; a
+partial registration/receipt failure requires review rather than adoption. Reuse/
+stop requires exact current SCM image/account/manual-start settings, protected
+receipts/config/key/ACLs, binary hash and literal loopback listener PID/executable
+identity. A receipt or SCM Running alone is insufficient. Lifecycle operations
+retain an exclusive owner-only lock. No kill-by-name/PID or external-service stop.
+Live SCM permissions, account logon rights, ACL behavior, startup/listener timing,
+shutdown and persistence remain NOT_VERIFIED; offline descriptors do not prove them.
+
+## Initialization and credentials remain separate prerequisites
+
+The exact single-member replica configuration is implemented as a public plan in
+PowerShell and the existing import-safe Node helper (`mongo-plan`). Actual replica
+initialization is **not implemented as a usable actuator**: after policy refusal,
+the reserved operation also requires an authenticated, connection-bound bootstrap
+contract. StartService has the same independent prerequisite guard, so activating
+the general policy alone cannot expose an unqualified first-user bootstrap window.
+There is no unauthenticated MongoDB connection/initialization shortcut or driver
+import in the helper. Unknown write outcomes must be reconciled, never replayed.
+
+This is a deliberate unresolved dependency for future approval, not a passing
+initialization implementation. Approve endpoint identity/authenticated bootstrap
+and its exact source/test inventory before enabling start or replica initialization.
+Service startup and replica initialization must remain separate authorized actions.
+Replica PRIMARY/session/transaction behavior requires its own real qualification.
+
+Future credentials: separate operator/bootstrap and application principals; the
+application principal is limited to approved deeplearner-dev operations without
+cluster/service administration or unapproved DDL. Freeze exact privileges in the
+later provisioning contract. No users/roles/passwords are created here. Application
+credentials/signing material retain Slice A current-user DPAPI/private stdin and
+process-local API-only delivery, with the existing JWT issuer/audience, LOCAL CORS
+and refresh-cookie behavior. Do not write .env or mark APP prerequisites ready.
+Schema/index reconciliation, accounts and content are later C-E scopes.
+
+## Preparation evidence and readiness
+
+Source scope: new scripts/Setup-DeepLearnerDev.ps1; modified package.json,
+apps/api/scripts/dev-local.ts, scripts/tests/DevLocal.Tests.ps1 and the approved
+LOCAL_DEVELOPMENT.md, DATABASE_DESIGN.md, DEVELOPMENT_ROADMAP.md sections. The
+pre-existing .gitignore change is preserved. No SYSTEM_ARCHITECTURE, application,
+auth, dependency, lockfile, lint configuration or private profile changes.
+
+Offline tests cover Plan-only output, protected-target rejection, inactive-policy
+refusal before effects, secret-free configuration, in-memory ACL descriptors and
+shared-parent rejection, native-wrapper compilation without native creation, TCP
+parser ambiguity and the separately guarded replica helper. Existing Slice A
+startup/private-validation tests remain applicable. The final offline completion pass
+on 2026-10-31 reran all **22 PowerShell inert/unit checks** and **9 API startup/
+private-validation tests**, all passing. The default `npm run dev:setup` completed
+as PLAN_ONLY without port, service, database or configuration operations. The
+listener identity check considers only LISTENING rows: established connections and
+TIME_WAIT rows do not invalidate an otherwise exact owned listener; missing,
+foreign, wildcard and duplicate listeners refuse. Port availability remains
+conservative across all target TCP bindings.
+
+Final completion evidence:
+
+| Check                                               | Result                                                                                                                                                 |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| PowerShell parse/inert checks                       | 22/22 PASS; includes 13 retained Slice A checks and 9 Slice B checks                                                                                   |
+| API startup/private-validation tests                | 9/9 PASS                                                                                                                                               |
+| API TypeScript                                      | PASS via workspace typecheck                                                                                                                           |
+| Source lint with command-only `.cache/**` exclusion | PASS: 0 errors, 0 warnings; lint configuration unchanged                                                                                               |
+| Prettier                                            | PASS for root package/TypeScript and the three Slice B Markdown sections                                                                               |
+| Encoding and whitespace                             | Eight paths UTF-8 without BOM, LF/final newline; added-source whitespace and `git diff --check` PASS                                                   |
+| Integrity and sensitive-data review                 | Exact eight-path scope; empty index; 12 ignored original Stitch hashes match; preserved ignore bytes and historical documentation; no detected secrets |
+| Independent source/security/scope review            | Critical 0 / High 0 / Medium 0 / Low 0 unresolved findings                                                                                             |
+| MongoDB/service/ACL/application runtime             | NOT_RUN / NOT_VERIFIED; no operational qualification                                                                                                   |
+
+Fresh full-root ESLint remains **FAIL: 563 errors, 0 warnings across 24 files,
+all under `.cache`**. This generated-cache limitation is separate from the passing
+source lint. No lint exclusion or configuration change is included. A small
+future separately approved global `.cache/**` exclusion remains the recommendation.
+The synthetic cleanup-refusal test prints a deliberate cleanup NOT_VERIFIED message;
+that passing negative check is not real application/MongoDB shutdown evidence.
+
+Preparation is **READY_FOR_OFFLINE_CHECKPOINT** for separate owner checkpoint
+review only. This secondary evidence label changes no feature acceptance or runtime
+gate. Persistent MongoDB remains **NOT_PROVISIONED**; startup/shutdown and
+production readiness remain **NOT_VERIFIED**. No policy activation, provisioning,
+application startup, Git staging/commit/push or production permission is implied.
+
+**Not ready for blanket provisioning execution.** The preparation is reviewable;
+policy/source/execution approval, private ACL/service-install inventory and the
+authenticated bootstrap contract remain prerequisites. Service is not installed
+by this task, replica is not initialized, development database is not created,
+application accounts/fixtures are not provisioned, and app startup is NOT_VERIFIED.
+F042/F043 remain IN_PROGRESS with acceptance BLOCKED; F043 MongoDB 15 NOT_RUN,
+browser 213 NOT_RUN, production NOT_VERIFIED, F044 NOT_STARTED.
+
+Design references: [MongoDB Windows services](https://www.mongodb.com/docs/manual/administration/run-mongodb-windows/),
+[MongoDB hostname validation](https://www.mongodb.com/docs/manual/reference/parameters/),
+[Windows service accounts](https://learn.microsoft.com/windows/security/identity-protection/access-control/service-accounts).
+
+---
+
+# Earlier Slice A checkpoint — retained
+
 # Local Development Slice A — implementation checkpoint, 2026-10-31
 
 ## Current startup command and scope
