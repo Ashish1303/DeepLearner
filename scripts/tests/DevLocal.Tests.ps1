@@ -182,7 +182,7 @@ Check 'configuration is authenticated loopback with keys outside writable data' 
 }
 Check 'all effectful setup actions refuse before probes, credentials or writes' {
     function Get-DevMongoPortRows { throw 'UNEXPECTED_PORT_PROBE' }
-    foreach ($operation in @('PrepareStorage','InstallService','StartService','StopService','InitializeReplica')) {
+    foreach ($operation in @('PrepareStorage','InstallService','StartService','StopService','InitializeReplica','BootstrapFirstUser')) {
         $refused=$false; try { Invoke-DevMongoSetup $operation } catch { $refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE' }
         Assert $refused "Execution unexpectedly reached $operation"
     }
@@ -246,5 +246,114 @@ Check 'replica helper emits only exact public plan and blocks initialization bef
     Assert ($replica._id -eq 'deeplearner-dev-rs' -and $replica.members.Count -eq 1 -and $replica.members[0].host -eq 'localhost:27019') 'Replica target changed'
     $message=@(& $node --import tsx $tool mongo-initialize 2>&1); $code=$LASTEXITCODE
     Assert ($code -eq 1 -and ($message -join '') -match 'DEV_PERSISTENT_POLICY_NOT_ACTIVE') 'Replica execution bypassed policy'
+}
+Check 'two exact transport configurations preserve access control and disable normal localhost bypass' {
+    $plan=Get-DevMongoPlan
+    $bootstrap=Get-DevMongoConfiguration $plan 'Bootstrap'; $normal=Get-DevMongoConfiguration $plan 'Normal'
+    Assert ($bootstrap.Contains('mode: requireTLS') -and $bootstrap.Contains('allowConnectionsWithoutCertificates: false')) 'Bootstrap accepts unintended clients'
+    Assert ($bootstrap.Contains('enableLocalhostAuthBypass: true') -and $normal.Contains('enableLocalhostAuthBypass: false')) 'Incorrect localhost-exception lifecycle'
+    foreach($text in @($bootstrap,$normal)){Assert ($text.Contains('authorization: enabled') -and $text.Contains('clusterAuthMode: keyFile') -and $text.Contains('bindIp: 127.0.0.1')) 'Authentication or target changed'}
+    Assert ((Get-DevMongoConfigurationPhaseFromText $plan $bootstrap) -eq 'Bootstrap') 'Bootstrap phase lost'
+    Assert ((Get-DevMongoConfigurationPhaseFromText $plan $normal) -eq 'Normal') 'Normal phase lost'
+    $refused=$false;try{Get-DevMongoConfigurationPhaseFromText $plan ($bootstrap.Replace('allowConnectionsWithoutCertificates: false','allowConnectionsWithoutCertificates: true'))}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_PRIVATE_CONFIGURATION_CHANGED'};Assert $refused 'Unknown transport config accepted'
+}
+Check 'bootstrap crypto, DPAPI, helper, service permissions and transition refuse before effects' {
+    $plan=Get-DevMongoPlan
+    foreach($body in @({New-DevMongoPassword},{Protect-DevMongoValue 'synthetic-only'},{Initialize-DevMongoPrivateMaterial $plan},{Set-DevMongoOwnerServiceRights $plan},{Write-DevMongoStage $plan 'complete' 'NORMAL_AUTHENTICATION_VERIFIED'},{Invoke-DevMongoNodeStep $plan 'administrator'},{Set-DevMongoNormalConfiguration $plan},{Assert-DevMongoAuthenticatedBootstrap})){
+        $refused=$false;try{& $body | Out-Null}catch{$refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'};Assert $refused 'Bootstrap primitive bypassed inactive policy'
+    }
+}
+Check 'private artifact ACL allowlist separates server material from owner credentials' {
+    $plan=Get-DevMongoPlan
+    foreach($path in @($plan.ca,$plan.serverCertificate,$plan.keyFile,$plan.nextConfiguration)){Assert ((Get-DevMongoPrivateFileKind $plan $path) -eq 'Read') 'Service cannot read required material'}
+    foreach($path in @($plan.clientCertificate,$plan.caKey,$plan.operatorSecret,$plan.applicationSecret,$plan.bootstrapManifest,(Get-DevMongoStagePath $plan 'complete'))){Assert ((Get-DevMongoPrivateFileKind $plan $path) -eq 'OwnerOnly') 'Service can read owner credentials'}
+    $refused=$false;try{Get-DevMongoPrivateFileKind $plan (Join-Path $plan.storage 'secret.pem')}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_TARGET_REJECTED'};Assert $refused 'Writable data used for private key'
+    $mask=Get-DevMongoServiceOwnerMask
+    Assert (($mask -band 0x30) -eq 0x30) 'Owner lacks start/stop'
+    Assert (($mask -band (0x2 -bor 0x10000 -bor 0x40000 -bor 0x80000)) -eq 0) 'Owner service grant includes change-config/delete/write-DACL/write-owner'
+}
+Check 'uncertain first-user, role and application writes select inspection without replay or credential regeneration' {
+    foreach($row in @(@('administrator','inspect-administrator'),@('application-role','inspect-application-role'),@('application-user','verify-application'))){
+        Assert ((Get-DevMongoRecoveryStep $row[0] $false $false) -eq $row[0]) 'Fresh operation lost'
+        Assert ((Get-DevMongoRecoveryStep $row[0] $false $true) -eq $row[1]) 'Uncertain write would replay'
+        Assert ((Get-DevMongoRecoveryStep $row[0] $true $true) -eq $row[1]) 'Completed write would replay'
+        $refused=$false;try{Get-DevMongoRecoveryStep $row[0] $true $false}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_BOOTSTRAP_STAGE_REJECTED'};Assert $refused 'Impossible phase accepted'
+    }
+}
+Check 'new private helper CLI refuses before reading secrets or creating a client' {
+    $tool=Join-Path $script:DevRepo 'apps/api/scripts/dev-mongo-bootstrap.ts'
+    $message=@(& $node --import tsx $tool 2>&1);$code=$LASTEXITCODE
+    Assert ($code -eq 1 -and ($message -join '') -match '^DEV_PERSISTENT_POLICY_NOT_ACTIVE$') 'Bootstrap helper entry did not refuse safely'
+}
+Check 'bootstrap orchestration reconciles interrupted transport and credential phases with all host effects mocked' {
+    # These local mocks exist only for this Check scope. They cannot alter the
+    # source policy guard; no real filesystem, SCM, crypto, helper or DB is called.
+    $plan=Get-DevMongoPlan; $calls=[Collections.Generic.List[string]]::new(); $files=@{}; $simulation=@{Phase='Normal';Interrupt=$false;MissingOperator=$false}
+    function Assert-DevMongoExecutionPolicy {}
+    function Open-DevMongoLifecycleLock {param($Plan) return [IO.MemoryStream]::new()}
+    function Assert-DevMongoPrepared {param($Plan)}
+    function Get-DevMongoConfigurationPhase {param($Plan) return $simulation.Phase}
+    function Test-Path {param([string]$LiteralPath) return $files.ContainsKey($LiteralPath)}
+    function Assert-DevMongoStage {param($Plan,$Stage) $calls.Add('inspect-stage:'+$Stage);return @{stage=$Stage}}
+    function Write-DevMongoStage {param($Plan,$Stage,$Status) $calls.Add('write-stage:'+$Stage);$files[(Get-DevMongoStagePath $Plan $Stage)]=$true}
+    function Assert-DevMongoPortFree {$calls.Add('port-check')}
+    function Assert-DevMongoRunningIdentity {param($Plan,$Service) if($Service.Status -ne 'Running'){throw 'MOCK_NOT_RUNNING'};$calls.Add('identity')}
+    $fakeService=[pscustomobject]@{Status='Stopped';Calls=$calls}
+    $fakeService | Add-Member ScriptMethod Refresh {}
+    $fakeService | Add-Member ScriptMethod Start {$this.Calls.Add('service-start');$this.Status='Running'}
+    $fakeService | Add-Member ScriptMethod Stop {$this.Calls.Add('service-stop');$this.Status='Stopped'}
+    $fakeService | Add-Member ScriptMethod WaitForStatus {param($Status,$Timeout) if($this.Status -ne $Status){throw 'MOCK_BAD_SERVICE_STATE'}}
+    $fakeService | Add-Member ScriptMethod Dispose {}
+    function Get-DevMongoService {param($Plan)return $fakeService}
+    function Invoke-DevMongoNodeStep {param($Plan,$Step)
+        $calls.Add('node:'+$Step)
+        if($simulation.MissingOperator -and $Step -eq 'inspect-administrator'){throw 'DEV_PRIVATE_CONFIG_MISSING'}
+        switch($Step){'verify-normal'{'NORMAL_AUTHENTICATION_VERIFIED'} 'inspect-administrator'{'ADMINISTRATOR_VERIFIED'} 'inspect-application-role'{'APPLICATION_ROLE_VERIFIED'} 'verify-application'{'APPLICATION_VERIFIED'} default{throw ('UNEXPECTED_MUTATION:'+ $Step)}}
+    }
+    function Set-DevMongoNormalConfiguration {param($Plan) $calls.Add('normal-config');if($fakeService.Status -ne 'Stopped'){throw 'MOCK_CONFIG_CHANGED_WHILE_RUNNING'};$simulation.Phase='Normal';if($simulation.Interrupt){throw 'SYNTHETIC_INTERRUPTED_TRANSITION'}}
+    foreach($stage in @('administrator','application')){$files[(Get-DevMongoStagePath $plan $stage)]=$true}
+    $result=Invoke-DevMongoBootstrap $plan
+    Assert ($result.status -eq 'NORMAL_AUTHENTICATION_VERIFIED') 'Interrupted normal transition not reconciled'
+    Assert (($calls | Where-Object {$_ -like 'node:*'}) -join ',' -eq 'node:verify-normal') 'Normal transition repeated bootstrap'
+    Assert ($calls.Contains('write-stage:complete') -and -not $calls.Contains('normal-config')) 'Normal phase overwritten or not completed'
+    $calls.Clear();$result=Invoke-DevMongoBootstrap $plan
+    Assert (-not ($calls | Where-Object {$_ -like 'write-stage:*'})) 'Completed restart rewrote stage state'
+    Assert (($calls | Where-Object {$_ -like 'node:*'}) -join ',' -eq 'node:verify-normal') 'Completed restart repeated bootstrap'
+    $calls.Clear();$files.Clear();$simulation.Phase='Bootstrap';$fakeService.Status='Running'
+    $files[(Get-DevMongoStagePath $plan 'initialize-intent')]=$true
+    $refused=$false;try{Invoke-DevMongoBootstrap $plan | Out-Null}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_INITIALIZATION_OUTCOME_UNKNOWN_RECONCILE'}
+    Assert ($refused -and -not ($calls | Where-Object {$_ -like 'node:*'})) 'Uncertain replica init replayed'
+    $calls.Clear();$files.Clear()
+    foreach($stage in @('replica','administrator-intent','application-role-intent','application-role','application-user-intent','application')){$files[(Get-DevMongoStagePath $plan $stage)]=$true}
+    $simulation.MissingOperator=$true
+    $refused=$false;try{Invoke-DevMongoBootstrap $plan | Out-Null}catch{$refused=$_.Exception.Message -eq 'DEV_PRIVATE_CONFIG_MISSING'}
+    Assert ($refused -and -not $calls.Contains('normal-config') -and -not $calls.Contains('node:administrator')) 'Missing operator credentials changed state'
+    $simulation.MissingOperator=$false;$calls.Clear();$simulation.Interrupt=$true
+    $refused=$false;try{Invoke-DevMongoBootstrap $plan | Out-Null}catch{$refused=$_.Exception.Message -eq 'SYNTHETIC_INTERRUPTED_TRANSITION'}
+    Assert ($refused -and $simulation.Phase -eq 'Normal') 'Transition interruption not exercised'
+    Assert ($calls.Contains('node:inspect-administrator') -and -not $calls.Contains('node:administrator')) 'Lost administrator ACK repeated createUser'
+    Assert ($calls.Contains('node:verify-application') -and -not $calls.Contains('node:application-user')) 'Lost application ACK repeated createUser'
+    Assert ($calls.IndexOf('node:verify-application') -lt $calls.IndexOf('service-stop')) 'Configuration transition preceded application verification'
+    Assert ($calls.IndexOf('service-stop') -lt $calls.IndexOf('normal-config')) 'Configuration changed before service stopped'
+    $simulation.Interrupt=$false;$calls.Clear();$result=Invoke-DevMongoBootstrap $plan
+    Assert (($calls | Where-Object {$_ -like 'node:*'}) -join ',' -eq 'node:verify-normal') 'Interrupted transition repeated credential operations'
+    Assert (-not $calls.Contains('normal-config') -and $calls.Contains('write-stage:complete')) 'Interrupted normal config reopened bootstrap'
+    $calls.Clear();$files.Clear();$simulation.Phase='Bootstrap';$files[(Get-DevMongoStagePath $plan 'complete')]=$true
+    $refused=$false;try{Invoke-DevMongoBootstrap $plan | Out-Null}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_BOOTSTRAP_REENTRY_REJECTED'}
+    Assert $refused 'Completion marker allowed re-entry into bootstrap transport'
+}
+Check 'service security rejects foreign owners and controlling ACEs without touching Windows service ACLs' {
+    $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+    $safe=[Security.AccessControl.RawSecurityDescriptor]::new("O:${sid}D:(A;;GA;;;SY)(A;;GA;;;BA)(A;;0x1200B5;;;${sid})(A;;0x20005;;;WD)")
+    Assert-DevMongoServiceSecurity $safe $sid
+    foreach($rights in @('0x2','0x10','0x20','0x40','0x100','0x10000','0x40000','0x80000','GA','GX','GW')){
+        $bad=[Security.AccessControl.RawSecurityDescriptor]::new("O:${sid}D:(A;;GA;;;SY)(A;;${rights};;;WD)")
+        $refused=$false;try{Assert-DevMongoServiceSecurity $bad $sid}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_FOREIGN_SERVICE_CONTROL_REFUSED'};Assert $refused 'Foreign service control accepted'
+    }
+    foreach($sddl in @('O:WDD:(A;;GA;;;SY)',"O:${sid}")){
+        $refused=$false;try{Assert-DevMongoServiceSecurity ([Security.AccessControl.RawSecurityDescriptor]::new($sddl)) $sid}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_SERVICE_PERMISSIONS_UNKNOWN'};Assert $refused 'Unknown service owner/DACL accepted'
+    }
+    Import-DevMongoServiceSecurityReader
+    Assert ($null -ne ('DeepLearnerMongoServiceSecurity' -as [type]).GetMethod('Read')) 'Read-only service-security native helper did not compile'
 }
 Write-Host "$passed inert/unit checks passed. No MongoDB/service/database/ACL operation or application startup was performed. Runtime qualification remains NOT_RUN."

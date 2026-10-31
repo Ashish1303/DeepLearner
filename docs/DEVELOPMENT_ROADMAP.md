@@ -2728,3 +2728,32 @@ DEV-PERSISTENT-27019 PROPOSED / NOT ACTIVE; F042/F043 IN_PROGRESS with acceptanc
 BLOCKED; F043 MongoDB 15 NOT_RUN, browser 213 NOT_RUN, live integration/production
 NOT_VERIFIED and F044 NOT_STARTED. No Git commit/push or production permission is
 granted by this preparation.
+
+# 21. First-user bootstrap offline implementation — 2026-10-31
+
+Secondary tooling evidence only; no feature acceptance or sequencing change.
+Owner-authorized exact nine-path implementation prepares the two-phase private TLS
+localhost-exception bootstrap and explicit stopped-service normal-config transition.
+The existing Node validator and application launcher remain unchanged. All real
+effects remain behind the existing inactive-policy guards.
+
+Prepared source includes exact users/roles, guarded certificate/credential/DPAPI
+creation, private path/ACL inventory, intent/result recovery records, no-repeat
+inspection, exact transport bytes, ownership checks and fresh normal authentication.
+App insert privilege inherently permits implicit creation of an approved namespace;
+no absolute database-enforced existing-only claim is made and no API guard is added.
+Schema/index reconciliation and product accounts/fixtures remain future C-E work.
+
+Final offline evidence: 29 PowerShell inert checks and 22 focused TypeScript tests
+PASS; API TypeScript, source lint, formatting, scope/privacy/encoding/whitespace
+checks PASS. Independent Critical 0 / High 0 / Medium 0 / Low 0 unresolved after
+corrections and fresh review. Full-root lint retains 563 errors in 24 cache files.
+Detailed evidence is in LOCAL_DEVELOPMENT.md. Secondary tooling status is
+READY_FOR_OFFLINE_CHECKPOINT for separate owner review only. No runtime pass, service installation,
+credential/certificate generation, ACL change, policy activation or Git write occurs
+in this offline task. Any remaining source findings must be resolved before a
+separately approved checkpoint; runtime execution requires a separate approval.
+
+Preserve MongoDB NOT_PROVISIONED; DEV-PERSISTENT-27019 PROPOSED / NOT ACTIVE;
+application startup/shutdown NOT_VERIFIED; F042/F043 acceptance BLOCKED;
+F043 MongoDB 15 NOT_RUN; browser 213 NOT_RUN; F044 NOT_STARTED; production NOT_VERIFIED.

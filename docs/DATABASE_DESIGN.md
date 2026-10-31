@@ -1798,3 +1798,55 @@ PASS, API TypeScript/source lint/format/integrity checks PASS, independent revie
 Critical 0 / High 0 / Medium 0 / Low 0 unresolved. Detailed evidence and the separate
 root lint cache limitation are recorded in LOCAL_DEVELOPMENT.md. Persistent MongoDB
 remains NOT_PROVISIONED; no runtime database, service or ACL qualification is claimed.
+
+## First-user bootstrap contract — offline implementation, 2026-10-31
+
+This records implementation preparation, not policy activation or database effects.
+DEV-PERSISTENT-27019 remains PROPOSED / NOT ACTIVE. All prior policy text and
+historical evidence remain unchanged; the following is a prospective narrow
+amendment requiring separate owner activation and particular execution approval.
+
+For only 127.0.0.1:27019 / deeplearner-dev-rs / deeplearner-dev, allow one exact
+replSetInitiate with member 0 localhost:27019; createUser for
+admin/deeplearner-local-operator and deeplearner-dev/deeplearner-local-app; and
+createRole for deeplearner-dev/deeplearner-local-app-runtime. Permit the necessary
+MongoDB-managed authentication/replication/session metadata consequences in admin,
+local and config only through these approved commands. No direct writes to those
+system collections, reconfiguration, user removal/reset, role expansion, data
+reset or application collection/index/fixture creation follows.
+
+Operator roles are userAdminAnyDatabase and clusterMonitor on admin. Treat that
+owner-only credential as fully privileged because user administration can grant
+further authority. Application authentication uses SCRAM-SHA-256 in deeplearner-dev,
+with the exact collection/action manifest in dev-mongo-bootstrap.ts. All21 product
+collections have find/listIndexes and the database has listCollections. No
+killCursors grant is needed for the application to close its own cursors.
+Read-only content: learningPaths/modules/topics/visualizations/practiceQuestions;
+concepts additionally update. Mutable insert/update collections: users/sessions/
+technologies/studentProgress/practiceRubricAuthorities/sectionEvidenceChallenges/
+visualizationCheckpointDefinitions. Append-only insert: auditLogs/practiceAttempts/
+practiceAssessments/practiceRubricVersions/sectionActivityReceipts/completionRequests.
+Only emailVerificationTokens/passwordResetTokens additionally permit remove.
+No app createIndex/dropIndex/dropCollection/user-admin/replica-admin actions.
+
+MongoDB insert privilege also permits implicit creation of the named collection.
+The role restricts namespace and actions; it cannot enforce insert-existing-only.
+This implementation does not broaden the reviewed insert manifest or change APIs.
+Existing schema/readiness gates and autoCreate/autoIndex=false remain essential.
+A separate Slice C provisioner, approved manifest and execution are required for
+createCollection/createIndex/listCollections/listIndexes; schema-changing grants
+remain excluded from the app, whose approved metadata inspection is retained.
+
+TLS protects only the one-time bootstrap transport, with private CA/server/client
+material and keyfile member authentication. MongoDB authorization remains enabled
+in both phases. After real authenticated administrator/application verification,
+the owned stopped service may receive the exact normal configuration, atomically
+replacing only mongo-control/mongod.cfg with enableLocalhostAuthBypass=false.
+No other private existing file is overwritten; a leftover next-config file or
+unknown bytes requires explicit reconciliation.
+
+First-user/app-user unknown writes never regenerate credentials or replay createUser.
+Stored credentials are tried through inspection; failed authentication stops for
+owner intervention. Unknown initialization and absent PRIMARY remain unreconciled,
+never reinitialized. This code provides no destructive or auth-disabling recovery.
+MongoDB remains NOT_PROVISIONED; real TLS/auth/transaction/persistence NOT_VERIFIED.

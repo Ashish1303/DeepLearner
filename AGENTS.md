@@ -493,3 +493,35 @@ Only the project owner can:
 - approve the next feature
 
 Never self-approve work or automatically continue to another roadmap item.
+
+## First-user bootstrap offline implementation — 2026-10-31
+
+Owner-approved nine-path implementation only. DEV-PERSISTENT-27019 remains
+PROPOSED / NOT ACTIVE; the PowerShell and existing Node execution guards remain
+unconditional refusals. No profile value, CLI flag or stage receipt activates them.
+No certificate/credential generation, service/ACL change, MongoDB connection or
+bootstrap execution is authorized by this amendment.
+
+The prepared flow uses BootstrapFirstUser for the exact dedicated 27019 service,
+certificate-required TLS during the MongoDB localhost exception, and a single
+stopped-service transition to the existing LOCAL/SCRAM transport with localhost
+bypass disabled. Normal StartService must verify the complete normal configuration,
+SCM/executable/listener ownership and fresh authenticated state; it never bootstraps.
+The Node helper is an internal private protocol, not a separately approved CLI.
+
+Future policy activation requires a separate reviewed source inventory covering
+both execution guards (including apps/api/scripts/dev-local.ts, unchanged here),
+all service/storage/profile/certificate/credential inventories and particular
+execution. A standalone Node-guard activation is not sufficient approval.
+
+The proposed narrow metadata exception in DATABASE_DESIGN.md permits only the
+listed replica/user/role commands and their MongoDB-managed system effects, after
+separate activation/execution approval. It grants no direct system-collection
+writes, application schema/seed permission or implicit recovery authority.
+Exact application insert grants inherently allow implicit creation of those
+approved collection names in MongoDB; never claim an absolute database-enforced
+insert-existing-only restriction. Startup readiness and autoCreate/autoIndex=false
+remain required; no runtime/API guard or broader privilege is introduced here.
+
+Keep F042/F043 acceptance BLOCKED, F043 MongoDB 15 NOT_RUN, browser 213 NOT_RUN,
+F044 NOT_STARTED and production NOT_VERIFIED. Historical failures remain intact.

@@ -1149,3 +1149,48 @@ outstanding. Observed root startup fails closed at DEV_PROFILE_MISSING, before a
 app or database execution. See LOCAL_DEVELOPMENT.md for source scope/evidence.
 No service, .env, persistent configuration, database or application source changes
 are included; all existing feature statuses and acceptance restrictions remain.
+
+## 34. Persistent first-user bootstrap preparation — 2026-10-31
+
+The owner approved offline implementation of a bounded bootstrap coordinator in
+existing Setup-DeepLearnerDev.ps1 and an import-safe internal Node protocol helper.
+No general-purpose supervisor, application API/security business-logic change,
+new dependency or runtime approval is included. Both execution guards remain
+unconditional refusals; DEV-PERSISTENT-27019 is PROPOSED / NOT ACTIVE.
+
+Phase 1: the exact dedicated virtual-account Windows service binds 127.0.0.1:27019
+with authorization/keyFile, requireTLS and mandatory private-CA client certificates.
+The client verifies the CA, server hostname/SAN, expiry, leaf key match and pinned
+certificate fingerprint. It also requires a specific certificate-rejection response
+from a no-client-certificate probe; generic transport failure is UNKNOWN.
+MongoDB's localhost exception supplies first-user authorization inside that channel.
+The owner, SYSTEM/Administrators and dedicated MongoDB service are trusted principals;
+this is not isolation from hostile code running as the Windows owner.
+
+Phase 2: only after actual operator/app authentication and exact privilege inspection,
+the same stopped service receives the known normal LOCAL/SCRAM configuration with
+localhost bypass disabled. No TLS-error-to-plaintext fallback exists. Configuration
+phase is derived from exact file bytes, not a CLI flag or optimistic receipt.
+A normal config after interruption is authenticated and completed without ever
+restoring bootstrap mode. Ordinary service start/reuse always performs fresh
+normal authentication; npm run dev never bootstraps or manages MongoDB.
+
+The helper receives bounded private stdin under existing retained Job containment.
+Only fixed public status frames return; stderr is discarded and raw driver/server
+errors never enter logs. Parent checks SCM/image/listener/storage/artifact identity
+around each helper invocation. The helper alone does not prove SCM/storage ownership.
+No direct public helper invocation or independent Node-only activation is approved.
+
+DPAPI passwords are durable before first network write; TLS CA signing key is
+DPAPI-protected, leaf PEM keys use explicit private ACLs, server key/internal key
+are service-readable and client/operator/app material is owner-only. Certificate
+stores and machine-wide trust are unchanged. Native service permissions grant only
+owner query/start/stop/interrogate/synchronize/read-control on this new service.
+SCM owner/live DACL are validated before reuse and before/after the grant; unrelated
+controlling permissions (including generic execute/write/all) refuse. The exact-
+service read-only native adapter has bounded buffers and retained handle cleanup.
+Install/elevation/logon/ACL behavior requires separately approved real qualification.
+
+Inert/mocked evidence is not TLS, authentication, service, transaction or persistence
+verification. F042/F043 acceptance BLOCKED,15 MongoDB/213 browser NOT_RUN and
+F044 NOT_STARTED remain unchanged; production readiness remains NOT_VERIFIED.

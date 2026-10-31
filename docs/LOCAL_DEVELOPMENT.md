@@ -1,3 +1,155 @@
+# First-user bootstrap — offline implementation, 2026-10-31
+
+This current record supersedes the earlier statement that authenticated bootstrap
+is unimplemented. It describes prepared source only; all earlier evidence below
+is retained byte-for-byte. DEV-PERSISTENT-27019 remains **PROPOSED / NOT ACTIVE**.
+
+## Commands and isolation
+
+`npm run dev:setup` remains PLAN_ONLY, including bootstrap/normal config templates.
+The reserved `BootstrapFirstUser` setup action now has a complete guarded candidate
+workflow. All effectful actions refuse with DEV_PERSISTENT_POLICY_NOT_ACTIVE before
+port/service probes, crypto, private reads/writes or MongoDB connections. Neither
+flags, profiles nor receipts activate execution. The unchanged Node guard is also
+unconditional; future activation must separately review both guard sources.
+
+The only instance is DeepLearnerDevMongo27019, virtual account
+NT SERVICE\DeepLearnerDevMongo27019, pinned 8.2.7 binary, 127.0.0.1:27019,
+deeplearner-dev-rs, member 0 localhost:27019 and database deeplearner-dev. Protect
+existing 27017 and 27018 services/data/credentials. No service is installed, adopted
+or changed by this task; all prior host qualification remains snapshot evidence.
+
+Bootstrap config keeps authorization enabled and keyfile membership authentication,
+requires TLS and a private client certificate, and permits MongoDB's documented
+localhost exception only inside that protected channel. CA/hostname/expiry/key/EKU/
+fingerprint checks fail closed. A no-certificate probe must give an explicit TLS
+certificate rejection, not just fail to connect. Windows Schannel/Node interoperability
+and the exact rejection codes are real-environment prerequisites, NOT_VERIFIED.
+
+## Workflow and interruption handling
+
+The coordinator checks exact SCM/image/storage/config/artifact/listener ownership,
+then: init once -> writable PRIMARY -> first operator -> protected unauthenticated
+find must return Mongo code13 -> operator authentication/config/roles -> restricted
+app role/user -> app authentication/effective privileges -> owned service stop ->
+atomic known normal config -> restart/fresh authentication -> completion record.
+Public hello/ping are not used as proof that data access requires authentication.
+
+Per-action create-new intent records precede uncertain writes. Unknown init or no
+PRIMARY stops for owner reconciliation without reinitialization. Lost first-user,
+role or app-user ACK selects authenticated inspection with the original stored
+credentials; it never resets passwords, expands roles or retries creation blindly.
+Missing operator credentials or failed inspection stops. Records are bound to the
+owner, target and private manifest; they are not live ownership/authentication proof.
+
+Only mongo-control/mongod.cfg may undergo the explicit stopped-service atomic
+transition via a create-new mongod.next.cfg. Unknown/partial temp state refuses.
+Normal bytes retain auth/keyfile and disable localhost bypass; they preserve the
+existing LOCAL/SCRAM app transport. An interrupted normal configuration is inspected
+in normal mode without TLS fallback or restoration of the bootstrap exception.
+A completion receipt alone cannot authorize normal startup: prepared/config/SCM/
+listener checks and fresh authenticated verification remain mandatory.
+
+Ordinary StartService/BootstrapFirstUser re-entry after completion only verifies
+normal state; no initialization or user/role creation is repeated. npm run dev
+and npm run dev:local remain application-only and never bootstrap or manage MongoDB.
+Schema/index, genuine Student/Admin accounts, fixture and profile/signing-secret
+activation are separate work; these MongoDB principals are not product accounts.
+
+## Private material and exact runtime inventory — not created
+
+Private root stays C:\Users\Shreeji\AppData\Local\DeepLearner\dev. Existing
+mongodb/mongo-logs/mongo-control paths remain separated. Plan revision2 adds:
+
+- mongo-control/bootstrap: private directory.
+- ca.crt and server.pem there: service-readable CA/server certificate+leaf key.
+- ca-key.dpapi, client.pem, operator-password.dpapi: owner-only signing key, client
+  certificate+leaf key and operator password. No certificate store/trust changes.
+- bootstrap-plan.json: owner-only target/helper-hash/certificate fingerprint manifest.
+- initialize-intent.json, replica.json, administrator-intent.json, administrator.json,
+  application-role-intent.json, application-role.json, application-user-intent.json,
+  application.json, complete.json: fixed owner-only intent/result records there.
+- mongo-control/mongod.next.cfg: creation-only transition candidate.
+- mongodb-uri.dpapi beside the future application profile: owner-only app URI in the
+  unchanged launcher DPAPI format. Profile/schema/signing-secret remain unactivated.
+
+Passwords are independent 32-byte random values, DPAPI-protected under the original
+Windows owner before any createUser. Leaf PEM keys are plaintext only inside the
+explicit private ACLs required by MongoDB/client; CA signing key is DPAPI protected.
+Owner/SYSTEM/Administrators remain trusted; hostile code under the owner identity
+is outside this isolation boundary. DPAPI/profile loss needs explicit recovery,
+never automatic auth disabling, data resets or credential regeneration.
+
+Service rights grant only query/start/stop/interrogate/synchronize/read-control for
+this service; no owner ChangeConfig/WriteDac/delete grant is added. The service
+object owner and live DACL must exclude unrelated controlling grants, including
+generic execute/write/all; a bounded exact-service native reader checks OWNER+DACL
+and closes its handles. Installation
+requires separate elevation under the original owner context, without changing
+service/storage ACLs globally. Virtual-account logon and live ACL behavior remain
+unqualified. The contained Node helper receives only private stdin; stdout is a
+fixed public status, stderr NUL, no driver command monitoring or raw error logs.
+
+## Privilege and scope contract
+
+Operator: admin/deeplearner-local-operator, userAdminAnyDatabase+clusterMonitor.
+App: deeplearner-dev/deeplearner-local-app with exact custom runtime role; see
+DATABASE_DESIGN.md and the source manifest. Effective stored/inherited grants must
+match exactly; unknown actions, resources or inherited roles refuse. No createIndex,
+dropIndex/dropCollection, user administration or replica administration is granted
+to the app. MongoDB insert inherently permits creation of its named collection,
+so this is namespace/action restriction rather than database-enforced existing-only
+insertion. autoCreate/autoIndex=false and schema readiness remain unchanged.
+Slice C needs a separately reviewed provisioner and exact index inventory.
+
+Exact source scope: AGENTS.md, scripts/Setup-DeepLearnerDev.ps1,
+scripts/tests/DevLocal.Tests.ps1, apps/api/scripts/dev-mongo-bootstrap.ts,
+apps/api/tests/dev-mongo-bootstrap.test.ts and current LOCAL/DATABASE/ARCHITECTURE/
+ROADMAP sections. No dependency, lockfile, app API/auth logic, .env, launcher or
+lint configuration changes. Source activation/review remains separate from runtime.
+
+## Offline evidence and remaining gates
+
+Final offline completion results:
+
+| Check                              | Result                                                                                                                                                     |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PowerShell syntax and inert checks | 29/29 PASS: retained startup/setup checks plus transport, guarded crypto/DPAPI, recovery, all-mocked orchestration and service-owner/DACL cases            |
+| Focused TypeScript tests           | 22/22 PASS: 13 bootstrap tests plus 9 retained startup/private-validation tests                                                                            |
+| API TypeScript                     | PASS via workspace typecheck; imported helper is included through its focused tests                                                                        |
+| Source ESLint                      | PASS: 0 errors/warnings with command-only cache exclusion; final two-file rerun PASS                                                                       |
+| Full-root ESLint                   | FAIL: 563 errors, 0 warnings across 24 files, all under .cache; no lint configuration change                                                               |
+| Formatting                         | Prettier PASS for the two TypeScript files and five newly amended Markdown sections; historical Markdown retained byte-for-byte                            |
+| Encoding/whitespace/scope          | All nine paths UTF-8/no BOM/LF/final newline; exact nine-path inventory, empty index, no conflicts, added-source whitespace and git diff --check PASS      |
+| Privacy/integrity                  | No detected literal secrets; two URI scan hits are runtime construction/validation expressions; 12 ignored original Stitch hashes and .gitignore unchanged |
+| Independent source/security review | Critical 0 / High 0 / Medium 0 / Low 0 unresolved; service-DACL validation and wording findings resolved and re-reviewed                                   |
+| Real environment                   | NOT_RUN / NOT_VERIFIED: no MongoDB/TLS connection, real certificate/credential generation, service/ACL operation, application startup or policy activation |
+
+The driver-option test constructs an unconnected client solely to verify the
+installed driver's TLS option parsing retains the strict server pin; it never calls
+connect(). Certificate tests use synthetic public facts/fingerprint input, with no
+new host keys or certificates. Native helper tests compile wrappers and inspect
+in-memory descriptors only. The retained synthetic cleanup-refusal test deliberately
+prints cleanup NOT_VERIFIED; it is not real MongoDB/application shutdown evidence.
+
+**READY_FOR_OFFLINE_CHECKPOINT** for a separate owner checkpoint decision. This
+secondary tooling label establishes no feature acceptance, operational readiness,
+Git permission, provisioning authority or policy activation. Mocked protocol/inert tests never prove
+real certificate rejection, MongoDB authentication, PRIMARY election, transactions,
+SCM permissions, Ctrl+C/shutdown or persistence. Existing full-root lint cache
+pollution remains a separate recorded limitation; no exclusion config is changed.
+
+Preserve MongoDB **NOT_PROVISIONED**, policy **PROPOSED / NOT ACTIVE**, app startup/
+shutdown **NOT_VERIFIED**, F042/F043 acceptance **BLOCKED**, F043 MongoDB **15 NOT_RUN**,
+browser **213 NOT_RUN**, F044 **NOT_STARTED**, production **NOT_VERIFIED**. No Git
+staging/commit/push or production permission is implied by implementation approval.
+
+References: [MongoDB localhost exception](https://www.mongodb.com/docs/manual/core/localhost-exception/),
+[TLS configuration](https://www.mongodb.com/docs/v8.0/tutorial/configure-ssl/),
+[create/insert privilege nuance](https://www.mongodb.com/docs/manual/reference/command/create/).
+
+---
+
 # Slice B — persistent MongoDB tooling preparation, 2026-10-31
 
 ## Authority and commands
