@@ -213,16 +213,72 @@ export function devReplicaPlan() {
   };
 }
 
-export function assertDevMongoExecutionPolicy(): never {
-  // No input, CLI switch or receipt can activate persistent execution.
-  throw new Error('DEV_PERSISTENT_POLICY_NOT_ACTIVE');
+const mongoPolicySchema = z.strictObject({
+  id: z.literal('DEV-PERSISTENT-27019'),
+  status: z.enum(['PROPOSED / NOT ACTIVE', 'ACTIVE']),
+  sourceVersion: z.literal(1),
+  target: z.strictObject({
+    host: z.literal('127.0.0.1'),
+    port: z.literal(27019),
+    replicaSet: z.literal('deeplearner-dev-rs'),
+    database: z.literal('deeplearner-dev'),
+    service: z.literal('DeepLearnerDevMongo27019'),
+  }),
+  operations: z.tuple([
+    z.literal('PrepareStorage'),
+    z.literal('InstallService'),
+    z.literal('StartService'),
+    z.literal('StopService'),
+    z.literal('BootstrapFirstUser'),
+  ]),
+});
+export type MongoSourcePolicy = z.infer<typeof mongoPolicySchema>;
+export function getDevMongoSourcePolicy(): MongoSourcePolicy {
+  return {
+    id: 'DEV-PERSISTENT-27019',
+    status: 'PROPOSED / NOT ACTIVE',
+    sourceVersion: 1,
+    target: {
+      host: '127.0.0.1',
+      port: 27019,
+      replicaSet: 'deeplearner-dev-rs',
+      database: 'deeplearner-dev',
+      service: 'DeepLearnerDevMongo27019',
+    },
+    operations: [
+      'PrepareStorage',
+      'InstallService',
+      'StartService',
+      'StopService',
+      'BootstrapFirstUser',
+    ],
+  };
+}
+// Pure comparison only: accepting synthetic facts here never authorizes I/O.
+export function assertDevMongoPolicyAgreement(
+  local: unknown,
+  peer: unknown,
+  requireActive = true,
+): void {
+  const a = mongoPolicySchema.safeParse(local),
+    b = mongoPolicySchema.safeParse(peer);
+  if (
+    !a.success ||
+    !b.success ||
+    JSON.stringify(a.data) !== JSON.stringify(b.data)
+  )
+    throw new Error('DEV_MONGO_SOURCE_POLICY_MISMATCH');
+  if (requireActive && a.data.status !== 'ACTIVE')
+    throw new Error('DEV_PERSISTENT_POLICY_NOT_ACTIVE');
+}
+export function assertDevMongoExecutionPolicy(peer: unknown): void {
+  assertDevMongoPolicyAgreement(getDevMongoSourcePolicy(), peer);
 }
 
 async function initializeDevReplica() {
-  assertDevMongoExecutionPolicy();
   // A separate authenticated, connection-bound bootstrap contract is required.
   // No driver import, connection or unauthenticated initialization is provided.
-  throw new Error('DEV_MONGO_AUTHENTICATED_BOOTSTRAP_REQUIRED');
+  throw new Error('DEV_MONGO_LEGACY_INITIALIZATION_DISABLED');
 }
 
 if (
@@ -249,8 +305,8 @@ if (
     process.stderr.write(
       process.argv[2] === 'mongo-initialize'
         ? error instanceof Error &&
-          error.message === 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'
-          ? 'DEV_PERSISTENT_POLICY_NOT_ACTIVE\n'
+          error.message === 'DEV_MONGO_LEGACY_INITIALIZATION_DISABLED'
+          ? 'DEV_MONGO_LEGACY_INITIALIZATION_DISABLED\n'
           : 'DEV_MONGO_INITIALIZATION_UNKNOWN_RECONCILE\n'
         : 'DEV_CONFIGURATION_REJECTED\n',
     );

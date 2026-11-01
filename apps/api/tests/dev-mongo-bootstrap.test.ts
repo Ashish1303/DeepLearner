@@ -10,17 +10,24 @@ import {
   applicationRole,
   assertApplicationPrivileges,
   assertCertificateFacts,
+  assertBootstrapInvocation,
+  assertBootstrapOwnerManifest,
   bootstrapProtocol,
   bootstrapClientOptions,
   bootstrapTarget,
   executeBootstrap,
   operatorName,
   pinnedServerCheck,
+  parsePowerShellSourcePolicy,
   validateBootstrapRequest,
   type BootstrapAction,
   type BootstrapRequest,
   type CommandStep,
 } from '../scripts/dev-mongo-bootstrap.js';
+import {
+  assertDevMongoPolicyAgreement,
+  getDevMongoSourcePolicy,
+} from '../scripts/dev-local.js';
 
 // Fixed synthetic bytes, not generated host credentials. All protocol replies are
 // in-memory; one driver constructor checks options without connect(). There is no
@@ -146,10 +153,10 @@ test('fixed target rejects protected ports, services, hosts, names and extra opt
     }),
   );
 });
-test('real entry refuses before private input, certificate files or dynamic driver import', async () => {
+test('imported actuator has no CLI context and child policy check is metadata only', async () => {
   await assert.rejects(
     executeBootstrap(undefined),
-    /DEV_PERSISTENT_POLICY_NOT_ACTIVE/,
+    /DEV_PERSISTENT_POLICY_NOT_ACTIVE|DEV_MONGO_EXECUTION_CONTEXT_REQUIRED/,
   );
   const child = spawnSync(
     process.execPath,
@@ -160,6 +167,7 @@ test('real entry refuses before private input, certificate files or dynamic driv
         '../scripts/dev-mongo-bootstrap.ts',
         import.meta.url,
       ).pathname.replace(/^\/([A-Za-z]:)/, '$1'),
+      '--check-policy',
     ],
     {
       input: JSON.stringify(request('administrator')),
@@ -167,10 +175,190 @@ test('real entry refuses before private input, certificate files or dynamic driv
       timeout: 10000,
     },
   );
-  assert.equal(child.status, 1);
-  assert.equal(child.stdout, '');
-  assert.equal(child.stderr.trim(), 'DEV_PERSISTENT_POLICY_NOT_ACTIVE');
+  assert.equal(child.status, 0);
+  assert.equal(JSON.parse(child.stdout).id, 'DEV-PERSISTENT-27019');
+  assert.equal(child.stderr, '');
   assert.ok(!child.stderr.includes(request('administrator').operatorPassword));
+});
+
+test('source agreement rejects inactive, mixed, wrong-version, target and operation policies without I/O', () => {
+  const inactive = getDevMongoSourcePolicy();
+  assert.throws(
+    () => assertDevMongoPolicyAgreement(inactive, inactive),
+    /NOT_ACTIVE/,
+  );
+  const active = { ...inactive, status: 'ACTIVE' };
+  assert.doesNotThrow(() => assertDevMongoPolicyAgreement(active, active));
+  for (const peer of [
+    inactive,
+    { ...active, sourceVersion: 2 },
+    { ...active, target: { ...active.target, port: 27017 } },
+    { ...active, target: { ...active.target, port: 27018 } },
+    { ...active, operations: [...active.operations, 'InitializeReplica'] },
+    { ...active, permit: true },
+    { ...active, id: 'other' },
+  ])
+    assert.throws(
+      () => assertDevMongoPolicyAgreement(active, peer),
+      /SOURCE_POLICY_MISMATCH/,
+    );
+});
+
+test('literal PS source and Node policy agree without executing a host operation', () => {
+  const source = readFileSync(
+    new URL('../../../scripts/Setup-DeepLearnerDev.ps1', import.meta.url),
+    'utf8',
+  );
+  assertDevMongoPolicyAgreement(
+    getDevMongoSourcePolicy(),
+    parsePowerShellSourcePolicy(source),
+    false,
+  );
+  assert.throws(
+    () =>
+      parsePowerShellSourcePolicy(
+        source + '\nfunction Get-DevMongoSourcePolicy {}',
+      ),
+    /SOURCE_POLICY_MISMATCH/,
+  );
+  assert.throws(
+    () =>
+      parsePowerShellSourcePolicy(
+        source.replace("return @'", 'return "profile" #'),
+      ),
+    /SOURCE_POLICY_MISMATCH/,
+  );
+});
+
+test('pure invocation facts reject wrong action, target, owner and revoked lifetime', () => {
+  const ownerSid = 'S-1-5-21-11-22-33-1001';
+  const facts = {
+    action: 'administrator',
+    ownerSid,
+    target: bootstrapTarget,
+    alive: true,
+  };
+  assert.doesNotThrow(() =>
+    assertBootstrapInvocation(facts, 'administrator', ownerSid),
+  );
+  assert.throws(
+    () => assertBootstrapInvocation(facts, 'initialize', ownerSid),
+    /ACTION_REJECTED/,
+  );
+  assert.throws(
+    () =>
+      assertBootstrapInvocation(
+        { ...facts, target: { ...bootstrapTarget, port: 27018 } },
+        'administrator',
+        ownerSid,
+      ),
+    /TARGET_REJECTED/,
+  );
+  assert.throws(
+    () =>
+      assertBootstrapInvocation(
+        facts,
+        'administrator',
+        'S-1-5-21-11-22-33-1002',
+      ),
+    /OWNER_REJECTED/,
+  );
+  assert.throws(
+    () =>
+      assertBootstrapInvocation(facts, 'administrator', 'claimed-env-owner'),
+    /OWNER_REJECTED/,
+  );
+  try {
+    throw new Error('synthetic cancellation');
+  } catch {
+    /* no real context */
+  } finally {
+    facts.alive = false;
+  }
+  assert.throws(
+    () => assertBootstrapInvocation(facts, 'administrator', ownerSid),
+    /CONTEXT_REQUIRED/,
+  );
+});
+
+test('cross-process manifest binds observed OS owner, exact target, helper source and certificate pins', () => {
+  const owner = 'S-1-5-21-11-22-33-1001',
+    helperHash = 'D'.repeat(64);
+  const r = request('administrator');
+  const plan = {
+    host: '127.0.0.1',
+    port: 27019,
+    replicaSet: 'deeplearner-dev-rs',
+    database: 'deeplearner-dev',
+    member: 'localhost:27019',
+    serviceName: 'DeepLearnerDevMongo27019',
+    root: 'C:\\Users\\Shreeji\\AppData\\Local\\DeepLearner\\dev',
+    policy: getDevMongoSourcePolicy().status,
+  };
+  const manifest = {
+    revision: 2,
+    ownerSid: owner,
+    target: JSON.stringify(plan),
+    helperHash,
+    certificates: r.certificates,
+  };
+  assert.doesNotThrow(() =>
+    assertBootstrapOwnerManifest(manifest, r, owner, helperHash),
+  );
+  for (const invalid of [
+    { ...manifest, ownerSid: 'S-1-5-21-11-22-33-1002' },
+    { ...manifest, helperHash: 'E'.repeat(64) },
+    {
+      ...manifest,
+      certificates: { ...r.certificates, client: 'F'.repeat(64) },
+    },
+    ...[27017, 27018].map((port) => ({
+      ...manifest,
+      target: JSON.stringify({ ...plan, port }),
+    })),
+    { ...manifest, target: JSON.stringify({ ...plan, root: 'C:\\foreign' }) },
+    {
+      ...manifest,
+      target: JSON.stringify({ ...plan, serviceName: 'MongoDB' }),
+    },
+    { ...manifest, target: JSON.stringify({ ...plan, policy: 'ACTIVE' }) },
+    { ...manifest, ownerContext: true },
+  ])
+    assert.throws(() =>
+      assertBootstrapOwnerManifest(invalid, r, owner, helperHash),
+    );
+});
+
+test('public input cannot issue a context, including after a failed exported call', async () => {
+  const forged = {
+    ...request('administrator'),
+    context: {
+      action: 'administrator',
+      alive: true,
+      ownerSid: 'S-1-5-21-11-22-33-1001',
+    },
+    policy: { status: 'ACTIVE' },
+  };
+  assert.throws(() => validateBootstrapRequest(forged));
+  for (const input of [forged, request('administrator'), undefined])
+    await assert.rejects(executeBootstrap(input), /EXECUTION_CONTEXT_REQUIRED/);
+  const source = readFileSync(
+    new URL('../scripts/dev-mongo-bootstrap.ts', import.meta.url),
+    'utf8',
+  );
+  const cli = source.indexOf('if (\n  process.argv[1]');
+  assert.ok(cli > 0);
+  assert.ok(source.indexOf('cliContext = {') > cli);
+  assert.ok(source.indexOf('acceptedContexts.add(') > cli);
+  assert.equal((source.match(/acceptedContexts\.add\(/g) ?? []).length, 1);
+  assert.match(
+    source.slice(cli),
+    /finally\s*\{[\s\S]*cliContext\.alive = false;[\s\S]*acceptedContexts\.delete\(cliContext\);[\s\S]*cliContext = undefined;/,
+  );
+  assert.match(
+    source,
+    /execFileSync\(\s*'C:\\\\Windows\\\\System32\\\\whoami\.exe'/,
+  );
 });
 test('replica initialization is exact, single-shot and PRIMARY-gated', () => {
   const result = drive('initialize');

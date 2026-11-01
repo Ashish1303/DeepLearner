@@ -155,6 +155,62 @@ Check 'real private validator returns a public plan without launching applicatio
     } finally { $owner.Dispose() }
 }
 . "$PSScriptRoot/../Setup-DeepLearnerDev.ps1"
+Check 'dot-sourcing exposes no context issuer and installs only the context-free refusal' {
+    $guard=${function:Assert-DevMongoExecutionPolicy}.ToString()
+    Assert ($guard.Contains("throw 'DEV_MONGO_EXECUTION_CONTEXT_REQUIRED'") -and -not $guard.Contains('Set-Item') -and -not $guard.Contains('New-Service') -and -not $guard.Contains('CreateExclusive')) 'Imported guard can issue context or perform effects'
+    $source=[IO.File]::ReadAllText((Join-Path $PSScriptRoot '../Setup-DeepLearnerDev.ps1'))
+    $cli=$source.IndexOf("if (`$MyInvocation.InvocationName -ne '.')")
+    Assert ($cli -gt 0 -and $source.IndexOf('Set-Item Function:Assert-DevMongoExecutionPolicy') -gt $cli) 'Context issuer exists outside CLI'
+    Assert ($source.Substring($cli).Contains('$lease.alive=$false; $lease.Clear()') -and $source.Substring($cli).Contains('Set-Item Function:Assert-DevMongoExecutionPolicy -Value $closedGuard')) 'CLI context not revoked/restored in finally'
+}
+Check 'pure source policy agreement rejects mixed status, version, target and operation changes' {
+    $inactive=Get-DevMongoSourcePolicy
+    $refused=$false;try{Assert-DevMongoPolicyAgreement $inactive $inactive}catch{$refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'};Assert $refused 'Inactive policy accepted'
+    $active=$inactive | ConvertTo-Json -Depth 8 | ConvertFrom-Json -AsHashtable; $active.status='ACTIVE'
+    Assert-DevMongoPolicyAgreement $active $active
+    foreach($change in @('status','sourceVersion','port','operation','extra')) {
+        $peer=$active | ConvertTo-Json -Depth 8 | ConvertFrom-Json -AsHashtable
+        switch($change){'status'{$peer.status='PROPOSED / NOT ACTIVE'} 'sourceVersion'{$peer.sourceVersion=2} 'port'{$peer.target.port=27018} 'operation'{$peer.operations+=@('InitializeReplica')} 'extra'{$peer['permit']=$true}}
+        $refused=$false;try{Assert-DevMongoPolicyAgreement $active $peer}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_SOURCE_POLICY_MISMATCH'};Assert $refused "Policy mismatch accepted: $change"
+    }
+}
+Check 'synthetic ACTIVE cannot authorize public setup calls or private primitives without a CLI context' {
+    $active=Get-DevMongoSourcePolicy; $active.status='ACTIVE'
+    function Get-DevMongoSourcePolicy {return $active}
+    function Get-DevMongoPortRows {throw 'UNEXPECTED_HOST_IO'}
+    function New-Service {throw 'UNEXPECTED_HOST_IO'}
+    function Read-DevSecret {throw 'UNEXPECTED_HOST_IO'}
+    foreach($operation in $active.operations) {
+        $refused=$false;try{Invoke-DevMongoSetup $operation}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_EXECUTION_CONTEXT_REQUIRED'};Assert $refused "ACTIVE direct call reached $operation"
+    }
+    foreach($body in @({New-DevMongoPassword},{Protect-DevMongoValue 'synthetic-only'},{New-DevMongoDirectory (Get-DevMongoPlan).storage 'Modify'},{Write-DevMongoPrivateFile (Get-DevMongoPlan).configuration ([byte[]]::new(0)) 'Read'})) {
+        $refused=$false;try{& $body}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_EXECUTION_CONTEXT_REQUIRED'};Assert $refused 'ACTIVE primitive bypassed private context'
+    }
+    $refused=$false;try{Assert-DevMongoExecutionPolicy @{alive=$true;action='PrepareStorage';policy='ACTIVE'}}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_EXECUTION_CONTEXT_REQUIRED'};Assert $refused 'Caller object forged a context'
+}
+Check 'pure invocation facts reject wrong owner, action, target and expired error lifetime' {
+    $sid='S-1-5-21-11-22-33-1001'; $target=(Get-DevMongoSourcePolicy).target | ConvertTo-Json -Compress
+    $facts=@{alive=$true;action='PrepareStorage';ownerSid=$sid;target=$target}
+    Assert-DevMongoInvocation $facts @('PrepareStorage') $sid $target
+    foreach($change in @('action','ownerSid','target','alive')) {
+        $copy=$facts.Clone();switch($change){'action'{$copy.action='InstallService'} 'ownerSid'{$copy.ownerSid='S-1-5-21-11-22-33-1002'} 'target'{$copy.target='27017'} 'alive'{$copy.alive=$false}}
+        $refused=$false;try{Assert-DevMongoInvocation $copy @('PrepareStorage') $sid $target}catch{$refused=$_.Exception.Message -match '^DEV_MONGO_(EXECUTION_CONTEXT_REQUIRED|ACTION_REJECTED|TARGET_REJECTED|OWNER_REJECTED)$'};Assert $refused "Invocation mismatch accepted: $change"
+    }
+    try {throw 'SYNTHETIC_CANCELLATION'}catch{}finally{$facts.alive=$false}
+    $refused=$false;try{Assert-DevMongoInvocation $facts @('PrepareStorage') $sid $target}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_EXECUTION_CONTEXT_REQUIRED'};Assert $refused 'Expired context survived error'
+}
+Check 'private file authorization limits each action to its reviewed artifact paths' {
+    $plan=Get-DevMongoPlan
+    foreach($path in @($plan.keyFile,$plan.configuration,$plan.ca,$plan.caKey,$plan.clientCertificate,$plan.operatorSecret,$plan.applicationSecret,$plan.bootstrapManifest,$plan.receipt)) {
+        Assert ((@(Get-DevMongoFileActions $plan $path) -join ',') -ceq 'PrepareStorage') 'Non-preparation action can write private material'
+    }
+    Assert ((@(Get-DevMongoFileActions $plan $plan.serviceReceipt) -join ',') -ceq 'InstallService') 'Registration receipt action broadened'
+    foreach($path in @($plan.nextConfiguration,(Get-DevMongoStagePath $plan 'complete'),(Get-DevMongoStagePath $plan 'administrator-intent'))) {
+        Assert ((@(Get-DevMongoFileActions $plan $path) -join ',') -ceq 'BootstrapFirstUser') 'Bootstrap transition writable during ordinary lifecycle'
+    }
+    Assert ((@(Get-DevMongoFileActions $plan $plan.operationLock) -join ',') -ceq 'InstallService,StartService,StopService,BootstrapFirstUser') 'Lifecycle lock scope changed'
+    $refused=$false;try{Get-DevMongoFileActions $plan 'C:\foreign'}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_TARGET_REJECTED'};Assert $refused 'Unknown write path accepted'
+}
 Check 'MongoDB setup parses and defaults to a non-mutating exact plan' {
     $tokens=$null; $errors=$null
     [Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot '../Setup-DeepLearnerDev.ps1'),[ref]$tokens,[ref]$errors) | Out-Null
@@ -183,7 +239,7 @@ Check 'configuration is authenticated loopback with keys outside writable data' 
 Check 'all effectful setup actions refuse before probes, credentials or writes' {
     function Get-DevMongoPortRows { throw 'UNEXPECTED_PORT_PROBE' }
     foreach ($operation in @('PrepareStorage','InstallService','StartService','StopService','InitializeReplica','BootstrapFirstUser')) {
-        $refused=$false; try { Invoke-DevMongoSetup $operation } catch { $refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE' }
+        $refused=$false; try { Invoke-DevMongoSetup $operation } catch { $refused=$_.Exception.Message -match '^DEV_(PERSISTENT_POLICY_NOT_ACTIVE|MONGO_EXECUTION_CONTEXT_REQUIRED|MONGO_LEGACY_INITIALIZATION_DISABLED)$' }
         Assert $refused "Execution unexpectedly reached $operation"
     }
     $refused=$false; try { Invoke-DevMongoSetup 'Activate' } catch { $refused=$_.Exception.Message -eq 'DEV_MONGO_ACTION_REJECTED' }
@@ -195,7 +251,7 @@ Check 'filesystem primitives reject foreign paths and cannot bypass policy' {
         $refused=$false; try { & $body } catch { $refused=$_.Exception.Message -eq 'DEV_MONGO_TARGET_REJECTED' }; Assert $refused 'Foreign write accepted'
     }
     foreach ($body in @({New-DevMongoDirectory $plan.storage 'Modify'},{Write-DevMongoPrivateFile $plan.configuration ([byte[]]::new(0)) 'Read'},{Open-DevMongoLifecycleLock $plan})) {
-        $refused=$false; try { & $body } catch { $refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE' }; Assert $refused 'Primitive bypassed inactive policy'
+        $refused=$false; try { & $body } catch { $refused=$_.Exception.Message -match '^DEV_(PERSISTENT_POLICY_NOT_ACTIVE|MONGO_EXECUTION_CONTEXT_REQUIRED)$' }; Assert $refused 'Primitive bypassed CLI context'
     }
 }
 Check 'ACL descriptors isolate service rights without changing any Windows ACL' {
@@ -245,7 +301,7 @@ Check 'replica helper emits only exact public plan and blocks initialization bef
     $replica=($json -join '') | ConvertFrom-Json
     Assert ($replica._id -eq 'deeplearner-dev-rs' -and $replica.members.Count -eq 1 -and $replica.members[0].host -eq 'localhost:27019') 'Replica target changed'
     $message=@(& $node --import tsx $tool mongo-initialize 2>&1); $code=$LASTEXITCODE
-    Assert ($code -eq 1 -and ($message -join '') -match 'DEV_PERSISTENT_POLICY_NOT_ACTIVE') 'Replica execution bypassed policy'
+    Assert ($code -eq 1 -and ($message -join '') -match 'DEV_MONGO_LEGACY_INITIALIZATION_DISABLED') 'Legacy initialization became available'
 }
 Check 'two exact transport configurations preserve access control and disable normal localhost bypass' {
     $plan=Get-DevMongoPlan
@@ -260,7 +316,7 @@ Check 'two exact transport configurations preserve access control and disable no
 Check 'bootstrap crypto, DPAPI, helper, service permissions and transition refuse before effects' {
     $plan=Get-DevMongoPlan
     foreach($body in @({New-DevMongoPassword},{Protect-DevMongoValue 'synthetic-only'},{Initialize-DevMongoPrivateMaterial $plan},{Assert-DevMongoServiceCreationSecurity $plan},{Assert-DevMongoInstallAdministrator},{Write-DevMongoStage $plan 'complete' 'NORMAL_AUTHENTICATION_VERIFIED'},{Invoke-DevMongoNodeStep $plan 'administrator'},{Set-DevMongoNormalConfiguration $plan},{Assert-DevMongoAuthenticatedBootstrap})){
-        $refused=$false;try{& $body | Out-Null}catch{$refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'};Assert $refused 'Bootstrap primitive bypassed inactive policy'
+        $refused=$false;try{& $body | Out-Null}catch{$refused=$_.Exception.Message -match '^DEV_(PERSISTENT_POLICY_NOT_ACTIVE|MONGO_EXECUTION_CONTEXT_REQUIRED)$'};Assert $refused 'Bootstrap primitive bypassed CLI context'
     }
 }
 Check 'private artifact ACL allowlist separates server material from owner credentials' {
@@ -280,10 +336,12 @@ Check 'uncertain first-user, role and application writes select inspection witho
         $refused=$false;try{Get-DevMongoRecoveryStep $row[0] $true $false}catch{$refused=$_.Exception.Message -eq 'DEV_MONGO_BOOTSTRAP_STAGE_REJECTED'};Assert $refused 'Impossible phase accepted'
     }
 }
-Check 'new private helper CLI refuses before reading secrets or creating a client' {
+Check 'private helper policy-check CLI reads no private input or database' {
     $tool=Join-Path $script:DevRepo 'apps/api/scripts/dev-mongo-bootstrap.ts'
-    $message=@(& $node --import tsx $tool 2>&1);$code=$LASTEXITCODE
-    Assert ($code -eq 1 -and ($message -join '') -match '^DEV_PERSISTENT_POLICY_NOT_ACTIVE$') 'Bootstrap helper entry did not refuse safely'
+    $message=@(& $node --import tsx $tool --check-policy);$code=$LASTEXITCODE
+    Assert ($code -eq 0 -and (($message -join '') | ConvertFrom-Json).id -eq 'DEV-PERSISTENT-27019') 'Policy metadata check failed'
+    $peer=($message -join '') | ConvertFrom-Json -AsHashtable
+    Assert-DevMongoPolicyAgreement (Invoke-DevMongoSetup).policyDefinition $peer $false
 }
 Check 'bootstrap orchestration reconciles interrupted transport and credential phases with all host effects mocked' {
     # These local mocks exist only for this Check scope. They cannot alter the
@@ -468,7 +526,7 @@ Check 'installer supplies creation descriptor, validates readback and receipts o
 Check 'service creation and installer guards remain inactive after local test mocks leave scope' {
     $plan=Get-DevMongoPlan
     foreach($body in @({Invoke-DevMongoInstall $plan},{Assert-DevMongoServiceCreationSecurity $plan},{Assert-DevMongoInstallAdministrator})){
-        $refused=$false;try{& $body}catch{$refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'};Assert $refused 'Real inactive guard was replaced or bypassed'
+        $refused=$false;try{& $body}catch{$refused=$_.Exception.Message -match '^DEV_(PERSISTENT_POLICY_NOT_ACTIVE|MONGO_EXECUTION_CONTEXT_REQUIRED)$'};Assert $refused 'Real CLI-context guard was replaced or bypassed'
     }
 }
 Write-Host "$passed inert/unit checks passed. No MongoDB/service/database/ACL operation or application startup was performed. Runtime qualification remains NOT_RUN."

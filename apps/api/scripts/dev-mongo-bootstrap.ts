@@ -5,24 +5,94 @@ import {
   X509Certificate,
 } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import {
   checkServerIdentity,
   connect as connectTLS,
   type PeerCertificate,
 } from 'node:tls';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { z } from 'zod';
 import {
   assertDevMongoExecutionPolicy,
+  assertDevMongoPolicyAgreement,
+  getDevMongoSourcePolicy,
   localTarget,
   readRequest,
 } from './dev-local.js';
 
-// Keep the runtime refusal unconditional while allowing TypeScript to check the
-// future actuator below. This wrapper is not configurable or injectable.
-function enforceExecutionPolicy(): void {
-  assertDevMongoExecutionPolicy();
+type InvocationFacts = {
+  action: string;
+  target: unknown;
+  ownerSid: string;
+  alive: boolean;
+};
+// Pure facts validation is not an actuator and cannot issue accepted contexts.
+export function assertBootstrapInvocation(
+  facts: InvocationFacts,
+  action: string,
+  ownerSid: string,
+): void {
+  if (!facts.alive) throw new Error('DEV_MONGO_EXECUTION_CONTEXT_REQUIRED');
+  if (facts.action !== action) throw new Error('DEV_MONGO_ACTION_REJECTED');
+  if (JSON.stringify(facts.target) !== JSON.stringify(bootstrapTarget))
+    throw new Error('DEV_MONGO_TARGET_REJECTED');
+  if (
+    !/^S-1-5-21-(?:\d+-){2}\d+-\d+$/.test(ownerSid) ||
+    facts.ownerSid !== ownerSid
+  )
+    throw new Error('DEV_MONGO_OWNER_REJECTED');
+}
+// No setter/exported issuer: only the actual CLI block below owns this identity.
+let cliContext: InvocationFacts | undefined;
+const acceptedContexts = new WeakSet<object>();
+function enforceExecutionPolicy(action?: string): void {
+  if (!cliContext || !acceptedContexts.has(cliContext))
+    throw new Error('DEV_MONGO_EXECUTION_CONTEXT_REQUIRED');
+  assertBootstrapInvocation(
+    cliContext,
+    action ?? cliContext.action,
+    osOwnerSid(),
+  );
+  assertDevMongoExecutionPolicy(powerShellSourcePolicy());
+}
+function powerShellSourcePolicy(): unknown {
+  const source = readFileSync(
+    new URL('../../../scripts/Setup-DeepLearnerDev.ps1', import.meta.url),
+    'utf8',
+  );
+  return parsePowerShellSourcePolicy(source);
+}
+export function parsePowerShellSourcePolicy(source: string): unknown {
+  if (source.length > 131072)
+    throw new Error('DEV_MONGO_SOURCE_POLICY_MISMATCH');
+  if ((source.match(/function Get-DevMongoSourcePolicy\b/g) ?? []).length !== 1)
+    throw new Error('DEV_MONGO_SOURCE_POLICY_MISMATCH');
+  const metadata = source.match(
+    /function Get-DevMongoSourcePolicy \{\r?\n {4}# Literal source metadata, also read by the Node CLI; never a private profile\.\r?\n {4}return @'\r?\n([^\r\n]+)\r?\n'@ \| ConvertFrom-Json -AsHashtable\r?\n\}/,
+  );
+  if (!metadata) throw new Error('DEV_MONGO_SOURCE_POLICY_MISMATCH');
+  return JSON.parse(metadata[1]!);
+}
+function osOwnerSid(): string {
+  if (process.platform !== 'win32') throw new Error('DEV_MONGO_OWNER_REJECTED');
+  const output = execFileSync(
+    'C:\\Windows\\System32\\whoami.exe',
+    ['/user', '/fo', 'csv', '/nh'],
+    {
+      encoding: 'utf8',
+      timeout: 5000,
+      maxBuffer: 4096,
+      windowsHide: true,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    },
+  );
+  const match = output
+    .trim()
+    .match(/^"[^"\r\n]+","(S-1-5-21-(?:\d+-){2}\d+-\d+)"$/);
+  if (!match) throw new Error('DEV_MONGO_OWNER_REJECTED');
+  return match[1]!;
 }
 
 export const bootstrapTarget = Object.freeze({
@@ -544,11 +614,11 @@ export function bootstrapClientOptions(
   };
 }
 
-// Every real I/O entry remains behind the existing unconditional policy guard.
-// No injected adapter or CLI/profile value can activate this path.
+// Exported calls cannot issue a context. All real I/O remains behind the CLI lease.
 export async function executeBootstrap(input: unknown) {
   enforceExecutionPolicy();
   const request = validateBootstrapRequest(input);
+  enforceExecutionPolicy(request.action);
   const normal = request.action === 'verify-normal';
   const ca = normal ? undefined : certificateFiles(request);
   const { default: mongoose } = await import('mongoose');
@@ -615,21 +685,90 @@ export async function executeBootstrap(input: unknown) {
   }
 }
 
+// Pure binding check. The CLI supplies independently observed SID/hash; this issues no context.
+export function assertBootstrapOwnerManifest(
+  manifestInput: unknown,
+  request: BootstrapRequest,
+  ownerSid: string,
+  helperHash: string,
+): void {
+  if (
+    !manifestInput ||
+    typeof manifestInput !== 'object' ||
+    Object.keys(manifestInput).length !== 5
+  )
+    throw new Error('DEV_MONGO_OWNER_REJECTED');
+  const manifest = manifestInput as Record<string, unknown>;
+  const plan = JSON.parse(String(manifest.target)) as Record<string, unknown>;
+  if (
+    manifest.revision !== 2 ||
+    manifest.ownerSid !== ownerSid ||
+    plan.host !== bootstrapTarget.host ||
+    plan.port !== bootstrapTarget.port ||
+    plan.replicaSet !== bootstrapTarget.replicaSet ||
+    plan.database !== bootstrapTarget.name ||
+    plan.member !== bootstrapTarget.member ||
+    plan.serviceName !== bootstrapTarget.service ||
+    plan.root !== path.win32.dirname(path.win32.dirname(bootstrapRoot)) ||
+    plan.policy !== getDevMongoSourcePolicy().status ||
+    manifest.helperHash !== helperHash ||
+    JSON.stringify(Object.entries(manifest.certificates as object).sort()) !==
+      JSON.stringify(Object.entries(request.certificates).sort())
+  )
+    throw new Error('DEV_MONGO_OWNER_REJECTED');
+}
+
 if (
   process.argv[1] &&
   pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url
 ) {
   try {
-    enforceExecutionPolicy(); // Refuse before stdin, certificates or driver imports.
-    if (
-      process.argv.length !== 2 ||
-      Number(process.versions.node.split('.')[0]) !== 24
-    )
-      throw new Error('DEV_MONGO_BOOTSTRAP_REQUEST_REJECTED');
-    process.stdout.write(
-      JSON.stringify(await executeBootstrap(await readRequest(process.stdin))) +
-        '\n',
-    );
+    if (process.argv.length === 3 && process.argv[2] === '--check-policy') {
+      // Local metadata only: no stdin, filesystem, crypto, child or driver calls.
+      process.stdout.write(JSON.stringify(getDevMongoSourcePolicy()) + '\n');
+    } else {
+      if (
+        process.argv.length !== 4 ||
+        process.argv[2] !== '--action' ||
+        !actions.includes(process.argv[3] as BootstrapAction) ||
+        Number(process.versions.node.split('.')[0]) !== 24
+      )
+        throw new Error('DEV_MONGO_BOOTSTRAP_REQUEST_REJECTED');
+      assertDevMongoPolicyAgreement(
+        getDevMongoSourcePolicy(),
+        powerShellSourcePolicy(),
+      );
+      const ownerSid = osOwnerSid();
+      const request = validateBootstrapRequest(
+        await readRequest(process.stdin),
+      );
+      if (request.action !== process.argv[3])
+        throw new Error('DEV_MONGO_ACTION_REJECTED');
+      const manifestBytes = readFileSync(
+        path.win32.join(bootstrapRoot, 'bootstrap-plan.json'),
+      );
+      if (manifestBytes.length > 16384)
+        throw new Error('DEV_MONGO_OWNER_REJECTED');
+      assertBootstrapOwnerManifest(
+        JSON.parse(manifestBytes.toString('utf8')),
+        request,
+        ownerSid,
+        createHash('sha256')
+          .update(readFileSync(fileURLToPath(import.meta.url)))
+          .digest('hex')
+          .toUpperCase(),
+      );
+      cliContext = {
+        action: request.action,
+        target: bootstrapTarget,
+        ownerSid,
+        alive: true,
+      };
+      acceptedContexts.add(cliContext);
+      process.stdout.write(
+        JSON.stringify(await executeBootstrap(request)) + '\n',
+      );
+    }
   } catch (error) {
     process.stderr.write(
       error instanceof Error &&
@@ -638,5 +777,11 @@ if (
         : 'DEV_MONGO_BOOTSTRAP_STOPPED_RECONCILE\n',
     );
     process.exitCode = 1;
+  } finally {
+    if (cliContext) {
+      cliContext.alive = false;
+      acceptedContexts.delete(cliContext);
+      cliContext = undefined;
+    }
   }
 }

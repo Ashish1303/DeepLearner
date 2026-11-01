@@ -4,14 +4,44 @@ param([ValidateSet('Plan','PrepareStorage','InstallService','StartService','Stop
 
 . "$PSScriptRoot/Start-DeepLearnerDev.ps1"
 
-function Assert-DevMongoExecutionPolicy {
-    # No CLI flag/profile/receipt activates this policy. A separately reviewed source
-    # amendment and particular execution approval are required before this can change.
-    throw 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'
+function Get-DevMongoSourcePolicy {
+    # Literal source metadata, also read by the Node CLI; never a private profile.
+    return @'
+{"id":"DEV-PERSISTENT-27019","status":"PROPOSED / NOT ACTIVE","sourceVersion":1,"target":{"host":"127.0.0.1","port":27019,"replicaSet":"deeplearner-dev-rs","database":"deeplearner-dev","service":"DeepLearnerDevMongo27019"},"operations":["PrepareStorage","InstallService","StartService","StopService","BootstrapFirstUser"]}
+'@ | ConvertFrom-Json -AsHashtable
+}
+
+# Pure comparison. Synthetic ACTIVE facts in tests cannot create a CLI context.
+function Assert-DevMongoPolicyAgreement($Local,$Peer,[bool]$RequireActive=$true) {
+    $expected=Get-DevMongoSourcePolicy
+    foreach($value in @($Local,$Peer)) {
+        if($null -eq $value -or $value.Count -ne $expected.Count -or $value.status -cnotin @('ACTIVE','PROPOSED / NOT ACTIVE')){throw 'DEV_MONGO_SOURCE_POLICY_MISMATCH'}
+        foreach($key in @('id','sourceVersion')){if(($value[$key] | ConvertTo-Json -Compress) -cne ($expected[$key] | ConvertTo-Json -Compress)){throw 'DEV_MONGO_SOURCE_POLICY_MISMATCH'}}
+        if($value.target.Count -ne $expected.target.Count){throw 'DEV_MONGO_SOURCE_POLICY_MISMATCH'}
+        foreach($key in $expected.target.Keys){if(($value.target[$key] | ConvertTo-Json -Compress) -cne ($expected.target[$key] | ConvertTo-Json -Compress)){throw 'DEV_MONGO_SOURCE_POLICY_MISMATCH'}}
+        if(($value.operations | ConvertTo-Json -Compress) -cne ($expected.operations | ConvertTo-Json -Compress)){throw 'DEV_MONGO_SOURCE_POLICY_MISMATCH'}
+    }
+    if($Local.status -cne $Peer.status){throw 'DEV_MONGO_SOURCE_POLICY_MISMATCH'}
+    if($RequireActive -and $Local.status -cne 'ACTIVE'){throw 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'}
+}
+
+function Assert-DevMongoInvocation($Context,[string[]]$AllowedActions,[string]$OwnerSid,[string]$FixedTarget) {
+    # Pure facts check; this cannot issue or install an accepted context.
+    if($null -eq $Context -or $Context.Count -ne 4 -or -not $Context.alive){throw 'DEV_MONGO_EXECUTION_CONTEXT_REQUIRED'}
+    if($Context.action -cnotin $AllowedActions){throw 'DEV_MONGO_ACTION_REJECTED'}
+    if($Context.target -cne $FixedTarget){throw 'DEV_MONGO_TARGET_REJECTED'}
+    if($OwnerSid -cnotmatch '^S-1-5-21-(?:\d+-){2}\d+-\d+$' -or $Context.ownerSid -cne $OwnerSid){throw 'DEV_MONGO_OWNER_REJECTED'}
+}
+
+function Assert-DevMongoExecutionPolicy([string[]]$AllowedActions) {
+    # The context-bearing replacement exists only inside the actual CLI try/finally.
+    # Dot-source, public calls and caller-supplied objects can never construct it.
+    if((Get-DevMongoSourcePolicy).status -cne 'ACTIVE'){throw 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'}
+    throw 'DEV_MONGO_EXECUTION_CONTEXT_REQUIRED'
 }
 
 function Assert-DevMongoAuthenticatedBootstrap {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('StartService')
     $plan=Get-DevMongoPlan
     Assert-DevMongoStage $plan 'complete' | Out-Null
     if ((Get-DevMongoConfigurationPhase $plan) -ne 'Normal') { throw 'DEV_MONGO_AUTHENTICATED_BOOTSTRAP_REQUIRED' }
@@ -20,7 +50,7 @@ function Assert-DevMongoAuthenticatedBootstrap {
 function Get-DevMongoPlan {
     $root='C:\Users\Shreeji\AppData\Local\DeepLearner\dev'
     $plan=[ordered]@{
-        revision=2; policy='PROPOSED / NOT ACTIVE'; executable='C:\Program Files\MongoDB\Server\8.2\bin\mongod.exe'
+        revision=2; policy=(Get-DevMongoSourcePolicy).status; executable='C:\Program Files\MongoDB\Server\8.2\bin\mongod.exe'
         binaryVersion='8.2.7'; binarySha256='89C1F5664DA621A6AD8A0B26DF880BAC8265BFA921F430520A1DB158CAF2F8FE'
         host='127.0.0.1'; port=27019; replicaSet='deeplearner-dev-rs'; member='localhost:27019'; database='deeplearner-dev'
         root=$root; storage=(Join-Path $root 'mongodb'); control=(Join-Path $root 'mongo-control'); logs=(Join-Path $root 'mongo-logs')
@@ -126,18 +156,27 @@ function New-DevMongoDirectory([string]$Path,[string]$Kind) {
     $plan=Get-DevMongoPlan
     $expected=if($Path -ceq $plan.root){'Traverse'}elseif($Path -ceq $plan.storage -or $Path -ceq $plan.logs){'Modify'}elseif($Path -ceq $plan.control -or $Path -ceq $plan.bootstrap){'Read'}else{throw 'DEV_MONGO_TARGET_REJECTED'}
     if ($Kind -cne $expected) { throw 'DEV_MONGO_TARGET_REJECTED' }
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('PrepareStorage')
     Assert-DevPath $Path
     if (Test-Path -LiteralPath $Path) { throw 'DEV_MONGO_EXISTING_STORAGE_REFUSED' }
     Import-DevMongoAtomicDirectory
     [DeepLearnerMongoIO]::CreateExclusive($Path,(Get-DevMongoAcl $Kind).GetSecurityDescriptorBinaryForm())
 }
 
+function Get-DevMongoFileActions($Plan,[string]$Path) {
+    Get-DevMongoPrivateFileKind $Plan $Path | Out-Null
+    $allowed=@('PrepareStorage')
+    if($Path -ceq $Plan.serviceReceipt){$allowed=@('InstallService')}
+    elseif($Path -ceq $Plan.operationLock){$allowed=@('InstallService','StartService','StopService','BootstrapFirstUser')}
+    elseif($Path -ceq $Plan.nextConfiguration -or $Path -cin @('initialize-intent','replica','administrator-intent','administrator','application-role-intent','application-role','application-user-intent','application','complete' | ForEach-Object {Get-DevMongoStagePath $Plan $_})){$allowed=@('BootstrapFirstUser')}
+    return $allowed
+}
+
 function Write-DevMongoPrivateFile([string]$Path,[byte[]]$Bytes,[string]$Kind) {
     $plan=Get-DevMongoPlan
     $expected=Get-DevMongoPrivateFileKind $plan $Path
     if ($Kind -cne $expected) { throw 'DEV_MONGO_TARGET_REJECTED' }
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @(Get-DevMongoFileActions $plan $Path)
     Assert-DevPath $Path
     $stream=[IO.FileSystemAclExtensions]::Create([IO.FileInfo]::new($Path),[IO.FileMode]::CreateNew,[Security.AccessControl.FileSystemRights]::Write,[IO.FileShare]::Read,4096,[IO.FileOptions]::None,(Get-DevMongoAcl $Kind $true))
     try { $stream.Write($Bytes,0,$Bytes.Length); $stream.Flush($true) } finally { $stream.Dispose() }
@@ -253,19 +292,19 @@ function Assert-DevMongoBootstrapArtifacts($Plan) {
 }
 
 function Protect-DevMongoValue([string]$Value) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('PrepareStorage')
     $secure=ConvertTo-SecureString $Value -AsPlainText -Force
     try { return [Text.Encoding]::UTF8.GetBytes((ConvertFrom-SecureString $secure)) } finally { $secure.Dispose() }
 }
 
 function New-DevMongoPassword {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('PrepareStorage')
     $bytes=[Security.Cryptography.RandomNumberGenerator]::GetBytes(32)
     try { return [Convert]::ToBase64String($bytes).TrimEnd('=').Replace('+','-').Replace('/','_') } finally { [Array]::Clear($bytes,0,$bytes.Length) }
 }
 
 function Initialize-DevMongoPrivateMaterial($Plan) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('PrepareStorage')
     Assert-DevMongoPlan $Plan
     # Creation-only and original-owner DPAPI. No certificate store changes.
     $caKey=$null; $serverKey=$null; $clientKey=$null; $ca=$null; $server=$null; $client=$null
@@ -384,19 +423,19 @@ function Assert-DevMongoApprovedServiceSecurity([Security.AccessControl.RawSecur
 }
 
 function Assert-DevMongoServiceCreationSecurity($Plan) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('InstallService')
     Assert-DevMongoPlan $Plan
     Assert-DevMongoApprovedServiceSecurity (Read-DevMongoServiceSecurity $Plan) ([Security.Principal.WindowsIdentity]::GetCurrent().User.Value)
 }
 
 function Assert-DevMongoInstallAdministrator {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('InstallService')
     $principal=[Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
     if(-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){throw 'DEV_MONGO_SEPARATE_ADMIN_INSTALL_REQUIRED'}
 }
 
 function Write-DevMongoStage($Plan,[string]$Stage,[string]$Status) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('BootstrapFirstUser')
     $path=Get-DevMongoStagePath $Plan $Stage
     $record=@{revision=2; stage=$Stage; status=$Status; ownerSid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value; target=($Plan | ConvertTo-Json -Compress -Depth 5); manifestHash=(Get-FileHash -LiteralPath $Plan.bootstrapManifest).Hash}
     Write-DevMongoPrivateFile $path ([Text.Encoding]::UTF8.GetBytes(($record | ConvertTo-Json -Compress -Depth 8))) 'OwnerOnly'
@@ -419,7 +458,7 @@ function Get-DevMongoRecoveryStep([ValidateSet('administrator','application-role
 }
 
 function Invoke-DevMongoNodeStep($Plan,[ValidateSet('initialize','administrator','inspect-administrator','application-role','inspect-application-role','application-user','verify-application','verify-normal')][string]$Step) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions $(if($Step -ceq 'verify-normal'){@('BootstrapFirstUser','StartService')}else{@('BootstrapFirstUser')})
     Assert-DevMongoPrepared $Plan
     $phase=Get-DevMongoConfigurationPhase $Plan
     if(($Step -eq 'verify-normal') -ne ($phase -eq 'Normal')){throw 'DEV_MONGO_TRANSPORT_PHASE_REJECTED'}
@@ -437,7 +476,7 @@ function Invoke-DevMongoNodeStep($Plan,[ValidateSet('initialize','administrator'
         $node=(Get-Command node.exe -CommandType Application | Select-Object -First 1).Source
         if(-not ('DeepLearnerLocal.Owner' -as [type])){Add-Type -Path (Join-Path $PSScriptRoot 'LocalProcessOwner.cs')}
         $owner=[DeepLearnerLocal.Owner]::new()
-        $child=$owner.StartControlled('mongo-bootstrap',$node,@('--import','tsx',(Join-Path $script:DevRepo 'apps/api/scripts/dev-mongo-bootstrap.ts')),$script:DevRepo,(New-DevEnvironment $script:DevRepo $node $Plan.bootstrap),'NUL')
+        $child=$owner.StartControlled('mongo-bootstrap',$node,@('--import','tsx',(Join-Path $script:DevRepo 'apps/api/scripts/dev-mongo-bootstrap.ts'),'--action',$Step),$script:DevRepo,(New-DevEnvironment $script:DevRepo $node $Plan.bootstrap),'NUL')
         $frame=Send-DevValidationRequest $child ($request | ConvertTo-Json -Compress -Depth 8) 180000
         if(-not $owner.WaitEmpty(5000)){throw 'DEV_MONGO_BOOTSTRAP_HELPER_NOT_EMPTY'}
         $result=$frame | ConvertFrom-Json -AsHashtable
@@ -451,7 +490,7 @@ function Invoke-DevMongoNodeStep($Plan,[ValidateSet('initialize','administrator'
 }
 
 function Set-DevMongoNormalConfiguration($Plan) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('BootstrapFirstUser')
     Assert-DevMongoPrepared $Plan
     Assert-DevMongoStage $Plan 'administrator' | Out-Null; Assert-DevMongoStage $Plan 'application' | Out-Null
     $service=Get-DevMongoService $Plan
@@ -466,7 +505,7 @@ function Set-DevMongoNormalConfiguration($Plan) {
 }
 
 function Invoke-DevMongoBootstrap($Plan) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('BootstrapFirstUser')
     $lock=Open-DevMongoLifecycleLock $Plan
     $service=$null
     try {
@@ -507,12 +546,12 @@ function Invoke-DevMongoBootstrap($Plan) {
         }
         if((Invoke-DevMongoNodeStep $Plan 'verify-normal') -cne 'NORMAL_AUTHENTICATION_VERIFIED'){throw 'DEV_MONGO_BOOTSTRAP_RESULT_REJECTED'}
         if(-not $complete){Write-DevMongoStage $Plan 'complete' 'NORMAL_AUTHENTICATION_VERIFIED'}
-        return @{status='NORMAL_AUTHENTICATION_VERIFIED'; policy='PROPOSED / NOT ACTIVE'; applicationProfile='NOT_ACTIVATED'}
+        return @{status='NORMAL_AUTHENTICATION_VERIFIED'; policy=(Get-DevMongoSourcePolicy).status; applicationProfile='NOT_ACTIVATED'}
     } finally {if($null -ne $service){$service.Dispose()}; $lock.Dispose()}
 }
 
 function Invoke-DevMongoPrepare($Plan) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('PrepareStorage')
     Assert-DevMongoPlan $Plan; Assert-DevMongoBinary $Plan; Assert-DevMongoPortFree
     $existing=Get-DevMongoService $Plan
     if ($existing) { $existing.Dispose(); throw 'DEV_MONGO_EXISTING_SERVICE_REFUSED' }
@@ -543,7 +582,7 @@ function Invoke-DevMongoPrepare($Plan) {
 }
 
 function Invoke-DevMongoInstall($Plan) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('InstallService')
     Assert-DevMongoPlan $Plan
     Assert-DevMongoPrepared $Plan; Assert-DevMongoPortFree
     $existing=Get-DevMongoService $Plan
@@ -569,7 +608,7 @@ function Invoke-DevMongoInstall($Plan) {
 }
 
 function Invoke-DevMongoStart($Plan) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('StartService')
     Assert-DevMongoAuthenticatedBootstrap
     Assert-DevMongoPrepared $Plan
     $service=Get-DevMongoService $Plan
@@ -584,7 +623,7 @@ function Invoke-DevMongoStart($Plan) {
 }
 
 function Invoke-DevMongoStop($Plan) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('StopService')
     Assert-DevMongoPrepared $Plan
     $service=Get-DevMongoService $Plan
     if (-not $service) { throw 'DEV_MONGO_SERVICE_NOT_INSTALLED' }
@@ -596,15 +635,11 @@ function Invoke-DevMongoStop($Plan) {
 }
 
 function Invoke-DevMongoInitialize($Plan) {
-    Assert-DevMongoExecutionPolicy
-    Assert-DevMongoPlan $Plan
-    # A pre-connection PID/receipt snapshot cannot bind an unauthenticated write
-    # to that endpoint. Do not add a localhost-exception execution shortcut.
-    Assert-DevMongoAuthenticatedBootstrap
+    throw 'DEV_MONGO_LEGACY_INITIALIZATION_DISABLED'
 }
 
 function Open-DevMongoLifecycleLock($Plan) {
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @('InstallService','StartService','StopService','BootstrapFirstUser')
     Assert-DevMongoPrepared $Plan
     Assert-DevPath $Plan.operationLock
     if (-not (Test-Path -LiteralPath $Plan.operationLock)) { Write-DevMongoPrivateFile $Plan.operationLock ([byte[]]::new(0)) 'OwnerOnly' }
@@ -614,12 +649,15 @@ function Open-DevMongoLifecycleLock($Plan) {
 
 function Invoke-DevMongoSetup([string]$Operation='Plan') {
     $plan=Get-DevMongoPlan; Assert-DevMongoPlan $plan
-    if ($Operation -eq 'Plan') { return [ordered]@{operation='PLAN_ONLY'; target=$plan; configurationTemplate=(Get-DevMongoConfiguration $plan); normalConfigurationTemplate=(Get-DevMongoConfiguration $plan 'Normal'); bootstrapAction='BootstrapFirstUser'; initialization=@{_id=$plan.replicaSet; members=@(@{_id=0; host=$plan.member})}; execution='REFUSED: policy inactive; no activation flag'; portQualification='RECHECK_REQUIRED before any future provisioning'; pending='Service/ACL/install/policy/particular-execution approvals and real TLS/authentication/ownership/transaction qualification'} }
+    if ($Operation -eq 'Plan') { return [ordered]@{operation='PLAN_ONLY'; policyDefinition=(Get-DevMongoSourcePolicy); target=$plan; configurationTemplate=(Get-DevMongoConfiguration $plan); normalConfigurationTemplate=(Get-DevMongoConfiguration $plan 'Normal'); bootstrapAction='BootstrapFirstUser'; initialization=@{_id=$plan.replicaSet; members=@(@{_id=0; host=$plan.member})}; execution=('Source policy: '+(Get-DevMongoSourcePolicy).status+'; separate invocation approval required'); portQualification='RECHECK_REQUIRED before any future provisioning'; pending='Service/ACL/install/policy/particular-execution approvals and real TLS/authentication/ownership/transaction qualification'} }
+    if($Operation -eq 'InitializeReplica'){throw 'DEV_MONGO_LEGACY_INITIALIZATION_DISABLED'}
+    if($Operation -cnotin (Get-DevMongoSourcePolicy).operations){throw 'DEV_MONGO_ACTION_REJECTED'}
+    Assert-DevMongoExecutionPolicy -AllowedActions @($Operation)
     if ($Operation -eq 'PrepareStorage') { Invoke-DevMongoPrepare $plan; return }
     if ($Operation -eq 'InitializeReplica') { Invoke-DevMongoInitialize $plan; return }
     if ($Operation -eq 'BootstrapFirstUser') { Invoke-DevMongoBootstrap $plan; return }
     if ($Operation -notin @('InstallService','StartService','StopService')) { throw 'DEV_MONGO_ACTION_REJECTED' }
-    Assert-DevMongoExecutionPolicy
+    Assert-DevMongoExecutionPolicy -AllowedActions @($Operation)
     $lock=Open-DevMongoLifecycleLock $plan
     try {
         switch ($Operation) {
@@ -631,11 +669,44 @@ function Invoke-DevMongoSetup([string]$Operation='Plan') {
 }
 
 if ($MyInvocation.InvocationName -ne '.') {
-    try { Invoke-DevMongoSetup $Action | ConvertTo-Json -Depth 8 }
+    $lease=$null; $closedGuard=${function:Assert-DevMongoExecutionPolicy}
+    try {
+        if($Action -notin @('Plan','InitializeReplica')) {
+            $policy=Get-DevMongoSourcePolicy
+            # Reject inactive source before process launch or private-path access.
+            Assert-DevMongoPolicyAgreement $policy $policy
+            $node=(Get-Command node.exe -CommandType Application | Select-Object -First 1).Source
+            if(-not ('DeepLearnerLocal.Owner' -as [type])){Add-Type -Path (Join-Path $PSScriptRoot 'LocalProcessOwner.cs')}
+            $probe=[DeepLearnerLocal.Owner]::new()
+            try {
+                $child=$probe.StartControlled('mongo-policy',$node,@('--import','tsx',(Join-Path $script:DevRepo 'apps/api/scripts/dev-mongo-bootstrap.ts'),'--check-policy'),$script:DevRepo,(New-DevEnvironment $script:DevRepo $node ([IO.Path]::GetTempPath())),'NUL')
+                $child.CloseInput(); $frame=$child.ReadFrameAsync()
+                if(-not $frame.Wait(10000) -or -not $probe.WaitEmpty(5000) -or $child.ExitCode -ne 0){throw 'DEV_MONGO_SOURCE_POLICY_MISMATCH'}
+                $peer=$frame.Result | ConvertFrom-Json -AsHashtable
+            } finally {$probe.Dispose()}
+            Assert-DevMongoPolicyAgreement $policy $peer
+            $ownerSid=[Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+            if([IO.Path]::GetFullPath((Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'DeepLearner/dev')) -cne (Get-DevMongoPlan).root){throw 'DEV_MONGO_OWNER_ROOT_MISMATCH'}
+            # Private closure identity, never read from argv, stdin, profile or environment.
+            $lease=@{alive=$true; action=$Action; ownerSid=$ownerSid; target=($policy.target | ConvertTo-Json -Compress)}
+            $accepted=$lease; $fixedTarget=$policy.target | ConvertTo-Json -Compress
+            $validateInvocation=${function:Assert-DevMongoInvocation}
+            Set-Item Function:Assert-DevMongoExecutionPolicy -Value ({
+                param([string[]]$AllowedActions)
+                & $validateInvocation $accepted $AllowedActions ([Security.Principal.WindowsIdentity]::GetCurrent().User.Value) $fixedTarget
+            }.GetNewClosure())
+        }
+        Invoke-DevMongoSetup $Action | ConvertTo-Json -Depth 8
+    }
     catch {
         $code=$_.Exception.Message
         if ($code -notmatch '^DEV_[A-Z_]+$') { $code='DEV_MONGO_OUTCOME_UNKNOWN_RECONCILE' }
         Write-Host "MongoDB setup refused: $code. No automatic retry/repair or fallback target."
         exit 1
+    }
+    finally {
+        if($null -ne $lease){$lease.alive=$false; $lease.Clear()}
+        Set-Item Function:Assert-DevMongoExecutionPolicy -Value $closedGuard
+        $accepted=$null; $lease=$null
     }
 }

@@ -1,3 +1,88 @@
+# MongoDB activation-source implementation — offline, 2026-11-01
+
+Owner-approved ten-path implementation at dev/7b16bdcddd0f40f0b854398a8e25708423115a7c.
+**DEV-PERSISTENT-27019 remains PROPOSED / NOT ACTIVE.** This section supersedes only
+current tooling descriptions; all historical records below remain unchanged.
+No provisioning, activation, credential/certificate generation, service/ACL action,
+MongoDB connection, application startup or Git write is authorized or performed.
+
+## Source policy and per-invocation authorization
+
+PowerShell and Node define policy version 1 with the same ID, inactive status,
+127.0.0.1:27019, replica set deeplearner-dev-rs, database deeplearner-dev, service
+DeepLearnerDevMongo27019 and exact prospective operations: PrepareStorage,
+InstallService, StartService, StopService and BootstrapFirstUser. Mismatched
+status/version/target/operations refuse. No input flag, profile, receipt, environment
+or request activates policy. Plan and --check-policy remain metadata only.
+
+Only the actual CLI entry blocks can issue accepted contexts after source agreement
+and OS owner checks. Contexts bind action, target and Windows SID, contain no
+credentials, and are revoked in finally. Imports, dot-sourcing and exported effect
+calls cannot issue contexts; caller-supplied objects fail. The Node helper compares
+its independently observed OS SID with the existing private manifest and validates
+fixed target/helper hash/certificate pins. It receives a fixed step argument that
+must match strict private stdin. No private context is transported in that frame.
+
+The Node context proves neither its PS parent Job nor live service ownership.
+Only the existing PS setup flow is an authorized future provisioning route; it
+must retain fresh service/executable/listener/path/ACL proof around each helper.
+The Windows owner and SYSTEM/Administrator trust boundary is unchanged.
+
+Preparation alone writes initial private material. Installation alone writes the
+service registration receipt. Start/stop may write only their lifecycle lock;
+bootstrap alone writes phase receipts and next normal configuration. Existing
+exact DACL/readback, mTLS/DPAPI/keyfile, least-privilege manifest, preserved-data
+recovery and protected 27017/27018 exclusions remain intact. Legacy InitializeReplica
+and mongo-initialize are permanently disabled. Ordinary npm run dev never bootstraps.
+
+## Offline evidence and remaining execution gates
+
+Final focused evidence:
+
+| Check                              | Result                                                                                                                                                                        |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PowerShell parse/inert regressions | 38/38 PASS: 33 retained and 5 new grouped activation/context/artifact checks                                                                                                  |
+| Bootstrap/startup TypeScript       | 27/27 PASS: 18 bootstrap and 9 retained startup/private-validator tests                                                                                                       |
+| API TypeScript                     | PASS with tsconfig.test.json                                                                                                                                                  |
+| Source lint                        | 469 files, 0 errors / 0 warnings; command-only .cache/** exclusion, no lint configuration change                                                                              |
+| Formatting/integrity               | Three TypeScript files and five new Markdown sections Prettier PASS; ten paths UTF-8/no BOM/LF/final newline; historical documentation bytes preserved; git diff --check PASS |
+| Scope/privacy                      | Exactly ten authorized modified paths; empty index; no conflicts, detected secrets or new dependencies; all twelve ignored Stitch hashes unchanged                            |
+| Metadata modes                     | Actual default PS CLI Plan and Node --check-policy remain inactive, non-mutating metadata; actual PS/Node policy parity PASS                                                  |
+| Independent security review        | Critical 0 / High 0 / Medium 0 / Low 0 unresolved on frozen source/tests and all ten approved paths                                                                           |
+| Runtime qualification              | NOT_RUN / NOT_VERIFIED; no accepted effect CLI context issued during tests                                                                                                    |
+
+Secondary tooling status: **READY_FOR_OFFLINE_CHECKPOINT**, for separate owner
+review only. No Git checkpoint or activation is authorized. Full-root lint was not
+rerun; its last historical result was 563 errors / 0 warnings in 24 .cache files.
+The source-lint result above excludes that generated cache only for this check.
+
+Pure synthetic ACTIVE facts do not alter source or issue accepted contexts.
+Positive orchestration/install tests mock filesystem, crypto, services and database
+boundaries; protocol/lease/policy checks use memory. Child execution is limited to
+metadata, permanently disabled legacy initialization and retained harmless startup
+validator/owned-child containment tests. No effect CLI is positively executed.
+Lease-facts cleanup and source-level finally placement are offline evidence, not
+real cancellation, owner, service or database qualification.
+
+Required next gates remain: separate exact source/policy activation approval;
+approved owner/private-storage/service/ACL/binary inventory and host prerequisites;
+particular normal-user PrepareStorage execution; separate elevated dedicated-service
+installation; owner-controlled authenticated bootstrap and explicit transport
+transition; genuine normal-user lifecycle and persistence/transaction verification.
+No automatic reset, adoption, retry or data deletion is authorized. Partial or
+ambiguous state requires preserved-data owner review. Schema/index provisioning,
+product accounts/fixtures and app profile activation require separate scope.
+
+Host OS SID inspection, service virtual-account logon and creation/readback,
+DPAPI/certificate/keyfile ACLs, mTLS client rejection, writable PRIMARY, actual
+operator/application privileges, normal transport transition, interruption recovery,
+transactions and persistence remain NOT_RUN / NOT_VERIFIED. Existing full-root lint
+cache failures remain historical; lint configuration is unchanged.
+
+Preserve MongoDB NOT_PROVISIONED; policy PROPOSED / NOT ACTIVE; app startup/shutdown
+NOT_VERIFIED; F042/F043 acceptance BLOCKED; F043 MongoDB 15 NOT_RUN; browser 213
+NOT_RUN; F044 NOT_STARTED; production NOT_VERIFIED. This is no runtime acceptance.
+
 # Slice B Windows service ACL correction — offline, 2026-10-31
 
 Owner-approved correction at dev/e5fbd8c50e86c179b22fd5549aba0d4d7d3749d0,

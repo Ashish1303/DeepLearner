@@ -1194,3 +1194,37 @@ Install/elevation/logon/ACL behavior requires separately approved real qualifica
 Inert/mocked evidence is not TLS, authentication, service, transaction or persistence
 verification. F042/F043 acceptance BLOCKED,15 MongoDB/213 browser NOT_RUN and
 F044 NOT_STARTED remain unchanged; production readiness remains NOT_VERIFIED.
+
+## Inactive local provisioning authorization boundary — 2026-11-01
+
+The owner-approved ten-file source amendment is offline only. Both runtimes retain
+PROPOSED / NOT ACTIVE policy version 1. PowerShell's literal source metadata and
+Node's strict source definition must agree on identity, status, version, exact
+27019 target and five operations before effects. PS's Plan and Node's
+--check-policy expose only their own definitions. The Node effect CLI reads the
+single PS literal instead of launching another interpreter, avoiding recursion
+or an additional runtime-path configuration.
+
+A private, per-invocation CLI lease binds action/target/OS Windows SID. Dot-source,
+imports, direct exported calls and JSON/profile/environment objects have no issuer.
+PS installs its context-bearing guard only inside its actual CLI try/finally;
+Node accepts only its private WeakSet identity. Finally revokes/restores these
+contexts; process exit also ends their memory lifetime. Contexts carry no secrets.
+The internal Node CLI uses an explicit fixed step argument which must match strict
+private stdin; it independently derives owner SID and checks the existing private
+manifest/source hash/certificate pins. It is not an independently authorized
+provisioning route or proof of the PS parent Job/live SCM ownership. The existing
+PS service/image/listener/storage/ACL checks before and after each child remain
+mandatory. Same-owner and SYSTEM/Administrator trust assumptions are unchanged.
+
+Action-specific guards and exact artifact-path allowances prevent ordinary service
+operations from creating bootstrap secrets or changing transport. Legacy replica
+initialization always refuses. Existing mTLS/keyfile/authentication, DPAPI,
+creation-time service DACL/readback, restricted role, interruption handling and
+protected-service exclusions are preserved. Normal npm run dev never bootstraps.
+
+Offline positive cases use memory/local mocks, never accepted live contexts.
+Host SID/service/TLS/auth/transaction/persistence behavior remains NOT_RUN /
+NOT_VERIFIED. Source activation, runtime execution, Git delivery and feature
+acceptance remain separate approvals. MongoDB NOT_PROVISIONED; F042/F043
+acceptance BLOCKED; F044 NOT_STARTED; production NOT_VERIFIED.

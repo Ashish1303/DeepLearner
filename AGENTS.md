@@ -525,3 +525,38 @@ remain required; no runtime/API guard or broader privilege is introduced here.
 
 Keep F042/F043 acceptance BLOCKED, F043 MongoDB 15 NOT_RUN, browser 213 NOT_RUN,
 F044 NOT_STARTED and production NOT_VERIFIED. Historical failures remain intact.
+
+## Inactive activation-source implementation — 2026-11-01
+
+Owner-approved ten-file offline implementation only. DEV-PERSISTENT-27019 remains
+**PROPOSED / NOT ACTIVE**, source-policy version 1. The historical unconditional
+refusal record above describes the earlier checkpoint. Current effect guards
+require matching PowerShell/Node source definitions and a private per-invocation
+CLI context; inactive source still refuses. No profile, receipt, environment,
+request body or CLI flag activates this policy or issues a context.
+
+The only prospective operations are PrepareStorage, InstallService, StartService,
+StopService and BootstrapFirstUser, for the exact dedicated 127.0.0.1:27019 target.
+Legacy InitializeReplica and mongo-initialize are permanently unavailable.
+Source activation, each particular runtime operation, Git commit and push remain
+separate explicit owner gates. This amendment activates none of them.
+
+Dot-sourcing/imports and exported effect calls cannot issue an accepted context.
+CLI contexts bind fixed target, exact action and independently derived Windows
+owner SID, contain no credentials and are revoked in finally. The internal Node
+helper checks the private owner-bound manifest/source hash/certificate pins; this
+does not prove its PS parent Job or live SCM ownership. Only the approved PS flow
+is an authorized future execution route; its fresh service/image/listener/path/ACL
+checks around each helper remain mandatory. Same-owner source/private-material
+control and SYSTEM/Administrator trust boundaries are unchanged.
+
+Offline tests must stay inert even with synthetic ACTIVE facts: no accepted live
+CLI context, real provisioning, crypto material, service or database actuator is
+allowed. Positive orchestration uses local host-operation mocks; policy/lease/
+protocol checks use memory. Child CLI tests use only Plan/policy-check metadata
+or permanently disabled legacy initialization. Test isolation must be reviewed
+before changing gates; ambiguity stops work.
+
+MongoDB remains NOT_PROVISIONED, application startup/shutdown NOT_VERIFIED,
+F042/F043 acceptance BLOCKED, F043 MongoDB 15 NOT_RUN, browser 213 NOT_RUN,
+F044 NOT_STARTED and production NOT_VERIFIED. No runtime qualification is implied.

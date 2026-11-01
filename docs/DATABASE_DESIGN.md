@@ -1850,3 +1850,38 @@ Stored credentials are tried through inspection; failed authentication stops for
 owner intervention. Unknown initialization and absent PRIMARY remain unreconciled,
 never reinitialized. This code provides no destructive or auth-disabling recovery.
 MongoDB remains NOT_PROVISIONED; real TLS/auth/transaction/persistence NOT_VERIFIED.
+
+## Inactive source policy and invocation authorization — 2026-11-01
+
+DEV-PERSISTENT-27019 remains **PROPOSED / NOT ACTIVE**, source-policy version 1.
+Matching source definitions contain policy ID/status/version, exact operations and
+127.0.0.1:27019 / deeplearner-dev-rs / deeplearner-dev /
+DeepLearnerDevMongo27019 identity. Mixed status, version, target or operation
+inventory refuses. Node reads the single literal PS source definition without
+executing it; PS obtains bounded, owned-child Node metadata. Plan and --check-policy
+return local metadata only and do not recurse, create contexts or access MongoDB.
+
+Prospective operations remain PrepareStorage, InstallService, StartService,
+StopService and BootstrapFirstUser. Preparation alone can create initial private
+material; installation alone writes the registration receipt; ordinary start/stop
+may write only the lifecycle lock. Bootstrap alone writes phase receipts and the
+next normal configuration. Unknown artifact paths refuse. No app schema/index,
+fixture, product account, reset or repair authority is added. Legacy unauthenticated
+initialization is permanently disabled.
+
+Contexts are issued only inside explicit CLI entry blocks after matching ACTIVE
+source and OS owner checks. Public inputs cannot supply their private identity.
+The Node helper independently reads its OS SID and binds the existing private
+manifest's owner, fixed target, source hash and certificate pins before issuing
+its context. That is owner/material binding, not independent SCM/parent ownership
+proof; mandatory PS live ownership checks remain unchanged. Source-controlled
+policy metadata is finalized before any future first preparation; no old receipt
+or partially prepared storage is migrated or adopted automatically.
+
+The two-phase authenticated TLS bootstrap, DPAPI secrets, keyfile, exact application
+privileges, creation-time service DACL/readback, stopped-service transition and
+ambiguous-write recovery rules remain unchanged. Protected 27017/27018 resources
+remain excluded. No runtime TLS/authentication/transactions/persistence have run.
+Separate source activation, host/service/ACL inventory and particular provisioning
+execution approvals are still required; schema/index and app profile work remain
+separate. MongoDB NOT_PROVISIONED; F042/F043 acceptance BLOCKED; F044 NOT_STARTED.
