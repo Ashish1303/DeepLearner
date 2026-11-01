@@ -7,7 +7,7 @@ param([ValidateSet('Plan','PrepareStorage','InstallService','StartService','Stop
 function Get-DevMongoSourcePolicy {
     # Literal source metadata, also read by the Node CLI; never a private profile.
     return @'
-{"id":"DEV-PERSISTENT-27019","status":"PROPOSED / NOT ACTIVE","sourceVersion":1,"target":{"host":"127.0.0.1","port":27019,"replicaSet":"deeplearner-dev-rs","database":"deeplearner-dev","service":"DeepLearnerDevMongo27019"},"operations":["PrepareStorage","InstallService","StartService","StopService","BootstrapFirstUser"]}
+{"id":"DEV-PERSISTENT-27019","status":"ACTIVE","sourceVersion":1,"target":{"host":"127.0.0.1","port":27019,"replicaSet":"deeplearner-dev-rs","database":"deeplearner-dev","service":"DeepLearnerDevMongo27019"},"operations":["PrepareStorage","InstallService","StartService","StopService","BootstrapFirstUser"]}
 '@ | ConvertFrom-Json -AsHashtable
 }
 

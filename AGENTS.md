@@ -560,3 +560,33 @@ before changing gates; ambiguity stops work.
 MongoDB remains NOT_PROVISIONED, application startup/shutdown NOT_VERIFIED,
 F042/F043 acceptance BLOCKED, F043 MongoDB 15 NOT_RUN, browser 213 NOT_RUN,
 F044 NOT_STARTED and production NOT_VERIFIED. No runtime qualification is implied.
+
+## Owner-approved source-policy activation — 2026-11-01
+
+DEV-PERSISTENT-27019 is now **ACTIVE at the source-policy level only**, version 1,
+following the owner's nine-file offline amendment approval. Both source statuses
+changed only after the four corrected fixtures and activation-safe checks passed.
+Earlier inactive-policy records above remain historical evidence, unchanged.
+
+The exact source allowlist remains PrepareStorage, InstallService, StartService,
+StopService and BootstrapFirstUser for 127.0.0.1:27019 / deeplearner-dev-rs /
+deeplearner-dev / DeepLearnerDevMongo27019. Activation is not permission to invoke
+any of them. Each effectful operation requires separate explicit owner approval,
+exact inventory and current host qualification; service installation/elevation
+requires its own approval under the original Windows owner. Protected 27017/27018
+resources, production and unrelated storage/services remain excluded.
+
+No application accounts, collection/index provisioning, fixtures, application
+profile activation or application startup is authorized. No credential/certificate
+generation, MongoDB connection, service/ACL change or database operation was
+performed by this amendment. CLI context/owner/source-agreement guards, exact
+service DACL, TLS/keyfile/DPAPI, privileges and recovery contracts are unchanged.
+The internal Node context does not prove its PS parent or live service ownership;
+the PS ownership checks around every helper remain mandatory. Legacy initialization
+remains disabled. Source deactivation does not stop a running service and also
+blocks guarded lifecycle actions; obtain any required owned-service shutdown
+approval separately. Never reset/delete/recreate persistent data to recover.
+
+MongoDB remains NOT_PROVISIONED; app startup/shutdown NOT_VERIFIED; F042/F043
+acceptance BLOCKED; F043 MongoDB 15 NOT_RUN; browser 213 NOT_RUN; F044 NOT_STARTED;
+production NOT_VERIFIED. Git staging/commit/push remain separately approved gates.

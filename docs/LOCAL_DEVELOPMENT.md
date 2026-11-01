@@ -1,3 +1,87 @@
+# Source-policy ACTIVE — offline amendment, 2026-11-01
+
+Owner-approved exact nine-path amendment at dev/0fea433ec2bc80f41163c143b2ed46fd55477064.
+**DEV-PERSISTENT-27019 is ACTIVE at the source-policy level only, version 1.**
+**MongoDB remains NOT_PROVISIONED.** All earlier inactive-state records below are
+historical and preserved byte-for-byte. Policy activation grants no runtime
+execution, provisioning, application startup or Git delivery permission.
+
+## Approved source change and fixture ordering
+
+First corrected four assumptions: both suites explicitly construct inactive
+fixtures; Plan compares status with the actual source definition; the invalid
+manifest fixture uses the opposite status. Structural isolation review and
+38/38 PowerShell plus 27/27 TypeScript tests passed with source still inactive.
+Only then were the PS literal JSON status and Node getter status changed to ACTIVE.
+Policy ID/version/target/operations and all guard/actuator code remain unchanged.
+
+Exact target: 127.0.0.1:27019; replica set deeplearner-dev-rs; database deeplearner-dev;
+service DeepLearnerDevMongo27019; storage
+C:\Users\Shreeji\AppData\Local\DeepLearner\dev\mongodb.
+The only source operations are PrepareStorage, InstallService, StartService,
+StopService and BootstrapFirstUser. Each requires separate owner authorization,
+exact inventory and fresh host qualification; installation/elevation is separately
+approved under the original Windows owner. No app accounts, indexes, fixtures,
+application profile activation or app startup are authorized.
+
+Imports, dot-source and exported calls remain context-free. Public objects cannot
+issue a CLI context. Cross-source agreement, OS owner/action/target binding, finally
+cleanup, exact service DACL/readback, mTLS/keyfile/DPAPI, restricted privileges,
+interruption rules and legacy initialization refusals are preserved. The Node
+context does not prove its PS parent/live service identity; existing PS ownership
+checks around every helper remain mandatory. Protected 27017/27018 resources and
+all production targets remain excluded.
+
+## Offline verification and pending host gates
+
+Final focused evidence:
+
+| Check                          | Result                                                                                                                                                                                                |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Before source activation       | 38/38 PowerShell and 27/27 TypeScript PASS with corrected fixtures and both sources still inactive                                                                                                    |
+| After source activation        | 38/38 PowerShell and 27/27 TypeScript PASS with both source definitions ACTIVE                                                                                                                        |
+| Syntax and metadata            | Two PowerShell parse checks PASS; actual default CLI Plan and Node --check-policy agree on ACTIVE version 1 without issuing a setup context                                                           |
+| API typecheck                  | PASS using tsconfig.test.json                                                                                                                                                                         |
+| Source lint                    | 469 files, 0 errors / 0 warnings; command-only .cache/** exclusion, no lint configuration modification                                                                                                |
+| Formatting/encoding/whitespace | Two TypeScript files and five new Markdown sections Prettier PASS; all nine paths UTF-8/no BOM/LF/final newline; git diff --check PASS                                                                |
+| Scope/privacy/history          | Exactly nine approved paths; empty index; no conflicts or detected secrets; only two source status literals changed; historical documentation bytes preserved; twelve ignored Stitch hashes unchanged |
+| Independent security review    | Critical 0 / High 0 / Medium 0 / Low 0 unresolved; frozen source/tests, test isolation and all nine paths reviewed                                                                                    |
+| Runtime qualification          | NOT_RUN / NOT_VERIFIED; no live setup action or accepted production context issued by tests                                                                                                           |
+
+Secondary tooling status: **READY_FOR_ACTIVATION_CHECKPOINT**, for separate owner
+checkpoint review only. No Git staging/commit/push is authorized. Full-root lint was
+not rerun; its historical 563 errors in 24 .cache files remain recorded below.
+
+Tests issue no accepted live CLI context and never execute positive provisioning
+actions. All such effects use local mocks; pure policy/protocol/lease fixtures stay in memory. Retained startup
+checks use temporary .cache fixtures and harmless owned validator children. The
+synthetic cleanup-refusal diagnostic remains deliberate, not runtime shutdown proof.
+
+No MongoDB connection, service install/start/stop, real credential/certificate
+generation, Windows ACL change, database/index creation or replica initialization
+occurred. Real OS-owner/cancellation, service/ACL/logon, DPAPI/keyfile/certificate,
+mTLS-client rejection, PRIMARY, authentication/privileges, transition, transactions
+and persistence remain NOT_RUN / NOT_VERIFIED.
+
+Before future setup: requalify port 27019, absence/ownership of the exact service,
+trusted parent/storage isolation, original-owner context, pinned MongoDB 8.2.7
+binary/hash and supported PowerShell/Node tooling. Private preparation, elevated
+service installation, authenticated bootstrap/transition and normal-user lifecycle
+need their own exact execution approvals. No broad CIM investigation or changes to
+protected services are authorized. Source activation alone does not make the
+application environment operational; schema/index, app accounts, fixtures and
+private application profile remain separate work.
+
+Source deactivation does not stop an already-running service or undo existing
+credentials/data; it also blocks guarded lifecycle calls. Obtain any needed
+verified-owned-service shutdown approval separately. On uncertain/partial outcomes,
+preserve state and stop for owner review; never automatically reset, delete, repair,
+retry mutation or regenerate credentials.
+
+Preserve MongoDB NOT_PROVISIONED; app startup/shutdown NOT_VERIFIED; F042/F043
+acceptance BLOCKED; F043 MongoDB 15 NOT_RUN; browser 213 NOT_RUN; F044 NOT_STARTED;
+production NOT_VERIFIED. No Git staging, commit or push was performed.
+
 # MongoDB activation-source implementation — offline, 2026-11-01
 
 Owner-approved ten-path implementation at dev/7b16bdcddd0f40f0b854398a8e25708423115a7c.

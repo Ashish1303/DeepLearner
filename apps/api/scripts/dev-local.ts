@@ -236,7 +236,7 @@ export type MongoSourcePolicy = z.infer<typeof mongoPolicySchema>;
 export function getDevMongoSourcePolicy(): MongoSourcePolicy {
   return {
     id: 'DEV-PERSISTENT-27019',
-    status: 'PROPOSED / NOT ACTIVE',
+    status: 'ACTIVE',
     sourceVersion: 1,
     target: {
       host: '127.0.0.1',

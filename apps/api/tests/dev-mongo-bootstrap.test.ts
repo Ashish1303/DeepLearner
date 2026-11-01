@@ -182,7 +182,10 @@ test('imported actuator has no CLI context and child policy check is metadata on
 });
 
 test('source agreement rejects inactive, mixed, wrong-version, target and operation policies without I/O', () => {
-  const inactive = getDevMongoSourcePolicy();
+  const inactive = {
+    ...getDevMongoSourcePolicy(),
+    status: 'PROPOSED / NOT ACTIVE',
+  };
   assert.throws(
     () => assertDevMongoPolicyAgreement(inactive, inactive),
     /NOT_ACTIVE/,
@@ -321,7 +324,16 @@ test('cross-process manifest binds observed OS owner, exact target, helper sourc
       ...manifest,
       target: JSON.stringify({ ...plan, serviceName: 'MongoDB' }),
     },
-    { ...manifest, target: JSON.stringify({ ...plan, policy: 'ACTIVE' }) },
+    {
+      ...manifest,
+      target: JSON.stringify({
+        ...plan,
+        policy:
+          getDevMongoSourcePolicy().status === 'ACTIVE'
+            ? 'PROPOSED / NOT ACTIVE'
+            : 'ACTIVE',
+      }),
+    },
     { ...manifest, ownerContext: true },
   ])
     assert.throws(() =>

@@ -1228,3 +1228,34 @@ Host SID/service/TLS/auth/transaction/persistence behavior remains NOT_RUN /
 NOT_VERIFIED. Source activation, runtime execution, Git delivery and feature
 acceptance remain separate approvals. MongoDB NOT_PROVISIONED; F042/F043
 acceptance BLOCKED; F044 NOT_STARTED; production NOT_VERIFIED.
+
+## Source-policy ACTIVE; execution gate unchanged — 2026-11-01
+
+Owner-approved nine-file offline amendment changed only the two policy status
+literals to ACTIVE after activation-safe fixture corrections/checks passed. Policy
+version 1, exact 27019 target, five operations and all guard/actuator code remain
+unchanged. Earlier inactive-state architecture records above are historical.
+No production source, API/authentication logic, dependencies, permits or environment
+switches changed.
+
+ACTIVE is source authorization only, not runtime execution permission. Every
+PrepareStorage/InstallService/StartService/StopService/BootstrapFirstUser invocation
+requires separate owner approval and current host qualification. Imports/dot-source
+and exported calls cannot issue accepted CLI contexts. Contexts bind exact action,
+target and OS-derived owner; cleanup, cross-source mismatch refusals and permanent
+legacy initialization refusals remain intact. Node owner/manifest binding still
+is not PS parent/live SCM proof; mandatory PS ownership checks remain unchanged.
+Protected 27017/27018 resources remain excluded.
+
+Positive provisioning tests remain memory/local mocks; no accepted production
+context or live provisioning action is executed. Retained startup tests use only
+temporary fixtures and harmless owned validator children. Earlier inactive results
+remain intact; current pre/post activation evidence is in LOCAL_DEVELOPMENT.md.
+No MongoDB/service/ACL/certificate/credential operation or application startup ran.
+
+Source deactivation does not stop an existing service and blocks guarded stop
+operations too; any needed verified-owned-service shutdown requires separate
+approval. No automatic rollback of persistent files, users or data is permitted.
+MongoDB NOT_PROVISIONED; real host/service/TLS/authentication/transactions/persistence
+NOT_VERIFIED; app startup/shutdown NOT_VERIFIED; F042/F043 acceptance BLOCKED;
+F043 MongoDB 15 NOT_RUN; browser 213 NOT_RUN; F044 NOT_STARTED; production NOT_VERIFIED.

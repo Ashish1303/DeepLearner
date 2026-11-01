@@ -165,6 +165,7 @@ Check 'dot-sourcing exposes no context issuer and installs only the context-free
 }
 Check 'pure source policy agreement rejects mixed status, version, target and operation changes' {
     $inactive=Get-DevMongoSourcePolicy
+    $inactive.status='PROPOSED / NOT ACTIVE'
     $refused=$false;try{Assert-DevMongoPolicyAgreement $inactive $inactive}catch{$refused=$_.Exception.Message -eq 'DEV_PERSISTENT_POLICY_NOT_ACTIVE'};Assert $refused 'Inactive policy accepted'
     $active=$inactive | ConvertTo-Json -Depth 8 | ConvertFrom-Json -AsHashtable; $active.status='ACTIVE'
     Assert-DevMongoPolicyAgreement $active $active
@@ -218,7 +219,7 @@ Check 'MongoDB setup parses and defaults to a non-mutating exact plan' {
     $result=Invoke-DevMongoSetup
     Assert ($result.operation -eq 'PLAN_ONLY') 'Default would execute'
     Assert ($result.target.port -eq 27019 -and $result.target.member -eq 'localhost:27019') 'Wrong target/member'
-    Assert ($result.target.policy -eq 'PROPOSED / NOT ACTIVE') 'Policy activated'
+    Assert ($result.target.policy -ceq (Get-DevMongoSourcePolicy).status) 'Plan/source policy mismatch'
 }
 Check 'changed protected ports, paths, services and network exposure refuse' {
     $plan=Get-DevMongoPlan

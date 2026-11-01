@@ -1885,3 +1885,35 @@ remain excluded. No runtime TLS/authentication/transactions/persistence have run
 Separate source activation, host/service/ACL inventory and particular provisioning
 execution approvals are still required; schema/index and app profile work remain
 separate. MongoDB NOT_PROVISIONED; F042/F043 acceptance BLOCKED; F044 NOT_STARTED.
+
+## Source-policy activation; runtime remains unauthorized — 2026-11-01
+
+DEV-PERSISTENT-27019 is **ACTIVE at the source-policy level only**, version 1.
+This current owner-approved amendment supersedes earlier inactive status wording
+for the five existing setup operations only. Historical proposals/results above
+are preserved; broader collection/index/seed proposals remain unimplemented and
+require separate inventory, implementation and execution approval.
+
+Exact identity is unchanged: 127.0.0.1:27019, deeplearner-dev-rs, deeplearner-dev,
+DeepLearnerDevMongo27019, dedicated persistent storage
+C:\Users\Shreeji\AppData\Local\DeepLearner\dev\mongodb.
+Only PrepareStorage, InstallService, StartService, StopService and BootstrapFirstUser
+are recognized by the source policy. Their source agreement and private CLI
+owner/action/target contexts remain required. Every effectful invocation additionally
+requires separate owner authorization and fresh host qualification. No service,
+credential, certificate, replica, database or user was created or accessed here.
+
+MongoDB remains NOT_PROVISIONED. App accounts, collections/indexes, fixtures and
+application profile activation remain unauthorized. Protected 27017/27018 resources
+and all production targets remain excluded. Authentication, mTLS bootstrap,
+keyfile/DPAPI/private ACLs, exact runtime privilege manifest, service DACL/readback,
+normal transport transition and ambiguous-write recovery are unchanged. The app's
+existing insert-privilege collection-creation nuance is not altered or expanded.
+
+Host port/service/storage/parent-owner/binary checks remain outstanding before
+setup; real service/ACL, TLS/authentication, transactions and persistence remain
+NOT_RUN / NOT_VERIFIED until separately approved execution. Source deactivation
+neither shuts down MongoDB nor reverses existing data or credentials. Stop only a
+verified owned service under separate authorization; preserve ambiguous/partial
+state for review, with no automatic reset, deletion, repair or credential reset.
+F042/F043 acceptance remains BLOCKED; F044 NOT_STARTED; production NOT_VERIFIED.

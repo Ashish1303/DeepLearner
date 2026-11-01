@@ -2811,3 +2811,30 @@ for review, never reset or adopted. Keep MongoDB NOT_PROVISIONED, policy PROPOSE
 NOT ACTIVE, app startup/shutdown NOT_VERIFIED, F042/F043 acceptance BLOCKED,
 F043 MongoDB 15 NOT_RUN, browser 213 NOT_RUN, F044 NOT_STARTED and production
 NOT_VERIFIED. No feature progression or production authority is granted.
+
+# 24. Source-policy activation amendment — offline only, 2026-11-01
+
+Owner-approved nine-file amendment at dev/0fea433ec2bc80f41163c143b2ed46fd55477064.
+DEV-PERSISTENT-27019 is now ACTIVE at the source-policy level only, version 1.
+Four state-dependent test assumptions were corrected and activation-safe checks
+passed while source remained inactive; only then did both source statuses change.
+Target, exact five operations, CLI contexts and all security/actuator code remain
+unchanged. Historical inactive-state evidence above remains byte-for-byte intact.
+
+Pre/post activation focused suites: 38/38 PowerShell and 27/27 TypeScript PASS in
+each phase. API typecheck, two PowerShell parse checks, metadata agreement,
+source lint (469 files, 0 errors/warnings), formatting/UTF-8/LF/whitespace and exact
+scope/privacy/history checks PASS. Fresh independent Critical 0 / High 0 / Medium 0 /
+Low 0 unresolved. Secondary tooling status: **READY_FOR_ACTIVATION_CHECKPOINT** for
+separate owner review. Exact evidence is in LOCAL_DEVELOPMENT.md. No real provisioning
+or accepted production test context ran.
+This activation is not effectful execution approval. Each setup operation requires
+separate owner authorization and host qualification. No app accounts, indexes,
+fixtures or profile activation are authorized. Protected 27017/27018 resources
+remain excluded. Source deactivation does not stop an existing service; separately
+approved owned-service shutdown and preserved-data recovery rules remain required.
+
+MongoDB NOT_PROVISIONED; real service/TLS/authentication/transaction/persistence
+qualification NOT_VERIFIED; app startup/shutdown NOT_VERIFIED; F042/F043 acceptance
+BLOCKED; F043 MongoDB 15 NOT_RUN; browser 213 NOT_RUN; F044 NOT_STARTED; production
+NOT_VERIFIED. No feature acceptance, Git commit/push or deployment is authorized.
