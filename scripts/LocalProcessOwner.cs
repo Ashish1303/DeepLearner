@@ -103,6 +103,21 @@ namespace DeepLearnerLocal {
         public uint ExitCode { get { if(!HasExited)throw new InvalidOperationException("MEMBER_RUNNING");uint value;if(!Native.GetExitCodeProcess(Process,out value))throw Native.Error("MEMBER_EXIT_FAILED");return value; } }
         public void Dispose() { Process.Dispose(); }
     }
+    // Telemetry only; these facts never grant membership or process authority.
+    public sealed class OwnershipObservation {
+        public uint Pid { get; }
+        public bool Owned { get; }
+        public string Classification { get; }
+        public string Stage { get; }
+        public int? NativeError { get; }
+        public long? CreationFiletime { get; }
+        public string MetadataStage { get; }
+        public int? MetadataError { get; }
+        internal OwnershipObservation(uint pid,bool owned,string classification,string stage,int? error,long? creation,string metadataStage,int? metadataError) {
+            Pid=pid;Owned=owned;Classification=classification;Stage=stage;NativeError=error;
+            CreationFiletime=creation;MetadataStage=metadataStage;MetadataError=metadataError;
+        }
+    }
     public sealed class Owner : IDisposable {
         readonly Handle job;
         readonly List<Child> children=new List<Child>();
@@ -118,8 +133,29 @@ namespace DeepLearnerLocal {
         public uint ActiveCount {
             get { Native.Accounting info; if(!Native.QueryInformationJobObject(job,1,out info,(uint)Marshal.SizeOf<Native.Accounting>(),IntPtr.Zero)) throw Native.Error("JOB_QUERY_FAILED"); return info.Active; }
         }
+        public OwnershipObservation LastOwnershipObservation { get; private set; }
         public bool Owns(uint pid) {
-            using(var process=Native.OpenProcess(0x1000,false,pid)) { bool member; return !process.IsInvalid && Native.IsProcessInJob(process,job,out member) && member; }
+            LastOwnershipObservation=null; // Never reuse telemetry from another PID/call.
+            using(var process=Native.OpenProcess(0x1000,false,pid)) {
+                if(process.IsInvalid) {
+                    int error=Marshal.GetLastWin32Error();
+                    LastOwnershipObservation=new OwnershipObservation(pid,false,"UNKNOWN","OPEN_PROCESS",error,null,"NOT_AVAILABLE",null);
+                    return false;
+                }
+                bool member;
+                bool queried=Native.IsProcessInJob(process,job,out member);
+                int? errorCode=queried ? (int?)null : Marshal.GetLastWin32Error();
+                bool owned=queried && member; // Original decision; metadata cannot change it.
+                long? creation=null;int? metadataError=null;string metadataStage="CREATION_UNAVAILABLE";
+                try {
+                    long value,exit,kernel,user;
+                    if(Native.GetProcessTimes(process,out value,out exit,out kernel,out user)) {
+                        if(value>0) { creation=value;metadataStage="CREATION_OBSERVED"; }
+                    } else { metadataError=Marshal.GetLastWin32Error(); }
+                } catch { /* Supplemental telemetry must not replace the original result. */ }
+                LastOwnershipObservation=new OwnershipObservation(pid,owned,queried ? (member ? "OWNED" : "UNRELATED") : "UNKNOWN",queried ? "MEMBERSHIP_QUERIED" : "IS_PROCESS_IN_JOB",errorCode,creation,metadataStage,metadataError);
+                return owned;
+            }
         }
         // Membership is not enough: callers cannot adopt a PID or a Child from another Owner.
         public IDictionary<string,object> Observe(Child child) {

@@ -9,7 +9,39 @@ import {
   validateRequest,
   validateSecrets,
   workspacePlan,
+  getDevManualMongoPolicy,
+  getDevMongoSourcePolicy,
+  assertDevManualMongoPolicyAgreement,
 } from '../scripts/dev-local.js';
+
+test('manual policy is separate, fixed-target and fails closed for inactive or confused facts', () => {
+  const actual = getDevManualMongoPolicy();
+  assert.equal(actual.id, 'DEV-PERSISTENT-27019-MANUAL');
+  assert.equal(actual.target.runtime, 'owned-process');
+  const inactive = { ...actual, status: 'INACTIVE' };
+  assert.throws(
+    () => assertDevManualMongoPolicyAgreement(inactive, inactive),
+    /INACTIVE/,
+  );
+  assert.doesNotThrow(() =>
+    assertDevManualMongoPolicyAgreement(inactive, inactive, false),
+  );
+  const active = { ...actual, status: 'ACTIVE' };
+  assert.doesNotThrow(() =>
+    assertDevManualMongoPolicyAgreement(active, active),
+  );
+  for (const peer of [
+    inactive,
+    getDevMongoSourcePolicy(),
+    { ...active, sourceVersion: 999 },
+    { ...active, target: { ...active.target, port: 27017 } },
+    { ...active, target: { ...active.target, port: 27018 } },
+    { ...active, operations: [...active.operations, 'StartService'] },
+    { ...active, activate: true },
+  ]) {
+    assert.throws(() => assertDevManualMongoPolicyAgreement(active, peer));
+  }
+});
 
 // Entirely synthetic configuration. Tests never connect, start apps or provision.
 const repository = 'E:\\AI\\DeepLearner';

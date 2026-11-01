@@ -275,6 +275,65 @@ export function assertDevMongoExecutionPolicy(peer: unknown): void {
   assertDevMongoPolicyAgreement(getDevMongoSourcePolicy(), peer);
 }
 
+const manualPolicySchema = z.strictObject({
+  id: z.literal('DEV-PERSISTENT-27019-MANUAL'),
+  status: z.enum(['INACTIVE', 'ACTIVE']),
+  sourceVersion: z.literal(2),
+  target: z.strictObject({
+    host: z.literal('127.0.0.1'),
+    port: z.literal(27019),
+    replicaSet: z.literal('deeplearner-dev-rs'),
+    database: z.literal('deeplearner-dev'),
+    runtime: z.literal('owned-process'),
+  }),
+  operations: z.tuple([
+    z.literal('BindManualSources'),
+    z.literal('RunOwnedMongo'),
+    z.literal('BootstrapOwnedMongo'),
+    z.literal('BindRecoverySources'),
+    z.literal('InspectOwnedMongo'),
+  ]),
+});
+export type ManualMongoPolicy = z.infer<typeof manualPolicySchema>;
+export function getDevManualMongoPolicy(): ManualMongoPolicy {
+  return {
+    id: 'DEV-PERSISTENT-27019-MANUAL',
+    status: 'ACTIVE',
+    sourceVersion: 2,
+    target: {
+      host: '127.0.0.1',
+      port: 27019,
+      replicaSet: 'deeplearner-dev-rs',
+      database: 'deeplearner-dev',
+      runtime: 'owned-process',
+    },
+    operations: [
+      'BindManualSources',
+      'RunOwnedMongo',
+      'BootstrapOwnedMongo',
+      'BindRecoverySources',
+      'InspectOwnedMongo',
+    ],
+  };
+}
+// Metadata validation cannot issue an execution lease, even with synthetic ACTIVE.
+export function assertDevManualMongoPolicyAgreement(
+  local: unknown,
+  peer: unknown,
+  requireActive = true,
+): void {
+  const a = manualPolicySchema.safeParse(local),
+    b = manualPolicySchema.safeParse(peer);
+  if (
+    !a.success ||
+    !b.success ||
+    JSON.stringify(a.data) !== JSON.stringify(b.data)
+  )
+    throw new Error('DEV_MANUAL_POLICY_MISMATCH');
+  if (requireActive && a.data.status !== 'ACTIVE')
+    throw new Error('DEV_MANUAL_POLICY_INACTIVE');
+}
+
 async function initializeDevReplica() {
   // A separate authenticated, connection-bound bootstrap contract is required.
   // No driver import, connection or unauthenticated initialization is provided.

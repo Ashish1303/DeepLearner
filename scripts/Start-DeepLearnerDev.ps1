@@ -101,10 +101,53 @@ function Assert-DevFreePorts {
     }
 }
 
+function Get-DevListenerDiagnostic([int]$Port, $Listener, $Owner, $Owned, [ValidateSet('ADDRESS_REJECTED','JOB_MEMBERSHIP_NOT_PROVEN','OWNERSHIP_CALL_FAILED','LISTENER_QUERY_FAILED')][string]$Stage) {
+    # Project only allowlisted primitives. Never serialize an exception, process or raw telemetry.
+    $service=switch($Port){3000{'Student'}5173{'Admin'}4000{'API'}default{'UNKNOWN'}}
+    $row=[ordered]@{event='DEV_LISTENER_OWNERSHIP_DIAGNOSTIC';timeUtc=[DateTime]::UtcNow.ToString('o');application=$service;expectedAddress='127.0.0.1';expectedPort=$Port;actualAddress=$null;actualPort=$null;pid=$null;creationFiletime=$null;creationUtc=$null;ownership='UNKNOWN';verificationStage=$Stage;nativeStage='NOT_AVAILABLE';nativeError=$null;metadataStage='NOT_AVAILABLE';metadataError=$null;automaticRetry=$false;adopted=$false}
+    try {
+        $ip=$null
+        if($Listener.LocalAddress -is [string] -and [Net.IPAddress]::TryParse($Listener.LocalAddress,[ref]$ip)){$row.actualAddress=$ip.ToString()}
+        if(($Listener.LocalPort -is [int] -or $Listener.LocalPort -is [uint16] -or $Listener.LocalPort -is [uint32]) -and $Listener.LocalPort -gt 0 -and $Listener.LocalPort -le 65535){$row.actualPort=[int]$Listener.LocalPort}
+        if(($Listener.OwningProcess -is [int] -or $Listener.OwningProcess -is [uint32]) -and $Listener.OwningProcess -gt 0){$row.pid=[uint32]$Listener.OwningProcess}
+    } catch { } # Missing socket metadata stays UNKNOWN, never raw text.
+    if($Stage -ceq 'ADDRESS_REJECTED'){$row.ownership='NOT_CHECKED';return $row}
+    if($Stage -cne 'JOB_MEMBERSHIP_NOT_PROVEN'){return $row}
+    try {
+        $fact=$Owner.LastOwnershipObservation # One snapshot; no second Owns/native query.
+        if($null -eq $row.pid -or $fact.Pid -isnot [uint32] -or $fact.Pid -ne $row.pid -or $Owned -isnot [bool] -or $fact.Owned -isnot [bool] -or $fact.Owned -ne $Owned){return $row}
+        if($fact.Classification -isnot [string] -or $fact.Stage -isnot [string] -or $fact.MetadataStage -isnot [string]){return $row}
+        $valid=($fact.Stage -ceq 'OPEN_PROCESS' -and $fact.Classification -ceq 'UNKNOWN' -and -not $Owned -and $null -ne $fact.NativeError -and $null -eq $fact.CreationFiletime -and $fact.MetadataStage -ceq 'NOT_AVAILABLE') -or
+            ($fact.Stage -ceq 'IS_PROCESS_IN_JOB' -and $fact.Classification -ceq 'UNKNOWN' -and -not $Owned -and $null -ne $fact.NativeError) -or
+            ($fact.Stage -ceq 'MEMBERSHIP_QUERIED' -and $fact.Classification -ceq $(if($Owned){'OWNED'}else{'UNRELATED'}) -and $null -eq $fact.NativeError)
+        if(-not $valid){return $row}
+        foreach($code in @($fact.NativeError,$fact.MetadataError)){if($null -ne $code -and ($code -isnot [int] -or $code -lt 0)){return $row}}
+        if($fact.MetadataStage -cnotin @('NOT_AVAILABLE','CREATION_OBSERVED','CREATION_UNAVAILABLE')){return $row}
+        $creation=$null;$utc=$null
+        if($null -ne $fact.CreationFiletime){
+            if($fact.CreationFiletime -isnot [long] -or $fact.CreationFiletime -le 0 -or $fact.MetadataStage -cne 'CREATION_OBSERVED' -or $null -ne $fact.MetadataError){return $row}
+            $utc=[DateTime]::FromFileTimeUtc($fact.CreationFiletime).ToString('o');$creation=$fact.CreationFiletime
+        }elseif($fact.MetadataStage -ceq 'CREATION_OBSERVED'){return $row}
+        $row.ownership=$fact.Classification;$row.nativeStage=$fact.Stage;$row.nativeError=$fact.NativeError
+        $row.creationFiletime=$creation;$row.creationUtc=$utc;$row.metadataStage=$fact.MetadataStage;$row.metadataError=$fact.MetadataError
+    } catch { } # Malformed diagnostics cannot change the ownership decision.
+    return $row
+}
+
 function Test-DevOwnedListener([int]$Port, $Owner) {
-    $listeners = @(Get-DevListeners $Port)
+    try {$listeners = @(Get-DevListeners $Port)}
+    catch {Write-Host ((Get-DevListenerDiagnostic $Port $null $null $null 'LISTENER_QUERY_FAILED')|ConvertTo-Json -Compress);throw}
     foreach ($listener in $listeners) {
-        if ($listener.LocalAddress -ne '127.0.0.1' -or -not $Owner.Owns([uint32]$listener.OwningProcess)) { throw 'DEV_LISTENER_OWNERSHIP_REJECTED' }
+        if ($listener.LocalAddress -ne '127.0.0.1') {
+            Write-Host ((Get-DevListenerDiagnostic $Port $listener $null $null 'ADDRESS_REJECTED')|ConvertTo-Json -Compress)
+            throw 'DEV_LISTENER_OWNERSHIP_REJECTED'
+        }
+        try {$owned=$Owner.Owns([uint32]$listener.OwningProcess)}
+        catch {Write-Host ((Get-DevListenerDiagnostic $Port $listener $null $null 'OWNERSHIP_CALL_FAILED')|ConvertTo-Json -Compress);throw}
+        if (-not $owned) {
+            Write-Host ((Get-DevListenerDiagnostic $Port $listener $Owner $owned 'JOB_MEMBERSHIP_NOT_PROVEN')|ConvertTo-Json -Compress)
+            throw 'DEV_LISTENER_OWNERSHIP_REJECTED'
+        }
     }
     return $listeners.Count -gt 0
 }

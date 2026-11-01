@@ -2838,3 +2838,260 @@ MongoDB NOT_PROVISIONED; real service/TLS/authentication/transaction/persistence
 qualification NOT_VERIFIED; app startup/shutdown NOT_VERIFIED; F042/F043 acceptance
 BLOCKED; F043 MongoDB 15 NOT_RUN; browser 213 NOT_RUN; F044 NOT_STARTED; production
 NOT_VERIFIED. No feature acceptance, Git commit/push or deployment is authorized.
+# Manual persistent MongoDB amendment — offline, 2026-11-01
+
+Owner-approved twelve-path implementation reuses the existing native ownership
+helper and prepared material; manual source policy starts INACTIVE. Existing
+service policy and historical failed installation evidence are unchanged.
+Offline implementation/review does not establish operational qualification.
+
+Next gates: focused offline checks and independent security review; explicit source
+activation; reviewed creation-only source-binding migration; particular owned-process
+bootstrap/authentication/shutdown/restart qualification; then additive schema,
+genuine accounts, JavaScript content and actual app/Chrome demonstration.
+No ordinary startup provisions data, recreates users or refreshes source pins.
+No staging/commit/push or feature advancement is implied by this amendment.
+
+MongoDB NOT_PROVISIONED; Slice B incomplete; Slices C–F NOT_RUN;
+F042/F043 IN_PROGRESS with acceptance BLOCKED; F043 isolated MongoDB 15 NOT_RUN;
+browser 213 NOT_RUN; F044 NOT_STARTED; production NOT_VERIFIED.
+
+## Source activation checkpoint — 2026-11-01
+
+The owner directly approved manual policy activation in chat, superseding the
+prior offline-only restriction for that action. Only the matching manual status
+literals changed to ACTIVE; independent reverse-diff/hash review confirmed no
+other source delta. Post-activation evidence: 46/46 PowerShell inert checks,
+33/33 TypeScript tests, API typecheck and affected-source lint/format PASS.
+No accepted live execution context was issued by tests. Service policy unchanged.
+
+This is source-level activation only. MongoDB is NOT_PROVISIONED, private binding
+has NOT_RUN, B remains incomplete and C–F remain NOT_RUN. The private files retain
+the original aggregate fingerprint recorded above. Automatic approval review
+rejected BindManualSources before execution because it treated private migration
+as separately excluded and did not accept the attachment's broader authorization.
+A direct confirmation of the remaining bounded B–F scope is pending. No fallback
+execution, automatic pin refresh, private sidecar write, startup or DB access ran.
+F042/F043 acceptance BLOCKED; F044 NOT_STARTED; production NOT_VERIFIED.
+
+## First manual runtime attempt — 2026-11-01, BLOCKED
+
+The owner directly reaffirmed the remaining reviewed B–F execution scope in chat.
+BindManualSources ran once and passed exact payload/private ACL readback; its
+SHA-256 is D0F5315CF1EEF02F80DF29C8321EDFED90F433CE3A6257A9D97FE246987AA35C.
+All eleven original private files and ACLs remain unchanged, including the original
+manifest digest 4CC2E0F8744F5A8A6ECF443CB2BB51822095E4599DFA58FDA956014250711A29.
+No credential or certificate was regenerated.
+
+One BootstrapOwnedMongo attempt started the owned process and reached the
+initialize helper, then failed DEV_CONFIGURATION_REJECTED at Send-DevValidationRequest
+(Invoke-DevManualNode). Forced retained-Job containment was reported; graceful
+shutdown/restart was NOT_VERIFIED. The validated manual-initialize-intent.json
+exists, but manual-replica.json and administrator-intent/completion do not.
+Replica initialization is UNKNOWN. This run did not reach administrator creation.
+No bootstrap retry, intent deletion/reconciliation, reset or repair followed.
+
+Post-failure evidence: no listener on 27019; one TIME_WAIT row with PID 0;
+lifecycle lock released; 22 data-directory entries preserved; configuration still
+Bootstrap. Sanitized MongoDB events show accepted TLS peers and event 23280,
+'No SSL certificate provided by peer; connection rejected'. Full TLS qualification
+and authenticated/PRIMARY/transaction/persistence results remain NOT_VERIFIED.
+
+Source-only independent incident review identifies a possible negative TLS-probe
+classification/timing issue. The exact helper failure is unconfirmed; this finding
+DOES NOT clear the initialization intent or establish a failed/absent init.
+The next safe step is bounded sanitized helper-phase diagnostics and an explicitly
+reviewed recovery path for inspection of replica state, with no initialization or
+user-write replay. No automatic source-binding refresh is permitted now that data
+and an unresolved initialization intent exist.
+
+Manual source policy remains ACTIVE. B is BLOCKED; C–F NOT_RUN; no app or Chrome
+success is claimed. F042/F043 acceptance BLOCKED; F044 NOT_STARTED; production
+NOT_VERIFIED. The twelve source changes remain uncommitted; index empty.
+
+## Approved diagnostic/recovery amendment — 2026-11-01
+
+The owner directly approved preserving the binding/intent/data, bounded sanitized
+error diagnostics and replica inspection without initialization replay. Manual
+policy version 2 adds only BindRecoverySources and InspectOwnedMongo; the revised
+source starts INACTIVE pending focused checks and independent review. Service
+policy remains unchanged. No recovery operation ran during source preparation.
+
+Generation0 manual-runtime.json and the original initialize-intent remain immutable,
+pinned by exact SHA-256. A creation-only manual-recovery-v1.json references both,
+the original manifest, current source hashes and original owner. It does not refresh
+or overwrite the old binding. Unexpected later/legacy/unknown records, changed
+original eleven-file/ACL fingerprint or a pending transition refuse before binding
+or restart. No automatic generation migration is permitted by normal startup.
+
+The explicit inspector issues only replSetGetStatus, replSetGetConfig and hello.
+Exact94 means NOT_INITIALIZED at inspection time; exact target/config/PRIMARY means
+INITIALIZED_PRIMARY. Neither result proves absent users or authorizes deletion of
+intent. Starting mongod can recover Mongo-managed journal/catalog files even when
+all inspection commands are read-only. Until shutdown authority is established,
+inspection cleanup is explicitly FORCED_OWNED_JOB, never graceful/persistence PASS.
+
+Any subsequent separately approved bootstrap re-reads state on the freshly owned
+process. It never initializes an already initialized node. A fresh exact94 permits
+one new original94-gated attempt, recorded append-only before the command. A second
+uncertain reconciled attempt stops before startup. Old intent and old binding are
+preserved; no initialization is emitted by the inspection protocol itself.
+
+Manual helper failures now return only fixed phase, DEV_* gate and bounded error
+code fields; no raw message, argv, request, credential or stack is exposed. The TLS
+negative probe retains strict CA/hostname/server-pin validation and a positive
+certificate-bearing connection. It requires a fresh append-only bounded log suffix,
+exact probe local-port/connectionId correlation with certificate rejection event23280,
+and retained process ownership around the helper. secureConnect, arbitrary reset,
+old log rows, timeout, rotation, truncation/regrowth and unknown closes are not proof.
+
+Recovery execution and B–F completion remain NOT_VERIFIED until actual qualified
+runs. F042/F043 acceptance BLOCKED; F044 NOT_STARTED; production NOT_VERIFIED.
+## Manual helper diagnostics — offline correction, 2026-11-01
+
+The owner authorized only offline diagnostic correction and independent review.
+The parent now reports bounded helper action/stage, observable uint32 exit code,
+response classification, fixed public message, safe phase/gate/code, and explicit
+connection-attempt evidence. Missing, malformed, unexpected and conflicting frames
+remain failures. Raw responses, private paths, credentials and exception text are
+not printed. Known public codes are allowlisted; arbitrary code-shaped text is
+redacted. Legacy frames without connection evidence report UNKNOWN.
+
+The helper adds only reporting metadata immediately before the existing connection
+attempt. Authentication, requests, waits/timeouts, ownership gates, retry behavior
+and initialization/user-write protocols are unchanged. Failed inspection cleanup
+reports UNKNOWN because existing Dispose does not prove retained exit/empty Job;
+this amendment adds no cleanup action. Synthetic success frames retain their
+classification but do not establish independently verified runtime state.
+
+Offline checks: 54 PowerShell checks passed with five child-process checks excluded;
+36 TypeScript tests passed in-process with two child-CLI tests explicitly excluded.
+Typecheck, source lint, formatting, UTF-8/LF and whitespace checks passed.
+Restriction deviation: the initial TypeScript negative-name filter failed to omit
+the two metadata-only child-CLI tests, so they ran before the corrected inert rerun.
+They used --check-policy and --check-manual-policy only; no MongoDB/application
+startup or database connection occurred. The rerun does not erase that deviation.
+
+Original binding, initialization intent, recovery-v1 binding and all original
+private-file/credential pins are preserved. No private source-pin migration ran.
+The amended source hashes intentionally do not match recovery-v1; live startup
+remains blocked by the existing source-binding checks. The next safe step is a
+separately reviewed append-only successor-binding proposal, then specific owner
+approval before any migration or one additional controlled inspection. No such
+runtime approval is implied here. The underlying earlier live error and replica
+state remain UNKNOWN. B BLOCKED; C–F NOT_RUN; F042/F043 acceptance unchanged;
+F044 NOT_STARTED; production NOT_VERIFIED. No Git staging, commit or push.
+## Recovery-v2 successor — offline implementation, 2026-11-01
+
+The owner approved only the two existing readers, focused tests and documentation
+within the existing twelve pending paths. Protected PID5128 was separately qualified
+as the NetworkService MongoDB service on 127.0.0.1:27017; fresh ordinary creation/
+service/listener/config correlation passed. No privileged reinspection was repeated.
+Protect that service and legacy27018; its identity grants no adoption authority.
+
+Manual policy remains version2 with unchanged status, target and operation list.
+BindRecoverySources now explicitly targets creation-only manual-recovery-v2.json;
+InspectOwnedMongo explicitly requires v2. Neither selects the newest existing file
+or falls back to v1. Other startup/bootstrap paths retain their v1 validation and
+reject v2 metadata. This successor grants only InspectOwnedMongo, maximumAttempts1.
+
+The strict twelve-field successor binds original owner/policy, original binding,
+initialization intent, archived recovery-v1 hash, prepared manifest, approved private
+material fingerprint, and all four final reviewed source hashes. Existing records
+are never refreshed. Future creation requires an external exact-source-hash guard
+against the final owner-reviewed inventory before the bounded bind command runs.
+
+PS validates actual original eleven-file content/length/owner/DACL fingerprint under
+the retained lifecycle lock. Node validates the declared approved fingerprint plus
+actual immutable lineage/manifest/source/certificate pins; it does not recompute
+Windows ACLs. Parent ownership/path/ACL/Job/listener gates remain mandatory.
+
+Before any owned startup, the inspector exclusively creates and reads back
+manual-replica-inspection-v2-intent.json, bound to the exact successor digest and
+original owner, action InspectOwnedMongo, inspectedState UNKNOWN. Existing intent,
+result, old inspection/reconciliation or unexpected metadata refuses before startup.
+A consumed or partially written attempt is never deleted, reset, adopted or retried.
+
+Only replSetGetStatus/replSetGetConfig/hello inspection remains available. A qualified
+state and retained child exit, empty owned Job and released socket are required
+before creation-only manual-replica-inspection-v2.json. Its six fields bind successor
+and attempt digests, original owner, state and FORCED_OWNED_JOB cleanup. Forced
+containment is not graceful shutdown or persistence verification. Missing proof or
+interruption preserves UNKNOWN and the consumed intent; it does not write a result.
+The v2 result is not adopted by bootstrap and never clears the original init intent.
+
+Offline verification uses PS -InertOnly and the confirmed positive TypeScript
+--test-skip-pattern exclusion of both child-CLI cases with --test-isolation=none.
+The earlier metadata-child deviation remains historical; no such launch is used
+by this amendment. Runtime/helper/filesystem effects in positive tests are local
+mocks; lineage, request and diagnostic tests use synthetic facts.
+
+No private v2 record, source-pin migration, credential/certificate operation,
+MongoDB startup/connection/write, service change or initialization ran. Source/test
+readiness is not permission for successor creation or one live inspection; each
+requires specific owner approval and fresh preflight. B remains BLOCKED; C–F NOT_RUN;
+F042/F043 acceptance unchanged, F044 NOT_STARTED, production NOT_VERIFIED. No Git
+staging, commit or push. Stop after independent offline review.
+## Bootstrap contract reconciliation — offline amendment, 2026-11-01
+
+The owner approved the two existing readers, existing inert tests and necessary
+within-inventory documentation only. No private record, source-pin migration,
+credential/config change, MongoDB process/connection or database write is authorized
+by this offline checkpoint. The original six binding/intent/result records and
+all private material remain frozen. No new recovery generation or framework.
+
+Manual policy remains ACTIVE/version2 with unchanged target/operation list.
+Recovery-v2 remains InspectOwnedMongo-only, maximumAttempts1, already consumed.
+Ordinary RunOwnedMongo still uses its existing contract; this amendment does not
+activate ordinary application or long-running MongoDB startup.
+
+The existing manual-initialize-reconciliation-v1.json path is reused with a strict
+revision2, fifteen-field bootstrap-specific receipt. It binds original owner,
+current policy, BootstrapOwnedMongo action, all four final reviewed source pins,
+all six immutable historical record digests, prepared manifest, original private
+material fingerprint and maximumInitializationAttempts1. It is not a recovery-v3.
+Future execution must first externally guard the exact owner-reviewed final source
+inventory; dynamically computed hashes alone are not an owner execution approval.
+
+The source-defined BootstrapOwnedMongo CLI lease alone selects this reconciliation
+path. Missing receipt is allowed only during its pre-consumption preparation; the
+original init intent and qualified v2 result remain mandatory. Initial state must
+be Bootstrap with no contradictory/later stages. Exclusive receipt creation and
+exact owner/ACL/content readback occur BEFORE owned startup. Existing receipt with
+no valid replica completion marker refuses before startup and is never recreated.
+After proven initialization, existing user/role intents choose inspection for any
+uncertain acknowledgement; createUser/createRole are not automatically repeated.
+
+Both readers validate archived v1/v2 as exact immutable lineage, not as refreshed
+current-source authority. The private Node --bootstrap-action selector requires
+the new receipt plus original owner, exact target/policy, source hashes and all six
+actual historical file digests before it can issue its internal CLI context. The
+flag alone cannot grant authority. --manual-action retains its separate contracts;
+inspection-only v2 cannot be used for bootstrap. The internal Node context does not
+prove the PS parent Job; the existing reviewed PS ownership gates remain required.
+
+The existing initialize protocol rechecks fresh exact ok0/code94 immediately before
+one replSetInitiate. The historical v2 result cannot replace this precondition, and
+InspectOwnedMongo is not replayed. Inconclusive initialization never writes its
+completion marker; the consumed receipt blocks another initialization startup.
+No new retry, timer, supervisor, service policy or credential role inventory added.
+
+Approved future normal transition reuses existing templates and shutdown gates.
+Bootstrap config bytes match the original prepared template. Normal fingerprint
+validation requires exact approved Normal bytes (localhost bypass disabled), then
+substitutes only Bootstrap config hash/length into the baseline aggregate; actual
+config ACL and all other ten private-file bytes/ACLs must still match. Original
+certificates/credentials are retained. PS computes the actual Windows fingerprint;
+Node checks its declared constant and actual lineage/manifest/source/certificate pins.
+
+Offline verification uses PS -InertOnly and in-process TS tests with the confirmed
+explicit skip pattern for both child-CLI cases. Positive writer/start/process paths
+were audited and locally mocked before tests ran. The earlier metadata-child test
+deviation remains historical and was not repeated. No transaction or persistence
+verification is claimed from inert tests or source readiness.
+
+Receipt creation and live bootstrap remain separately subject to specific approval
+of final hashes, exact receipt content and bounded runtime scope after independent
+review. This offline amendment creates no private receipt and grants no runtime
+permission. B remains BLOCKED; C–F NOT_RUN; F042/F043 acceptance unchanged;
+F044 NOT_STARTED, production NOT_VERIFIED. No Git staging, commit or push.

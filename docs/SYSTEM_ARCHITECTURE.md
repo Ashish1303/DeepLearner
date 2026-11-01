@@ -1259,3 +1259,65 @@ approval. No automatic rollback of persistent files, users or data is permitted.
 MongoDB NOT_PROVISIONED; real host/service/TLS/authentication/transactions/persistence
 NOT_VERIFIED; app startup/shutdown NOT_VERIFIED; F042/F043 acceptance BLOCKED;
 F043 MongoDB 15 NOT_RUN; browser 213 NOT_RUN; F044 NOT_STARTED; production NOT_VERIFIED.
+## Manual MongoDB lifecycle — offline amendment, 2026-11-01
+
+Prefer an owner-managed foreground MongoDB process to further service installation.
+Reuse the existing LocalProcessOwner native helper; no new supervisor/dependency.
+The new manual policy is separately INACTIVE; the ACTIVE service policy is unchanged.
+Manual contexts bind exact action/target/OS owner and are issued only by the actual
+PS CLI after PS/Node policy agreement, then revoked in finally. Node retains a
+separate private manual context; imports/synthetic ACTIVE facts issue none.
+
+The PS coordinator retains original Child handles, creation/image/Job observations
+and checks literal 27019 listener ownership before/after helper operations. The
+helper's existing no-window process model uses authenticated shutdown, not an
+assumed console signal. Only retained owned Job containment is an error fallback.
+An old PID/receipt is never adopted. The source sidecar also pins the unmodified
+native owner helper, original manifest digest and all current execution sources.
+
+Original service-bound private metadata remains immutable provenance. Manual-only
+sidecar and staged results provide explicit reviewed compatibility; no silent pin
+migration or credential regeneration. Shutdown-role permissions are operator-only.
+Bootstrap mTLS transitions to loopback SCRAM WITHOUT TLS; non-loopback use is excluded.
+Normal-operation TLS remains a separate hardening decision. All runtime results
+are NOT_VERIFIED until qualified execution. B incomplete; C–F NOT_RUN;
+F042/F043 acceptance BLOCKED; F044 NOT_STARTED; production NOT_VERIFIED.
+
+## Approved diagnostic/recovery amendment — 2026-11-01
+
+The owner directly approved preserving the binding/intent/data, bounded sanitized
+error diagnostics and replica inspection without initialization replay. Manual
+policy version 2 adds only BindRecoverySources and InspectOwnedMongo; the revised
+source starts INACTIVE pending focused checks and independent review. Service
+policy remains unchanged. No recovery operation ran during source preparation.
+
+Generation0 manual-runtime.json and the original initialize-intent remain immutable,
+pinned by exact SHA-256. A creation-only manual-recovery-v1.json references both,
+the original manifest, current source hashes and original owner. It does not refresh
+or overwrite the old binding. Unexpected later/legacy/unknown records, changed
+original eleven-file/ACL fingerprint or a pending transition refuse before binding
+or restart. No automatic generation migration is permitted by normal startup.
+
+The explicit inspector issues only replSetGetStatus, replSetGetConfig and hello.
+Exact94 means NOT_INITIALIZED at inspection time; exact target/config/PRIMARY means
+INITIALIZED_PRIMARY. Neither result proves absent users or authorizes deletion of
+intent. Starting mongod can recover Mongo-managed journal/catalog files even when
+all inspection commands are read-only. Until shutdown authority is established,
+inspection cleanup is explicitly FORCED_OWNED_JOB, never graceful/persistence PASS.
+
+Any subsequent separately approved bootstrap re-reads state on the freshly owned
+process. It never initializes an already initialized node. A fresh exact94 permits
+one new original94-gated attempt, recorded append-only before the command. A second
+uncertain reconciled attempt stops before startup. Old intent and old binding are
+preserved; no initialization is emitted by the inspection protocol itself.
+
+Manual helper failures now return only fixed phase, DEV_* gate and bounded error
+code fields; no raw message, argv, request, credential or stack is exposed. The TLS
+negative probe retains strict CA/hostname/server-pin validation and a positive
+certificate-bearing connection. It requires a fresh append-only bounded log suffix,
+exact probe local-port/connectionId correlation with certificate rejection event23280,
+and retained process ownership around the helper. secureConnect, arbitrary reset,
+old log rows, timeout, rotation, truncation/regrowth and unknown closes are not proof.
+
+Recovery execution and B–F completion remain NOT_VERIFIED until actual qualified
+runs. F042/F043 acceptance BLOCKED; F044 NOT_STARTED; production NOT_VERIFIED.
