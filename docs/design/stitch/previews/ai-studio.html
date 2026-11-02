@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>DeepLearner AI Studio — design preview</title>
+    <link rel="stylesheet" href="preview.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to preview content</a>
+    <header>
+      <div>
+        <strong>DeepLearner</strong>
+        <p>AI Content Studio · design lab</p>
+      </div>
+      <span class="badge">PREVIEW / NOT AVAILABLE</span>
+    </header>
+    <div class="layout">
+      <nav aria-label="Design preview sections">
+        <p>Presentation only</p>
+        <a href="#overview">Command Center</a>
+        <a href="#outline">Curriculum outline</a>
+        <a href="#generation">Generation</a>
+        <a href="#review">Lesson Review Studio</a>
+        <a href="#comparison">Revision comparison</a>
+        <a href="#publishing">Publishing</a>
+      </nav>
+      <main id="main" tabindex="-1">
+        <div class="notice" id="limitations">
+          <p>
+            <strong>Isolated design preview.</strong> No authentication, API,
+            model, queue or database is connected. All business actions are
+            disabled. No displayed panel represents a real job, approved
+            revision, score or publishing result. Existing Technology Management
+            remains unchanged in the authenticated Admin application.
+          </p>
+        </div>
+        <section
+          class="panel hero"
+          id="overview"
+          aria-labelledby="overview-title"
+        >
+          <p class="eyebrow">AI Command Center</p>
+          <h1 id="overview-title">A workspace for deliberate content.</h1>
+          <p class="lead">
+            Plan with AI. Review the evidence. Approve a specific revision.
+            Publish only through a separate, verified decision.
+          </p>
+          <div class="actions">
+            <button class="primary" disabled aria-describedby="limitations">
+              Create curriculum — unavailable
+            </button>
+          </div>
+          <div class="tiles">
+            <div class="tile">
+              <h2>Curricula</h2>
+              <p class="value">Not connected</p>
+              <p>No inventory loaded.</p>
+            </div>
+            <div class="tile">
+              <h2>Generation queue</h2>
+              <p class="value">Not connected</p>
+              <p>No job status loaded.</p>
+            </div>
+            <div class="tile">
+              <h2>Human review</h2>
+              <p class="value">Not connected</p>
+              <p>No review count loaded.</p>
+            </div>
+            <div class="tile">
+              <h2>Shared AI budget</h2>
+              <p class="value">Not connected</p>
+              <p>
+                Settled, reserved, uncertain and available amounts require
+                verified evidence.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section class="panel" id="outline" aria-labelledby="outline-title">
+          <p class="eyebrow">Plan before generation</p>
+          <h2 id="outline-title">Curriculum outline</h2>
+          <div class="columns">
+            <div class="placeholder">
+              <h3>Proposed hierarchy</h3>
+              <ol>
+                <li>Technology selection</li>
+                <li>Learning Path and audience</li>
+                <li>Modules and Topics</li>
+                <li>Concepts and learning modes</li>
+              </ol>
+              <p>
+                Structure illustration only; no curriculum has been created.
+              </p>
+            </div>
+            <div>
+              <h3>Outline approval</h3>
+              <p>
+                Scope, source policy, coverage and cost evidence must be
+                available before a generation request can be approved.
+              </p>
+              <div class="actions">
+                <button disabled>Request AI outline</button
+                ><button disabled>Approve outline</button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section
+          class="panel"
+          id="generation"
+          aria-labelledby="generation-title"
+        >
+          <p class="eyebrow">Bounded generation</p>
+          <h2 id="generation-title">Generation progress</h2>
+          <p>
+            No job is running. Stage presentation is illustrative, not a live
+            progress indicator.
+          </p>
+          <ol>
+            <li>Approved outline — not connected</li>
+            <li>Source verification — not connected</li>
+            <li>Learning modes — not connected</li>
+            <li>Independent validation — not connected</li>
+            <li>Human review — not connected</li>
+          </ol>
+          <div class="actions">
+            <button disabled>Pause job</button
+            ><button disabled>Cancel job</button>
+          </div>
+        </section>
+        <section class="panel" id="review" aria-labelledby="review-title">
+          <p class="eyebrow">Human review</p>
+          <h2 id="review-title">Lesson Review Studio</h2>
+          <div class="columns">
+            <div>
+              <div
+                class="actions"
+                aria-label="Unavailable learning-mode previews"
+              >
+                <button disabled>Read</button><button disabled>Visualize</button
+                ><button disabled>Example</button
+                ><button disabled>Practice</button
+                ><button disabled>Revise</button>
+              </div>
+              <div class="placeholder">
+                <h3>Immutable lesson preview</h3>
+                <p>
+                  No private lesson or Student data is loaded. A future preview
+                  must bind the exact revision and must not create Student
+                  progress or attempts.
+                </p>
+              </div>
+            </div>
+            <div class="tile">
+              <h3>Sources and quality checks</h3>
+              <dl>
+                <div>
+                  <dt>Source citations</dt>
+                  <dd>NOT_VERIFIED</dd>
+                </div>
+                <div>
+                  <dt>Safety and rubric review</dt>
+                  <dd>NOT_VERIFIED</dd>
+                </div>
+                <div>
+                  <dt>Supported rendering</dt>
+                  <dd>NOT_VERIFIED</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+          <p>
+            Corrections request an AI revision. This is not a manual lesson
+            authoring form.
+          </p>
+          <div class="actions">
+            <button disabled>Request AI revision</button
+            ><button disabled>Reject revision</button
+            ><button class="primary" disabled>Approve revision</button>
+          </div>
+        </section>
+        <section
+          class="panel"
+          id="comparison"
+          aria-labelledby="comparison-title"
+        >
+          <p class="eyebrow">Compare before approval</p>
+          <h2 id="comparison-title">AI Revision Comparison</h2>
+          <p>No revision chronology or difference evidence is connected.</p>
+          <div class="columns">
+            <article class="placeholder">
+              <h3>Original revision</h3>
+              <p>Baseline identity and digest unavailable.</p>
+              <p>
+                Original content will appear here after an approved retrieval
+                contract exists.
+              </p>
+            </article>
+            <article class="placeholder">
+              <h3>Proposed revision</h3>
+              <p>Proposal identity and digest unavailable.</p>
+              <p>
+                Added and removed content must be described with text as well as
+                color.
+              </p>
+            </article>
+          </div>
+          <div class="actions">
+            <button disabled>Request another revision</button
+            ><button disabled>Approve exact proposal</button>
+          </div>
+        </section>
+        <section
+          class="panel"
+          id="publishing"
+          aria-labelledby="publishing-title"
+        >
+          <p class="eyebrow">Separate release decision</p>
+          <h2 id="publishing-title">Publishing overview</h2>
+          <p>
+            Approval does not publish. A future publication requires current
+            Admin authority, a frozen module manifest, eligible revisions, audit
+            evidence and explicit handling of conflicts and uncertain outcomes.
+          </p>
+          <div class="actions">
+            <button disabled>Inspect publication manifest</button
+            ><button disabled>Publish approved module</button>
+          </div>
+        </section>
+      </main>
+    </div>
+    <footer>
+      Design-only artifact · No production navigation · F042/F043 acceptance
+      remains BLOCKED · Production readiness NOT_VERIFIED
+    </footer>
+  </body>
+</html>
