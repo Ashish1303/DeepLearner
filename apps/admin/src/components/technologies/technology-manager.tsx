@@ -234,6 +234,16 @@ export function TechnologyManager({
       aria-labelledby="technology-title"
       aria-busy={busy}
     >
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className={styles.successFeedback}
+      >
+        {state.status === 'success' && state.message && (
+          <p className={styles.successNotice}>{state.message}</p>
+        )}
+      </div>
       <header className={styles.header}>
         <div>
           <p className="eyebrow">Curriculum / Technology inventory</p>
@@ -285,7 +295,7 @@ export function TechnologyManager({
           Refresh inventory
         </button>
       </div>
-      {state.message && (
+      {state.message && state.status !== 'success' && (
         <p
           role={error ? 'alert' : 'status'}
           aria-live={error ? 'assertive' : 'polite'}

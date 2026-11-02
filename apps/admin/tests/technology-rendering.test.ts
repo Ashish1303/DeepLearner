@@ -360,3 +360,45 @@ test('Technology hook preserves an unresolved mutation until explicit reconcilia
     assert.equal(disconnected, 1);
   }
 });
+
+test('success notification renders one polite message without replacing the inventory', () => {
+  const html = render({
+    ...state,
+    status: 'success',
+    message: 'Draft saved.',
+  });
+  assert.match(
+    html,
+    /role="status" aria-live="polite" aria-atomic="true" class="successFeedback"/,
+  );
+  assert.match(html, /class="successNotice">Draft saved\.<\/p>/);
+  assert.equal((html.match(/Draft saved\./g) || []).length, 1);
+  assert(html.includes('Technology inventory, page 1'));
+  assert(!html.includes('role="alert"'));
+  assert(!html.includes('autofocus'));
+});
+
+test('success copy is escaped and non-success guidance stays outside the notification rail', () => {
+  const success = render({
+    ...state,
+    status: 'success',
+    message: '<script>synthetic</script>',
+  });
+  assert(success.includes('&lt;script&gt;synthetic&lt;/script&gt;'));
+  assert(!success.includes('<script>'));
+  for (const status of ['conflict', 'uncertain', 'denied', 'error'] as const) {
+    const html = render({
+      ...state,
+      status,
+      message: 'Reload and compare the stored record.',
+      needsReconciliation: true,
+    });
+    assert.match(
+      html,
+      /role="alert" aria-live="assertive" aria-atomic="true" class="error"/,
+    );
+    assert(!html.includes('class="successNotice"'));
+    assert(html.includes('Do not resubmit'));
+    assert(html.includes('Technology inventory, page 1'));
+  }
+});

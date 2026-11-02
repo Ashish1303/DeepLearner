@@ -254,6 +254,25 @@
 .fieldError {
   color: var(--studio-danger);
 }
+.successFeedback {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+.successNotice {
+  max-width: min(24rem, 100%);
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--studio-border-decorative);
+  border-inline-start: 3px solid var(--studio-action);
+  border-radius: 0.5rem;
+  background: var(--studio-panel);
+  color: var(--studio-ink);
+  box-shadow: var(--studio-card-shadow);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
 .notice,
 .error,
 .reconcile {
