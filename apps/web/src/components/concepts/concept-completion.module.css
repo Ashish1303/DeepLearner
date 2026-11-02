@@ -4,10 +4,10 @@
   min-width: 0;
   margin-block: 1.5rem;
   padding: 1.5rem;
-  border: 1px solid #c8ded9;
-  border-radius: 1rem;
-  background: #f5fbf9;
-  color: #183d36;
+  border: 1px solid var(--studio-border-decorative);
+  border-radius: 0.75rem;
+  background: var(--studio-panel-subtle);
+  color: var(--studio-ink);
   overflow-wrap: anywhere;
 }
 .panel h2,
@@ -16,7 +16,7 @@
   margin: 0;
 }
 .note {
-  color: #365c53;
+  color: var(--studio-ink-secondary);
   font-size: 0.9375rem;
 }
 .requirements {
@@ -32,26 +32,26 @@
 .panel button {
   min-height: 2.75rem;
   max-width: 100%;
-  border: 1px solid #087f72;
+  border: 1px solid var(--studio-focus);
   border-radius: 0.5rem;
   padding: 0.625rem 1rem;
   background: #fff;
-  color: #075b51;
+  color: var(--studio-action);
   font: inherit;
   cursor: pointer;
 }
 .panel button:disabled {
-  border-color: #6b817c;
-  color: #536b65;
-  background: #eef3f1;
+  border-color: var(--studio-border-control);
+  color: var(--studio-ink-secondary);
+  background: var(--studio-panel-muted);
   cursor: default;
 }
 .panel :is(button, input, a, [tabindex]):focus-visible {
-  outline: 3px solid #087f72;
+  outline: 3px solid var(--studio-focus);
   outline-offset: 3px;
 }
 .panel a {
-  color: #075b51;
+  color: var(--studio-action);
   text-decoration: underline;
 }
 .actions {
@@ -63,7 +63,7 @@
   display: grid;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid #c8ded9;
+  border: 1px solid var(--studio-border-decorative);
   border-radius: 0.75rem;
 }
 .challenge fieldset {
@@ -90,4 +90,20 @@
   .actions {
     flex-direction: column;
   }
+}
+
+.panel {
+  box-shadow: var(--studio-card-shadow);
+}
+.challenge {
+  background: var(--studio-panel);
+}
+.choice {
+  min-height: 44px;
+}
+.choice input {
+  accent-color: var(--studio-action);
+}
+.panel button:not(:disabled):hover {
+  background: var(--studio-panel-muted);
 }

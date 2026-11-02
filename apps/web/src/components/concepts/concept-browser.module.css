@@ -3,7 +3,7 @@
   grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
   min-width: 0;
-  color: #173b37;
+  color: var(--studio-ink);
   overflow-wrap: anywhere;
 }
 .browser h1 {
@@ -18,11 +18,11 @@
   line-height: 1.7;
 }
 .browser a {
-  color: #086b60;
+  color: var(--studio-action);
   text-underline-offset: 0.2em;
 }
 .browser :is(a, button, h1, h2, pre):focus-visible {
-  outline: 3px solid #087f72;
+  outline: 3px solid var(--studio-focus);
   outline-offset: 4px;
 }
 .breadcrumbs {
@@ -36,7 +36,7 @@
 .breadcrumbs li:not(:last-child)::after {
   content: '/';
   margin-left: 1rem;
-  color: #526e69;
+  color: var(--studio-ink-secondary);
 }
 .list {
   display: grid;
@@ -47,8 +47,8 @@
 .notice,
 .read {
   padding: 1.5rem;
-  border: 1px solid #d5e5e1;
-  border-radius: 1rem;
+  border: 1px solid var(--studio-border-decorative);
+  border-radius: 0.75rem;
   background: #fff;
   min-width: 0;
 }
@@ -57,7 +57,7 @@
   font-size: 1.15rem;
 }
 .level {
-  color: #45635e;
+  color: var(--studio-ink-secondary);
   font-size: 0.9rem;
 }
 .read {
@@ -75,9 +75,10 @@
   overflow: auto;
   max-width: 100%;
   padding: 1rem;
-  background: #eff6f4;
+  background: var(--studio-chrome);
+  color: var(--studio-on-chrome);
   border-radius: 0.5rem;
-  line-height: 1.65;
+  line-height: 1.75;
 }
 .read code {
   font-family: var(--font-mono), monospace;
@@ -88,9 +89,9 @@
 }
 .read blockquote {
   margin-inline: 0;
-  border-left: 3px solid #087f72;
+  border-left: 3px solid var(--studio-focus);
   padding: 0.5rem 1rem;
-  background: #eff6f4;
+  background: var(--studio-panel-subtle);
 }
 .pagination {
   display: flex;
@@ -99,10 +100,10 @@
   gap: 1rem;
 }
 .browser button {
-  border: 1px solid #8dada5;
+  border: 1px solid var(--studio-border-control);
   border-radius: 0.5rem;
   background: #fff;
-  color: #075d54;
+  color: var(--studio-action);
   padding: 0.7rem 1rem;
   font: inherit;
   cursor: pointer;
@@ -130,12 +131,12 @@
   margin-bottom: 1rem;
 }
 .tabs button[aria-selected='true'] {
-  background: #075d54;
+  background: var(--studio-action);
   color: #fff;
-  border-color: #075d54;
+  border-color: var(--studio-action);
 }
 .browser [role='tabpanel']:focus-visible {
-  outline: 3px solid #087f72;
+  outline: 3px solid var(--studio-focus);
   outline-offset: 4px;
 }
 .examples {
@@ -155,4 +156,32 @@
 .revise section > p,
 .revise li {
   white-space: pre-wrap;
+}
+
+.read {
+  box-shadow: var(--studio-card-shadow);
+  padding: clamp(1rem, 3vw, 2rem);
+}
+.read :not(pre) > code {
+  background: var(--studio-panel-muted);
+  color: var(--studio-action);
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.25rem;
+}
+.browser button {
+  min-height: 44px;
+  max-width: 100%;
+  line-height: 1.5;
+}
+.tabs {
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  background: var(--studio-panel-muted);
+}
+.tabs button {
+  flex: 1 1 auto;
+  margin: 0;
+}
+.browser button:not(:disabled):not([aria-selected='true']):hover {
+  background: var(--studio-panel-subtle);
 }

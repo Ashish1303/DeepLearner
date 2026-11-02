@@ -4,7 +4,7 @@
   gap: 1rem;
   min-width: 0;
   max-width: 100%;
-  color: #173b37;
+  color: var(--studio-ink);
   background: #fff;
   overflow-wrap: anywhere;
   line-height: 1.6;
@@ -17,8 +17,8 @@
 }
 .notice {
   padding: 1rem;
-  color: #173b37;
-  background: #f0f7f5;
+  color: var(--studio-ink);
+  background: var(--studio-panel-subtle);
   border-radius: 0.75rem;
 }
 .scroll {
@@ -26,12 +26,12 @@
   max-width: 100%;
   max-height: 480px;
   overflow: auto;
-  border: 1px solid #526e69;
+  border: 1px solid var(--studio-ink-secondary);
   border-radius: 0.75rem;
-  background: #f8fafc;
+  background: var(--studio-panel-subtle);
 }
 .scroll:focus-visible {
-  outline: 3px solid #087f72;
+  outline: 3px solid var(--studio-focus);
   outline-offset: 4px;
 }
 .diagram {
@@ -42,36 +42,44 @@
 .node,
 .badge {
   fill: #fff;
-  stroke: #526e69;
+  stroke: var(--studio-ink-secondary);
   stroke-width: 2;
 }
 .selectedNode {
-  fill: #eef2ff;
-  stroke: #3525cd;
+  fill: var(--studio-selection);
+  stroke: var(--studio-action);
   stroke-width: 4;
 }
 .edge {
   fill: none;
-  stroke: #526e69;
+  stroke: var(--studio-ink-secondary);
   stroke-width: 2;
 }
 .selectedEdge {
   fill: none;
-  stroke: #3525cd;
+  stroke: var(--studio-action);
   stroke-width: 4;
   stroke-dasharray: 8 4;
 }
 .arrow {
-  fill: #173b37;
+  fill: var(--studio-ink);
 }
 .label {
-  fill: #173b37;
+  fill: var(--studio-ink);
   font:
     14px system-ui,
     sans-serif;
 }
 .currentStep {
-  border-left: 4px solid #3525cd;
-  background: #eef2ff;
+  border-left: 4px solid var(--studio-action);
+  background: var(--studio-selection);
 }
 /* Static for every motion preference: no timers, animation or transitions. */
+
+.renderer {
+  border-radius: 0.75rem;
+}
+.currentStep {
+  padding: 1rem;
+  border-radius: 0.5rem;
+}

@@ -3,7 +3,7 @@
   gap: 1.5rem;
   min-width: 0;
   overflow-wrap: anywhere;
-  color: #173b37;
+  color: var(--studio-ink);
 }
 .browser h1 {
   font-size: clamp(1.6rem, 4vw, 2.25rem);
@@ -16,11 +16,11 @@
   line-height: 1.65;
 }
 .browser a {
-  color: #086b60;
+  color: var(--studio-action);
   text-underline-offset: 0.2em;
 }
 .browser :is(a, button, h2):focus-visible {
-  outline: 3px solid #087f72;
+  outline: 3px solid var(--studio-focus);
   outline-offset: 4px;
 }
 .breadcrumbs {
@@ -34,7 +34,7 @@
 .breadcrumbs li:not(:last-child)::after {
   content: '/';
   margin-left: 1rem;
-  color: #526e69;
+  color: var(--studio-ink-secondary);
 }
 .grid {
   display: grid;
@@ -51,8 +51,8 @@
 .card,
 .notice {
   padding: 1.25rem;
-  border: 1px solid #d5e5e1;
-  border-radius: 1rem;
+  border: 1px solid var(--studio-border-decorative);
+  border-radius: 0.75rem;
   background: #fff;
   min-width: 0;
 }
@@ -62,7 +62,7 @@
 }
 .level {
   font-size: 0.9rem;
-  color: #45635e;
+  color: var(--studio-ink-secondary);
 }
 .pagination {
   display: flex;
@@ -71,10 +71,10 @@
   gap: 1rem;
 }
 .browser button {
-  border: 1px solid #8dada5;
+  border: 1px solid var(--studio-border-control);
   border-radius: 0.5rem;
   background: #fff;
-  color: #075d54;
+  color: var(--studio-action);
   padding: 0.7rem 1rem;
   font: inherit;
   cursor: pointer;
@@ -97,4 +97,21 @@
   .notice {
     padding: 1rem;
   }
+}
+
+.card,
+.notice {
+  box-shadow: var(--studio-card-shadow);
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+.browser button {
+  min-height: 44px;
+  max-width: 100%;
+  line-height: 1.5;
+}
+.browser button:not(:disabled):hover {
+  background: var(--studio-panel-subtle);
+}
+.breadcrumbs a {
+  font-weight: 600;
 }

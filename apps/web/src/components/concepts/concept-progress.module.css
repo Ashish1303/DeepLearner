@@ -31,9 +31,26 @@
   cursor: pointer;
 }
 .panel button:focus-visible {
-  outline: 3px solid #087f72;
+  outline: 3px solid var(--studio-focus);
   outline-offset: 3px;
 }
 .note {
   font-size: 0.875rem;
+}
+
+.panel {
+  background: var(--studio-panel);
+  border-color: var(--studio-border-decorative);
+}
+.panel button {
+  min-height: 44px;
+  max-width: 100%;
+  border: 1px solid var(--studio-border-control);
+  border-radius: 0.5rem;
+  background: var(--studio-panel);
+  color: var(--studio-action);
+}
+.panel button:disabled {
+  cursor: default;
+  opacity: 0.6;
 }
