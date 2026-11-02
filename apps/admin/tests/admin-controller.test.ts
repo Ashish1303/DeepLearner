@@ -821,6 +821,296 @@ const technologyOperation = {
   kind: 'detail' as const,
   id: technologyRecord.id,
 };
+for (const action of ['login', 'restore', 'revalidate'] as const)
+  test(
+    'first inventory is admitted at the ready notification after ' + action,
+    async (t) => {
+      let reads = 0;
+      const f = fixture(
+        t,
+        {},
+        {
+          technologies: {
+            async execute() {
+              reads++;
+              return {
+                items: [technologyRecord],
+                pagination: { page: 1, limit: 20, total: 1, totalPages: 1 },
+              };
+            },
+          },
+        },
+      );
+      if (action === 'revalidate') {
+        await f.controller.login(user.email, 'synthetic-password');
+        f.controller.suspend();
+      }
+      let inventory: ReturnType<typeof createTechnologyController> | undefined;
+      let loaded: Promise<void> | undefined;
+      const unsubscribe = f.controller.subscribe(() => {
+        const s = f.controller.getSnapshot();
+        if (s.status !== 'eligible' || s.pending || inventory) return;
+        inventory = createTechnologyController(f.controller, user.id);
+        inventory.connect();
+        loaded = inventory.list(1);
+      });
+      t.after(() => {
+        unsubscribe();
+        inventory?.dispose();
+      });
+      if (action === 'login')
+        await f.controller.login(user.email, 'synthetic-password');
+      else await f.controller[action]();
+      assert(inventory, 'ready notification must mount the inventory');
+      await loaded;
+      assert.equal(inventory.getSnapshot().status, 'ready');
+      assert.equal(reads, 1, 'exactly one initial read, without retries');
+      assert.equal(f.controller.getSnapshot().status, 'eligible');
+    },
+  );
+test(
+  'first inventory survives StrictMode setup cleanup and reconnect after login',
+  { timeout: 5000 },
+  async (t) => {
+    let reads = 0;
+    const f = fixture(
+      t,
+      {},
+      {
+        technologies: {
+          async execute() {
+            reads++;
+            return {
+              items: [technologyRecord],
+              pagination: { page: 1, limit: 20, total: 1, totalPages: 1 },
+            };
+          },
+        },
+      },
+    );
+    let inventory: ReturnType<typeof createTechnologyController> | undefined;
+    let loaded: Promise<unknown> | undefined;
+    const unsubscribe = f.controller.subscribe(() => {
+      if (f.controller.getSnapshot().status !== 'eligible' || inventory) return;
+      inventory = createTechnologyController(f.controller, user.id);
+      const disconnect = inventory.connect();
+      const cancelled = inventory.list();
+      disconnect();
+      inventory.connect();
+      loaded = Promise.all([cancelled, inventory.list()]);
+    });
+    t.after(() => {
+      unsubscribe();
+      inventory?.dispose();
+    });
+    await f.controller.login(user.email, 'synthetic-password');
+    await loaded;
+    assert(inventory);
+    assert.equal(inventory.getSnapshot().status, 'ready');
+    assert.equal(inventory.getSnapshot().message, '');
+    assert.equal(
+      reads,
+      1,
+      'cancelled setup must not dispatch; the new setup reads once',
+    );
+    assert.equal(f.controller.getSnapshot().status, 'eligible');
+  },
+);
+
+for (const action of [
+  'release',
+  'cancel',
+  'logout',
+  'switch',
+  'disconnect',
+  'expire',
+  'reject',
+] as const)
+  test(
+    'session readiness waits for coordinated settlement: ' + action,
+    async (t) => {
+      const me = deferred<CurrentUser>();
+      const settled = deferred<void>();
+      const returned = deferred<void>();
+      let now = 0;
+      let held = true;
+      let eligible = 0;
+      let reads = 0;
+      const coordination: AdminCoordination = {
+        supported: () => true,
+        listen: () => () => {},
+        publish() {},
+        async run(work) {
+          const value = await work();
+          if (held) {
+            returned.resolve();
+            await settled.promise;
+            if (action === 'reject') throw new AdminCoordinationError();
+          }
+          return value;
+        },
+      };
+      const f = fixture(
+        t,
+        { me: async () => me.promise },
+        {
+          coordination,
+          now: () => now,
+          technologies: {
+            async execute() {
+              reads++;
+              return technologyRecord;
+            },
+          },
+        },
+      );
+      const unsubscribe = f.controller.subscribe(() => {
+        if (f.controller.getSnapshot().status === 'eligible') eligible++;
+      });
+      t.after(unsubscribe);
+      const pending = f.controller.login(user.email, 'synthetic-password');
+      await flush();
+      assert.equal(f.controller.getSnapshot().status, 'checking');
+      await assert.rejects(
+        f.controller.requestTechnology(user.id, technologyOperation),
+        TechnologyError,
+      );
+      me.resolve(user);
+      await returned.promise;
+      assert.equal(f.controller.getSnapshot().status, 'checking');
+      assert.equal(f.controller.getSnapshot().pending, true);
+      assert.equal(f.controller.getSnapshot().user, null);
+      await assert.rejects(
+        f.controller.requestTechnology(user.id, technologyOperation),
+        TechnologyError,
+      );
+      let logout: Promise<void> | undefined;
+      if (action === 'cancel') f.controller.cancel();
+      if (action === 'logout') logout = f.controller.logout();
+      if (action === 'switch') f.controller.invalidateSession('AUTH_FORBIDDEN');
+      if (action === 'disconnect') f.disconnect();
+      if (action === 'expire') now = 900000;
+      held = false;
+      settled.resolve();
+      await pending;
+      await logout;
+      assert.equal(eligible, action === 'release' ? 1 : 0);
+      assert.equal(reads, 0);
+      assert.equal(
+        f.controller.getSnapshot().status === 'eligible',
+        action === 'release',
+      );
+    },
+  );
+
+for (const action of ['logout', 'switch', 'cancel'] as const)
+  test(
+    'first inventory discards a late response after ' + action,
+    async (t) => {
+      const response = deferred<{
+        items: (typeof technologyRecord)[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          totalPages: number;
+        };
+      }>();
+      const dispatched = deferred<void>();
+      let signal: AbortSignal | undefined;
+      let reads = 0;
+      const f = fixture(
+        t,
+        {},
+        {
+          technologies: {
+            async execute(_request, _token, abort) {
+              reads++;
+              signal = abort;
+              dispatched.resolve();
+              return response.promise;
+            },
+          },
+        },
+      );
+      let inventory: ReturnType<typeof createTechnologyController> | undefined;
+      let loaded: Promise<void> | undefined;
+      const unsubscribe = f.controller.subscribe(() => {
+        if (f.controller.getSnapshot().status !== 'eligible' || inventory)
+          return;
+        inventory = createTechnologyController(f.controller, user.id);
+        inventory.connect();
+        loaded = inventory.list();
+      });
+      t.after(() => {
+        unsubscribe();
+        inventory?.dispose();
+      });
+      await f.controller.login(user.email, 'synthetic-password');
+      await dispatched.promise;
+      let logout: Promise<void> | undefined;
+      if (action === 'logout') logout = f.controller.logout();
+      if (action === 'switch') f.emit('identity-changed');
+      if (action === 'cancel') inventory!.cancel();
+      assert(signal?.aborted);
+      response.resolve({
+        items: [technologyRecord],
+        pagination: { page: 1, limit: 20, total: 1, totalPages: 1 },
+      });
+      await loaded;
+      await logout;
+      assert.equal(inventory!.getSnapshot().page, null);
+      assert.equal(reads, 1);
+      if (action === 'logout') {
+        inventory!.dispose();
+        inventory = undefined;
+        await f.controller.login(user.email, 'synthetic-password');
+        await loaded;
+        assert.equal(inventory!.getSnapshot().status, 'ready');
+        assert.equal(reads, 2, 'next login makes one fresh inventory request');
+      }
+    },
+  );
+
+for (const [code, status] of [
+  ['RATE_LIMITED', 429],
+  ['UNAVAILABLE', 503],
+  ['NETWORK_ERROR', 0],
+] as const)
+  test('first inventory error has no automatic retry: ' + status, async (t) => {
+    let reads = 0;
+    const f = fixture(
+      t,
+      {},
+      {
+        technologies: {
+          async execute() {
+            reads++;
+            throw new TechnologyError(code, status);
+          },
+        },
+      },
+    );
+    let inventory: ReturnType<typeof createTechnologyController> | undefined;
+    let loaded: Promise<void> | undefined;
+    const unsubscribe = f.controller.subscribe(() => {
+      if (f.controller.getSnapshot().status !== 'eligible' || inventory) return;
+      inventory = createTechnologyController(f.controller, user.id);
+      inventory.connect();
+      loaded = inventory.list();
+    });
+    t.after(() => {
+      unsubscribe();
+      inventory?.dispose();
+    });
+    await f.controller.login(user.email, 'synthetic-password');
+    await loaded;
+    await flush();
+    assert.equal(inventory!.getSnapshot().status, 'error');
+    assert.equal(reads, 1);
+    assert.equal(f.controller.getSnapshot().status, 'eligible');
+  });
+
 test('restricted business capability keeps token private and rejects caller-controlled transport', async (t) => {
   let calls = 0;
   const f = fixture(

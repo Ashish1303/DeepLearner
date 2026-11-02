@@ -210,21 +210,33 @@ export function createAdminController(
       throw new AdminApiError('INVALID_RESPONSE');
     const projected = projectAdmin(parsed.data);
     if (!projected) throw new AdminApiError('AUTH_FORBIDDEN', 403);
-    accountId = projected.id;
-    update({
-      status: 'eligible',
-      user: projected,
-      pending: false,
-      message: '',
-    });
+    return projected;
   }
-  function single(work: () => Promise<void>) {
+  function single(version: number, work: () => Promise<AdminIdentity | void>) {
     if (flight) return flight;
     const next = Promise.resolve()
       .then(work)
+      .then((identity) => {
+        if (!identity || flight !== next || loggingOut) return;
+        check(version);
+        expireIfNeeded();
+        check(version);
+        if (!ready()) return;
+        // Publish readiness only after the coordinated operation has settled.
+        // Synchronous subscribers may immediately request the first inventory.
+        accountId = identity.id;
+        flight = undefined;
+        update({
+          status: 'eligible',
+          user: identity,
+          pending: false,
+          message: '',
+        });
+      })
       .catch(() => {
         // Unexpected collaborator failures must never retain privileged state.
-        invalidate('uncertain', uncertainMessage);
+        if (generation === version && !disposed)
+          invalidate('uncertain', uncertainMessage);
       })
       .finally(() => {
         if (flight === next) flight = undefined;
@@ -429,10 +441,10 @@ export function createAdminController(
         return Promise.resolve();
       }
       const version = begin();
-      return single(async () => {
+      return single(version, async () => {
         let sent = false;
         try {
-          await coordination.run(async () => {
+          return await coordination.run(async () => {
             check(version);
             publish('identity-changed');
             check(version);
@@ -452,7 +464,7 @@ export function createAdminController(
               },
               version,
             );
-            await loadCurrent(version, login.data.user.id);
+            return loadCurrent(version, login.data.user.id);
           }, operationAbort?.signal);
         } catch (error) {
           failure(error, version, sent);
@@ -472,10 +484,10 @@ export function createAdminController(
       )
         return Promise.resolve();
       const version = begin();
-      return single(async () => {
+      return single(version, async () => {
         let sent = false;
         try {
-          await coordination.run(async () => {
+          return await coordination.run(async () => {
             check(version);
             publish('identity-changed');
             check(version);
@@ -483,7 +495,7 @@ export function createAdminController(
             const access = await api.refresh();
             check(version);
             setAccess(access, version);
-            await loadCurrent(version);
+            return loadCurrent(version);
           }, operationAbort?.signal);
         } catch (error) {
           failure(error, version, sent);
@@ -501,9 +513,9 @@ export function createAdminController(
       operationAbort?.abort();
       operationAbort = new AbortController();
       update({ status: 'checking', user: null, pending: true, message: '' });
-      return single(async () => {
+      return single(version, async () => {
         try {
-          await coordination.run(
+          return await coordination.run(
             () => loadCurrent(version, expectedId),
             operationAbort?.signal,
           );

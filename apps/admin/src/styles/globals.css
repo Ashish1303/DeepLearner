@@ -1,7 +1,35 @@
 :root {
+  /* Stitch Slice 1a: local tokens; feature layouts and installed fonts stay intact. */
+  --studio-canvas: #fdf7ff;
+  --studio-panel: #ffffff;
+  --studio-panel-subtle: #f8f2fa;
+  --studio-panel-muted: #f2ecf4;
+  --studio-panel-raised: #ece6ee;
+  --studio-panel-strong: #e6e0e9;
+  --studio-ink: #1d1b20;
+  --studio-ink-secondary: #494551;
+  --studio-chrome: #322f35;
+  --studio-on-chrome: #f5eff7;
+  --studio-action: #4f378a;
+  --studio-action-hover: #6750a4;
+  --studio-on-action: #ffffff;
+  --studio-selection: #e1d4fd;
+  --studio-on-selection: #645a7d;
+  --studio-focus: #6750a4;
+  --studio-focus-on-chrome: #cfbcff;
+  --studio-border-decorative: #cbc4d2;
+  --studio-border-control: #7a7582;
+  --studio-gold: #c9a74d;
+  --studio-attention-bg: #ffdf93;
+  --studio-attention-ink: #241a00;
+  --studio-danger: #ba1a1a;
+  --studio-danger-bg: #ffdad6;
+  --studio-shell-gutter: clamp(1rem, 3vw, 2rem);
+  --studio-card-radius: 0.5rem;
+  --studio-card-shadow: 0 0.25rem 1.5rem rgb(29 27 32 / 4%);
   font-family: Arial, Helvetica, sans-serif;
-  color: #18362d;
-  background: #f4f6f3;
+  color: var(--studio-ink);
+  background: var(--studio-canvas);
   color-scheme: light;
   font-synthesis: none;
 }
@@ -12,14 +40,20 @@ body {
   margin: 0;
 }
 .admin-shell {
+  min-height: 100vh;
   min-height: 100svh;
+  min-width: 0;
   display: flex;
   flex-direction: column;
+  background: var(--studio-canvas);
 }
 .admin-header {
-  background: #fff;
-  padding: 1.75rem clamp(1.5rem, 5vw, 5rem);
-  border-bottom: 1px solid #dce3d9;
+  min-height: 4rem;
+  background: var(--studio-chrome);
+  color: var(--studio-on-chrome);
+  padding: 0.5rem var(--studio-shell-gutter);
+  border-bottom: 1px solid var(--studio-ink-secondary);
+  box-shadow: 0 1px 8px rgb(29 27 32 / 8%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -27,24 +61,32 @@ body {
   flex-wrap: wrap;
 }
 .brand {
-  font-size: 1.4rem;
+  max-width: 100%;
+  font-size: 1.375rem;
   font-weight: 700;
-  letter-spacing: -0.05em;
+  line-height: 1.3;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
 }
 .brand-dot {
-  color: #287959;
+  color: var(--studio-focus-on-chrome);
 }
 .workspace-label {
-  color: #52655b;
+  max-width: 100%;
+  color: var(--studio-on-chrome);
   font-size: 0.8rem;
-  border-left: 1px solid #dce3d9;
-  padding-left: 1rem;
+  line-height: 1.5;
+  border-inline-start: 1px solid var(--studio-border-control);
+  padding-inline-start: 1rem;
+  overflow-wrap: anywhere;
 }
 main {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   display: grid;
   align-items: center;
-  padding: 3rem clamp(1.5rem, 5vw, 5rem);
+  padding: 2rem var(--studio-shell-gutter) 3rem;
 }
 .welcome {
   max-width: 46rem;
@@ -68,26 +110,36 @@ h1 {
   color: #52655b;
 }
 footer {
-  color: #52655b;
-  font-size: 0.8rem;
+  color: var(--studio-ink-secondary);
+  background: var(--studio-panel-subtle);
+  border-top: 1px solid var(--studio-border-decorative);
+  font-size: 0.875rem;
   line-height: 1.6;
-  padding: 1.75rem clamp(1.5rem, 5vw, 5rem);
+  padding: 1rem var(--studio-shell-gutter);
+  overflow-wrap: anywhere;
 }
 .skip-link {
   position: absolute;
+  z-index: 100;
   top: -5rem;
   left: 1rem;
-  background: #fff;
-  color: #18362d;
-  padding: 0.75rem;
+  max-width: calc(100% - 2rem);
+  min-height: 44px;
+  background: var(--studio-panel);
+  color: var(--studio-action);
+  border: 1px solid var(--studio-border-control);
+  border-radius: var(--studio-card-radius);
+  padding: 0.75rem 1rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 .skip-link:focus {
   top: 1rem;
-  outline: 3px solid #19775b;
+  outline: 3px solid var(--studio-focus);
   outline-offset: 3px;
 }
 
-/* F042 access states: retain the existing Admin palette and landmarks. */
+/* Shared card surfaces only; F042 form and F043 feature styling remain separate. */
 main > section {
   width: 100%;
   margin-inline: auto;
@@ -98,10 +150,10 @@ main > section {
   max-width: 44rem;
   min-width: 0;
   padding: clamp(1.25rem, 4vw, 2.5rem);
-  background: #fff;
-  border: 1px solid #dce3d9;
-  border-radius: 0.5rem;
-  box-shadow: 0 0.25rem 1.5rem rgb(24 54 45 / 4%);
+  background: var(--studio-panel);
+  border: 1px solid var(--studio-border-decorative);
+  border-radius: var(--studio-card-radius);
+  box-shadow: var(--studio-card-shadow);
   overflow-wrap: anywhere;
 }
 .admin-access h1,
@@ -172,11 +224,26 @@ fieldset:disabled input {
 }
 button:focus-visible,
 input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
 a:focus-visible,
 h1:focus,
 main:focus {
-  outline: 3px solid #0d6348;
+  outline: 3px solid var(--studio-focus);
   outline-offset: 4px;
+}
+.admin-header .secondary-action {
+  margin-top: 0;
+  color: var(--studio-on-chrome);
+  background: transparent;
+  border-color: var(--studio-border-decorative);
+}
+.admin-header button:not(:disabled):hover {
+  background: var(--studio-ink-secondary);
+  box-shadow: inset 0 0 0 1px var(--studio-border-decorative);
+}
+.admin-header :is(button, a, input):focus-visible {
+  outline-color: var(--studio-focus-on-chrome);
 }
 .access-status {
   padding: 0.75rem;
@@ -201,6 +268,7 @@ main:focus {
   margin-top: 1rem;
 }
 .admin-session {
+  max-width: 100%;
   margin-left: auto;
   overflow-wrap: anywhere;
 }
@@ -233,7 +301,7 @@ main:focus {
     align-items: start;
   }
   .admin-header {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
   }
   .admin-session {
     margin-left: 0;
