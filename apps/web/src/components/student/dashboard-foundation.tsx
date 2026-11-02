@@ -28,6 +28,7 @@ export function DashboardFoundation() {
           learning content.
         </p>
       </section>
+      <DashboardActivity />
       <div className={styles.grid}>
         <section className={styles.card} aria-labelledby="account-title">
           <span className={styles.label}>Account</span>
@@ -118,7 +119,6 @@ export function DashboardFoundation() {
           )}
         </section>
       </div>
-      <DashboardActivity />
     </>
   );
 }

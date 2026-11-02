@@ -1,4 +1,33 @@
 :root {
+  /* Shared visual vocabulary only; public-page theme variables are unchanged. */
+  --studio-canvas: #fdf7ff;
+  --studio-panel: #ffffff;
+  --studio-panel-subtle: #f8f2fa;
+  --studio-panel-muted: #f2ecf4;
+  --studio-panel-raised: #ece6ee;
+  --studio-panel-strong: #e6e0e9;
+  --studio-ink: #1d1b20;
+  --studio-ink-secondary: #494551;
+  --studio-chrome: #322f35;
+  --studio-on-chrome: #f5eff7;
+  --studio-action: #4f378a;
+  --studio-action-hover: #6750a4;
+  --studio-on-action: #ffffff;
+  --studio-selection: #e1d4fd;
+  --studio-on-selection: #645a7d;
+  --studio-focus: #6750a4;
+  --studio-focus-on-chrome: #cfbcff;
+  --studio-border-decorative: #cbc4d2;
+  --studio-border-control: #7a7582;
+  --studio-gold: #c9a74d;
+  --studio-attention-bg: #ffdf93;
+  --studio-attention-ink: #241a00;
+  --studio-danger: #ba1a1a;
+  --studio-danger-bg: #ffdad6;
+  --studio-shell-gutter: clamp(1rem, 3vw, 2rem);
+  --studio-card-radius: 0.5rem;
+  --studio-card-shadow: 0 0.25rem 1.5rem rgb(29 27 32 / 4%);
+
   --ink: #0f172a;
   --ink-secondary: #475569;
   --surface: #fafaf9;

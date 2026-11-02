@@ -1,4 +1,13 @@
 .shell {
+  --ink: var(--studio-ink);
+  --ink-secondary: var(--studio-ink-secondary);
+  --surface: var(--studio-canvas);
+  --surface-subtle: var(--studio-panel-subtle);
+  --border: var(--studio-border-decorative);
+  --accent: var(--studio-action);
+  --action: var(--studio-action);
+  --teal: var(--studio-action);
+  min-width: 0;
   min-height: 100svh;
   background: var(--surface);
   color: var(--ink);
@@ -7,11 +16,16 @@
   position: fixed;
   inset: 0 auto 0 0;
   width: 16rem;
-  background: white;
+  background: var(--studio-chrome);
   border-right: 1px solid var(--border);
   z-index: 20;
 }
 .navigation {
+  --ink: var(--studio-on-chrome);
+  --ink-secondary: var(--studio-on-chrome);
+  --surface-subtle: var(--studio-ink-secondary);
+  background: var(--studio-chrome);
+  color: var(--studio-on-chrome);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -31,11 +45,12 @@
   letter-spacing: -0.04em;
 }
 .brand span {
+  border-radius: 0.25rem;
   font-family: var(--font-mono), monospace;
   font-size: 0.6rem;
   letter-spacing: 0.04em;
-  background: #e6f6f6;
-  color: var(--teal);
+  background: var(--studio-selection);
+  color: var(--studio-action);
   padding: 0.2rem 0.35rem;
 }
 .navigation nav {
@@ -55,12 +70,13 @@
   margin: 1rem 0 0.5rem;
 }
 .active {
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: 0.6rem;
   padding: 0.7rem;
   background: var(--action);
-  color: var(--ink);
+  color: var(--studio-on-action);
   font-weight: 600;
   border-radius: 0.35rem;
   text-decoration: none;
@@ -118,12 +134,14 @@
   color: var(--ink);
 }
 .content {
+  min-width: 0;
   margin-left: 16rem;
 }
 .header {
+  color: var(--studio-on-chrome);
   min-height: 4.5rem;
   padding: 0.75rem 2rem;
-  background: white;
+  background: var(--studio-chrome);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -153,7 +171,7 @@
 .card {
   padding: clamp(1.25rem, 3vw, 2rem);
   border: 1px solid var(--border);
-  border-radius: 0.6rem;
+  border-radius: 0.75rem;
   background: white;
   min-width: 0;
   overflow-wrap: anywhere;
@@ -176,7 +194,7 @@
 }
 .welcome {
   border-top: 3px solid var(--accent);
-  background: linear-gradient(120deg, white, #f0fbfa);
+  background: var(--studio-panel);
 }
 .grid {
   display: grid;
@@ -229,7 +247,7 @@
   padding: 0;
 }
 .drawer::backdrop {
-  background: #0f172a88;
+  background: rgb(29 27 32 / 55%);
 }
 .drawer .navigation {
   height: calc(100% - 3rem);
@@ -277,4 +295,61 @@
 }
 .navLink:hover {
   background: var(--surface-subtle);
+}
+
+.shell :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--studio-focus);
+  outline-offset: 4px;
+}
+.navigation :is(a, button):focus-visible,
+.header :is(a, button):focus-visible {
+  outline-color: var(--studio-focus-on-chrome);
+}
+.header .label,
+.header .menuButton {
+  color: var(--studio-on-chrome);
+}
+.navigation .account {
+  border: 1px solid var(--studio-border-control);
+}
+.brand,
+.navLink,
+.active {
+  overflow-wrap: anywhere;
+}
+.navLink {
+  min-height: 44px;
+}
+.card {
+  box-shadow: var(--studio-card-shadow);
+}
+.details > div {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.details > div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.secondaryButton {
+  min-height: 44px;
+  max-width: 100%;
+  line-height: 1.5;
+}
+.secondaryButton:not(:disabled):hover {
+  background: var(--studio-panel-subtle);
+}
+.drawer {
+  background: var(--studio-canvas);
+}
+@media (max-width: 390px) {
+  .header {
+    gap: 0.5rem;
+  }
+  .headerName {
+    max-width: 32%;
+  }
+  .card {
+    padding: 1rem;
+  }
 }
