@@ -3,7 +3,7 @@
   min-width: 0;
   max-width: 90rem;
   margin-inline: auto;
-  color: #18362d;
+  color: var(--studio-ink);
 }
 .header {
   display: flex;
@@ -13,7 +13,7 @@
   margin-bottom: 2rem;
 }
 .header h1 {
-  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
   margin: 0.65rem 0;
 }
 .header button {
@@ -21,7 +21,7 @@
   margin-top: 1rem;
 }
 .intro {
-  color: #52655b;
+  color: var(--studio-ink-secondary);
   line-height: 1.7;
   max-width: 46rem;
   margin: 0;
@@ -33,8 +33,8 @@
   gap: 1rem;
   padding: 1rem 1.25rem;
   background: #fff;
-  border: 1px solid #dce3d9;
-  border-radius: 0.6rem 0.6rem 0 0;
+  border: 1px solid var(--studio-border-decorative);
+  border-radius: 0.75rem 0.75rem 0 0;
 }
 .toolbar > div {
   display: flex;
@@ -48,9 +48,9 @@
 .count {
   font-size: 0.8rem;
   border-radius: 2rem;
-  background: #edf4ee;
+  background: var(--studio-selection);
   padding: 0.35rem 0.65rem;
-  color: #285b43;
+  color: var(--studio-action);
 }
 .layout {
   display: grid;
@@ -60,7 +60,7 @@
 }
 .inventory {
   background: #fff;
-  border: 1px solid #dce3d9;
+  border: 1px solid var(--studio-border-decorative);
   border-top: 0;
   border-radius: 0 0 0.6rem 0.6rem;
   min-width: 0;
@@ -76,8 +76,8 @@
   text-align: left;
 }
 .tableWrap thead {
-  background: #f0f5f1;
-  color: #52655b;
+  background: var(--studio-panel-subtle);
+  color: var(--studio-ink-secondary);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -86,7 +86,7 @@
 .tableWrap td {
   padding: 1.1rem 1.25rem;
   vertical-align: middle;
-  border-bottom: 1px solid #e4eae2;
+  border-bottom: 1px solid var(--studio-border-decorative);
 }
 .tableWrap tbody th {
   font-weight: 500;
@@ -94,14 +94,14 @@
   overflow-wrap: anywhere;
 }
 .tableWrap tbody tr:hover {
-  background: #fafcf9;
+  background: var(--studio-panel-subtle);
 }
 .name {
   display: block;
   max-width: 100%;
   padding: 0.25rem 0;
   border: 0;
-  color: #174e3a;
+  color: var(--studio-action);
   background: transparent;
   font: inherit;
   font-weight: 700;
@@ -113,7 +113,7 @@
 .slug {
   display: block;
   font-size: 0.78rem;
-  color: #52655b;
+  color: var(--studio-ink-secondary);
   font-family: ui-monospace, monospace;
   margin-top: 0.15rem;
 }
@@ -121,7 +121,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  border-radius: 0.3rem;
+  border-radius: 0.5rem;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -153,7 +153,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  color: #52655b;
+  color: var(--studio-ink-secondary);
   font-size: 0.85rem;
 }
 .actions {
@@ -165,19 +165,19 @@
 .empty {
   padding: 3rem 1.5rem;
   text-align: center;
-  color: #52655b;
+  color: var(--studio-ink-secondary);
 }
 .empty h2 {
-  color: #18362d;
+  color: var(--studio-ink);
   font-size: 1.2rem;
 }
 .editor {
   background: #fff;
-  border: 1px solid #dce3d9;
+  border: 1px solid var(--studio-border-decorative);
   border-radius: 0.6rem;
   padding: clamp(1.25rem, 3vw, 2rem);
   min-width: 0;
-  box-shadow: 0 0.25rem 1.5rem rgb(24 54 45 / 4%);
+  box-shadow: 0 0.25rem 1.5rem rgb(29 27 32 / 4%);
 }
 .editorHeading {
   display: flex;
@@ -195,11 +195,11 @@
   height: 44px;
   width: 44px;
   flex-shrink: 0;
-  background: #f3f7f2;
-  border: 1px solid #dce3d9;
-  border-radius: 0.3rem;
+  background: var(--studio-panel-subtle);
+  border: 1px solid var(--studio-border-decorative);
+  border-radius: 0.5rem;
   font-size: 1.6rem;
-  color: #18362d;
+  color: var(--studio-ink);
   cursor: pointer;
 }
 .form {
@@ -222,22 +222,22 @@
   width: 100%;
   min-width: 0;
   min-height: 44px;
-  border: 1px solid #788b81;
-  border-radius: 0.3rem;
+  border: 1px solid var(--studio-border-control);
+  border-radius: 0.5rem;
   padding: 0.75rem;
   font: inherit;
-  color: #18362d;
+  color: var(--studio-ink);
   background: #fff;
 }
 .form textarea {
   resize: vertical;
 }
 .form input[readonly] {
-  background: #f3f6f2;
-  color: #52655b;
+  background: var(--studio-panel-subtle);
+  color: var(--studio-ink-secondary);
 }
 .form [aria-invalid='true'] {
-  border-color: #a62d35;
+  border-color: var(--studio-danger);
 }
 .form label:not(:first-of-type) {
   margin-top: 0.6rem;
@@ -249,10 +249,10 @@
   line-height: 1.5;
 }
 .help {
-  color: #52655b;
+  color: var(--studio-ink-secondary);
 }
 .fieldError {
-  color: #801f25;
+  color: var(--studio-danger);
 }
 .notice,
 .error,
@@ -268,9 +268,9 @@
   color: #185638;
 }
 .error {
-  background: #fff1ef;
-  color: #801f25;
-  border-left: 3px solid #a62d35;
+  background: var(--studio-danger-bg);
+  color: var(--studio-danger);
+  border-left: 3px solid var(--studio-danger);
 }
 .reconcile {
   background: #fff7e5;
@@ -284,7 +284,7 @@
   margin: 1.2rem 0;
 }
 .metadata dt {
-  color: #52655b;
+  color: var(--studio-ink-secondary);
 }
 .metadata dd {
   margin: 0.35rem 0 0;
@@ -292,11 +292,11 @@
 }
 .readonly {
   padding-top: 1rem;
-  color: #52655b;
+  color: var(--studio-ink-secondary);
   line-height: 1.6;
 }
 .readonly h3 {
-  color: #18362d;
+  color: var(--studio-ink);
   font-size: 1rem;
 }
 .readonly dd {
@@ -305,24 +305,24 @@
 }
 .readonly dt {
   font-weight: 700;
-  color: #18362d;
+  color: var(--studio-ink);
 }
 .description {
   white-space: pre-wrap;
 }
 .footnote {
   font-size: 0.78rem;
-  color: #52655b;
+  color: var(--studio-ink-secondary);
   line-height: 1.7;
   margin-top: 1.5rem;
   max-width: 60rem;
 }
 .workspace :is(button, input, textarea, h1, h2):focus-visible {
-  outline: 3px solid #0d6348;
+  outline: 3px solid var(--studio-focus);
   outline-offset: 4px;
 }
 .workspace :is(h1, h2):focus {
-  outline: 3px solid #0d6348;
+  outline: 3px solid var(--studio-focus);
   outline-offset: 4px;
 }
 @media (min-width: 72rem) {
@@ -359,5 +359,52 @@
   .form .actions {
     align-items: stretch;
     flex-direction: column;
+  }
+}
+
+.toolbar {
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: var(--studio-panel-subtle);
+}
+.tableWrap caption {
+  text-align: start;
+  padding: 1rem 1.25rem;
+  color: var(--studio-ink-secondary);
+}
+.tableWrap:focus-visible {
+  outline: 3px solid var(--studio-focus);
+  outline-offset: -3px;
+}
+.slug {
+  overflow-wrap: anywhere;
+}
+.editor {
+  border-top: 3px solid var(--studio-action);
+}
+.form input,
+.form textarea {
+  line-height: 1.6;
+}
+.form input::placeholder,
+.form textarea::placeholder {
+  color: var(--studio-ink-secondary);
+  opacity: 1;
+}
+.form input[readonly] {
+  border-style: dashed;
+}
+.badge,
+.help,
+.fieldError,
+.footnote {
+  font-size: 0.8125rem;
+}
+@media (max-width: 25rem) {
+  .toolbar {
+    padding: 1rem;
+  }
+  .actions > button {
+    max-width: 100%;
   }
 }

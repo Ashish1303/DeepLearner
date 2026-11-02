@@ -96,7 +96,7 @@ main {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #287959;
+  color: var(--studio-action);
 }
 h1 {
   font-size: clamp(2.5rem, 5vw, 4.5rem);
@@ -107,7 +107,7 @@ h1 {
 }
 .welcome > p:last-child {
   line-height: 1.8;
-  color: #52655b;
+  color: var(--studio-ink-secondary);
 }
 footer {
   color: var(--studio-ink-secondary);
@@ -139,7 +139,7 @@ footer {
   outline-offset: 3px;
 }
 
-/* Shared card surfaces only; F042 form and F043 feature styling remain separate. */
+/* Stitch access styling; authentication and feature behavior are unchanged. */
 main > section {
   width: 100%;
   margin-inline: auto;
@@ -181,11 +181,11 @@ main > section {
   width: 100%;
   min-width: 0;
   min-height: 44px;
-  border: 1px solid #788b81;
-  border-radius: 0.25rem;
+  border: 1px solid var(--studio-border-control);
+  border-radius: 0.5rem;
   padding: 0.75rem;
   font: inherit;
-  color: #18362d;
+  color: var(--studio-ink);
   background: #fff;
   box-sizing: border-box;
 }
@@ -197,8 +197,8 @@ main > section {
   min-height: 44px;
   max-width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid #1b5a45;
-  border-radius: 0.25rem;
+  border: 1px solid var(--studio-action);
+  border-radius: 0.5rem;
   font: inherit;
   font-weight: 600;
   line-height: 1.35;
@@ -207,15 +207,15 @@ main > section {
 }
 .primary-action {
   color: #fff;
-  background: #1b5a45;
+  background: var(--studio-action);
   margin-top: 0.75rem;
 }
 .secondary-action {
-  color: #184d3b;
+  color: var(--studio-action);
   background: #fff;
 }
 button:not(:disabled):hover {
-  box-shadow: inset 0 0 0 1px #184d3b;
+  box-shadow: inset 0 0 0 1px var(--studio-action);
 }
 button:disabled,
 fieldset:disabled input {
@@ -247,14 +247,14 @@ main:focus {
 }
 .access-status {
   padding: 0.75rem;
-  background: #f0f5f1;
-  border-left: 3px solid #287959;
+  background: var(--studio-panel-subtle);
+  border-left: 3px solid var(--studio-action);
   line-height: 1.5;
 }
 .access-error {
-  color: #801f25;
-  background: #fff4f4;
-  border-left-color: #a62d35;
+  color: var(--studio-danger);
+  background: var(--studio-danger-bg);
+  border-left-color: var(--studio-danger);
 }
 .access-actions,
 .admin-session {
@@ -277,7 +277,7 @@ main:focus {
 }
 .session-note {
   font-size: 0.875rem;
-  color: #52655b;
+  color: var(--studio-ink-secondary);
   line-height: 1.6;
   margin: 1.5rem 0 0;
 }
@@ -314,5 +314,33 @@ main:focus {
   .admin-access,
   .admin-welcome {
     padding: 1.25rem;
+  }
+}
+
+.primary-action:not(:disabled):hover {
+  background: var(--studio-action-hover);
+}
+.secondary-action:not(:disabled):hover {
+  background: var(--studio-panel-subtle);
+}
+.admin-header .secondary-action:not(:disabled):hover {
+  background: var(--studio-ink-secondary);
+}
+.admin-access {
+  border-top: 4px solid var(--studio-action);
+}
+.admin-access input:focus-visible {
+  border-color: var(--studio-focus);
+}
+.access-intro > p:not(.access-status) {
+  color: var(--studio-ink-secondary);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
   }
 }

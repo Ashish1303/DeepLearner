@@ -332,7 +332,12 @@ export function TechnologyManager({
           )}
           {state.page && (
             <>
-              <div className={styles.tableWrap}>
+              <div
+                className={styles.tableWrap}
+                role="region"
+                aria-label="Technology inventory table"
+                tabIndex={0}
+              >
                 <table>
                   <caption className="visually-hidden">
                     Technology inventory, page {state.query.page}
