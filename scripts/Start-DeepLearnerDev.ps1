@@ -137,19 +137,35 @@ function Get-DevListenerDiagnostic([int]$Port, $Listener, $Owner, $Owned, [Valid
 function Test-DevOwnedListener([int]$Port, $Owner) {
     try {$listeners = @(Get-DevListeners $Port)}
     catch {Write-Host ((Get-DevListenerDiagnostic $Port $null $null $null 'LISTENER_QUERY_FAILED')|ConvertTo-Json -Compress);throw}
-    foreach ($listener in $listeners) {
-        if ($listener.LocalAddress -ne '127.0.0.1') {
-            Write-Host ((Get-DevListenerDiagnostic $Port $listener $null $null 'ADDRESS_REJECTED')|ConvertTo-Json -Compress)
-            throw 'DEV_LISTENER_OWNERSHIP_REJECTED'
+    # One bounded snapshot refresh, never a process/startup retry. Every admitted row still needs positive ownership.
+    for ($snapshot = 0; $snapshot -lt 2; $snapshot++) {
+        $changed = $false
+        foreach ($listener in $listeners) {
+            if ($listener.LocalAddress -ne '127.0.0.1') {
+                Write-Host ((Get-DevListenerDiagnostic $Port $listener $null $null 'ADDRESS_REJECTED')|ConvertTo-Json -Compress)
+                throw 'DEV_LISTENER_OWNERSHIP_REJECTED'
+            }
+            try {$owned=$Owner.Owns([uint32]$listener.OwningProcess)}
+            catch {Write-Host ((Get-DevListenerDiagnostic $Port $listener $null $null 'OWNERSHIP_CALL_FAILED')|ConvertTo-Json -Compress);throw}
+            if (-not $owned) {
+                $diagnostic=Get-DevListenerDiagnostic $Port $listener $Owner $owned 'JOB_MEMBERSHIP_NOT_PROVEN'
+                if ($snapshot -eq 0 -and $diagnostic.nativeStage -ceq 'OPEN_PROCESS' -and $diagnostic.nativeError -eq 87) {
+                    try {$current = @(Get-DevListeners $Port)}
+                    catch {Write-Host ((Get-DevListenerDiagnostic $Port $null $null $null 'LISTENER_QUERY_FAILED')|ConvertTo-Json -Compress);throw}
+                    $same = @($current | Where-Object {$_.LocalAddress -ceq $listener.LocalAddress -and $_.LocalPort -eq $listener.LocalPort -and $_.OwningProcess -eq $listener.OwningProcess})
+                    if ($same.Count -eq 0) {
+                        $listeners=$current
+                        $changed=$true
+                        break
+                    }
+                }
+                Write-Host ($diagnostic|ConvertTo-Json -Compress)
+                throw 'DEV_LISTENER_OWNERSHIP_REJECTED'
+            }
         }
-        try {$owned=$Owner.Owns([uint32]$listener.OwningProcess)}
-        catch {Write-Host ((Get-DevListenerDiagnostic $Port $listener $null $null 'OWNERSHIP_CALL_FAILED')|ConvertTo-Json -Compress);throw}
-        if (-not $owned) {
-            Write-Host ((Get-DevListenerDiagnostic $Port $listener $Owner $owned 'JOB_MEMBERSHIP_NOT_PROVEN')|ConvertTo-Json -Compress)
-            throw 'DEV_LISTENER_OWNERSHIP_REJECTED'
-        }
+        if (-not $changed) {return $listeners.Count -gt 0}
     }
-    return $listeners.Count -gt 0
+    throw 'DEV_LISTENER_OWNERSHIP_REJECTED'
 }
 
 function Update-DevListenerRecovery([hashtable]$State, [bool]$Listening, [long]$Now, [int]$GraceMs = 60000) {

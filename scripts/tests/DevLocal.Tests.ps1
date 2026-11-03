@@ -1079,6 +1079,70 @@ Check 'diagnostic data cannot grant ownership even when it claims an owned proce
     function Get-DevListeners {param($Port)@([pscustomobject]@{LocalAddress='127.0.0.1';LocalPort=4000;OwningProcess=[uint32]123})}
     $refused=$false;try{Test-DevOwnedListener 4000 $owner|Out-Null}catch{$refused=$_.Exception.Message -ceq 'DEV_LISTENER_OWNERSHIP_REJECTED'};Assert $refused 'Telemetry granted ownership'
 }
+
+# Pure listener-snapshot race regressions: no native calls, Jobs, listeners or application startup.
+function New-DevListenerRaceFact([uint32]$Number,[string]$Mode) {
+    $open=$Mode -cin @('gone','denied')
+    return [pscustomobject]@{Pid=$Number;Owned=($Mode -ceq 'owned');Classification=$(if($Mode -ceq 'owned'){'OWNED'}elseif($Mode -ceq 'unrelated'){'UNRELATED'}else{'UNKNOWN'});Stage=$(if($open){'OPEN_PROCESS'}elseif($Mode -ceq 'membership-error'){'IS_PROCESS_IN_JOB'}else{'MEMBERSHIP_QUERIED'});NativeError=$(if($Mode -ceq 'denied'){[int]5}elseif($Mode -cin @('gone','membership-error')){[int]87}else{$null});CreationFiletime=$null;MetadataStage=$(if($open){'NOT_AVAILABLE'}else{'CREATION_UNAVAILABLE'});MetadataError=$null}
+}
+function Invoke-DevListenerRaceCase([hashtable]$Snapshots,$Facts,[string]$Method='Test-DevOwnedListener',[int]$FailQuery=0) {
+    $script:raceQueries=0
+    $owner=[pscustomobject]@{LastOwnershipObservation=$null;facts=@{};calls=[Collections.Generic.List[uint32]]::new()}
+    foreach($fact in $Facts){$owner.facts[[string]$fact.Pid]=$fact}
+    $owner|Add-Member ScriptMethod Owns {
+        param($Number)
+        $this.calls.Add([uint32]$Number)
+        if(-not $this.facts.ContainsKey([string]$Number)){throw 'UNEXPECTED_TEST_PID'}
+        $this.LastOwnershipObservation=$this.facts[[string]$Number]
+        return $this.LastOwnershipObservation.Owned
+    }
+    $events=[Collections.Generic.List[string]]::new()
+    function Write-Host {param($Object)$events.Add([string]$Object)}
+    function Get-DevListeners {
+        param($Port)
+        $script:raceQueries++
+        if($script:raceQueries -eq $FailQuery){throw 'DEV_PORT_INSPECTION_UNAVAILABLE'}
+        if(-not $Snapshots.ContainsKey($script:raceQueries)){throw 'UNEXPECTED_EXTRA_SNAPSHOT'}
+        return @($Snapshots[$script:raceQueries])
+    }
+    $value=$null;$failure=$null
+    try{$value=& $Method 4000 $owner}catch{$failure=$_.Exception.Message}
+    return @{value=$value;failure=$failure;queries=$script:raceQueries;ownershipCalls=$owner.calls.Count;events=@($events)}
+}
+$raceOld=[pscustomobject]@{LocalAddress='127.0.0.1';LocalPort=4000;OwningProcess=[uint32]123}
+$raceNew=[pscustomobject]@{LocalAddress='127.0.0.1';LocalPort=4000;OwningProcess=[uint32]456}
+$raceOther=[pscustomobject]@{LocalAddress='127.0.0.1';LocalPort=4000;OwningProcess=[uint32]789}
+$raceWildcard=[pscustomobject]@{LocalAddress='0.0.0.0';LocalPort=4000;OwningProcess=[uint32]456}
+foreach($case in @(
+    @{name='owned listener uses one query';snapshots=@{1=@($raceOld)};facts=@((New-DevListenerRaceFact 123 owned));value=$true;failure=$null;queries=1;calls=1},
+    @{name='vanished snapshot becomes missing, never owned';snapshots=@{1=@($raceOld);2=@()};facts=@((New-DevListenerRaceFact 123 gone));value=$false;failure=$null;queries=2;calls=1},
+    @{name='replacement needs fresh positive Job membership';snapshots=@{1=@($raceOld);2=@($raceNew)};facts=@((New-DevListenerRaceFact 123 gone),(New-DevListenerRaceFact 456 owned));value=$true;failure=$null;queries=2;calls=2},
+    @{name='unrelated replacement remains rejected';snapshots=@{1=@($raceOld);2=@($raceNew)};facts=@((New-DevListenerRaceFact 123 gone),(New-DevListenerRaceFact 456 unrelated));value=$null;failure='DEV_LISTENER_OWNERSHIP_REJECTED';queries=2;calls=2},
+    @{name='unchanged or reused PID row is never retried or adopted';snapshots=@{1=@($raceOld);2=@($raceOld)};facts=@((New-DevListenerRaceFact 123 gone));value=$null;failure='DEV_LISTENER_OWNERSHIP_REJECTED';queries=2;calls=1},
+    @{name='second query failure is not a third snapshot';snapshots=@{1=@($raceOld);2=@($raceNew)};facts=@((New-DevListenerRaceFact 123 gone),(New-DevListenerRaceFact 456 gone));value=$null;failure='DEV_LISTENER_OWNERSHIP_REJECTED';queries=2;calls=2},
+    @{name='access denied is not treated as process exit';snapshots=@{1=@($raceOld);2=@()};facts=@((New-DevListenerRaceFact 123 denied));value=$null;failure='DEV_LISTENER_OWNERSHIP_REJECTED';queries=1;calls=1},
+    @{name='Job query error87 is not an OpenProcess disappearance';snapshots=@{1=@($raceOld);2=@()};facts=@((New-DevListenerRaceFact 123 membership-error));value=$null;failure='DEV_LISTENER_OWNERSHIP_REJECTED';queries=1;calls=1},
+    @{name='known unrelated process refuses without refresh';snapshots=@{1=@($raceOld);2=@()};facts=@((New-DevListenerRaceFact 123 unrelated));value=$null;failure='DEV_LISTENER_OWNERSHIP_REJECTED';queries=1;calls=1},
+    @{name='wildcard replacement refuses before ownership';snapshots=@{1=@($raceOld);2=@($raceWildcard)};facts=@((New-DevListenerRaceFact 123 gone),(New-DevListenerRaceFact 456 owned));value=$null;failure='DEV_LISTENER_OWNERSHIP_REJECTED';queries=2;calls=1},
+    @{name='all replacement rows require ownership';snapshots=@{1=@($raceOld);2=@($raceNew,$raceOther)};facts=@((New-DevListenerRaceFact 123 gone),(New-DevListenerRaceFact 456 owned),(New-DevListenerRaceFact 789 unrelated));value=$null;failure='DEV_LISTENER_OWNERSHIP_REJECTED';queries=2;calls=3}
+)){
+    Check ('listener race: '+$case.name) {
+        $result=Invoke-DevListenerRaceCase $case.snapshots $case.facts
+        Assert ($result.failure -ceq $case.failure) ('Unexpected refusal: '+$case.name)
+        Assert ($result.value -ceq $case.value) ('Unexpected ownership result: '+$case.name)
+        Assert ($result.queries -eq $case.queries -and $result.ownershipCalls -eq $case.calls) ('Unbounded query/retry: '+$case.name)
+    }
+}
+Check 'listener race: fresh snapshot inspection failure refuses closed' {
+    $r=Invoke-DevListenerRaceCase @{1=@($raceOld);2=@()} @((New-DevListenerRaceFact 123 gone)) -FailQuery 2
+    Assert ($r.failure -ceq 'DEV_PORT_INSPECTION_UNAVAILABLE' -and $r.queries -eq 2 -and $r.ownershipCalls -eq 1) 'Failed reinspection accepted or retried'
+    Assert ($r.events.Count -eq 1 -and $r.events[0].Contains('LISTENER_QUERY_FAILED')) 'Safe reinspection diagnostic missing'
+}
+Check 'listener race: malformed native telemetry cannot authorize snapshot refresh' {
+    $r=Invoke-DevListenerRaceCase @{1=@($raceOld);2=@()} @([pscustomobject]@{Pid=[uint32]123;Owned=$false;Classification='UNKNOWN';Stage='OPEN_PROCESS';NativeError='87';CreationFiletime=$null;MetadataStage='NOT_AVAILABLE';MetadataError=$null})
+    Assert ($r.failure -ceq 'DEV_LISTENER_OWNERSHIP_REJECTED' -and $r.queries -eq 1) 'Malformed telemetry treated as qualified disappearance'
+}
+
 Check 'cancellation cleanup retains only owned Job containment and closes all handles using mocks' {
     $tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot '../Start-DeepLearnerDev.ps1'),[ref]$tokens,[ref]$errors)
     $fn=$ast.Find({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Invoke-DevStartup'},$true)
