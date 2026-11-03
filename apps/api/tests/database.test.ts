@@ -272,3 +272,133 @@ test('real Mongoose malformed URI error is sanitized without opening a socket', 
   await db.disconnect();
   assert(!f.logs.join('').includes('SECRET_SENTINEL'));
 });
+
+test('LOCAL connection diagnostic follows bounded driver causes without disclosing private error data', async () => {
+  const f = fixture();
+  const network = Object.assign(new Error('PRIVATE_ERROR_SENTINEL'), {
+    name: 'MongoNetworkError',
+    cause: { code: 'ECONNREFUSED', address: 'PRIVATE_ADDRESS_SENTINEL' },
+  });
+  const topology = {
+    get error() {
+      return network;
+    },
+  };
+  f.driver.connect = async () => {
+    throw Object.assign(new Error('PRIVATE_URI_SENTINEL'), {
+      name: 'MongooseServerSelectionError',
+      reason: topology,
+      cause: topology,
+      stack: 'PRIVATE_STACK_SENTINEL',
+    });
+  };
+  const db = createDatabase(f.driver, { ...config, APP_ENV: 'LOCAL' }, f.log);
+  await assert.rejects(db.connect(), { message: 'Database connection failed' });
+  await db.disconnect();
+  const diagnostics = f.logs
+    .map((line) => JSON.parse(line))
+    .filter((entry) => entry.msg === 'Local database connection diagnostic');
+  assert.equal(diagnostics.length, 1);
+  assert.equal(diagnostics[0].failureClass, 'MongooseServerSelectionError');
+  assert.equal(diagnostics[0].failureCode, 'ECONNREFUSED');
+  assert(!f.logs.join('').includes('PRIVATE_'));
+});
+
+test('LOCAL diagnostic allowlists authentication codes and refuses arbitrary error fields', async () => {
+  for (const code of [18, 13, 'PRIVATE_CODE_SENTINEL']) {
+    const f = fixture();
+    f.driver.connect = async () => {
+      throw {
+        name: 'MongoServerError',
+        code,
+        message: 'PRIVATE_MESSAGE_SENTINEL',
+        details: { password: 'PRIVATE_PASSWORD_SENTINEL' },
+      };
+    };
+    const db = createDatabase(f.driver, { ...config, APP_ENV: 'LOCAL' }, f.log);
+    await assert.rejects(db.connect(), {
+      message: 'Database connection failed',
+    });
+    await db.disconnect();
+    const diagnostic = f.logs
+      .map((line) => JSON.parse(line))
+      .find((entry) => entry.msg === 'Local database connection diagnostic');
+    assert.equal(
+      diagnostic.failureCode,
+      typeof code === 'number' ? code : 'UNKNOWN',
+    );
+    assert(!f.logs.join('').includes('PRIVATE_'));
+  }
+});
+
+test('LOCAL malformed and cyclic diagnostic causes stay bounded and preserve failure handling', async () => {
+  let reads = 0;
+  const cyclic = {
+    get cause(): unknown {
+      reads++;
+      return cyclic;
+    },
+  };
+  const corrupt = {
+    get name(): unknown {
+      throw new Error('PRIVATE_GETTER_SENTINEL');
+    },
+  };
+  for (const failure of [cyclic, corrupt, null]) {
+    const f = fixture();
+    f.driver.connect = async () => {
+      throw failure;
+    };
+    const db = createDatabase(f.driver, { ...config, APP_ENV: 'LOCAL' }, f.log);
+    await assert.rejects(db.connect(), {
+      message: 'Database connection failed',
+    });
+    await db.disconnect();
+    const diagnostic = f.logs
+      .map((line) => JSON.parse(line))
+      .find((entry) => entry.msg === 'Local database connection diagnostic');
+    assert.equal(diagnostic.failureClass, 'UNKNOWN');
+    assert.equal(diagnostic.failureCode, 'UNKNOWN');
+    assert(!f.logs.join('').includes('PRIVATE_'));
+  }
+  assert.equal(reads, 6);
+});
+
+test('hosted database failures retain existing logs without LOCAL diagnostics', async () => {
+  for (const APP_ENV of ['DEVELOPMENT', 'PRODUCTION'] as const) {
+    const f = fixture();
+    f.driver.connect = async () => {
+      throw { name: 'MongoServerError', code: 18 };
+    };
+    const db = createDatabase(f.driver, { ...config, APP_ENV }, f.log);
+    await assert.rejects(db.connect(), {
+      message: 'Database connection failed',
+    });
+    await db.disconnect();
+    assert(!f.logs.join('').includes('Local database connection diagnostic'));
+  }
+});
+
+test('LOCAL diagnostic snapshots the allowlisted name without a second getter read', async () => {
+  const f = fixture();
+  let reads = 0;
+  f.driver.connect = async () => {
+    throw {
+      get name() {
+        return ++reads === 1 ? 'MongoServerError' : 'PRIVATE_NAME_SENTINEL';
+      },
+      code: 'PRIVATE_CODE_SENTINEL',
+      message: 'PRIVATE_MESSAGE_SENTINEL',
+    };
+  };
+  const db = createDatabase(f.driver, { ...config, APP_ENV: 'LOCAL' }, f.log);
+  await assert.rejects(db.connect(), { message: 'Database connection failed' });
+  await db.disconnect();
+  const diagnostic = f.logs
+    .map((line) => JSON.parse(line))
+    .find((entry) => entry.msg === 'Local database connection diagnostic');
+  assert.equal(reads, 1);
+  assert.equal(diagnostic.failureClass, 'MongoServerError');
+  assert.equal(diagnostic.failureCode, 'UNKNOWN');
+  assert(!f.logs.join('').includes('PRIVATE_'));
+});

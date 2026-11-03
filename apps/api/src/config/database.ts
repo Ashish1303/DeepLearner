@@ -73,6 +73,64 @@ function normalizeTLSURI(uri: string): string {
   return uri.slice(0, separator) + (query ? `?${query}` : '');
 }
 
+// Emit only fixed operational labels; never serialize a driver error or its message.
+function localConnectionDiagnostic(failure: unknown) {
+  let failureClass = 'UNKNOWN';
+  let failureCode: string | number = 'UNKNOWN';
+  for (let depth = 0; depth < 6; depth++) {
+    if (typeof failure !== 'object' || failure === null) break;
+    try {
+      const current = failure as {
+        name?: unknown;
+        code?: unknown;
+        cause?: unknown;
+        reason?: unknown;
+        error?: unknown;
+      };
+      const name = depth === 0 ? current.name : undefined;
+      if (
+        typeof name === 'string' &&
+        [
+          'MongooseServerSelectionError',
+          'MongoServerSelectionError',
+          'MongoNetworkError',
+          'MongoNetworkTimeoutError',
+          'MongoServerError',
+          'MongoParseError',
+        ].includes(name)
+      )
+        failureClass = name;
+      const code = current.code;
+      if (
+        (typeof code === 'string' &&
+          [
+            'ECONNREFUSED',
+            'ETIMEDOUT',
+            'ENOTFOUND',
+            'EAI_AGAIN',
+            'EACCES',
+            'ECONNRESET',
+            'ERR_TLS_CERT_ALTNAME_INVALID',
+            'CERT_HAS_EXPIRED',
+            'DEPTH_ZERO_SELF_SIGNED_CERT',
+            'UNABLE_TO_VERIFY_LEAF_SIGNATURE',
+          ].includes(code)) ||
+        code === 18 ||
+        code === 13
+      ) {
+        failureCode = code;
+        break;
+      }
+      // Mongoose wraps the topology as cause; its error links to the network cause.
+      failure = current.cause ?? current.reason ?? current.error;
+    } catch {
+      // Malformed diagnostic evidence must not replace the sanitized startup error.
+      break;
+    }
+  }
+  return { failureClass, failureCode };
+}
+
 interface DatabaseDriver {
   set(
     key: 'bufferCommands' | 'autoCreate' | 'autoIndex' | 'debug',
@@ -145,8 +203,13 @@ export function createDatabase(
           autoIndex: false,
         });
         transition('connected');
-      } catch {
+      } catch (failure) {
         transition('error');
+        if (config.APP_ENV === 'LOCAL')
+          log.error(
+            { module: 'database', ...localConnectionDiagnostic(failure) },
+            'Local database connection diagnostic',
+          );
         throw new Error('Database connection failed');
       }
     });
