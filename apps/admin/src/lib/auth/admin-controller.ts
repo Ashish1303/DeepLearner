@@ -1,4 +1,14 @@
 import {
+  learningPathRequest,
+  type LearningPathRequest,
+  type LearningPathResult,
+} from '../learning-paths/contracts';
+import {
+  createLearningPathClient,
+  LearningPathError,
+  type LearningPathClient,
+} from '../learning-paths/learning-path-client';
+import {
   AdminApiError,
   type AdminClient,
   type AdminErrorCode,
@@ -58,6 +68,7 @@ export function createAdminController(
   coordination: AdminCoordination,
   now: () => number = () => performance.now(),
   technologies?: TechnologyClient,
+  learningPaths?: LearningPathClient,
 ) {
   let state = initial;
   let token: string | undefined;
@@ -73,6 +84,7 @@ export function createAdminController(
   let operationAbort: AbortController | undefined;
   const business = new Map<AbortController, Promise<unknown>>();
   let technologyClient = technologies;
+  let learningPathClient = learningPaths;
   let technologyRecoveryRequired = false;
   const listeners = new Set<() => void>();
   const update = (next: AdminState) => {
@@ -388,7 +400,116 @@ export function createAdminController(
       abort.abort();
     }
   }
+  /** Fixed read-only Learning Path capability; never reconciles Technology mutations. */
+  async function requestLearningPath(
+    account: string,
+    raw: LearningPathRequest,
+    external?: AbortSignal,
+  ): Promise<LearningPathResult> {
+    if (!ready()) throw new LearningPathError('FORBIDDEN', 403);
+    expireIfNeeded();
+    const parsed = learningPathRequest.safeParse(raw);
+    if (!parsed.success) throw new LearningPathError('VALIDATION_ERROR', 400);
+    if (
+      state.status !== 'eligible' ||
+      state.pending ||
+      accountId !== account ||
+      state.user?.id !== account ||
+      !token ||
+      flight ||
+      loggingOut
+    )
+      throw new LearningPathError('FORBIDDEN', 403);
+    const request = parsed.data,
+      version = generation,
+      start = now(),
+      abort = new AbortController();
+    let timedOut = false;
+    const cancel = () => abort.abort();
+    const checkBusiness = () => {
+      const elapsed = now() - start;
+      if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed >= 15000) {
+        timedOut = true;
+        abort.abort();
+      }
+      expireIfNeeded();
+      if (
+        disposed ||
+        !connected ||
+        generation !== version ||
+        accountId !== account ||
+        !token ||
+        state.status !== 'eligible' ||
+        !coordination.supported() ||
+        abort.signal.aborted
+      )
+        throw new LearningPathError(timedOut ? 'TIMEOUT' : 'CANCELLED');
+    };
+    const timer = setTimeout(() => {
+      timedOut = true;
+      abort.abort();
+    }, 15000);
+    external?.addEventListener('abort', cancel, { once: true });
+    if (external?.aborted) cancel();
+    let rejectAbort = () => {};
+    const lost = new Promise<never>((_, reject) => {
+      rejectAbort = () =>
+        reject(new LearningPathError(timedOut ? 'TIMEOUT' : 'CANCELLED'));
+      abort.signal.addEventListener('abort', rejectAbort, { once: true });
+      if (abort.signal.aborted) rejectAbort();
+    });
+    void lost.catch(() => {});
+    // Admission is deferred so the entry exists before any operation can run.
+    const pending = Promise.resolve().then(() =>
+      coordination.run(async () => {
+        checkBusiness();
+        if (!learningPathClient) {
+          const { env } = await import('../env');
+          checkBusiness();
+          learningPathClient = createLearningPathClient(env.VITE_API_BASE_URL);
+        }
+        checkBusiness();
+        const value = await learningPathClient.execute(
+          request,
+          token!,
+          abort.signal,
+        );
+        checkBusiness();
+        return value;
+      }, abort.signal),
+    );
+    business.set(abort, pending);
+    void pending.finally(() => business.delete(abort)).catch(() => {});
+    try {
+      return await Promise.race([pending, lost]);
+    } catch (error) {
+      if (generation === version && !disposed) {
+        if (
+          error instanceof LearningPathError &&
+          [401, 403].includes(error.status)
+        )
+          invalidate(
+            error.status === 403 ? 'denied' : 'expired',
+            new AdminApiError(
+              error.status === 403
+                ? 'AUTH_FORBIDDEN'
+                : 'AUTH_ACCESS_TOKEN_EXPIRED',
+            ).message,
+          );
+        else if (error instanceof AdminCoordinationError)
+          invalidate('unsupported', new AdminCoordinationError().message);
+      }
+      if (error instanceof LearningPathError) throw error;
+      throw new LearningPathError('UNAVAILABLE');
+    } finally {
+      clearTimeout(timer);
+      external?.removeEventListener('abort', cancel);
+      abort.signal.removeEventListener('abort', rejectAbort);
+      abort.abort();
+    }
+  }
   return {
+    requestLearningPath,
     requestTechnology: (
       account: string,
       request: TechnologyRequest,

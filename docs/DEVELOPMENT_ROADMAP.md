@@ -2011,7 +2011,109 @@ production readiness NOT_VERIFIED; F044 NOT_STARTED. No Git staging/commit/push.
 See the [exact change/evidence record](features/F043-admin-technology-management.md).
 
 ### F044 — Admin Learning Path Management
-Status: `NOT_STARTED`
+Status: `IN_PROGRESS`
+
+Owner decision 2026-11-02: read-only workspace approved as PARTIAL F044 progress.
+Required technologyId binding on detail and protected archived-parent inspection
+are approved. The named F044 read-only sequencing exception is enacted in
+AGENTS.md. Backend A was authorized on 2026-11-02; frontend B received its
+separate exact-inventory/offline authorization on 2026-11-03.
+Checkpoint A: READY_FOR_REVIEW — offline only. Frontend Checkpoint B: READY_FOR_REVIEW — offline only, separately authorized on 2026-11-03
+for the exact read-only inventory and focused offline checks. F044 acceptance remains BLOCKED by mandatory F042/F043 prerequisite
+verification and its own live gates. No authoring, generation, approval, publishing,
+deletion, schema expansion, live execution or Git delivery is authorized.
+Existing 213 browser scenarios remain NOT_RUN; production NOT_VERIFIED.
+See [F044's exact contract and inventories](features/F044-admin-learning-path-management.md).
+
+Offline evidence, 2026-11-02: 94 focused + 120 existing service/model/audit + 15
+in-process Technology-router regressions = 229 distinct PASS. One existing real-app
+HTTP listener case explicitly excluded, not PASS. API production build/no-emit and
+focused production/F044-test TypeScript PASS; targeted lint/format/scope/privacy
+PASS. Full API/test typecheck FAIL with two unchanged baseline TS2322 diagnostics
+at dev-mongo-bootstrap.test.ts:2103, reproduced from HEAD in memory. No out-of-scope
+fix or whole-workspace TypeScript PASS. Independent review initially 1 Medium/3 Low,
+all resolved and independently rereviewed, zero unresolved findings. New F044
+PARENT + T01–T08 are 9 NOT_RUN with no authenticated RESULT/ACK; no live execution.
+F042/F043/manual/browser/production limitations remain unchanged.
+
+Frontend B evidence, 2026-11-03: 383 distinct offline cases PASS (233 final
+changed-file cases + 150 unchanged relevant regressions). Initial 376 PASS / 1
+FAIL render run and four corrected test-only TS errors retained in feature record.
+Admin build/typecheck, full Admin source/test + prepared-browser TypeScript,
+targeted lint/format/CSS/scope/privacy checks PASS. No API source drift; existing
+full API/test baseline TS2322 failure preserved, not rerun or fixed. Independent
+source review and browser-preparation corrections recorded in feature contract.
+Twelve F044 browser cases newly PREPARED, NOT_RUN; inherited 213 NOT_RUN unchanged,
+combined 225 NOT_RUN. Nine real F044 records NOT_RUN; no authenticated RESULT/ACK,
+live API/browser/accessibility or production verification. No Git delivery.
+
+F044 test-support preparation, 2026-11-03: same existing supervisor now has a
+fixed F044 PARENT/T01–T08 profile and separate RESULT/digest ACK; no new supervisor.
+T03 clean archived and T07 corrupt/orphan fixtures isolated; 19 collections/27
+explicit indexes declared only. Frozen 618 repository +29 supplemental =647 content
+pins, prepared runtime manifest and explicit F044 Playwright config/origins.
+Offline 30 F044 protocol/manifest checks, 17 pure PS checks, 106 relevant F043
+protocol checks PASS (child-CLI registration explicitly excluded). Focused no-emit
+TypeScript and tracked lint PASS; historical test-support failures retained in
+feature record. Browser discovery lists 12 cases only; execution NOT_RUN.
+Independent review found one Medium basename mismatch, corrected in both startup
+and cleanup; final independent rereview zero unresolved Critical/High/Medium/Low.
+All647 frozen content hashes independently matched; scope/UTF-8/LF/format/privacy/
+history/diff and ignored Node support lint PASS. Runtime BLOCKED: approved PowerShell 7.6.8
+executable absent/null pin; protected identity/current baseline, including 27019
+coverage, NOT_VERIFIED. No substitute, DB/app/browser execution or provisioning.
+Five-second RPC/ACK, two-second heartbeat, 180/205-second caps, one attempt and
+ownership-safe cleanup unchanged. Forced containment remains failure evidence.
+New config raises pending repository scope from30 to31, plus10 ignored support
+paths. All production behavior/checkpoint content unchanged. F044 IN_PROGRESS,
+F042/F043 acceptance BLOCKED; nine real records and225 browser cases NOT_RUN;
+manual gaps unresolved; baseline API/test TS2322 unchanged; production NOT_VERIFIED.
+Separate runtime and Git approvals remain mandatory. See F044 reconciliation record.
+
+F044 runtime-prerequisite reconciliation,2026-11-03: expected31-path dev/HEAD/index
+and prior reviewed pins verified. Actual unelevated read-only shell is Microsoft
+PowerShell7.6.9, Valid Microsoft signature and exact candidate SHA recorded in F044;
+approved7.6.8 not found in checked registered/standard locations. No runtime
+substitution/install. Current-process CIM/owner/retained handle/any-Job and port
+queries PASS; exact owned child/Job controls NOT_TESTED. Protected27017 MongoDB
+process owner/path UNKNOWN (CIM owner2; native query-limited OpenProcess error5),
+despite correlated Running service/listener metadata. No retries or elevation.
+F044-only baseline collector now includes actual27017data, complete legacy and
+persistent development root metadata,27019 plus existing ports, source/environment
+digests, strict process/owner/image and service/listener binding. F043 default
+collector retained; unknown facts refuse. Metadata is not DB byte/consistency proof.
+Initial33affected pure PS checks PASS, final39after independent Medium linkage
+correction, final40after case-classification Low correction: exact executable/
+config/storage and opaque process/service command
+binding; additional unqualified MongoDB targets refuse. Initial text-generation
+parser failure retained. Protected live process command and collector/ACK latency
+remain UNKNOWN/NOT_VERIFIED.
+Exactly6existing support/doc paths changed; no application changes. OldD69E3ABF...
+manifest is HISTORICAL/STALE after these changes; no refreeze until prerequisites
+resolved and no valid current execution fingerprint. Final independent source rereview0unresolved Critical/High/Medium/Low;
+scope/format/UTF-8/LF/privacy/history/diff checks PASS in F044 record. No live execution/Git delivery.
+F044 IN_PROGRESS; F042/F043 acceptance BLOCKED;9integration and225browser cases
+NOT_RUN; baseline TS2322/manual gaps preserved; production NOT_VERIFIED.
+
+F044 owner-approved PowerShell7.6.9support-pin reconciliation,2026-11-03: exact
+WindowsApps executable version/hash/Valid Microsoft signature reverified before
+use. Approval is F044 support/offline only, not guarded execution. F043 sources/
+runtime policy and reviewed application content unchanged.46affected PS checks
+and18selected single-process protocol checks PASS; targeted changed-test lint PASS.
+Current647-content-pin freeze authorized despite remaining runtime blockers;
+historical D69...freeze retained as history. Content matching is not qualification.
+Protected owner/image/live-command linkage remains UNKNOWN (retained CIM2/native5;
+no retry). SCM/registry/config metadata is partial evidence, no complete existing
+alternative established. Need a supported query-only operator/context for fresh
+protected facts; no elevation/ACL change authorized. Exact owned Job, collector
+latency and five-second ACK feasibility remain NOT_VERIFIED pending separate bounded
+qualification approval. No integration/children/services/browser/Git delivery.
+Final19distinct Node checks PASS including the current-content check;46PSchecks
+PASS. Independent C0/H0/M0/L0unresolved;647pins independently match. Scope/UTF-8/LF/
+format/privacy/history/diff PASS; final doc wording refrozen and successor verified.
+Content-valid manifest is not execution readiness. F044 IN_PROGRESS;
+F042/F043 acceptance BLOCKED;9integration and225browser cases NOT_RUN; production
+NOT_VERIFIED; baseline TS2322/manual gaps preserved.
 
 ### F045 — Admin Module Management
 Status: `NOT_STARTED`
@@ -2428,15 +2530,19 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F043 - Admin Technology Management (Slice 2 frontend implementation)
+**Current Feature:** F044 - Admin Learning Path Management (read-only frontend Checkpoint B)
 **Current Status:** `IN_PROGRESS`
-**Next Feature:** F044 - Admin Learning Path Management (not authorized)
+**Next Feature:** F044 verification/owner review (no additional slice or F045 progression)
 
-**Open verification feature:** F042 remains IN_PROGRESS, acceptance BLOCKED,
-HTTP/MongoDB verification incomplete. The owner-approved F043-only exception
-permits this named implementation sequence without accepting F042. Slice 2 was
-separately authorized on 2026-10-30; F044 receives no sequencing exception. The following named
-decision paragraph is the historical documentation-only gate preceding Slice 1.
+**Open verification features:** F042 and F043 remain IN_PROGRESS, acceptance
+BLOCKED; mandatory HTTP/MongoDB/ownership/RESULT-ACK/cleanup gates remain open.
+The 2026-11-02 F044-only exception permits the approved read-only backend sequence,
+not acceptance or live/Git execution. Frontend B was separately approved on
+2026-11-03. The previous implementation pointer
+was F043 Slice 2 IN_PROGRESS, next F044 not authorized. That pointer changed only
+after this separate owner decision; no earlier acceptance evidence was altered.
+The following 2026-10-30 decision is historical and its F044 prohibition is now
+qualified only by the named 2026-11-02 read-only exception.
 
 **Named sequencing decision, 2026-10-30:** F042 remains the open verification
 feature, IN_PROGRESS with acceptance BLOCKED. Under the F043-only AGENTS.md

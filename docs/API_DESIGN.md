@@ -2561,3 +2561,60 @@ Mocks cannot prove live integration. Formal automated/security/database/browser,
 ownership/isolation, RESULT/digest ACK, deadlines, cleanup and release gates remain
 mandatory. A blocked demonstration needs an explicit named owner exception; it
 does not authorize UI completion. See LOCAL_DEVELOPMENT.md for prospective stages.
+
+
+## F044 protected Learning Path inspection — approved read-only contract, 2026-11-02
+
+F044 is IN_PROGRESS as partial development under its explicitly enacted read-only
+sequencing exception. Only backend Checkpoint A/offline checks are authorized;
+frontend/live verification/Git and feature acceptance remain gated. F042/F043
+acceptance stays BLOCKED; 213 browser scenarios NOT_RUN; production NOT_VERIFIED.
+The exact contract and deferred gates are in
+[F044](features/F044-admin-learning-path-management.md). Older NOT_STARTED and
+no-F044-authority statements above remain historical at their original dates.
+
+GET /api/v1/admin/learning-paths requires technologyId; optional page/limit default
+to 1/20. GET /api/v1/admin/learning-paths/:id requires technologyId only. Both
+remain beneath the existing authenticate/current-account requireAdmin boundary.
+IDs are exactly 24 hex characters, normalized lowercase. Reject unknown/repeated/
+nested/operator queries and nonempty/body-framed GET/HEAD. Page/limit are canonical
+positive decimal strings, page <=10001, limit <=100, safe offset <=10000. Order:
+order ASC, slug ASC, _id ASC, binary collation. Valid later pages are 200 empty.
+
+Eligible Admins may inspect DRAFT/PUBLISHED/ARCHIVED Paths under any existing valid
+DRAFT/PUBLISHED/ARCHIVED Technology, including archived-parent read-only inspection.
+List missing parent: 404 TECHNOLOGY_NOT_FOUND. Detail missing parent/path/orphan
+or mismatched technologyId: 404 LEARNING_PATH_NOT_FOUND. Corrupt observed projected
+data/status/identity: sanitized 503 DEPENDENCY_UNAVAILABLE. Counts/items share the
+parent predicate; explicit parent recheck precedes response. No transaction or
+cross-request snapshot guarantee. Public F017 published-only behavior is unchanged.
+
+Exact private DTO: id, technologyId, title, slug, description, targetLevel,
+completionScore, status, order, revision, createdAt, updatedAt. Preserve F017 title/
+slug/description/targetLevel/completionScore bounds; description/targetLevel become
+null when absent. revision maps existing nonnegative safe __v; dates are canonical
+UTC ISO, updatedAt >= createdAt. completionScore is a configured threshold, not
+personal progress. Exclude raw IDs/version names, actor/user data, private fields
+and descendants. No model defaults repair corrupt required values.
+
+List uses success:true/data array/message:null/meta requestId,page,limit,total,
+totalPages. Detail uses success:true/data object/message:null/meta requestId.
+Existing sanitized errors/request IDs/no-store/CORS/security headers apply,
+including 400, 401, 403, 404, 413/415, 429, 503 and safe 500. Validation details
+remain bounded schema-declared public field/messages only; never raw exception
+objects. No arbitrary server error text is rendered by future clients.
+
+Preserve F042 current stored verified ACTIVE ADMIN checks and five-second read
+deadline, namespace 300/IP and 120/account per 15 minutes. Add feature-local 120
+reads/minute/Admin shared across both endpoints, bounded HMAC keys/capacity10000,
+no live-counter eviction, fail-closed exhaustion; process-local only. Business
+reads use primary preference and ten-second monotonic/cancellable budget; refuse
+expired/late work even with delayed callbacks. Client disconnect suppresses send
+and releases handlers. Current eligibility is checked at admission, not locked
+through serialization; stateless JWT limits remain unchanged.
+
+GET/HEAD never mutate users, versions, sessions, content, progress, audit, schema
+or indexes. No User-version fence, authoring/approval/publishing/delete, generation,
+provider/job implementation or provisioning. Prepared real DB assertions are NOT_RUN
+until separately qualified target/ownership/fixtures/indexes/RESULT-ACK/cleanup
+approval. No integration result follows from offline tests or this contract.

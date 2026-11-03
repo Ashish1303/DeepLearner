@@ -6,6 +6,8 @@ import type { AdminAccessService } from './modules/admin/admin-access.service.js
 import type { AdminLimits } from './modules/admin/admin-rate-limit.js';
 import { technologyBodyParser } from './modules/admin/technologies/admin-technology.routes.js';
 import type { AdminTechnologyService } from './modules/admin/technologies/admin-technology.service.js';
+import type { AdminLearningPathService } from './modules/admin/learning-paths/admin-learning-path.service.js';
+import type { LearningPathReadLimits } from './modules/admin/learning-paths/admin-learning-path-rate-limit.js';
 import type { TechnologyLimits } from './modules/admin/technologies/admin-technology-rate-limit.js';
 import type { DashboardService } from './modules/progress/dashboard.controller.js';
 import type { DashboardLimits } from './modules/progress/dashboard-rate-limit.js';
@@ -86,6 +88,8 @@ export function createApp(
   adminLimits?: AdminLimits,
   adminTechnologies?: AdminTechnologyService,
   adminTechnologyLimits?: TechnologyLimits,
+  adminLearningPaths?: AdminLearningPathService,
+  adminLearningPathLimits?: LearningPathReadLimits,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -167,6 +171,8 @@ export function createApp(
       adminLimits,
       adminTechnologies,
       adminTechnologyLimits,
+      adminLearningPaths,
+      adminLearningPathLimits,
     ),
   );
   app.use(

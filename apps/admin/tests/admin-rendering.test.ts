@@ -158,6 +158,27 @@ function view(
   ).AdminAccess as (props: ViewProps) => ReactElement;
 }
 const blankController = {} as AdminController;
+test('F044 workspace navigation defaults to Technology Management and exposes read-only inspection only after explicit selection', () => {
+  const defaultHtml = app(eligible).html();
+  assert(defaultHtml.includes('aria-label="Admin workspaces"'));
+  assert(defaultHtml.includes('aria-label="Technology workspace"'));
+  assert(!defaultHtml.includes('aria-label="Learning Path workspace"'));
+  const selected = app(
+    eligible,
+    true,
+    blankController,
+    'learning-paths',
+  ).html();
+  assert(selected.includes('aria-label="Learning Path workspace"'));
+  assert(!selected.includes('aria-label="Technology workspace"'));
+  const denied = app(
+    { ...eligible, status: 'expired', user: null },
+    true,
+    blankController,
+    'learning-paths',
+  ).html();
+  assert(!denied.includes('aria-label="Learning Path workspace"'));
+});
 const render = (state = initial, available = true) =>
   renderToStaticMarkup(
     createElement(view(), { state, controller: blankController, available }),
@@ -166,6 +187,7 @@ function app(
   state: AdminState,
   available = true,
   controller = blankController,
+  workspace: 'technologies' | 'learning-paths' = 'technologies',
 ) {
   const Access = view();
   const shell = compile('../src/components/layout/admin-shell.tsx', (name) => {
@@ -173,7 +195,29 @@ function app(
     return require(name);
   });
   const App = compile('../src/app/app.tsx', (name) => {
+    if (name === 'react') {
+      const react = require(name);
+      return {
+        ...react,
+        useState: (initial: unknown) =>
+          react.useState(initial === 'technologies' ? workspace : initial),
+      };
+    }
     if (name === 'react/jsx-runtime') return require(name);
+    if (name.endsWith('.module.css'))
+      return {
+        __esModule: true,
+        default: new Proxy({}, { get: (_target, key) => String(key) }),
+      };
+    if (name === '../components/learning-paths/learning-path-manager')
+      return {
+        LearningPathManager: () =>
+          createElement(
+            'section',
+            { 'aria-label': 'Learning Path workspace' },
+            'Read-only Learning Paths',
+          ),
+      };
     if (name === '../components/layout/admin-shell') return shell;
     if (name === '../components/auth/admin-access')
       return { AdminAccess: Access };

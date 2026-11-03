@@ -10,6 +10,10 @@ import {
 } from '../src/lib/technologies/technology-client';
 import { createTechnologyController } from '../src/lib/technologies/technology-controller';
 import {
+  LearningPathError,
+  type LearningPathClient,
+} from '../src/lib/learning-paths/learning-path-client';
+import {
   createAdminBrowserCoordination,
   AdminCoordinationError,
   type AdminControl,
@@ -56,6 +60,217 @@ function deferred<T>() {
 const flush = async () => {
   for (let i = 0; i < 8; i++) await Promise.resolve();
 };
+
+const pathRead = {
+  kind: 'list',
+  query: { technologyId: 'b'.repeat(24), page: 1, limit: 20 },
+} as const;
+const emptyPaths = {
+  items: [],
+  pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+};
+test('F044 first read after fresh login and restoration receives private token only inside restricted transport', async (t) => {
+  for (const action of ['login', 'restore'] as const) {
+    let calls = 0;
+    const f = fixture(
+      t,
+      {},
+      {
+        learningPaths: {
+          async execute(request, access, signal) {
+            calls++;
+            assert.deepEqual(request, pathRead);
+            assert.equal(access, token);
+            assert(!signal.aborted);
+            return emptyPaths;
+          },
+        },
+      },
+    );
+    if (action === 'login')
+      await f.controller.login('admin@example.test', 'synthetic-password');
+    else await f.controller.restore();
+    assert.equal(f.controller.getSnapshot().status, 'eligible');
+    await f.controller.requestLearningPath(user.id, pathRead);
+    assert.equal(calls, 1);
+    assert(!JSON.stringify(f.controller.getSnapshot()).includes(token));
+  }
+});
+test('F044 capability refuses pending readiness, wrong account and mutation descriptors before dispatch', async (t) => {
+  let calls = 0;
+  const delayed = deferred<typeof login>();
+  const f = fixture(
+    t,
+    { login: () => delayed.promise },
+    {
+      learningPaths: {
+        async execute() {
+          calls++;
+          return emptyPaths;
+        },
+      },
+    },
+  );
+  const loginWork = f.controller.login(
+    'admin@example.test',
+    'synthetic-password',
+  );
+  await flush();
+  await assert.rejects(
+    f.controller.requestLearningPath(user.id, pathRead),
+    LearningPathError,
+  );
+  delayed.resolve(login);
+  await loginWork;
+  await assert.rejects(
+    f.controller.requestLearningPath('e'.repeat(24), pathRead),
+    LearningPathError,
+  );
+  await assert.rejects(
+    f.controller.requestLearningPath(user.id, { kind: 'create' } as never),
+    LearningPathError,
+  );
+  assert.equal(calls, 0);
+});
+test('F044 pending read is cancelled on logout and late completion cannot restore authority', async (t) => {
+  const delayed = deferred<typeof emptyPaths>();
+  let signal: AbortSignal | undefined;
+  const f = fixture(
+    t,
+    {},
+    {
+      learningPaths: {
+        async execute(_r, _t, s) {
+          signal = s;
+          return delayed.promise;
+        },
+      },
+    },
+  );
+  await f.controller.restore();
+  const pending = f.controller.requestLearningPath(user.id, pathRead);
+  const refusal = assert.rejects(pending, LearningPathError);
+  await flush();
+  const logout = f.controller.logout();
+  assert(signal?.aborted);
+  await refusal;
+  delayed.resolve(emptyPaths);
+  await logout;
+  assert.equal(f.controller.getSnapshot().status, 'anonymous');
+});
+test('F044 read refuses a queued operation whose 15 second budget expired', async (t) => {
+  let time = 0,
+    hold = false,
+    calls = 0;
+  const queued = deferred<void>();
+  const coordination: AdminCoordination = {
+    supported: () => true,
+    publish() {},
+    listen: () => () => {},
+    async run(work, signal) {
+      if (hold) await queued.promise;
+      signal?.throwIfAborted();
+      return work();
+    },
+  };
+  const f = fixture(
+    t,
+    {},
+    {
+      now: () => time,
+      coordination,
+      learningPaths: {
+        async execute() {
+          calls++;
+          return emptyPaths;
+        },
+      },
+    },
+  );
+  await f.controller.restore();
+  hold = true;
+  const pending = f.controller.requestLearningPath(user.id, pathRead);
+  const refusal = assert.rejects(
+    pending,
+    (e: unknown) => e instanceof LearningPathError && e.code === 'TIMEOUT',
+  );
+  await flush();
+  time = 15001;
+  queued.resolve();
+  await refusal;
+  assert.equal(calls, 0);
+});
+for (const status of [401, 403])
+  test(
+    'F044 ' + status + ' invalidates current account authority',
+    async (t) => {
+      const f = fixture(
+        t,
+        {},
+        {
+          learningPaths: {
+            async execute() {
+              throw new LearningPathError(
+                status === 401 ? 'AUTH_REQUIRED' : 'FORBIDDEN',
+                status,
+              );
+            },
+          },
+        },
+      );
+      await f.controller.restore();
+      await assert.rejects(
+        f.controller.requestLearningPath(user.id, pathRead),
+        LearningPathError,
+      );
+      assert.equal(
+        f.controller.getSnapshot().status,
+        status === 401 ? 'expired' : 'denied',
+      );
+      assert.equal(f.controller.getSnapshot().user, null);
+    },
+  );
+test('switching through F044 does not clear or replay uncertain F043 mutation', async (t) => {
+  let writes = 0;
+  const f = fixture(
+    t,
+    {},
+    {
+      technologies: {
+        async execute(request) {
+          if (request.kind === 'create') {
+            writes++;
+            throw new TechnologyError('NETWORK_ERROR');
+          }
+          throw Error('unexpected');
+        },
+      },
+      learningPaths: {
+        async execute() {
+          return emptyPaths;
+        },
+      },
+    },
+  );
+  await f.controller.restore();
+  await assert.rejects(
+    f.controller.requestTechnology(user.id, {
+      kind: 'create',
+      input: { name: 'Synthetic', slug: 'synthetic' },
+    }),
+    TechnologyError,
+  );
+  assert(f.controller.hasTechnologyUncertainty());
+  await f.controller.requestLearningPath(user.id, pathRead);
+  assert(f.controller.hasTechnologyUncertainty());
+  const returned = createTechnologyController(f.controller, user.id);
+  const disconnect = returned.connect();
+  assert(returned.getSnapshot().needsReconciliation);
+  await returned.create({ name: 'Synthetic', slug: 'synthetic' });
+  assert.equal(writes, 1);
+  disconnect();
+  returned.dispose();
+});
 function fixture(
   t: TestContext,
   overrides: Partial<AdminClient> = {},
@@ -64,6 +279,7 @@ function fixture(
     now?: () => number;
     coordination?: AdminCoordination;
     technologies?: TechnologyClient;
+    learningPaths?: LearningPathClient;
   } = {},
 ) {
   const calls: string[] = [];
@@ -119,6 +335,7 @@ function fixture(
     coordination,
     options.now,
     options.technologies,
+    options.learningPaths,
   );
   const disconnect = controller.connect();
   t.after(() => controller.dispose());
@@ -821,6 +1038,63 @@ const technologyOperation = {
   kind: 'detail' as const,
   id: technologyRecord.id,
 };
+for (const capability of ['learning-path', 'technology'] as const)
+  for (const reason of ['selection-cancel', 'deadline'] as const)
+    test(`F044 ${capability} queued ${reason} preserves eligibility with the actual coordinator wrapper`, async (t) => {
+      t.mock.timers.enable({ apis: ['setTimeout'] });
+      const browser = browserFixture();
+      let dispatched = 0;
+      const f = fixture(
+        t,
+        {},
+        {
+          coordination: browser.coordination,
+          learningPaths: {
+            async execute() {
+              dispatched++;
+              return emptyPaths;
+            },
+          },
+          technologies: {
+            async execute() {
+              dispatched++;
+              return technologyRecord;
+            },
+          },
+        },
+      );
+      await f.controller.restore();
+      const gate = deferred<void>();
+      const occupied = browser.coordination.run(() => gate.promise);
+      await flush();
+      const abort = new AbortController();
+      const pending =
+        capability === 'learning-path'
+          ? f.controller.requestLearningPath(user.id, pathRead, abort.signal)
+          : f.controller.requestTechnology(
+              user.id,
+              technologyOperation,
+              abort.signal,
+            );
+      const rejected = assert.rejects(
+        pending,
+        (e: unknown) =>
+          (e instanceof LearningPathError || e instanceof TechnologyError) &&
+          e.code === (reason === 'deadline' ? 'TIMEOUT' : 'CANCELLED'),
+      );
+      try {
+        await flush();
+        if (reason === 'selection-cancel') abort.abort();
+        else t.mock.timers.tick(15000);
+        await rejected;
+      } finally {
+        gate.resolve();
+        await occupied;
+      }
+      await flush();
+      assert.equal(dispatched, 0);
+      assert.equal(f.controller.getSnapshot().status, 'eligible');
+    });
 for (const action of ['login', 'restore', 'revalidate'] as const)
   test(
     'first inventory is admitted at the ready notification after ' + action,

@@ -361,6 +361,43 @@ This exception authorizes no F044/other-feature progression, production readines
 or deployment. Scope, deferred evidence, risks and slice boundaries are recorded
 in docs/features/F043-admin-technology-management.md and the F042/roadmap records.
 
+## Named F044 read-only development sequencing exception — 2026-11-02
+
+The owner approved only Technology selection and protected read-only Learning Path
+inventory/detail under F044. This exception supersedes earlier F044 sequencing
+prohibitions only for that exact slice; the default one-feature-at-a-time rule and
+the historical F043-only exception remain unchanged outside this scope.
+The owner approved the F044 API/DTO/parent/navigation contract and checkpoint
+inventories and separately authorized backend Checkpoint A implementation and
+focused offline checks. Frontend Checkpoint B still needs separate implementation
+approval. F044 is partial development progress, never full feature completion.
+
+Require a stable reviewed dependency contract, expected Git baseline/scope and
+applicable retained offline evidence before implementation. An unresolved shared
+security defect invalidating the dependency suspends work; Critical/High findings
+block continuation. Reuse F042 Admin and F043 selection/session boundaries without
+treating them as verified. Preserve Technology mutation uncertainty and all
+historical failures, UNKNOWN results, incomplete RESULT/ACK and cleanup/baseline
+limitations. Outstanding manual stale-revision and Student learning checks remain
+unresolved; neither a defect nor PASS is inferred.
+
+After implementation require focused offline/static/scope/privacy checks and a
+fresh independent review, all findings resolved before checkpoint eligibility.
+Live HTTP/database/browser verification remains separately authorized and requires
+a qualified isolated environment, exact source/fixture/index/result manifest,
+ownership/Job checks, secret safety, deadlines, authenticated RESULT/digest ACK
+and cleanup/protected-baseline proof. This exception grants no runtime execution,
+permission change or transfer of an existing browser exception.
+
+F042/F043 remain IN_PROGRESS, acceptance BLOCKED. Final acceptance requires their
+mandatory prerequisite verification plus F044's own applicable real verification
+and explicit owner approval. Preserve all 213 browser scenarios NOT_RUN and
+production readiness NOT_VERIFIED. Every commit and push requires separate owner
+approval. No authoring, generation, editorial approval, publication, deletion,
+schema expansion, F052–F054 implementation, other F044 slice or F045/later work
+is authorized. See docs/features/F044-admin-learning-path-management.md for exact
+scope, deferred evidence and the two checkpoint inventories.
+
 ---
 
 ## Documentation-approved persistent LOCAL workflow — 2026-10-31
