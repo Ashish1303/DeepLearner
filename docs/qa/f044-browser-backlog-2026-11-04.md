@@ -310,3 +310,74 @@ No deadline, branch/owner/Job/lease gate, network boundary or native supervisor 
 weakened. No application-source change is part of these corrections. F044 remains
 IN_PROGRESS; F042/F043 acceptance BLOCKED; original nine integration records,
 five P assertions and six API assertions remain NOT_RUN; production NOT_VERIFIED.
+
+
+### Updated merged-candidate execution — 2026-11-04
+
+One invocation of the existing reviewed runner executed at correction commit
+`75e875afbb1f5f3b25256692d68abe2fbfe25897`, including merged dev
+`56458ab5c213928273196f3c76aff2d36a7f5408`:
+
+```powershell
+& 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.9.0_x64__8wekyb3d8bbwe\pwsh.exe' -NoLogo -NoProfile -NonInteractive -File scripts/Test-BrowserBacklog.ps1
+```
+
+**Current result: 225 distinct stable cases executed; 222 PASS / 3 FAIL / 0
+NOT_RUN / 0 skipped / 0 retries. Overall exit 1.** There was also one passing
+prerequisite qualification execution, separately counted (226 total executions).
+All executed identities exactly match the frozen inventory. U's 16 cases remain
+excluded/NOT_RUN. This is mocked-network evidence, not real API/database evidence.
+Historical 225/225 above remains historical and does not supersede these failures.
+
+The three failures are F044-B03, F044-B08 and F044-B10 in
+`tests/browser/admin-learning-paths.spec.ts`, at assertions on lines 362, 438 and
+463. Each broad `getByRole('status')` matches both the intended Learning Path
+status and the newly merged private-proposal status region. Playwright reports a
+strict-mode violation. This confirms a test-locator compatibility problem, not an
+authentication or application-data defect. B10 failed before its subsequent
+logout assertions, so that scenario does not establish logout race correctness.
+No retries, test suppression, application fixes or extra locator corrections were
+performed. Recommended follow-up is to scope those three locators to their exact
+Learning Path status content/region, preserving assertions and case identities,
+then separately rerun the affected owned file. PR remains CHANGES_REQUIRED.
+
+Run evidence is retained, ignored, under
+`.cache/browser-backlog/89d4e98a4abd49fca42fa622baa7544c/`: 19 per-CLI Job receipts,
+per-file sanitized results/journals, native qualification, network counters and
+`closeout.json`. Every Job proves empty membership, closed handles and normal
+cleanup; forced containment is false. Final cleanup confirms retained handles
+closed, QA ports released, power requests released, no lifecycle failure and no
+forced containment. The nonzero run exit is from the failed assertions, not a
+cleanup timeout. Closeout was written at 15:29:02 UTC. A later tool wait returned
+well after its requested duration; it occurred after the run had completed and
+is not evidence of a runner timeout or host-sleep cause.
+
+All 265 source pins were rehashed after execution with zero drift. Reproduction
+fingerprints (SHA-256):
+
+- Frozen inventory JSON: `271874a015f6455e249af854fdaf342bbbc0c629abc8d8f18b9066ce74fc3f51`.
+- Source-pin map: `a67a53f80eef05e3b4aee5546a6f4235dae20a5af10e988bc46224d3d021391b`
+  (UTF-8 JSON, keys sorted, separators comma/colon, no extra whitespace).
+- Closeout file: `26d7a2f436e38eedc8fe7b1a7206b1a2d7ea077994c21da2112feaeb6d46fc01`.
+- Node 24.15.0, `C:\Program Files\nodejs\node.exe`:
+  `3331E1FFE19874215472217C5E94F5A0C6D8E18C4AC7111D3937AA0AD5E9B4A5`.
+- Chrome 156.0.8078.74, approved Program Files Chrome executable:
+  `4132EB3E9C5B3978874EED48CB45C21DEBF343A0D383B6D2FB01A5FCF349EC65`.
+- PowerShell 7.6.9, approved WindowsApps executable, valid Microsoft signature:
+  `2A6769A3330DC1084D0154BFDE7D164AB750CA7F700F313F9D417C1BE78B2233`.
+- Installed refused-fallback Playwright patch:
+  `c940637985a63463b50ddabf4d41f3c927380286afb877eea98e0cf86896f932`.
+
+Execution was unelevated under the required owner. Native retained/independent
+Job checks passed and the unowned parent was refused. Network counters report
+zero API fallthrough, zero direct probes and two successful proxy probes; 1,415
+other proxy requests were denied. No real API/database access, provisioning,
+content writes, owner-session use or primary-development resource adoption was
+performed. Existing timeout/ownership/privacy restrictions remain unchanged.
+
+The two original PR findings are resolved and self-reviewed; no new independent
+second-agent review is claimed. The three newly observed compatibility failures
+remain open for follow-up and independent Desktop re-review. GitHub CI status is
+separate; no absent/pending check is called PASS. F044 remains IN_PROGRESS;
+F042/F043 acceptance BLOCKED; original nine/P five/API six integration groups
+NOT_RUN; production NOT_VERIFIED. No PR merge into dev is authorized or performed.
