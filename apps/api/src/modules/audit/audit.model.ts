@@ -13,6 +13,8 @@ export const auditSchema = new Schema(
     action: {
       type: String,
       enum: [
+        'CURRICULUM_BRIEF_ADMITTED',
+        'LEARNING_PATH_PROPOSAL_REVISION_CREATED',
         'TECHNOLOGY_CREATED',
         'TECHNOLOGY_UPDATED',
         'PRACTICE_RUBRIC_AUTHORED',
@@ -46,13 +48,23 @@ export const auditSchema = new Schema(
     },
     resourceType: {
       type: String,
-      enum: ['USER', 'PRACTICE_RUBRIC', 'TECHNOLOGY'],
+      enum: [
+        'USER',
+        'PRACTICE_RUBRIC',
+        'TECHNOLOGY',
+        'CURRICULUM_BRIEF_REVISION',
+        'LEARNING_PATH_PROPOSAL_REVISION',
+      ],
       required: true,
       immutable: true,
     },
     resourceId: {
       type: Schema.Types.ObjectId,
       ref: function (this: { resourceType: string }) {
+        if (this.resourceType === 'CURRICULUM_BRIEF_REVISION')
+          return 'AdminCurriculumBriefRevision';
+        if (this.resourceType === 'LEARNING_PATH_PROPOSAL_REVISION')
+          return 'AdminLearningPathProposalRevision';
         if (this.resourceType === 'TECHNOLOGY') return 'Technology';
         return this.resourceType === 'PRACTICE_RUBRIC'
           ? 'PracticeRubricVersion'
@@ -72,6 +84,12 @@ export const auditSchema = new Schema(
     metadata: {
       type: new Schema(
         {
+          technologyId: { type: Schema.Types.ObjectId, cast: false },
+          revision: { type: Number, cast: false },
+          operationId: { type: String, cast: false },
+          proposalId: { type: Schema.Types.ObjectId, cast: false },
+          sourceId: { type: Schema.Types.ObjectId, cast: false },
+          sourceRevision: { type: Number, cast: false },
           source: {
             type: String,
             enum: [
@@ -89,6 +107,8 @@ export const auditSchema = new Schema(
               return (
                 action !== 'USER_PROFILE_UPDATED' &&
                 ![
+                  'CURRICULUM_BRIEF_ADMITTED',
+                  'LEARNING_PATH_PROPOSAL_REVISION_CREATED',
                   'TECHNOLOGY_CREATED',
                   'TECHNOLOGY_UPDATED',
                   'PRACTICE_RUBRIC_AUTHORED',
@@ -178,6 +198,72 @@ export const auditSchema = new Schema(
 auditSchema.pre('validate', function () {
   const action = this.action;
   const meta = this.metadata;
+  const brief = action === 'CURRICULUM_BRIEF_ADMITTED';
+  if (brief || action === 'LEARNING_PATH_PROPOSAL_REVISION_CREATED') {
+    const allowed = brief
+      ? ['technologyId', 'revision', 'operationId']
+      : ['proposalId', 'revision', 'sourceId', 'sourceRevision'];
+    const keys = meta
+      ? Object.keys(
+          this.toObject({ getters: false, virtuals: false, transform: false })
+            .metadata ?? {},
+        )
+      : [];
+    if (
+      this.category !== 'CONTENT_MANAGEMENT' ||
+      this.resourceType !==
+        (brief
+          ? 'CURRICULUM_BRIEF_REVISION'
+          : 'LEARNING_PATH_PROPOSAL_REVISION') ||
+      !this.actorId ||
+      !this.resourceId ||
+      !this._id.equals(this.resourceId) ||
+      this.$isDefault('_id') ||
+      this.$isDefault('createdAt') ||
+      !(this.createdAt instanceof Date) ||
+      !Number.isFinite(this.createdAt.getTime())
+    )
+      this.invalidate('category', 'Invalid private proposal audit identity');
+    if (
+      !meta ||
+      keys.length !== allowed.length ||
+      keys.some((key) => !allowed.includes(key)) ||
+      allowed.some((key) => !keys.includes(key))
+    ) {
+      this.invalidate('metadata', 'Invalid private proposal audit metadata');
+      return;
+    }
+    if (
+      brief
+        ? !(meta.technologyId instanceof mongoose.Types.ObjectId) ||
+          meta.revision !== 1 ||
+          typeof meta.operationId !== 'string' ||
+          !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}(?![\s\S])/.test(
+            meta.operationId,
+          )
+        : !(meta.proposalId instanceof mongoose.Types.ObjectId) ||
+          !(meta.sourceId instanceof mongoose.Types.ObjectId) ||
+          !meta.proposalId.equals(meta.sourceId) ||
+          !Number.isSafeInteger(meta.revision) ||
+          meta.revision! < 1 ||
+          meta.revision! > Number.MAX_SAFE_INTEGER ||
+          meta.sourceRevision !== 1
+    )
+      this.invalidate('metadata', 'Invalid private proposal revision audit');
+    return;
+  }
+  if (
+    meta &&
+    [
+      meta.technologyId,
+      meta.revision,
+      meta.operationId,
+      meta.proposalId,
+      meta.sourceId,
+      meta.sourceRevision,
+    ].some((value) => value !== undefined)
+  )
+    this.invalidate('metadata', 'Private proposal metadata prohibited');
   if (action === 'TECHNOLOGY_CREATED' || action === 'TECHNOLOGY_UPDATED') {
     const create = action === 'TECHNOLOGY_CREATED';
     const fields = meta?.changedFields;

@@ -2,11 +2,11 @@
 
 ## Status, authority and source precedence
 
-Latest scoped extension: **source-structure S READY_FOR_REVIEW — offline only**.
-The dated S authorization/evidence below records the S-only sequencing extension,
-implementation and independent review. C1 remains READY_FOR_REVIEW — offline only;
-the historical TypeScript blocker is resolved. Earlier contracts/evidence remain
-intact. Authenticated admission/persistence P and API/UI remain separately gated.
+Latest scoped extension: **P READY_FOR_REVIEW — offline only; uncommitted**.
+The dated P authorization/evidence below records internal admission/persistence
+implementation and independent review. C1/S and historical read-only A/B remain
+READY_FOR_REVIEW — offline only; earlier contracts/evidence remain intact. Live
+authority/transactions, proposal API/UI and acceptance remain separately gated.
 
 Feature: **IN_PROGRESS**. Read-only contract approved 2026-11-02 as PARTIAL
 F044 progress. Backend Checkpoint A: **READY_FOR_REVIEW — offline only**, with the
@@ -2437,3 +2437,199 @@ pins remain historical/stale; no refreeze or runtime qualification occurred.
 F044 IN_PROGRESS; C1/A/B/S READY_FOR_REVIEW — offline only; F042/F043 acceptance
 BLOCKED; nine integration records and 225 browser cases NOT_RUN; production
 readiness NOT_VERIFIED. No acceptance or other-feature status advances.
+
+## P internal persistence authorization — 2026-11-04
+
+S was delivered in f95e1bf025958527df2d75c73716d0ef1e406d24, normal fast-forward
+push with local/tracking/fresh remote equality and clean tree/index. The owner
+separately authorized P only, including the six-path application/test inventory,
+offline verification and independent review. AGENTS.md enacts only P's bounded
+offline extension. Earlier P NOT_STARTED/proposed-policy wording is historical.
+P implementation is IN_PROGRESS; it must remain uncommitted for review.
+
+P implements the approved internal capture/reconciliation and revision-consumer
+contract. Initial capture derives actor/IDs/time server-side. Later revision commands
+are prepared internally with fixed server identity/time, complete expected
+predecessor and original actor binding, then validated against actual stored source
+and greatest predecessor in the transaction. Prepared data is not source authority
+or authorization. Explicit reconciliation never writes/fences or retries a mutation.
+No endpoint/UI, additional collection/index, generic transport or supervisor.
+
+Snapshot DRAFT/PUBLISHED eligibility is not a concurrent archive/delete fence.
+An overlapping post-snapshot archival/deletion may coexist with private commit;
+no cascade/publication follows. Archived-parent protected inspection remains allowed,
+new writes refuse; missing-parent reads refuse while historical evidence remains.
+Historical admission survives author demotion/deletion; every consumer requires
+current account authorization. Existing C1/S model and DTO contracts stay unchanged.
+
+All live guarantees remain unverified. Nine read-only integration records and225
+browser cases remain NOT_RUN; F044 IN_PROGRESS; F042/F043 acceptance BLOCKED;
+production NOT_VERIFIED. P/API/UI/live execution and Git delivery are distinct gates.
+
+## P implementation and independent offline review — 2026-11-04
+
+**P READY_FOR_REVIEW — offline only; uncommitted.** The owner's exact-scope P
+authorization supersedes earlier P NOT_STARTED/pending-sequencing wording only.
+S remains separately delivered in f95e1bf025958527df2d75c73716d0ef1e406d24, whose
+parent is d0a2e5a81023f613aa37a796c2df815446853178. Exactly seven reviewed S paths
+were committed with offline limitations and pushed normally after a fresh fetch.
+Final local/tracking/freshly queried origin/dev all matched the S SHA, with clean
+tree/index before P began. No additional commit or push occurred during P.
+
+### Exact P implementation and scope
+
+CREATE:
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+apps/api/tests/admin-learning-path-proposal-persistence.integration.ts
+```
+
+MODIFY application/test paths only:
+
+```text
+apps/api/src/modules/audit/audit.model.ts
+apps/api/tests/auth-audit.test.ts
+```
+
+AGENTS.md enacts the P-only offline extension. This document, DATABASE_DESIGN.md
+and the roadmap record authorization/evidence/current pointers. No existing C1/S
+source, router, application startup, public LearningPath storage/API, dependency,
+runtime configuration, fixture/index setup or other feature source changed.
+
+The unmounted internal service implements capture, actor-bound operation recovery,
+server-prepared later-revision persistence and explicit prepared-revision recovery.
+It reuses C1/S validation, content/digest definitions and private DTOs. Initial
+capture derives actor/IDs/time on the server; strict input rejects caller-owned
+fields. The source ID also identifies the initial proposal family; its revision ID
+is distinct. One intended transaction writes brief, proposal and both exact audits
+after current signed-context/stored verified ACTIVE ADMIN checks and the conditional
+User-version fence. Duplicate actor/key checks precede any fence/write, including
+inside the transaction. Recovery never fences, audits or replays a write.
+
+Source consumption re-resolves the immutable brief and matching admission audit;
+current author eligibility is not substituted for historical admission. Consumers
+independently require current authorization. Later revisions require the actual
+greatest stored predecessor, complete expected-record equality including date,
+source/Technology binding and a matching prior audit. No silent latest selection,
+revision skipping or rebinding. Prepared revision handles retain fixed server
+candidate identity/time and original context in a service-local WeakMap; each
+permits one write attempt, then read recovery only. They are process/context-local,
+not a durable receipt or client authorization token; process loss requires explicit
+reconciliation/operator handling, not reconstruction/replay of an uncertain command.
+
+Repository calls use the existing connected Mongoose client's native driver only
+when explicitly invoked; imports do not connect. Primary/session/index metadata
+checks refuse missing prerequisites without DDL. Transactions use snapshot/primary,
+majority+journaled commit, one application commit call and existing bounded session
+cleanup. The service retains the 10-second business budget, 5-second authorization
+phase, commit min(2000ms, remaining), monotonic rechecks, cancellation and sanitized
+uncertainty. No callback/body retry. Guarded 180/205-second, RPC/ACK 5-second and
+heartbeat 2-second controls are unchanged and not qualified by these source checks.
+
+All new audit branches validate exact resource/actor/time/metadata and reject new
+metadata on legacy events. No bodies, private digests, tokens or raw database errors
+are returned/logged. Success projects C1's exact private DTO after raw validation.
+Known partial/corrupt recovery evidence is PROPOSAL_OUTCOME_UNKNOWN. A missing
+actor/key lookup is only UNRESOLVED; it proves neither absence of a prior attempt
+nor safe retry. Postcommit loss/cleanup uncertainty never compensates or replays.
+
+Technology eligibility remains the owner's explicit snapshot policy, not a parent
+version fence. Concurrent post-snapshot archival/deletion may coexist with private
+commit; no publication/cascade follows. Future writes refuse archived/absent
+parents. Archived-parent protected inspection is allowed; missing-parent recovery
+refuses while retaining source/proposal/audit evidence. Real races are unverified.
+
+### Executed offline checks and retained failures
+
+- Focused command:
+  `node --import tsx --test --test-isolation=none --test-reporter=spec apps/api/tests/admin-learning-path-proposal-persistence.test.ts apps/api/tests/auth-audit.test.ts`.
+  Executed through the supported command-specific host route, synthetic/in-memory
+  only, no child-runtime/bootstrap/database/browser suite. First actual result:
+  **53 PASS / 1 FAIL**. The failed test incorrectly expected a linked-row rejection
+  after changing the indexed actor, which instead removes the row from this actor/
+  key lookup. The corrected assertion requires UNRESOLVED, never success/safe retry.
+  Final expanded result: **65 PASS / 0 FAIL / 0 skipped / 0 cancelled**, not summed
+  across runs. Tests cover current authorization/fence refusal, strict input/source
+  binding, key conflicts, staged rollback intent, competing predecessor commands,
+  historical authors, cancellation/deadlines and explicit uncertain recovery.
+- Native-driver/session doubles additionally cover primary/index refusal before
+  session creation, transaction-start/body/final-verification failure, commit loss,
+  abort failure with endSession still attempted, endSession throw/hasEnded=false,
+  and delayed callback after cancellation without a second write or commit.
+  These are mocked boundaries, not actual resources or cleanup proof.
+- Initial full API/test TypeScript found one new TS2339: inferred embedded metadata
+  was a plain type without toObject. Using the root document's explicit plain
+  metadata view corrected it without a cast/compiler relaxation. Full command
+  `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.test.json --noEmit --incremental false --pretty false`
+  then PASS, including after the final prepared-assertion-only edit. Historical
+  baseline TS2322 errors remain resolved; no unrelated source was changed.
+- API production build/typecheck PASS:
+  `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.json --incremental false --pretty false`.
+  Only normal ignored dist outputs, no runtime startup/deployment. Six-file ESLint
+  with max-warnings=0 PASS; final prepared file lint PASS after its last edit.
+  Scoped Prettier, UTF-8/LF/no-BOM, whitespace, exact-scope/privacy and diff checks
+  PASS. No unrelated passing suite or desktop/login QA repeated.
+
+### Fresh independent review and resolutions
+
+A fresh reviewer context inspected all six actual files, dependent contracts and
+existing transaction/audit patterns, with no tests, edits or live execution.
+Four Medium findings were reported, no Critical/High/Low:
+
+1. Linked partial/corrupt recovery returned generic dependency failure. Recovery
+   now maps integrity/dependency uncertainty to PROPOSAL_OUTCOME_UNKNOWN while
+   preserving fixed authorization/parent/conflict refusals; focused regressions
+   check the exact code and prohibit false success.
+2. The prepared parent's timeout did not abort a delayed qualifier/ownership
+   callback. It now reuses the existing read-only integration lifetime helper,
+   installs parent loss before qualification, checks around awaits, carries child
+   cancellation and disposes in finally. A pure delayed-callback test passes.
+3. The prepared rollback assertion checked only source absence. It now fixes
+   source/revision IDs, proves the second-audit refusal was reached after staging
+   the proposal, and checks complete source/proposal/two-audit absence plus unchanged
+   User authority/version. The final assertion strengthening was source-reviewed,
+   typechecked and linted, **not executed against a database**.
+4. Native session failure/cleanup paths lacked direct doubles. The ten additional
+   refusal/cleanup/cancellation cases described above were added and passed.
+
+Final independent closeout reread corrections and reported **Critical 0 / High 0 /
+Medium 0 / Low 0 unresolved**. Test execution is the implementation agent's
+evidence, not an independent test rerun. Self-review separately checked final
+scope, privacy, historical documents and limitations.
+
+### Live gaps and next approval
+
+Five additional named P persistence cases are PREPARED ONLY: capture/two audits,
+actor-key reconciliation, predecessor conflict, audit rollback and injected
+acknowledgement-loss reconciliation. Importing their file registers/runs nothing.
+They are not bound to the existing nine read-only record IDs or authenticated
+execution manifest. Existing lifetime/process ownership is reused; no supervisor,
+target, fixture, index or credential was created. A future qualification must supply
+the full approved isolated target/source/fixture/index/record/privilege manifest,
+actual concurrent demotion/deletion and competing-transaction assertions, authentic
+RESULT/ACK, protected-baseline proof and ownership-safe cleanup. The prepared
+injected ACK-loss case does not qualify a real network/forced MongoDB timeout.
+
+Offline evidence establishes call ordering, validation and refusal behavior through
+doubles. Actual stored authority, physical uniqueness/indexes, transaction/audit
+atomicity, concurrency, latency/deadline feasibility and process/storage cleanup
+remain NOT_VERIFIED. Existing guarded pins are stale; no refreeze/qualification.
+
+Smallest next application checkpoint is separately approved proposal **API A**,
+before UI U: protected capture, actor-bound operation recovery and bound private
+detail. A's previously proposed inventory needs explicit owner reconciliation:
+plain by-ID detail inspection is not exposed by P, so add MODIFY of this service
+and its persistence test file for that current-Admin/source-audited read, alongside
+the already proposed A paths. This is a future inventory proposal only, not API
+implementation/enactment. Do not misuse process-local revision handles as an HTTP
+detail capability. U follows only its own scoped approval and stable API contract.
+
+P leaves ten pending paths: four new files, two audit/test modifications and four
+sequencing/evidence documents. Index empty; HEAD remains the delivered S SHA.
+P is uncommitted, no further push. F044 IN_PROGRESS; C1/A/B/S/P READY_FOR_REVIEW —
+offline only (A/B here are historical read-only checkpoints, not proposed API A);
+F042/F043 acceptance BLOCKED; nine integration records and 225 browser cases
+NOT_RUN; production NOT_VERIFIED. No feature acceptance or later-feature progress.

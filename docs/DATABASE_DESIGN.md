@@ -2159,3 +2159,48 @@ explicit and untested in a real database. No provisioning, connection, DDL,
 writer/API/UI, integration execution or acceptance change. Existing source pins
 are not refrozen. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine integration
 records and 225 browser cases NOT_RUN; production NOT_VERIFIED.
+
+## F044 P offline implementation authorization — 2026-11-04
+
+The owner authorized only P internal admission/persistence implementation and
+offline checks after S delivery. The exact proposed brief/proposal/audit/index
+definitions above apply, without DDL or live execution. P's source authority must
+come from actual immutable source plus matching admission audit, never a caller
+tuple. Current actor authorization/fencing remains transactional; historical author
+demotion/deletion does not erase admitted input. Parent eligibility remains snapshot
+only with the documented archive/delete race, no parent version write/cascade.
+No endpoint/UI, provisioning, collection/index change or database operation is
+authorized by this source checkpoint. F042/F043 acceptance BLOCKED; nine records
+and225 browser cases NOT_RUN; F044 IN_PROGRESS; production NOT_VERIFIED.
+
+## F044 P internal persistence offline evidence — 2026-11-04
+
+P READY_FOR_REVIEW — offline only, uncommitted. The exact six-path P implementation
+uses native-driver snapshot/primary transactions, majority+journaled commit,
+current-Admin User-version fencing, immutable source/admission-audit resolution,
+greatest stored predecessor checks and atomic brief/proposal/two-audit capture.
+No collection/index is created and C1/S schemas/model guards are unchanged. The
+two new CONTENT_MANAGEMENT audit branches have exact metadata/resource/actor/time
+rules; legacy branches reject their metadata. Recovery is actor-bound, read-only,
+and maps known partial/corrupt evidence to UNKNOWN; missing lookup is UNRESOLVED,
+never proof of safe replay. Later revision commands are process/context-local
+prepared handles with one write attempt; no durable receipt framework is added.
+
+Actual offline P/audit tests: initial53 PASS/1 FAIL (incorrect lookup-corruption
+expectation), final65 PASS/0 FAIL, not summed. Initial new TS2339 metadata typing
+error corrected within audit.model.ts; final full API/test TypeScript, production
+build/typecheck and targeted lint/format/encoding/diff/privacy checks PASS.
+Independent review: four Medium findings resolved, final0/0/0/0 unresolved;
+reviewer executed no tests/live operations. Prepared rollback proof requires its
+second-audit injection after staged proposal, complete row absence and unchanged
+User; the real case has NOT_RUN. Existing lifetime/deadline handling is reused.
+
+No real admission/transaction/uniqueness/index/ownership/cleanup guarantee is
+established from doubles. Five named additional assertions are prepared only,
+not bound to the old nine-record manifest. Physical prerequisites, real concurrent
+demotion/deletion/competing transactions, authenticated RESULT/ACK and protected
+baselines need separately approved qualification/execution. Snapshot parent races
+remain explicit, no cascade/publication or parent fence. No new target/provisioning,
+database call, runtime restart, API/UI or manifest refreeze occurred. F044 remains
+IN_PROGRESS; F042/F043 acceptance BLOCKED; nine existing records and225 browser
+cases NOT_RUN; production NOT_VERIFIED. P remains uncommitted for owner review.

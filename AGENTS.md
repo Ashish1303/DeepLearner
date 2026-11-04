@@ -982,3 +982,39 @@ readiness NOT_VERIFIED. Existing mandatory authorization, isolation, process/Job
 ownership, protected baselines, RESULT/ACK, deadlines, cleanup and acceptance gates
 are unchanged. Each additional implementation checkpoint and every commit/push
 requires separate explicit owner approval. No automatic progression follows S.
+
+## Named F044 P internal persistence offline extension — 2026-11-04
+
+The owner separately approved P implementation, focused offline verification and
+fresh independent review after S delivery. Permit only these application/test paths:
+
+```text
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+CREATE apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-persistence.integration.ts
+MODIFY apps/api/src/modules/audit/audit.model.ts
+MODIFY apps/api/tests/auth-audit.test.ts
+```
+
+This extends S only to the reviewed internal source-admission/proposal transaction,
+stored predecessor/source validation, current-Admin User-version fence, exact two
+new audit branches and explicit actor-bound uncertain-save reconciliation. Model
+registration remains disconnected; persistence code may be inspected/tested only
+through inert offline doubles. Integration assertions may be prepared, not invoked.
+No live database connection/write, provisioning/index creation, endpoint, UI,
+startup import, generic framework, generation/editorial/publication or other slice.
+The source contract's snapshot parent policy is not an archive/deletion fence.
+
+Require the S/C1 source contracts, expected Git baseline, exact inventory and no
+blocking security defect. Require meaningful offline success/refusal/rollback/
+uncertainty tests, full API/test TypeScript, production build/typecheck, targeted
+lint/format/encoding/scope/privacy/diff checks and independent review with findings
+resolved. Mocks establish neither real transactions/indexes nor source admission.
+Live qualification still needs its own approved isolated target, manifest, ownership,
+deadlines, authenticated RESULT/ACK, cleanup and protected-baseline verification.
+
+P remains uncommitted for owner review; no P Git delivery is approved. F044 stays
+IN_PROGRESS; F042/F043 acceptance BLOCKED; nine existing integration records and
+225 browser cases NOT_RUN; production NOT_VERIFIED. Every later implementation,
+live execution, commit and push requires separate explicit owner approval.

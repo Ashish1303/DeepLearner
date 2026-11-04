@@ -4,6 +4,144 @@ import { Types } from 'mongoose';
 import { Audit, auditSchema } from '../src/modules/audit/audit.model.js';
 import * as repository from '../src/modules/audit/audit.repository.js';
 
+test('F044 admission/proposal audit tuples require exact private metadata and server identities', async () => {
+  const actorId = new Types.ObjectId('a'.repeat(24));
+  const briefId = new Types.ObjectId('b'.repeat(24));
+  const rowId = new Types.ObjectId('c'.repeat(24));
+  const technologyId = new Types.ObjectId('d'.repeat(24));
+  const createdAt = new Date('2026-11-04T00:00:00.000Z');
+  const admitted = {
+    _id: briefId,
+    category: 'CONTENT_MANAGEMENT',
+    action: 'CURRICULUM_BRIEF_ADMITTED',
+    actorId,
+    resourceType: 'CURRICULUM_BRIEF_REVISION',
+    resourceId: briefId,
+    requestId: 'request',
+    createdAt,
+    metadata: {
+      technologyId,
+      revision: 1,
+      operationId: '12345678-1234-4123-8123-123456789abc',
+    },
+  };
+  const proposal = {
+    ...admitted,
+    _id: rowId,
+    action: 'LEARNING_PATH_PROPOSAL_REVISION_CREATED',
+    resourceType: 'LEARNING_PATH_PROPOSAL_REVISION',
+    resourceId: rowId,
+    metadata: {
+      proposalId: briefId,
+      revision: 1,
+      sourceId: briefId,
+      sourceRevision: 1,
+    },
+  };
+  for (const valid of [
+    admitted,
+    proposal,
+    {
+      ...proposal,
+      metadata: { ...proposal.metadata, revision: Number.MAX_SAFE_INTEGER },
+    },
+  ])
+    await new Audit(valid).validate();
+  for (const input of [admitted, proposal]) {
+    for (const change of [
+      { category: 'CONTENT_APPROVAL' },
+      { resourceType: 'TECHNOLOGY' },
+      { actorId: undefined },
+      { _id: undefined },
+      { createdAt: undefined },
+      { createdAt: new Date(NaN) },
+      { resourceId: actorId },
+      { metadata: { ...input.metadata, source: 'ACCESS_TOKEN' } },
+      { metadata: { ...input.metadata, stack: 'SYNTHETIC_PRIVATE' } },
+      { metadata: { ...input.metadata, changedFields: ['name'] } },
+    ])
+      await assert.rejects(new Audit({ ...input, ...change }).validate());
+    for (const key of Object.keys(input.metadata)) {
+      const metadata: Record<string, unknown> = { ...input.metadata };
+      delete metadata[key];
+      await assert.rejects(new Audit({ ...input, metadata }).validate());
+    }
+  }
+  for (const revision of [0, 2, '1'])
+    await assert.rejects(
+      new Audit({
+        ...admitted,
+        metadata: { ...admitted.metadata, revision },
+      }).validate(),
+    );
+  for (const metadata of [
+    { ...proposal.metadata, sourceRevision: 2 },
+    { ...proposal.metadata, revision: 0 },
+    { ...proposal.metadata, sourceId: actorId },
+    { ...proposal.metadata, revision: 1.1 },
+    { ...proposal.metadata, proposalId: briefId.toHexString() },
+  ])
+    await assert.rejects(new Audit({ ...proposal, metadata }).validate());
+  assert.equal(
+    auditSchema
+      .path('resourceId')
+      .options.ref.call({ resourceType: 'CURRICULUM_BRIEF_REVISION' }),
+    'AdminCurriculumBriefRevision',
+  );
+  assert.equal(
+    auditSchema
+      .path('resourceId')
+      .options.ref.call({ resourceType: 'LEARNING_PATH_PROPOSAL_REVISION' }),
+    'AdminLearningPathProposalRevision',
+  );
+});
+
+test('F044 metadata cannot broaden existing Auth/Technology/rubric audit branches', async () => {
+  const actorId = new Types.ObjectId();
+  const metadata = {
+    technologyId: actorId,
+    revision: 1,
+    operationId: '12345678-1234-4123-8123-123456789abc',
+    proposalId: actorId,
+    sourceId: actorId,
+    sourceRevision: 1,
+  };
+  for (const [key, value] of Object.entries(metadata))
+    for (const event of [
+      {
+        category: 'AUTH',
+        action: 'AUTH_REGISTERED',
+        resourceType: 'USER',
+        metadata: { source: 'EMAIL_PASSWORD' },
+      },
+      {
+        category: 'CONTENT_MANAGEMENT',
+        action: 'TECHNOLOGY_CREATED',
+        resourceType: 'TECHNOLOGY',
+        metadata: {
+          changedFields: ['name', 'slug'],
+          revisionBefore: null,
+          revisionAfter: 0,
+        },
+      },
+      {
+        category: 'CONTENT_APPROVAL',
+        action: 'PRACTICE_RUBRIC_AUTHORED',
+        resourceType: 'PRACTICE_RUBRIC',
+        metadata: { rubricVersion: 1 },
+      },
+    ])
+      await assert.rejects(
+        new Audit({
+          ...event,
+          actorId,
+          resourceId: actorId,
+          requestId: 'request',
+          metadata: { ...event.metadata, [key]: value },
+        }).validate(),
+      );
+});
+
 test('F043 Technology audit tuples accept exact revisions and do not broaden legacy events', async () => {
   const actorId = new Types.ObjectId();
   const resourceId = new Types.ObjectId();

@@ -2213,6 +2213,36 @@ feature pointer reconciles S only. F044 IN_PROGRESS, C1/A/B/S READY_FOR_REVIEW �
 offline only; F042/F043 acceptance BLOCKED; nine integration records and 225 browser
 cases NOT_RUN; production NOT_VERIFIED. No Git delivery or runtime approval follows.
 
+**F044 P-only implementation authorization — 2026-11-04:** S committed/pushed
+as f95e1bf025958527df2d75c73716d0ef1e406d24 with matching fresh remote. The owner
+authorized exact six-path P internal persistence/audit work and offline review,
+plus its bounded sequencing extension. P IN_PROGRESS; no API/UI/live execution,
+provisioning or P Git delivery. All mandatory acceptance and source/parent policies
+remain. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine integration records
+and225 browser cases NOT_RUN; production NOT_VERIFIED. History remains preserved.
+
+**F044 P internal persistence offline review — 2026-11-04:** P is
+READY_FOR_REVIEW — offline only, uncommitted. S delivered normally as
+f95e1bf025958527df2d75c73716d0ef1e406d24, local/tracking/fresh remote verified.
+The six authorized P source/test paths implement internal capture, current-Admin
+transaction fencing, source/audit/predecessor checks and explicit uncertain-save
+reconciliation. Four scoped documents retain sequencing/policies/evidence. No API/UI,
+connection/provisioning/live operation or P Git delivery. Current pointer is P review.
+
+Focused P/audit tests: final65 PASS (initial53 PASS/1 failed test assumption retained).
+New TS2339 corrected; final full API/test TypeScript, production build/typecheck,
+lint/format/encoding/diff/scope/privacy PASS. Fresh independent review's four Medium
+findings resolved, final Critical0/High0/Medium0/Low0; no independent test rerun.
+Five additional persistence assertions PREPARED ONLY; existing nine-record manifest
+does not cover the new writes. Actual transaction/concurrency/index/ownership/cleanup
+and RESULT/ACK remain unverified. Snapshot parent policy is not a lifecycle fence.
+
+Next proposal API A needs separate approval and explicit inventory addition for
+P service/test by-ID detail-read support; it is not implemented here. UI U remains
+separately gated. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine integration
+records and225 browser cases NOT_RUN; production NOT_VERIFIED. No next feature or
+acceptance advance. History and stale execution pins remain preserved.
+
 ### F045 — Admin Module Management
 Status: `NOT_STARTED`
 
@@ -2628,7 +2658,7 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F044 - Admin Learning Path Management (source-structure S, offline review)
+**Current Feature:** F044 - Admin Learning Path Management (P internal persistence, offline review)
 **Current Status:** `IN_PROGRESS`
 **Next Feature:** F044 verification/owner review (no additional slice or F045 progression)
 
