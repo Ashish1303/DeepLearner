@@ -66,7 +66,7 @@
     {
       "project": "admin",
       "file": "admin-learning-paths.spec.ts",
-      "sha256": "ba66e78308d5ab8b22ca79aa80d219f649452f87f770985a7d0a580f7b525d6e",
+      "sha256": "44a7e168440db9a755a61ef3e0a4cae47a7749d5e68c86afbadda5b0c21e8c65",
       "cases": [
         ["F044-B01 default workspace and deliberate navigation"],
         ["F044-B02 bounded Technology chooser"],

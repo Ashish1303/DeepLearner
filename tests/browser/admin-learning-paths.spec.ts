@@ -359,7 +359,11 @@ test('F044-B03 child pagination and empty later page', async ({
   await open(page);
   await select(page);
   await page.getByRole('button', { name: 'Next Learning Paths' }).click();
-  await expect(page.getByRole('status')).toContainText('No Learning Paths');
+  await expect(
+    page
+      .getByRole('region', { name: 'Learning Paths', exact: true })
+      .locator(':scope > [role="status"]'),
+  ).toContainText('No Learning Paths');
   await expect(
     page.getByRole('button', { name: 'Previous Learning Paths' }),
   ).toBeEnabled();
@@ -435,7 +439,11 @@ test('F044-B08 empty inventory is explicit', async ({ page, fixture }) => {
   fixture.empty = true;
   await open(page);
   await select(page);
-  await expect(page.getByRole('status')).toContainText('No Learning Paths');
+  await expect(
+    page
+      .getByRole('region', { name: 'Learning Paths', exact: true })
+      .locator(':scope > [role="status"]'),
+  ).toContainText('No Learning Paths');
 });
 test('F044-B09 rate limit and explicit retry without replay', async ({
   page,
@@ -460,9 +468,11 @@ test('F044-B10 logout refuses a late private read', async ({
   fixture.hold = true;
   await open(page);
   await select(page);
-  await expect(page.getByRole('status')).toContainText(
-    'Loading Learning Paths',
-  );
+  await expect(
+    page
+      .getByRole('region', { name: 'Learning Paths', exact: true })
+      .locator(':scope > [role="status"]'),
+  ).toContainText('Loading Learning Paths');
   await expect.poll(() => fixture.reads).toBe(1);
   await page.getByRole('button', { name: 'Sign out of this device' }).click();
   await expect(
