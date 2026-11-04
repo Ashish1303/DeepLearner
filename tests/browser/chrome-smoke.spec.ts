@@ -1,5 +1,5 @@
 import process from 'node:process';
-import { expect, test } from '@playwright/test';
+import { API_ORIGIN, expect, test, markBrowserClose } from './qa-test';
 
 function isRunning(pid: number): boolean {
   try {
@@ -25,6 +25,23 @@ test('installed Chrome supports isolated browser automation and cleanup', async 
   };
   try {
     await rememberProcesses();
+    // Permit only the exact probe navigation. In particular, Chrome's automatic
+    // favicon request must not become an unmatched logical-API request.
+    await context.route('**/*', (route) =>
+      route.request().isNavigationRequest() &&
+      route.request().url() === `${API_ORIGIN}/qa-network-probe`
+        ? route.continue()
+        : route.abort(),
+    );
+    await test.step('nonallowlisted loopback goes through the deny proxy', async () => {
+      const response = await page.goto(`${API_ORIGIN}/qa-network-probe`);
+      expect(response?.status()).toBe(503);
+      expect(await response?.serverAddr()).toEqual({
+        ipAddress: '127.0.0.1',
+        port: 4101,
+      });
+      await expect(page.locator('body')).toHaveText('QA_NETWORK_DENIED');
+    });
     await context.route('**/*', (route) => route.abort());
     await test.step('navigation and harmless in-memory DOM', async () => {
       await page.goto('about:blank');
@@ -89,6 +106,8 @@ test('installed Chrome supports isolated browser automation and cleanup', async 
   } finally {
     await test.step('browser and observed test-owned processes exit', async () => {
       await context.close();
+      markBrowserClose();
+      await cdp.send('Browser.close');
       await browser.close();
       expect(browser.isConnected()).toBe(false);
       expect(ownedPids.size).toBeGreaterThan(0);

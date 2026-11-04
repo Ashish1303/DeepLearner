@@ -69,6 +69,23 @@ function AdminWorkspace({
 export function App() {
   const { state, controller, available } = useAdminAuth();
   const eligible = available && isEligibleAdminState(state);
+  // AdminAccess unmounts in the workspace. Retain access-loss focus history
+  // here so a completed refusal/logout can return keyboard focus safely.
+  const wasEligible = useRef(eligible);
+  const focusAfterAccessLoss = useRef(false);
+  useEffect(() => {
+    if (wasEligible.current && !eligible) focusAfterAccessLoss.current = true;
+    wasEligible.current = eligible;
+    if (eligible) focusAfterAccessLoss.current = false;
+    else if (
+      focusAfterAccessLoss.current &&
+      !state.pending &&
+      document.visibilityState === 'visible'
+    ) {
+      document.getElementById('admin-signin-title')?.focus();
+      focusAfterAccessLoss.current = false;
+    }
+  }, [eligible, state.pending, state.status]);
   return (
     <AdminShell
       session={

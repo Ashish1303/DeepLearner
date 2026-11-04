@@ -1,17 +1,18 @@
+import { ADMIN_ORIGIN, API_ORIGIN } from './qa-test';
 import {
   expect,
   test as base,
   type BrowserContext,
   type Page,
   type Route,
-} from '@playwright/test';
+} from './qa-test';
 import type { Technology } from '../../apps/admin/src/lib/technologies/contracts';
 
 // PREPARED ONLY: F043-B01–B20 NOT_RUN. Separate qualified-browser approval required.
 // Synthetic HTTP responses verify UI contracts only, never live API/MongoDB behavior.
 // Existing Admin runtime must already be available; this spec starts no services.
-const APP = 'http://localhost:5173',
-  API = 'http://localhost:4000';
+const APP = ADMIN_ORIGIN,
+  API = API_ORIGIN;
 const record: Technology = {
   id: 'a'.repeat(24),
   name: 'TypeScript',
@@ -207,15 +208,18 @@ async function release(state: Mock) {
   }
 }
 const test = base.extend<{ technology: Mock }>({
-  technology: async ({ context }, use) => {
-    const state = await mock(context);
-    try {
-      await use(state);
-    } finally {
-      await release(state);
-      expect(state.unexpected).toEqual([]);
-    }
-  },
+  technology: [
+    async ({ context }, use) => {
+      const state = await mock(context);
+      try {
+        await use(state);
+      } finally {
+        await release(state);
+        expect(state.unexpected).toEqual([]);
+      }
+    },
+    { auto: true },
+  ],
 });
 test.use({
   baseURL: APP,
@@ -229,10 +233,23 @@ const inventory = (page: Page) =>
   page.getByRole('heading', { name: 'Technologies', exact: true });
 async function open(page: Page) {
   await page.goto(APP);
+  const initialInventory = page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return (
+      url.origin === API &&
+      url.pathname === '/api/v1/admin/technologies' &&
+      url.search === '?page=1&limit=20' &&
+      response.request().method() === 'GET'
+    );
+  });
   await page
     .getByRole('button', { name: 'Restore existing session', exact: true })
     .click();
   await expect(inventory(page)).toBeVisible();
+  await (await initialInventory).finished();
+  await expect(
+    page.getByRole('button', { name: 'Refresh inventory', exact: true }),
+  ).toBeEnabled();
 }
 async function editor(page: Page) {
   await page

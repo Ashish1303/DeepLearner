@@ -1,4 +1,7 @@
-import { expect, test, type Page } from '@playwright/test';
+import { WEB_ORIGIN } from './qa-test';
+import { expect, test, type Page } from './qa-test';
+import { writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const title = 'How JavaScript Closures Remember Variables';
 const issues = new WeakMap<Page, string[]>();
@@ -40,7 +43,7 @@ test.beforeEach(async ({ page, context }) => {
     const request = route.request();
     const url = new URL(request.url());
     if (
-      url.origin === 'http://127.0.0.1:3000' &&
+      url.origin === WEB_ORIGIN &&
       request.method() === 'GET' &&
       !url.pathname.startsWith('/api/')
     )
@@ -127,12 +130,13 @@ for (const width of [1280, 768, 390])
       ),
     ).toBe(true);
     for (let index = 0; index < 6; index++) {
+      const stepTitle = stepTitles[index];
+      if (stepTitle === undefined)
+        throw new Error('Expected step title missing');
       await page.keyboard.press('Enter');
       await expect(status(page)).toHaveText(`Step ${index + 1} of 6 — paused.`);
       await highlights(page, index);
-      await expect(
-        page.getByText(stepTitles[index], { exact: true }),
-      ).toBeVisible();
+      await expect(page.getByText(stepTitle, { exact: true })).toBeVisible();
       await expect(button(page, 'Next')).toBeFocused();
     }
     await expect(button(page, 'Next')).toBeDisabled();
@@ -155,23 +159,90 @@ for (const width of [1280, 768, 390])
       scrollHeight: node.scrollHeight,
     }));
     if (width === 390) expect(sizes.scroll).toBeGreaterThan(sizes.client);
-    if (sizes.scroll > sizes.client) {
-      await page.keyboard.press('ArrowRight');
+    await diagram.evaluate((node) => {
+      const records: {
+        event: string;
+        time: number;
+        x: number;
+        y: number;
+        focused: boolean;
+      }[] = [];
+      const record = (event: string) => {
+        records.push({
+          event,
+          time: performance.now(),
+          x: node.scrollLeft,
+          y: node.scrollTop,
+          focused: document.activeElement === node,
+        });
+        if (records.length > 64) records.shift();
+      };
+      node.addEventListener('scroll', () => record('SCROLL'));
+      node.addEventListener('scrollend', () => record('SCROLL_END'));
+      node.addEventListener('keydown', (event) => {
+        if (
+          event instanceof KeyboardEvent &&
+          ['ArrowRight', 'ArrowDown', 'End'].includes(event.key)
+        )
+          record(event.key);
+      });
+      Reflect.set(window, 'qaScrollTrace', records);
+    });
+    const scrollKey = async (
+      key: 'ArrowRight' | 'ArrowDown' | 'Control+End',
+    ) => {
+      // First-pixel movement is not completion of Chrome's native animation.
+      // Observe its real completion before issuing a different-axis key.
+      expect(await diagram.evaluate((node) => 'onscrollend' in node)).toBe(
+        true,
+      );
+      await diagram.evaluate((node) => {
+        node.setAttribute('data-qa-scroll-state', 'pending');
+        node.addEventListener(
+          'scrollend',
+          () => node.setAttribute('data-qa-scroll-state', 'ended'),
+          { once: true },
+        );
+      });
+      await page.keyboard.press(key);
+      await expect(diagram).toHaveAttribute('data-qa-scroll-state', 'ended');
+      await expect(diagram).toBeFocused();
+    };
+    const directory = process.env.QA_BROWSER_OUTPUT;
+    if (!directory) throw Error('QA_REPORT_DESTINATION_REQUIRED');
+    try {
+      if (sizes.scroll > sizes.client) {
+        await scrollKey('ArrowRight');
+        await expect
+          .poll(() => diagram.evaluate((node) => node.scrollLeft))
+          .toBeGreaterThan(0);
+      }
+      expect(sizes.scrollHeight).toBeGreaterThan(sizes.height);
+      await scrollKey('ArrowDown');
       await expect
-        .poll(() => diagram.evaluate((node) => node.scrollLeft))
+        .poll(() => diagram.evaluate((node) => node.scrollTop))
         .toBeGreaterThan(0);
+      await scrollKey('Control+End');
+      await expect
+        .poll(() =>
+          diagram.evaluate((node) => node.scrollTop + node.clientHeight),
+        )
+        .toBeGreaterThanOrEqual(sizes.scrollHeight - 1);
+    } finally {
+      if (!page.isClosed()) {
+        writeFileSync(
+          join(directory, `scroll-metrics-${width}.json`),
+          JSON.stringify({
+            width,
+            sizes,
+            events: await page.evaluate(() =>
+              Reflect.get(window, 'qaScrollTrace'),
+            ),
+          }),
+          { flag: 'wx' },
+        );
+      }
     }
-    expect(sizes.scrollHeight).toBeGreaterThan(sizes.height);
-    await page.keyboard.press('ArrowDown');
-    await expect
-      .poll(() => diagram.evaluate((node) => node.scrollTop))
-      .toBeGreaterThan(0);
-    await page.keyboard.press('Control+End');
-    await expect
-      .poll(() =>
-        diagram.evaluate((node) => node.scrollTop + node.clientHeight),
-      )
-      .toBeGreaterThanOrEqual(sizes.scrollHeight - 1);
     const dimensions = await page.evaluate(() => ({
       client: document.documentElement.clientWidth,
       scroll: document.documentElement.scrollWidth,

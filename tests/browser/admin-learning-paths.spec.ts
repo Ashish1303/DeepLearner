@@ -1,10 +1,11 @@
-import { test as base, expect, type BrowserContext } from '@playwright/test';
+import { ADMIN_ORIGIN, API_ORIGIN } from './qa-test';
+import { test as base, expect, type BrowserContext } from './qa-test';
 import type { LearningPath } from '../../apps/admin/src/lib/learning-paths/contracts';
 
 // PREPARED ONLY: F044-B01-B12 NOT_RUN. No service startup or live API evidence.
 // Separate qualified, ownership-safe browser approval required before execution.
-const APP = 'http://127.0.0.1:5173',
-  API = 'http://127.0.0.1:4000';
+const APP = ADMIN_ORIGIN,
+  API = API_ORIGIN;
 const parentId = 'a'.repeat(24),
   otherId = 'c'.repeat(24);
 const parent = {

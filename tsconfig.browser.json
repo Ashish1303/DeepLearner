@@ -1,0 +1,15 @@
+{
+  "extends": "./apps/web/tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "types": ["node", "vite/client"]
+  },
+  "include": [
+    "apps/web/next-env.d.ts",
+    "apps/admin/src/vite-env.d.ts",
+    "tests/browser/**/*.ts",
+    "playwright*.config.ts",
+    "scripts/browser-backlog/reporter.ts"
+  ],
+  "exclude": ["node_modules"]
+}

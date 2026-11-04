@@ -184,59 +184,72 @@ const render = (state = initial, available = true) =>
     createElement(view(), { state, controller: blankController, available }),
   );
 function app(
-  state: AdminState,
+  state: AdminState | (() => AdminState),
   available = true,
   controller = blankController,
   workspace: 'technologies' | 'learning-paths' = 'technologies',
+  inert?: { react: Record<string, unknown>; document: unknown },
 ) {
   const Access = view();
   const shell = compile('../src/components/layout/admin-shell.tsx', (name) => {
     assert.equal(name, 'react/jsx-runtime');
     return require(name);
   });
-  const App = compile('../src/app/app.tsx', (name) => {
-    if (name === 'react') {
-      const react = require(name);
-      return {
-        ...react,
-        useState: (initial: unknown) =>
-          react.useState(initial === 'technologies' ? workspace : initial),
-      };
-    }
-    if (name === 'react/jsx-runtime') return require(name);
-    if (name.endsWith('.module.css'))
-      return {
-        __esModule: true,
-        default: new Proxy({}, { get: (_target, key) => String(key) }),
-      };
-    if (name === '../components/learning-paths/learning-path-manager')
-      return {
-        LearningPathManager: () =>
-          createElement(
-            'section',
-            { 'aria-label': 'Learning Path workspace' },
-            'Read-only Learning Paths',
-          ),
-      };
-    if (name === '../components/layout/admin-shell') return shell;
-    if (name === '../components/auth/admin-access')
-      return { AdminAccess: Access };
-    if (name === '../components/technologies/technology-manager')
-      return {
-        TechnologyManager: ({ accountId }: { accountId: string }) =>
-          createElement(
-            'section',
-            { 'aria-label': 'Technology workspace', 'data-account': accountId },
-            'Technologies',
-          ),
-      };
-    if (name === '../hooks/use-admin-auth')
-      return {
-        ...helpers,
-        useAdminAuth: () => ({ state, available, controller }),
-      };
-    throw Error('Unexpected App import');
-  }).App as () => ReactElement;
+  const App = compile(
+    '../src/app/app.tsx',
+    (name) => {
+      if (name === 'react') {
+        const react = require(name);
+        return {
+          ...react,
+          ...inert?.react,
+          useState: (initial: unknown) =>
+            react.useState(initial === 'technologies' ? workspace : initial),
+        };
+      }
+      if (name === 'react/jsx-runtime') return require(name);
+      if (name.endsWith('.module.css'))
+        return {
+          __esModule: true,
+          default: new Proxy({}, { get: (_target, key) => String(key) }),
+        };
+      if (name === '../components/learning-paths/learning-path-manager')
+        return {
+          LearningPathManager: () =>
+            createElement(
+              'section',
+              { 'aria-label': 'Learning Path workspace' },
+              'Read-only Learning Paths',
+            ),
+        };
+      if (name === '../components/layout/admin-shell') return shell;
+      if (name === '../components/auth/admin-access')
+        return { AdminAccess: Access };
+      if (name === '../components/technologies/technology-manager')
+        return {
+          TechnologyManager: ({ accountId }: { accountId: string }) =>
+            createElement(
+              'section',
+              {
+                'aria-label': 'Technology workspace',
+                'data-account': accountId,
+              },
+              'Technologies',
+            ),
+        };
+      if (name === '../hooks/use-admin-auth')
+        return {
+          ...helpers,
+          useAdminAuth: () => ({
+            state: typeof state === 'function' ? state() : state,
+            available,
+            controller,
+          }),
+        };
+      throw Error('Unexpected App import');
+    },
+    inert?.document,
+  ).App as () => ReactElement;
   return { App, html: () => renderToStaticMarkup(createElement(App)) };
 }
 function fixture(
@@ -686,7 +699,12 @@ test('access revalidation and shell logout are wired without redirects or extra 
   click(f.tree, 'Check current access');
   await flush();
   assert.equal(revalidations, 1);
-  const root = app(eligible, true, controller).App();
+  let root!: ReactElement;
+  function CaptureApp() {
+    root = app(eligible, true, controller).App();
+    return null;
+  }
+  renderToStaticMarkup(createElement(CaptureApp));
   const session = (root.props as { session: { onLogout(): void } }).session;
   session.onLogout();
   await flush();
@@ -705,6 +723,64 @@ test('focus effect restores heading after loss of access only while visible', ()
   f.effects();
   assert.equal(f.focused(), 1);
   f.cleanup();
+});
+
+test('App retains focus history across access component unmount and waits for settled visible access loss', () => {
+  let state = initial,
+    index = 0,
+    focused = 0;
+  const refs: { current: unknown }[] = [],
+    effects: (() => void)[] = [];
+  const document = {
+    visibilityState: 'visible',
+    getElementById(id: string) {
+      assert.equal(id, 'admin-signin-title');
+      return {
+        focus() {
+          focused++;
+        },
+      };
+    },
+  };
+  const react = {
+    useRef(value: unknown) {
+      const slot = index++;
+      return refs[slot] ?? (refs[slot] = { current: value });
+    },
+    useEffect(effect: () => void) {
+      effects.push(effect);
+    },
+  };
+  const component = app(() => state, true, blankController, 'technologies', {
+    react,
+    document,
+  }).App;
+  const draw = (next: AdminState) => {
+    state = next;
+    index = 0;
+    effects.length = 0;
+    component();
+    for (const effect of effects) effect();
+  };
+  draw(initial);
+  assert.equal(focused, 0);
+  draw(eligible);
+  draw({ ...initial, status: 'checking', pending: true });
+  assert.equal(focused, 0);
+  draw({ ...initial, status: 'denied' });
+  assert.equal(focused, 1);
+  draw({ ...initial, status: 'denied' });
+  assert.equal(focused, 1);
+  draw(eligible);
+  draw({ ...initial, status: 'checking', pending: true });
+  draw(eligible);
+  assert.equal(focused, 1);
+  document.visibilityState = 'hidden';
+  draw({ ...initial, status: 'denied' });
+  assert.equal(focused, 1);
+  document.visibilityState = 'visible';
+  draw({ ...initial, status: 'expired' });
+  assert.equal(focused, 2);
 });
 
 test('mount is passive; visibility and focus revalidate existing authority without refresh rotation', async (t) => {

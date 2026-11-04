@@ -1,4 +1,5 @@
-import process from 'node:process';
+import { backgroundProgress, backgroundStudent } from './background-progress';
+import { API_ORIGIN, WEB_ORIGIN } from './qa-test';
 import {
   expect,
   test,
@@ -6,7 +7,7 @@ import {
   type Page,
   type Request,
   type Route,
-} from '@playwright/test';
+} from './qa-test';
 
 // Browser execution is separately gated. These are mocked contract tests, not live API/DB proof.
 const tech = 'a'.repeat(24),
@@ -15,7 +16,7 @@ const tech = 'a'.repeat(24),
   topicId = 'd'.repeat(24);
 const cid = (index: number) => index.toString(16).padStart(24, '0');
 const topicUrl = '/topics/' + topicId;
-const api = 'http://127.0.0.1:4000/api/v1';
+const api = `${API_ORIGIN}/api/v1`;
 const summary = (index: number, account = '') => ({
   id: cid(index),
   technologyId: tech,
@@ -105,7 +106,7 @@ const initialUser = {
   createdAt: '2026-01-01T00:00:00.000Z',
 };
 const headers = {
-  'Access-Control-Allow-Origin': 'http://127.0.0.1:3000',
+  'Access-Control-Allow-Origin': WEB_ORIGIN,
   'Access-Control-Allow-Credentials': 'true',
   'Access-Control-Allow-Headers': 'authorization,content-type',
   'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
@@ -159,11 +160,11 @@ async function mock(context: BrowserContext) {
       account: state.conceptAccount,
     };
     const transitionHold = state.transitionHold;
-    if (url.origin === 'http://127.0.0.1:3000') {
+    if (url.origin === WEB_ORIGIN) {
       await route.continue();
       return;
     }
-    if (url.origin !== 'http://127.0.0.1:4000') {
+    if (url.origin !== API_ORIGIN) {
       state.externalRequests.push(url.origin);
       await route.abort();
       return;
@@ -209,6 +210,14 @@ async function mock(context: BrowserContext) {
       await send(envelope(state.user));
       return;
     }
+    if (
+      await backgroundProgress(
+        route,
+        url,
+        backgroundStudent(state.user, !state.invalidSession),
+      )
+    )
+      return;
     const fullHeaders = await request.allHeaders();
     state.catalogCredentials.push({
       authorization: 'authorization' in fullHeaders,
@@ -361,7 +370,7 @@ async function mock(context: BrowserContext) {
     {
       name: 'synthetic_api_cookie',
       value: 'synthetic',
-      url: 'http://127.0.0.1:4000',
+      url: API_ORIGIN,
       httpOnly: true,
     },
   ]);
@@ -505,22 +514,6 @@ async function switchIdentity(page: Page) {
     channel.close();
   });
 }
-const observedPids = new Set<number>();
-test.beforeAll(async ({ browser }) => {
-  const cdp = await browser.newBrowserCDPSession();
-  const { processInfo } = await cdp.send('SystemInfo.getProcessInfo');
-  for (const entry of processInfo) observedPids.add(entry.id);
-  await cdp.detach();
-});
-test.afterEach(async ({ browser }) => {
-  const cdp = await browser.newBrowserCDPSession();
-  try {
-    const { processInfo } = await cdp.send('SystemInfo.getProcessInfo');
-    for (const entry of processInfo) observedPids.add(entry.id);
-  } finally {
-    await cdp.detach();
-  }
-});
 test.afterAll(async ({ browser }) => {
   try {
     const closed = await Promise.allSettled(
@@ -531,22 +524,8 @@ test.afterAll(async ({ browser }) => {
     await browser.close();
   }
   expect(browser.isConnected()).toBe(false);
-  await expect
-    .poll(
-      () =>
-        [...observedPids].filter((pid) => {
-          try {
-            process.kill(pid, 0);
-            return true;
-          } catch (error) {
-            if ((error as NodeJS.ErrnoException).code === 'ESRCH') return false;
-            throw error;
-          }
-        }).length,
-      { timeout: 10000 },
-    )
-    .toBe(0);
-  // Playwright owns webServer teardown after the suite; verify its port/process release at the execution gate.
+  // The native guardian, not a CDP disconnect, verifies retained-process exit,
+  // an empty owned Job and released ports at final browser shutdown.
 });
 
 test('Read default, Revise navigation, no extra fetch and resource/reload reset', async ({
@@ -559,7 +538,7 @@ test('Read default, Revise navigation, no extra fetch and resource/reload reset'
     (response) => {
       const url = new URL(response.url());
       return (
-        url.origin === 'http://127.0.0.1:3000' &&
+        url.origin === WEB_ORIGIN &&
         url.pathname === '/concepts/' + cid(1) &&
         url.searchParams.has('_rsc') &&
         response.request().method() === 'GET'
@@ -612,9 +591,35 @@ for (const width of [1280, 768, 390])
         'Revise',
       ]);
       const before = { ...state.counters };
-      // The loaded h1 receives focus. Tab from there reaches the first tab via the real keyboard.
+      // Later completion controls precede the mode tabs. Verify their real
+      // keyboard order rather than assuming the tabs immediately follow h1.
       await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
-      await page.keyboard.press('Tab');
+      await expect(
+        page.getByRole('button', { name: 'Refresh requirements', exact: true }),
+      ).toBeVisible();
+      for (const control of [
+        page.getByRole('button', {
+          name: 'Prepare Read acknowledgement',
+          exact: true,
+        }),
+        page.getByRole('button', {
+          name: 'Prepare Example acknowledgement',
+          exact: true,
+        }),
+        page.getByRole('link', {
+          name: 'Open Practice output questions',
+          exact: true,
+        }),
+        page.getByRole('button', { name: 'Refresh requirements', exact: true }),
+        page.getByRole('link', {
+          name: 'Practice output questions',
+          exact: true,
+        }),
+        read,
+      ]) {
+        await page.keyboard.press('Tab');
+        await expect(control).toBeFocused();
+      }
       await expect(read).toBeFocused();
       for (const [key, name] of [
         ['ArrowRight', 'Example'],
