@@ -9,7 +9,8 @@
     "apps/admin/src/vite-env.d.ts",
     "tests/browser/**/*.ts",
     "playwright*.config.ts",
-    "scripts/browser-backlog/reporter.ts"
+    "scripts/browser-backlog/reporter.ts",
+    "scripts/browser-backlog/reporter.test.ts"
   ],
   "exclude": ["node_modules"]
 }

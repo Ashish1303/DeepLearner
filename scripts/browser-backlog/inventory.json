@@ -1,0 +1,563 @@
+{
+  "revision": 1,
+  "reviewedHead": "8010e7a41bb79f5b8580e26529ce9465cdd6ee1a",
+  "identity": "project + file + full nested title path; independent of line number and Playwright-generated ID",
+  "excluded": [
+    {
+      "file": "admin-learning-path-proposals.spec.ts",
+      "cases": 16,
+      "status": "NOT_RUN"
+    }
+  ],
+  "supportSources": {
+    "tests/browser/qa-test.ts": "e07be2bfcf78558f3b017c7a0ffbb50c381129f3efe1948e6e985cc577e6d088",
+    "scripts/browser-backlog/lease.mjs": "154cee21e99273f68f02e7be9dfe66c965be7aa0d86db797fb803b3f67e44231"
+  },
+  "files": [
+    {
+      "project": "admin",
+      "file": "admin-access.spec.ts",
+      "sha256": "fa9bcfffa71191ad1c2435163a30dccacb5dd827d21ace0a43c68491f30d372d",
+      "cases": [
+        ["F042-B01 mount is passive and restoration is explicit"],
+        [
+          "F042-B02 sign-in requires current Admin eligibility before the Technology workspace"
+        ],
+        ["F042-B03 Student identity cannot expose Admin content"],
+        ["F042-B04 disabled current account is denied"],
+        ["F042-B05 suspended current account is denied"],
+        ["F042-B06 unverified current account is denied"],
+        ["F042-B07 expired access hides authority without automatic refresh"],
+        [
+          "F042-B08 unavailable dependency and missing account never imply authorization"
+        ],
+        [
+          "F042-B09 private or malformed DTO is refused without exposing its contents"
+        ],
+        ["F042-B10 rate limiting has manual retry and no invented countdown"],
+        [
+          "F042-B11 ambiguous refresh cannot be replayed automatically or via restore"
+        ],
+        ["F042-B12 manual recovery obtains newly checked eligibility"],
+        [
+          "F042-B13 current-device logout removes privileged content and session identity"
+        ],
+        [
+          "F042-B14 failed logout remains uncertain and requires explicit sign-out retry"
+        ],
+        ["F042-B15 account invalidation discards a former-account response"],
+        [
+          "F042-B16 same-origin peer-tab sign-out invalidates the current Admin display"
+        ],
+        [
+          "F042-B17 untrusted return parameters never create navigation or restore authority"
+        ],
+        [
+          "F042-B18 native keyboard submission and access-loss focus are usable"
+        ],
+        [
+          "F042-B19 desktop tablet and mobile layouts keep labels and actions in bounds"
+        ],
+        [
+          "F042-B20 labelled fields and loading success error announcements retain semantics"
+        ]
+      ]
+    },
+    {
+      "project": "admin",
+      "file": "admin-learning-paths.spec.ts",
+      "sha256": "ba66e78308d5ab8b22ca79aa80d219f649452f87f770985a7d0a580f7b525d6e",
+      "cases": [
+        ["F044-B01 default workspace and deliberate navigation"],
+        ["F044-B02 bounded Technology chooser"],
+        ["F044-B03 child pagination and empty later page"],
+        ["F044-B04 detail refuses a different parent"],
+        ["F044-B05 all actual statuses remain read-only"],
+        ["F044-B06 archived parent notice and inspection"],
+        ["F044-B07 missing parent clears children"],
+        ["F044-B08 empty inventory is explicit"],
+        ["F044-B09 rate limit and explicit retry without replay"],
+        ["F044-B10 logout refuses a late private read"],
+        ["F044-B11 native keyboard navigation and focus"],
+        ["F044-B12 four-width containment"]
+      ]
+    },
+    {
+      "project": "admin",
+      "file": "admin-technologies.spec.ts",
+      "sha256": "1097a0c9629dd6d62cc58716f2f28cff479af4031a2dec265e319e2a68c9835b",
+      "cases": [
+        ["F043-B01 inventory requires explicit authenticated restoration"],
+        ["F043-B02 empty inventory has truthful zero count"],
+        ["F043-B03 bounded pagination can return to the previous page"],
+        ["F043-B04 DRAFT detail exposes revision and immutable slug"],
+        ["F043-B05 create sends one draft operation and shows success"],
+        ["F043-B06 edit submits current revision and displays increment"],
+        ["F043-B07 field validation prevents malformed draft submission"],
+        ["F043-B08 PUBLISHED records remain read-only"],
+        ["F043-B09 ARCHIVED records remain read-only"],
+        ["F043-B10 revision conflict requires explicit reload without replay"],
+        ["F043-B11 unknown write result hides editor and never replays"],
+        ["F043-B12 HTTP 401 invalidates eligible workspace"],
+        ["F043-B13 HTTP 403 removes displayed authority"],
+        ["F043-B14 missing detail is safely unavailable"],
+        [
+          "F043-B15 rate limit and dependency failure expose manual recovery only"
+        ],
+        ["F043-B16 private response fields are refused before display"],
+        ["F043-B17 cancellation and account-change signals discard late reads"],
+        ["F043-B18 logout clears Technology data and leaves storage empty"],
+        ["F043-B19 keyboard editor focus, labels and close restoration"],
+        [
+          "F043-B20 desktop tablet and mobile retain contained layout and escaped text"
+        ]
+      ]
+    },
+    {
+      "project": "qualification",
+      "file": "chrome-smoke.spec.ts",
+      "sha256": "8549ba2b809c6fad36e00a955c4747e1cd584352451d061e22237419943ad0af",
+      "cases": [
+        ["installed Chrome supports isolated browser automation and cleanup"]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "concept-completion.spec.ts",
+      "sha256": "ba66d704eeeaa43b98951784fea673bd23897d2dcdbe02c14e4d5c1d430e5cdd",
+      "cases": [
+        [
+          "F038 required requirements, explicit completion, reload and activity stay separate"
+        ],
+        [
+          "F038 views and playback without acknowledged required evidence never qualify"
+        ],
+        [
+          "F038 original zero score cannot meet seventy or be replaced by a copied retry"
+        ],
+        ["F038 Example and conditional Revise coverage remain required"],
+        ["F038 denied accounts do not display or retain completion data"],
+        ["F038 Concept navigation cancels late views"],
+        ["F038 interrupted completion retries its original UUID and body"],
+        [
+          "F038 checkpoint refusal cannot reveal expected choices or qualify interaction"
+        ],
+        [
+          "F038 stale and revoked server views never silently restore completion"
+        ],
+        ["F038 keyboard and reduced motion do not require playback"],
+        [
+          "F038 responsive loading, unavailable and error states preserve reflow"
+        ],
+        [
+          "F038 Practice navigation preserves output default and unsupported grading stays ineligible"
+        ]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "concept-example.spec.ts",
+      "sha256": "b21961882e6b0dc5a29b9e34fb1a60e164f8d77a44d43c1cad5dc3a3c56e1b68",
+      "cases": [
+        [
+          "Read default, Example navigation, no extra fetch and resource/reload reset"
+        ],
+        [
+          "Example tabs keyboard, responsive code overflow, safe Markdown and heading hierarchy"
+        ],
+        ["empty examples show truthful empty state"],
+        ["legacy examples show truthful empty state"],
+        ["Example detail 401 is observed before explicit Retry"],
+        ["Example detail 404 is observed before explicit Retry"],
+        ["Example detail 503 is observed before explicit Retry"],
+        ["Example detail malformed is observed before explicit Retry"],
+        ["ADMIN cannot access Example content"],
+        ["INVALID cannot access Example content"],
+        [
+          "same-document cancellation and account transition reject old success"
+        ],
+        [
+          "same-document cancellation and account transition reject old failure"
+        ],
+        ["mounted STUDENT to STUDENT transition isolates delayed success"],
+        ["mounted STUDENT to STUDENT transition isolates delayed failure"],
+        [
+          "held Example detail shows loading until the identified response is released"
+        ],
+        [
+          "incomplete student can browse Examples while dashboard stays onboarding-gated"
+        ]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "concept-progress.spec.ts",
+      "sha256": "caf565d7dab52b5bd60ae03f2437f826dcc2f7cb7eeea978beecb5edf92a46b9",
+      "cases": [
+        ["F037 Concept activity preserves Read and Practice navigation"],
+        ["F037 zero activity has no completion, score, XP or write request"],
+        [
+          "F037 saved activity persists across remount without inventing attempts"
+        ],
+        ["F037 loading and scoped error Retry never fabricate zero"],
+        ["F037 obsolete Concept response cannot replace a different Concept"],
+        [
+          "F037 account replacement removes held activity and rejects former-account data"
+        ],
+        ["F037 native keyboard Retry preserves semantic times and status"],
+        ["F037 desktop tablet mobile activity remains contained"]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "concept-read.spec.ts",
+      "sha256": "fe1fb67b698c3b454fb601ed20aaa00d0a9851fdbc100b90644eb5ae8385bf50",
+      "cases": [
+        ["F025 source footer in every mode and viewport, official=false"],
+        ["F025 source footer in every mode and viewport, official=true"],
+        [
+          "F025 malformed source is observed before explicit Retry without auth side effects"
+        ],
+        [
+          "Topic navigation, direct Read reload, breadcrumbs and restricted Markdown"
+        ],
+        ["Previous/Next mounted focus, empty later page and explicit recovery"],
+        ["catalog 400 permits explicit Retry without auth side effects"],
+        ["catalog 401 permits explicit Retry without auth side effects"],
+        ["catalog 403 permits explicit Retry without auth side effects"],
+        ["catalog 404 permits explicit Retry without auth side effects"],
+        ["catalog 429 permits explicit Retry without auth side effects"],
+        ["catalog 503 permits explicit Retry without auth side effects"],
+        ["catalog network permits explicit Retry without auth side effects"],
+        ["catalog malformed permits explicit Retry without auth side effects"],
+        ["loading, bounded timeout and explicit Retry"],
+        ["ADMIN cannot see Concept content"],
+        ["DISABLED cannot see Concept content"],
+        ["SUSPENDED cannot see Concept content"],
+        ["PENDING_VERIFICATION cannot see Concept content"],
+        ["UNVERIFIED cannot see Concept content"],
+        ["INVALID cannot see Concept content"],
+        [
+          "incomplete student browses Concepts but dashboard still requires onboarding"
+        ],
+        [
+          "same-document cancellation and account transition reject old success"
+        ],
+        [
+          "same-document cancellation and account transition reject old failure"
+        ],
+        ["mounted STUDENT to STUDENT transition isolates delayed success"],
+        ["mounted STUDENT to STUDENT transition isolates delayed failure"],
+        [
+          "responsive keyboard navigation, code overflow and mobile logout failure"
+        ],
+        ["empty first page and invalid route ID never fabricate content"]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "concept-revise.spec.ts",
+      "sha256": "51fe3c859cb24fa2212f755b5d0283d4f64bbdfbf1ce8d0296d71f0a0e459a25",
+      "cases": [
+        [
+          "Read default, Revise navigation, no extra fetch and resource/reload reset"
+        ],
+        [
+          "three-tab keyboard, safe Revise content and contained scrolling at 1280"
+        ],
+        [
+          "three-tab keyboard, safe Revise content and contained scrolling at 768"
+        ],
+        [
+          "three-tab keyboard, safe Revise content and contained scrolling at 390"
+        ],
+        ["summary-only revision omits unavailable optional sections"],
+        ["empty revision shows truthful empty state"],
+        ["legacy revision shows truthful empty state"],
+        ["Revise detail 401 is observed before explicit Retry"],
+        ["Revise detail 404 is observed before explicit Retry"],
+        ["Revise detail 503 is observed before explicit Retry"],
+        ["Revise detail malformed is observed before explicit Retry"],
+        ["ADMIN cannot access Revise content"],
+        ["INVALID cannot access Revise content"],
+        [
+          "same-document cancellation and account transition reject old success"
+        ],
+        [
+          "same-document cancellation and account transition reject old failure"
+        ],
+        ["mounted STUDENT to STUDENT transition isolates delayed success"],
+        ["mounted STUDENT to STUDENT transition isolates delayed failure"],
+        [
+          "held Revise detail shows loading until the identified response is released"
+        ],
+        [
+          "incomplete student can browse Revise while dashboard stays onboarding-gated"
+        ]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "dashboard.spec.ts",
+      "sha256": "e49a39af74537cba725a73e77cf8231010a7e35c39a0b8b597b8f82d4cb31acc",
+      "cases": [
+        ["F041-B01 authorized Student loads a self-only five-entry page"],
+        ["F041-B02 anonymous access redirects without a Dashboard read"],
+        ["F041-B03 Admin and ineligible accounts cannot mount the panel"],
+        [
+          "F041-B04 genuine empty activity offers Explore without a mastery claim"
+        ],
+        ["F041-B05 classification and absence variants stay distinct"],
+        ["F041-B06 malformed/private response refuses rendering"],
+        ["F041-B07 network and 503 errors recover only by manual retry"],
+        ["F041-B08 rate limit has no invented countdown or automatic retry"],
+        ["F041-B09 non-LOCAL 404 is unavailable rather than empty or Weak"],
+        ["F041-B10 Next, first and Refresh replace bounded pages"],
+        ["F041-B11 repeated activation while loading admits one request"],
+        ["F041-B12 late superseded navigation generation is never displayed"],
+        ["F041-B13 cross-tab logout invalidation clears private activity"],
+        ["F041-B14 account change rejects a former-account held response"],
+        [
+          "F041-B15 Concept links use existing routes and navigation cancels the panel"
+        ],
+        ["F041-B16 desktop cards fit without horizontal scrolling"],
+        ["F041-B17 tablet cards and controls remain usable"],
+        ["F041-B18 mobile long escaped titles wrap safely"],
+        [
+          "F041-B19 keyboard activation returns focus after explicit page success"
+        ],
+        ["F041-B20 loading, results and errors have semantic announcements"]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "practice-answer-unlock.spec.ts",
+      "sha256": "eca8a9147a006049c32c6a81c5785ab1c98afcf1ee6d8fcecf415ce609a1d55d",
+      "cases": [
+        [
+          "F035 desktop all four types require submission before transient five-field reveal"
+        ],
+        [
+          "F035 tablet/mobile native keyboard submission and contained inert answers"
+        ],
+        [
+          "F035 blank drafts never submit and rejected requests do not reveal sensitive errors"
+        ],
+        [
+          "F035 account Concept type and question navigation clear reveals and isolate drafts"
+        ],
+        [
+          "F035 edited and superseded submissions ignore held success and preserve current draft"
+        ],
+        [
+          "F035 confirmed clearing removes reveal while cancel and stale confirmation preserve drafts"
+        ],
+        [
+          "F035 explicit retry safe Markdown and unchanged GET secrecy never add grading or execution"
+        ]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "practice-attempts.spec.ts",
+      "sha256": "34fe1fcc398dd129d9c3a2646dc289f3c535a258aff0f106271be7a62ec33a65",
+      "cases": [
+        ["F036 desktop four types disclose only after saved ungraded receipt"],
+        [
+          "F036 response loss retries same key and explicit new attempt uses another key"
+        ],
+        [
+          "F036 rejected dependency and authorization requests never reveal private errors"
+        ],
+        [
+          "F036 held commit response cannot cross question type Concept or account identity"
+        ],
+        [
+          "F036 changed revision is refused until explicit refresh and new submission"
+        ],
+        [
+          "F036 type/page retained retry keys and confirmed clearing do not delete saved attempts"
+        ],
+        [
+          "F036 tablet/mobile keyboard save is contained with stable focused native control"
+        ],
+        [
+          "F036 pending cancellation preserves saved outcome without automatic resubmission"
+        ]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "practice-coding.spec.ts",
+      "sha256": "f21f50898986bb412c6ddd2ce22afb947cb5a2aa24fd6c3f35b8476b70b54f1e",
+      "cases": [
+        ["coding selection, keyboard focus and contained rendering at 1280px"],
+        ["coding selection, keyboard focus and contained rendering at 768px"],
+        ["coding selection, keyboard focus and contained rendering at 390px"],
+        [
+          "type round trips preserve drafts and clearing requires confirmation for all four types"
+        ],
+        [
+          "coding loading, empty, error Retry and wrong-type payload fail safely"
+        ],
+        ["obsolete coding success or error cannot replace OUTPUT or its draft"],
+        [
+          "account identity replacement and Concept navigation erase all four type stores and confirmation"
+        ]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "practice-descriptive.spec.ts",
+      "sha256": "80f06ad1a9866514f0d665f52e6ef595cb915c1a73d41e068fa68039756e4218",
+      "cases": [
+        [
+          "descriptive selection, keyboard focus and contained rendering at 1280px"
+        ],
+        [
+          "descriptive selection, keyboard focus and contained rendering at 768px"
+        ],
+        [
+          "descriptive selection, keyboard focus and contained rendering at 390px"
+        ],
+        [
+          "type round trips preserve drafts and clearing requires confirmation for both types"
+        ],
+        [
+          "descriptive loading, empty, error Retry and wrong-type payload fail safely"
+        ],
+        ["obsolete descriptive response cannot replace OUTPUT or its draft"],
+        [
+          "account identity replacement and Concept navigation erase both type stores and confirmation"
+        ]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "practice-output.spec.ts",
+      "sha256": "d5f7bf67cb5936c7d3b3b63a5358dbede54bc9eb8fe02c2fd319f8d74e3ffaa1",
+      "cases": [
+        [
+          "Concept link opens protected output practice without changing mode tabs"
+        ],
+        ["output practice keyboard, focus and contained code at 1280px"],
+        ["output practice keyboard, focus and contained code at 768px"],
+        ["output practice keyboard, focus and contained code at 390px"],
+        [
+          "pagination retains drafts and local clearing sends no writes or extra API reads"
+        ],
+        [
+          "prompt Markdown and starter code remain inert with no answer leakage or external fetches"
+        ],
+        [
+          "loading, failure and explicit Retry recover without implicit retries"
+        ],
+        [
+          "empty published result and malformed secret-bearing DTO fail truthfully"
+        ],
+        ["practice 401 removes protected content"],
+        ["practice 403 removes protected content"],
+        ["ADMIN cannot mount practice or make a protected question read"],
+        [
+          "Concept change cancels old work and never carries a draft into another Concept"
+        ],
+        ["account change removes drafts and suppresses a delayed response"],
+        ["logout clears drafts and reload does not persist them"]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "practice-scenario.spec.ts",
+      "sha256": "430ac86c38c83e85f9beb70ffc647885bae386eed59a8a4cdd78a197646d41c0",
+      "cases": [
+        [
+          "scenario selection, keyboard focus and contained rendering at 1280px"
+        ],
+        ["scenario selection, keyboard focus and contained rendering at 768px"],
+        ["scenario selection, keyboard focus and contained rendering at 390px"],
+        [
+          "type round trips preserve drafts and clearing requires confirmation for all three types"
+        ],
+        [
+          "scenario loading, empty, error Retry and wrong-type payload fail safely"
+        ],
+        [
+          "obsolete scenario success or error cannot replace OUTPUT or its draft"
+        ],
+        [
+          "account identity replacement and Concept navigation erase all three type stores and confirmation"
+        ]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "visualization-controls.spec.ts",
+      "sha256": "7a73e751f11baa4824bd819049170e7c2dca0ef8fb31fd802b63c3811adc1cc2",
+      "cases": [
+        [
+          "F028 mounted renderer, keyboard controls and contained overflow at 1280px"
+        ],
+        [
+          "F028 mounted renderer, keyboard controls and contained overflow at 768px"
+        ],
+        [
+          "F028 mounted renderer, keyboard controls and contained overflow at 390px"
+        ],
+        [
+          "F028 real-time playback completes on final step and explicit Replay keeps focus"
+        ],
+        [
+          "F028 mounted pause resumes a full interval, manual movement pauses and Reset invalidates timers"
+        ],
+        [
+          "F028 Change account resets same-document selection and cancels old playback"
+        ],
+        [
+          "F028 Change visualization resets same-document selection and cancels old playback"
+        ],
+        [
+          "F028 Replace snapshot resets same-document selection and cancels old playback"
+        ],
+        [
+          "F028 reduced motion disables timed actions and retains manual navigation"
+        ],
+        [
+          "F028 simulated visibility loss pauses without resetting or automatically resuming"
+        ],
+        [
+          "F028 invalid, empty, missing and logout inputs disable playback safely"
+        ],
+        [
+          "F028 unmount and single-step completion clear timers without looping"
+        ],
+        [
+          "F028 authored text is inert and playback adds no API or source requests"
+        ]
+      ]
+    },
+    {
+      "project": "student",
+      "file": "visualization-lesson.spec.ts",
+      "sha256": "5894c2d0ea1dea06e22a1e233f48182d1b09d439b02ff9961fb1b34a260f8d9e",
+      "cases": [
+        [
+          "F029 six closure stages, readable graph and keyboard scrolling at 1280px"
+        ],
+        [
+          "F029 six closure stages, readable graph and keyboard scrolling at 768px"
+        ],
+        [
+          "F029 six closure stages, readable graph and keyboard scrolling at 390px"
+        ],
+        ["F029 fallback timing, pause/resume, final dwell and explicit replay"],
+        ["F029 reduced motion retains all manual stages without autoplay"],
+        [
+          "F029 identity and synthetic snapshot replacement cancel lesson playback"
+        ],
+        [
+          "F029 authored code stays inert and playback makes no network requests"
+        ]
+      ]
+    }
+  ]
+}

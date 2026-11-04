@@ -266,3 +266,47 @@ No live API/MongoDB authentication, transactions or durability are established
 by mocked browser results. Parallel backend/C2 changes and guarded integration
 remain separate review/qualification work. No feature acceptance or production
 deployment is authorized by this QA delivery.
+
+
+## PR #1 review corrections against current dev — 2026-11-04
+
+The owner authorized a normal QA-branch merge of committed `origin/dev`, focused
+corrections for the two review findings, relevant offline checks, the existing
+ownership-qualified mocked runner, and QA-branch/PR delivery. No merge into dev.
+The fetched reviewed inputs were unchanged: dev
+`56458ab5c213928273196f3c76aff2d36a7f5408` and QA
+`8010e7a41bb79f5b8580e26529ce9465cdd6ee1a`. Normal merge
+`89896ecaa832d6f3efe956813a4724d2b6878899` was conflict-free. Primary dev and its
+running resources were preserved. Earlier evidence above is historical, not
+qualification for this merged candidate.
+
+The runner/config now select the explicit inventory in
+`scripts/browser-backlog/inventory.json`: 225 stable project/file/full-title-path
+identities across 18 files, captured from the reviewed PR discovery. Source hashes,
+owned-fixture imports, Admin origin 5181 and Student origin 3101 are checked.
+Unexpected files, changed spec/fixture sources, duplicate/substituted/missing case
+identities and unqualified fixture imports fail closed. Runtime admission checks
+each identity before its test body. U's separate 16 cases remain explicitly
+excluded and NOT_RUN; no U fixture conversion or U ownership qualification occurs.
+
+Discovery uses documented reporter lifecycle events, never argv guessing.
+`--list` has no test-execution events and emits no execution-result receipt.
+Actual execution requires phase-bound output destinations before owned CDP
+attachment. Reporter failures are latched and explicitly return failed because
+Playwright swallows thrown reporter exceptions. Sanitized result rows include
+stable identities; execution receipts remain creation-only.
+
+Current offline checks: 37 Node protocol/inventory tests PASS; four reporter tests
+PASS; 32 inert PowerShell controls PASS; browser TypeScript, Admin production
+build/source TypeScript, targeted lint and ordinary discovery PASS. Discovery
+selects exactly 225 cases/18 files, not U. Existing nonblocking dynamic-env import
+warning remains. An initial negative test mistakenly selected its unchanged
+project; that synthetic fixture was corrected. Initial reporter return typing and
+three lint errors were corrected; affected checks were rerun successfully.
+
+The current candidate's actual owned-browser results and cleanup are still pending
+at this correction checkpoint. Historical 225 PASS does not substitute for them.
+No deadline, branch/owner/Job/lease gate, network boundary or native supervisor was
+weakened. No application-source change is part of these corrections. F044 remains
+IN_PROGRESS; F042/F043 acceptance BLOCKED; original nine integration records,
+five P assertions and six API assertions remain NOT_RUN; production NOT_VERIFIED.

@@ -1,11 +1,21 @@
 import { defineConfig } from '@playwright/test';
 import foundation from './playwright.config';
 import { join } from 'node:path';
+import {
+  inventory,
+  assertSources,
+} from './scripts/browser-backlog/inventory.mjs';
+
+assertSources();
+const files = (project: string) =>
+  inventory.files
+    .filter((file: { project: string }) => file.project === project)
+    .map((file: { file: string }) => '**/' + file.file);
 
 // Only scripts/Test-BrowserBacklog.ps1 supplies the live owned-browser lease.
 // Discovery is inert; no webServer or Playwright-managed process-tree teardown.
 export default defineConfig(foundation, {
-  testMatch: '**/*.spec.ts',
+  testMatch: inventory.files.map((file: { file: string }) => '**/' + file.file),
   outputDir: process.env.QA_BROWSER_OUTPUT
     ? join(process.env.QA_BROWSER_OUTPUT, 'artifacts')
     : '.cache/browser-backlog/discovery-artifacts',
@@ -23,14 +33,14 @@ export default defineConfig(foundation, {
   projects: [
     {
       name: 'student',
-      testIgnore: ['**/admin-*.spec.ts', '**/chrome-smoke.spec.ts'],
+      testMatch: files('student'),
       use: { baseURL: 'http://127.0.0.1:3101' },
     },
     {
       name: 'admin',
-      testMatch: '**/admin-*.spec.ts',
+      testMatch: files('admin'),
       use: { baseURL: 'http://127.0.0.1:5181' },
     },
-    { name: 'qualification', testMatch: '**/chrome-smoke.spec.ts' },
+    { name: 'qualification', testMatch: files('qualification') },
   ],
 });

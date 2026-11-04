@@ -12,6 +12,13 @@ if ((git branch --show-current) -ne 'qa/f044-browser-backlog') { throw 'QA_BRANC
 foreach ($dir in @($repo, (Join-Path $repo 'apps/web'), (Join-Path $repo 'apps/admin'))) {
     if (Get-ChildItem -LiteralPath $dir -Force | Where-Object { ($_.Name -eq '.env' -or $_.Name.StartsWith('.env.')) -and $_.Name -ne '.env.example' }) { throw 'QA_PRIVATE_ENV_REFUSED' }
 }
+# Frozen, reviewed scope. U remains explicitly excluded/NOT_RUN.
+$inventory=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'browser-backlog/inventory.json') -Raw|ConvertFrom-Json
+$expectedFiles=@($inventory.files.file)+@($inventory.excluded.file)
+$actualFiles=@(Get-ChildItem -LiteralPath (Join-Path $repo 'tests/browser') -Filter '*.spec.ts' -File|ForEach-Object Name)
+if(@(Compare-Object ($expectedFiles|Sort-Object) ($actualFiles|Sort-Object)).Count){throw 'QA_FILE_INVENTORY_REFUSED'}
+foreach($file in $inventory.files){if((Get-FileHash -LiteralPath (Join-Path $repo ('tests/browser/'+$file.file)) -Algorithm SHA256).Hash -ine $file.sha256){throw 'QA_SPEC_SOURCE_DRIFT'}}
+foreach($property in $inventory.supportSources.PSObject.Properties){if((Get-FileHash -LiteralPath (Join-Path $repo $property.Name) -Algorithm SHA256).Hash -ine $property.Value){throw 'QA_FIXTURE_SOURCE_DRIFT'}}
 $node = (Get-Command node.exe -ErrorAction Stop).Source
 $chrome = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
 if (-not (Test-Path -LiteralPath $chrome -PathType Leaf)) { throw 'QA_CHROME_MISSING' }
@@ -227,7 +234,7 @@ try {
         Start-Browser
         foreach($phase in @('admin','student')){
             if($Project -ne 'all' -and $Project -ne $phase){continue}
-            $files=@(Get-ChildItem -LiteralPath (Join-Path $repo 'tests/browser') -Filter '*.spec.ts' -File | Where-Object { $_.Name -ne 'chrome-smoke.spec.ts' -and ($_.Name.StartsWith('admin-') -eq ($phase -eq 'admin')) } | Sort-Object Name)
+            $files=@($inventory.files|Where-Object project -EQ $phase|ForEach-Object { Get-Item -LiteralPath (Join-Path $repo ('tests/browser/'+$_.file)) }|Sort-Object Name)
             if($Spec){$files=@($files|Where-Object Name -EQ $Spec);if(-not $files.Count){throw 'QA_SPEC_NOT_IN_PROJECT'}}
             foreach($file in $files){
                 $label="$phase-$($file.BaseName)"; $envMap['QA_BROWSER_OUTPUT']=Join-Path $run $label; [IO.Directory]::CreateDirectory($envMap['QA_BROWSER_OUTPUT'])|Out-Null
