@@ -381,3 +381,95 @@ remain open for follow-up and independent Desktop re-review. GitHub CI status is
 separate; no absent/pending check is called PASS. F044 remains IN_PROGRESS;
 F042/F043 acceptance BLOCKED; original nine/P five/API six integration groups
 NOT_RUN; production NOT_VERIFIED. No PR merge into dev is authorized or performed.
+
+
+### Three scoped locator corrections and targeted rerun — 2026-11-04
+
+Owner approval was limited to F044-B03/B08/B10 locator corrections, their spec
+pin, affected checks, one owned file-level execution and QA-branch delivery.
+Starting QA head was `0c5cb16f342d53c41425eed88530c3c00d1f9abc`; fetched dev remained
+`56458ab5c213928273196f3c76aff2d36a7f5408`. Both checkouts/indexes were clean.
+
+Only the three broad status locators changed. Each now selects the direct status
+child of the exactly named Learning Paths region:
+
+```typescript
+page.getByRole('region', { name: 'Learning Paths', exact: true })
+  .locator(':scope > [role="status"]')
+```
+
+This excludes the nested private-proposal live region while retaining strict
+single-element resolution. Empty-page text, loading text, pagination-button state,
+read count, logout and late-response assertions are unchanged. No first/nth,
+forced action, timeout increase, skipped assertion or application change was used.
+A formatting-aware comparison confirmed every other assertion/token unchanged.
+Only this spec's SHA changed in the frozen inventory; all 225 stable identities
+and explicit U16 exclusion are unchanged.
+
+Affected checks PASS: 11 inventory/source/owned-fixture controls; browser TypeScript;
+targeted lint/format; UTF-8/LF and diff checks. Ordinary discovery succeeds with
+225 cases/18 files; explicit Admin file discovery selects exactly 12 cases/one file.
+No execution-result receipts are produced by discovery. Existing unchanged build/
+protocol evidence was retained; unrelated passing suites were not rerun.
+
+Correction/tested commit: `a13847e589b478747fe8b91ede00f2de3451c9f1`.
+The existing runner already supports file selection; it was not modified:
+
+```powershell
+& 'C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.9.0_x64__8wekyb3d8bbwe\pwsh.exe' -NoLogo -NoProfile -NonInteractive -File scripts/Test-BrowserBacklog.ps1 -Project admin -Spec admin-learning-paths.spec.ts
+```
+
+Exactly one targeted invocation completed with exit 0. **12/12 selected F044 cases
+PASS, zero FAIL/skipped/retries**, plus two passing qualification executions
+(prerequisite and final shutdown qualification). These are 14 executions total,
+not a fresh full-backlog run. Stable case identities and order matched the frozen
+manifest exactly:
+
+- F044-B01 default workspace and deliberate navigation — PASS.
+- F044-B02 bounded Technology chooser — PASS.
+- F044-B03 child pagination and empty later page — PASS.
+- F044-B04 detail refuses a different parent — PASS.
+- F044-B05 all actual statuses remain read-only — PASS.
+- F044-B06 archived parent notice and inspection — PASS.
+- F044-B07 missing parent clears children — PASS.
+- F044-B08 empty inventory is explicit — PASS.
+- F044-B09 rate limit and explicit retry without replay — PASS.
+- F044-B10 logout refuses a late private read — PASS.
+- F044-B11 native keyboard navigation and focus — PASS.
+- F044-B12 four-width containment — PASS.
+
+Evidence ledger remains separate:
+
+| Invocation | Selected feature cases | PASS | FAIL | Meaning |
+| --- | ---: | ---: | ---: | --- |
+| Original merged-candidate run `89d4e98a4abd49fca42fa622baa7544c` | 225 | 222 | 3 | Historical full-run failures retained. |
+| Targeted corrected-file run `fc667149c3154bd1b9f1246f2b75d801` | 12 | 12 | 0 | Corrected file only; not a fresh 225-case PASS. |
+
+All three targeted CLI Job receipts prove normal cleanup, empty Jobs and closed
+handles. Final closeout confirms QA ports and temporary power requests released,
+no forced containment and no lifecycle failure. Native retained/independent Job
+qualification and unowned-parent refusal passed. Primary dev and owner-started
+resources were not restarted, adopted or terminated. The PowerShell 7.6.9
+executable hash and valid Microsoft signature were reverified before use.
+
+All 265 source pins match after the run. SHA-256 fingerprints:
+
+- Changed spec: `44a7e168440db9a755a61ef3e0a4cae47a7749d5e68c86afbadda5b0c21e8c65`.
+- Inventory JSON: `d95dab3312916575b66f2ef86516dbf258bc7c4df9764185cde6038b9e3bffb9`.
+- Canonical sorted source-pin map: `7b601c1662556639f0ff33a004f49f974557f56d5ec4768ae52d5fdcf1a24e4f`.
+- Closeout JSON: `fe2b590614b9c615845c9981e131bf855b8ccb4568b308ec6e9c5544041a974e`.
+- Node executable: `3331E1FFE19874215472217C5E94F5A0C6D8E18C4AC7111D3937AA0AD5E9B4A5`.
+- Chrome executable: `4132EB3E9C5B3978874EED48CB45C21DEBF343A0D383B6D2FB01A5FCF349EC65`.
+
+The approved PowerShell and installed refused-fallback patch hashes remain as
+recorded above. Full ignored evidence is retained under
+`.cache/browser-backlog/fc667149c3154bd1b9f1246f2b75d801/`; no generated/private
+runtime artifacts are delivered. Network evidence reports no API fallthrough or
+direct probe traffic; the two proxy qualification probes passed.
+
+Self-review found no remaining issue in the focused locator/pin correction. No
+new independent second-agent review is claimed. The corrected candidate is ready
+for independent Desktop re-review; no merge into dev or feature acceptance follows.
+U16 remains excluded/NOT_RUN. Original nine/P five/API six integration groups
+remain NOT_RUN. Mocked-browser PASS is not real API/database acceptance.
+F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED.
