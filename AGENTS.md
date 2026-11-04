@@ -1071,3 +1071,37 @@ New API assertions must be listed separately, prepared only until qualified actu
 execution. Production NOT_VERIFIED. No staging, commit or push is authorized in
 this checkpoint; every Git delivery, next slice and live operation needs separate
 explicit owner approval. No automatic U/F045 progression or acceptance follows A.
+
+## Named F044 U restricted proposal UI offline extension — 2026-11-04
+
+The owner separately approved U's exact 21-path inventory and memory-only policy,
+U-only enactment, implementation, focused offline verification and fresh independent
+review. Permit only the 17 application/test/config and four sequencing/evidence
+paths listed in the dated U contract. This supersedes earlier UI prohibitions only
+for brief entry, explicit private capture, actor-bound GET recovery and known
+private result/detail. Technology Management remains the default workspace.
+
+Require settled current-account Admin authority, restricted fixed requests, one
+root-controller intent, exact parent/content validation, bounded transport and no
+automatic POST replay. Keep uncertainty separate from Technology recovery. Editable
+draft navigation needs explicit discard; uncertain intent survives only the same
+authenticated generation. Authority loss clears private material and retains only
+a content-free loss guard where possible. Reload loses context and guard; warnings
+are best effort, not guaranteed. The owner accepted the documented requirement for
+separately approved operator reconciliation before repeating a lost uncertain Save.
+No browser persistence or invented operator/reset/reconciliation capability.
+
+Require focused offline tests, Admin build/typecheck, applicable test TypeScript,
+targeted lint/format/CSS/encoding/privacy/scope/diff checks and fresh independent
+review with blocking findings resolved. Prepare the 16 U mocked browser cases and
+selection config; discovery is allowed without launching a browser. No live API/
+database write, browser execution, startup/restart, backend change, new dependency,
+generation/editorial/publication or further slice is authorized. Live verification
+still requires separate scope/target/data approval and all existing ownership,
+baselines, deadlines, authenticated RESULT/ACK and cleanup gates.
+
+F044 remains IN_PROGRESS, partial development; F042/F043 acceptance BLOCKED.
+Original nine integration records, five P assertions, six API assertions and 225
+existing browser cases remain NOT_RUN. Newly prepared16 U cases stay separately
+NOT_RUN. Production readiness NOT_VERIFIED. No staging, commit or push; every Git
+delivery, live operation and next slice requires separate explicit owner approval.

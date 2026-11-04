@@ -19,6 +19,33 @@ function AdminWorkspace({
   );
   const container = useRef<HTMLDivElement>(null);
   const moved = useRef(false);
+  const navigationGuard = useRef<((next: () => void) => void) | null>(null);
+  const [proposalBusy, setProposalBusy] = useState(false);
+  const [proposalWarning, setProposalWarning] = useState(false);
+  const navigate = (next: () => void) => {
+    if (navigationGuard.current) navigationGuard.current(next);
+    else next();
+  };
+  useEffect(() => {
+    const sync = () => {
+      const phase = auth.getProposalIntent(accountId).phase;
+      setProposalBusy(phase === 'saving' || phase === 'reconciling');
+      setProposalWarning(phase !== 'none');
+    };
+    sync();
+    return auth.subscribe(sync);
+  }, [auth, accountId]);
+  useEffect(() => {
+    if (!proposalWarning) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      if (auth.getProposalIntent(accountId).phase !== 'none') {
+        event.preventDefault();
+        event.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [auth, accountId, proposalWarning]);
   useEffect(() => {
     if (moved.current)
       container.current?.querySelector<HTMLElement>('h1')?.focus();
@@ -33,10 +60,13 @@ function AdminWorkspace({
         <button
           type="button"
           aria-pressed={workspace === 'technologies'}
+          disabled={proposalBusy}
           onClick={() => {
             if (workspace !== 'technologies') {
-              moved.current = true;
-              setWorkspace('technologies');
+              navigate(() => {
+                moved.current = true;
+                setWorkspace('technologies');
+              });
             }
           }}
         >
@@ -45,10 +75,13 @@ function AdminWorkspace({
         <button
           type="button"
           aria-pressed={workspace === 'learning-paths'}
+          disabled={proposalBusy}
           onClick={() => {
             if (workspace !== 'learning-paths') {
-              moved.current = true;
-              setWorkspace('learning-paths');
+              navigate(() => {
+                moved.current = true;
+                setWorkspace('learning-paths');
+              });
             }
           }}
         >
@@ -59,7 +92,13 @@ function AdminWorkspace({
         {workspace === 'technologies' ? (
           <TechnologyManager auth={auth} accountId={accountId} />
         ) : (
-          <LearningPathManager auth={auth} accountId={accountId} />
+          <LearningPathManager
+            auth={auth}
+            accountId={accountId}
+            registerWorkspaceNavigation={(guard) => {
+              navigationGuard.current = guard;
+            }}
+          />
         )}
       </div>
     </div>

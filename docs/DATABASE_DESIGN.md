@@ -2296,3 +2296,89 @@ ownership/private channel, authenticated RESULT/ACK, baselines and cleanup. No
 database call, provisioning, live API or manifest refreeze occurred. Browser 225
 NOT_RUN; F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED.
 The smallest next application checkpoint U needs separate implementation approval.
+
+## F044 API A delivery and U memory-only UI proposal — 2026-11-04
+
+API A delivered as 7b7c2cbb9c15190c3d5130815281ab3e22467c8c, exact 16 reviewed
+paths, normal fast-forward push, matching local/tracking/fresh remote SHA and clean
+tree/index before this uncommitted documentation. Historical uncommitted wording
+describes earlier review state; no acceptance advancement. Existing 210 distinct
+offline PASS/independent 0/0/0/0 unresolved retained without reruns.
+
+Checkpoint U is PROPOSED — PENDING OWNER APPROVAL, NOT_STARTED. The feature's
+dated U contract defines the restricted Admin form, explicit capture, same-intent
+read recovery and known private result/detail. No backend/model/index/schema or
+source-authority change. Existing actor/key uniqueness and historical admission,
+current-operation authorization/fence, atomic pair/two audits, retention and
+snapshot parent race remain mandatory; private admission is not editorial approval.
+
+No browser persistence is proposed for content, keys or results. One root-controller
+in-memory intent supports same-authority workspace return and no automatic replay;
+editable drafts are discarded only through specified navigation/loss behavior.
+Logout/account or authority-generation loss clears private material. A content-free
+guard may survive in that root, but reload loses all context/guards. An absent
+lookup or lost key cannot prove no Save exists; repeating a lost uncertain intent
+requires separately approved operator reconciliation. A new page cannot enforce
+cross-reload deduplication without durable evidence; owner must accept that explicit
+boundary or separately scope another design. No storage/receipt/recovery endpoint
+or procedure is invented here. No database writes from planning or offline U approval.
+
+Proposed U inventory is 17 application/test/config paths plus four enactment/evidence
+documents, 21 total. The one addition to the earlier 16-file UI inventory is
+playwright.f044-proposals.config.ts: existing configs select other filenames.
+It would extend existing F044 discovery settings with only a new testMatch,
+preserving deadlines/defaults/ownership gates, not qualifying browser execution.
+No config/source is created by this documentation.
+
+Keep groups separate: original 9 integration records NOT_RUN, P 5 NOT_RUN, API 6
+PREPARED/NOT_RUN, browser 225 NOT_RUN. Proposed 16 U browser scenarios are not yet
+prepared or added to that count. Real Save requires a separate qualified target/
+fixture/index/source/result manifest and explicit mutation approval, ownership,
+baselines, authenticated RESULT/ACK and cleanup. Guarded pins remain stale; ignored
+support is undelivered/not clean-clone reproducible. F044 IN_PROGRESS;
+F042/F043 acceptance BLOCKED; production NOT_VERIFIED. U sequencing inactive.
+
+## F044 U owner-authorized offline implementation — 2026-11-04
+
+The owner approved the preceding U contract, exact 21-path inventory and memory-only
+limitations, and separately authorized U-only enactment/implementation/offline
+verification and fresh independent review. The preceding PROPOSED/NOT_STARTED text
+is retained as historical planning evidence; U implementation is now IN_PROGRESS.
+The named active extension is limited to U in AGENTS.md. No live verification,
+backend change, Git delivery or acceptance is implied. Operator reconciliation
+after lost uncertain intent remains a separate approval; no procedure is invented.
+
+Keep original 9 integration records, P 5 and API 6 assertions and 225 existing browser
+cases NOT_RUN; new 16 U browser cases are prepared separately, not executed. F044
+IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED. Historical
+guarded/source-pin and clean-clone reproducibility limitations remain unchanged.
+
+### U offline checkpoint evidence — 2026-11-04
+
+U is READY_FOR_REVIEW — offline only, within the approved 21 paths. Final affected
+offline tests: 231/231 PASS. Comprehensive Admin source/test and prepared-browser
+TypeScript, Admin build/typecheck, targeted lint/format/CSS/encoding/privacy/scope
+and whitespace checks PASS. Initial failures and their corrections are retained in
+the feature record, alongside check details and independent review evidence.
+Fresh-context independent source/test review: zero unresolved Critical/High/Medium/
+Low findings after resolving all findings. The reviewer executed no tests/runtime.
+
+The root retains one actor-bound intent in memory only; only exact capture or
+matching COMMITTED recovery clears uncertainty. GET UNRESOLVED never permits
+replay. Dirty drafts require explicit discard; authority loss clears private data.
+Reload loses intent and guard; warnings are not guaranteed. A lost uncertain Save
+requires separately approved operator reconciliation, with no invented UI reset.
+
+Browser discovery found 16 new U mocked cases, PREPARED/NOT_RUN, separate from the
+existing 225 NOT_RUN. Original nine integration records, five P assertions and six
+API assertions stay NOT_RUN. No live persistence/transactions/indexes/audit,
+browser/UI/API behavior or runtime ownership/cleanup is proved by offline doubles.
+Guarded pins remain stale; ignored support remains undelivered/not clean-clone
+reproducible. No refreeze or runtime/Git delivery occurred. See the dated U evidence
+in docs/features/F044-admin-learning-path-management.md for full detail.
+
+Next: separate owner approval for checkpoint delivery and/or bounded qualified
+Desktop QA, explicitly including private Save writes if desired. Current-account
+credentials/session, owned applications and approved test data/target are required;
+browser host safety and all real-integration gates remain unchanged. F044 remains
+IN_PROGRESS; F042/F043 acceptance BLOCKED; production readiness NOT_VERIFIED.

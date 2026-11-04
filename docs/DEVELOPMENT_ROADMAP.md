@@ -2308,6 +2308,36 @@ remain unverified; guarded pins remain stale. F044 IN_PROGRESS; F042/F043 accept
 BLOCKED; production NOT_VERIFIED. U is the next proposed application checkpoint,
 not authorized; no next-feature or acceptance advancement, staging/commit/push.
 
+**F044 API A delivered; U contract proposed — 2026-11-04:** exact 16 reviewed
+API paths committed/pushed as 7b7c2cbb9c15190c3d5130815281ab3e22467c8c; parent
+594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc. Fresh remote ancestry/normal push and
+matching local/tracking/remote SHA verified; clean tree/index before U drafting.
+API A remains READY_FOR_REVIEW — offline only. Retain 210 distinct offline PASS and
+independent 0/0/0/0 unresolved evidence; no passing tests/runtime QA rerun.
+
+U is **PROPOSED — PENDING OWNER APPROVAL; NOT_STARTED**. See the exact
+[U contract](features/F044-admin-learning-path-management.md#proposal-api-a-delivery-and-checkpoint-u-contract--2026-11-04).
+Keep Technology Management default; add explicit eligible-parent brief entry,
+Save/private result and actor-bound explicit recovery, no automatic mutation replay.
+No browser persistence; editable drafts are not retained across navigation/reload.
+Frozen uncertain intent survives only specified same-authority in-memory workspace
+navigation. Private context is cleared on account/authority loss; reload cannot
+detect a lost uncertain Save. Owner must accept the operator-reconciliation boundary
+before implementation, or separately scope durable recovery; do not invent storage.
+
+Exact proposed inventory: 11 CREATE/6 MODIFY application/test/config paths plus four
+scoped enactment/evidence documents = 21 paths. Includes only one new browser
+selection config in addition to the earlier 16-file UI plan, because current configs
+exclude the U spec; existing defaults/deadlines/ownership rules stay unchanged.
+U estimate 1–2 engineering days offline including review, excluding real Save/browser
+qualification. U-only sequencing is proposed, not enacted; implementation/live
+writes/Git delivery require separate approvals. Current implementation pointer stays
+API A offline review. No F045/later progression or acceptance advancement.
+
+Original 9 / P 5 / API 6 and browser 225 remain separate unexecuted groups; proposed 16 U
+browser cases are not prepared/count-added. F044 IN_PROGRESS; F042/F043 acceptance
+BLOCKED; production NOT_VERIFIED. Stale guarded pins and undelivered support remain.
+
 ### F045 — Admin Module Management
 Status: `NOT_STARTED`
 
@@ -3394,3 +3424,48 @@ of final hashes, exact receipt content and bounded runtime scope after independe
 review. This offline amendment creates no private receipt and grants no runtime
 permission. B remains BLOCKED; C–F NOT_RUN; F042/F043 acceptance unchanged;
 F044 NOT_STARTED, production NOT_VERIFIED. No Git staging, commit or push.
+
+## F044 U owner-authorized offline implementation — 2026-11-04
+
+The owner approved the preceding U contract, exact 21-path inventory and memory-only
+limitations, and separately authorized U-only enactment/implementation/offline
+verification and fresh independent review. The preceding PROPOSED/NOT_STARTED text
+is retained as historical planning evidence; U implementation is now IN_PROGRESS.
+The named active extension is limited to U in AGENTS.md. No live verification,
+backend change, Git delivery or acceptance is implied. Operator reconciliation
+after lost uncertain intent remains a separate approval; no procedure is invented.
+
+Keep original 9 integration records, P 5 and API 6 assertions and 225 existing browser
+cases NOT_RUN; new 16 U browser cases are prepared separately, not executed. F044
+IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED. Historical
+guarded/source-pin and clean-clone reproducibility limitations remain unchanged.
+
+### U offline checkpoint evidence — 2026-11-04
+
+U is READY_FOR_REVIEW — offline only, within the approved 21 paths. Final affected
+offline tests: 231/231 PASS. Comprehensive Admin source/test and prepared-browser
+TypeScript, Admin build/typecheck, targeted lint/format/CSS/encoding/privacy/scope
+and whitespace checks PASS. Initial failures and their corrections are retained in
+the feature record, alongside check details and independent review evidence.
+Fresh-context independent source/test review: zero unresolved Critical/High/Medium/
+Low findings after resolving all findings. The reviewer executed no tests/runtime.
+
+The root retains one actor-bound intent in memory only; only exact capture or
+matching COMMITTED recovery clears uncertainty. GET UNRESOLVED never permits
+replay. Dirty drafts require explicit discard; authority loss clears private data.
+Reload loses intent and guard; warnings are not guaranteed. A lost uncertain Save
+requires separately approved operator reconciliation, with no invented UI reset.
+
+Browser discovery found 16 new U mocked cases, PREPARED/NOT_RUN, separate from the
+existing 225 NOT_RUN. Original nine integration records, five P assertions and six
+API assertions stay NOT_RUN. No live persistence/transactions/indexes/audit,
+browser/UI/API behavior or runtime ownership/cleanup is proved by offline doubles.
+Guarded pins remain stale; ignored support remains undelivered/not clean-clone
+reproducible. No refreeze or runtime/Git delivery occurred. See the dated U evidence
+in docs/features/F044-admin-learning-path-management.md for full detail.
+
+Next: separate owner approval for checkpoint delivery and/or bounded qualified
+Desktop QA, explicitly including private Save writes if desired. Current-account
+credentials/session, owned applications and approved test data/target are required;
+browser host safety and all real-integration gates remain unchanged. F044 remains
+IN_PROGRESS; F042/F043 acceptance BLOCKED; production readiness NOT_VERIFIED.

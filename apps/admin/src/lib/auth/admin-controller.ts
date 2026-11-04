@@ -1,4 +1,21 @@
 import {
+  proposalRequest,
+  operationId,
+  matchesIntent,
+  proposalDto,
+  recoveryDto,
+  type ProposalRequest,
+  type ProposalResult,
+  type ProposalIntentView,
+  type ProposalContent,
+  type ProposalWireRequest,
+} from '../learning-path-proposals/contracts';
+import {
+  createProposalClient,
+  ProposalError,
+  type ProposalClient,
+} from '../learning-path-proposals/proposal-client';
+import {
   learningPathRequest,
   type LearningPathRequest,
   type LearningPathResult,
@@ -69,6 +86,7 @@ export function createAdminController(
   now: () => number = () => performance.now(),
   technologies?: TechnologyClient,
   learningPaths?: LearningPathClient,
+  proposals?: ProposalClient,
 ) {
   let state = initial;
   let token: string | undefined;
@@ -86,6 +104,55 @@ export function createAdminController(
   let technologyClient = technologies;
   let learningPathClient = learningPaths;
   let technologyRecoveryRequired = false;
+  let proposalClient = proposals;
+  let proposalLost = false;
+  type Intent = {
+    account: string;
+    generation: number;
+    technologyId: string;
+    key: string;
+    content: ProposalContent;
+    dispatched: boolean;
+    phase: 'saving' | 'uncertain' | 'reconciling' | 'unresolved';
+  };
+  let proposalIntent: Intent | undefined;
+  let proposalReading = false;
+  const notifyProposal = () => {
+    for (const fn of listeners) {
+      try {
+        fn();
+      } catch {
+        /* Rendering is isolated. */
+      }
+    }
+  };
+  function loseProposalContext() {
+    if (proposalIntent?.dispatched) proposalLost = true;
+    proposalIntent = undefined;
+  }
+  function getProposalIntent(account: string): ProposalIntentView {
+    expireIfNeeded();
+    if (proposalLost) return { phase: 'context-lost' };
+    if (
+      state.status !== 'eligible' ||
+      state.pending ||
+      accountId !== account ||
+      !token
+    )
+      return { phase: 'none' };
+    const intent = proposalIntent;
+    if (
+      !intent ||
+      intent.account !== account ||
+      intent.generation !== generation
+    )
+      return { phase: 'none' };
+    return {
+      phase: intent.phase,
+      technologyId: intent.technologyId,
+      content: structuredClone(intent.content),
+    };
+  }
   const listeners = new Set<() => void>();
   const update = (next: AdminState) => {
     state = Object.freeze(next);
@@ -99,6 +166,7 @@ export function createAdminController(
     }
   };
   function clearAuthority() {
+    loseProposalContext();
     for (const abort of business.keys()) abort.abort();
     token = undefined;
     accountId = undefined;
@@ -508,7 +576,239 @@ export function createAdminController(
       abort.abort();
     }
   }
+  /** Three fixed proposal capabilities. An uncertain intent is never a UI-resettable flag. */
+  async function requestProposal(
+    account: string,
+    raw: ProposalRequest,
+    external?: AbortSignal,
+  ): Promise<ProposalResult> {
+    if (!ready()) throw new ProposalError('FORBIDDEN', 403);
+    expireIfNeeded();
+    const parsed = proposalRequest.safeParse(raw);
+    if (!parsed.success) throw new ProposalError('VALIDATION_ERROR', 400, true);
+    if (
+      state.status !== 'eligible' ||
+      state.pending ||
+      accountId !== account ||
+      state.user?.id !== account ||
+      !token ||
+      flight ||
+      loggingOut
+    )
+      throw new ProposalError('FORBIDDEN', 403);
+    const request = parsed.data,
+      version = generation,
+      start = now(),
+      abort = new AbortController();
+    let intent = proposalIntent;
+    let wire: ProposalWireRequest;
+    if (request.kind === 'capture') {
+      if (technologyRecoveryRequired)
+        throw new ProposalError('TECHNOLOGY_RECOVERY_REQUIRED');
+      if (proposalLost) throw new ProposalError('CONTEXT_LOST');
+      if (intent || proposalReading)
+        throw new ProposalError('RECOVERY_REQUIRED');
+      let key: string;
+      try {
+        key = globalThis.crypto.randomUUID();
+        if (!operationId.safeParse(key).success) throw new Error();
+      } catch {
+        throw new ProposalError('UNAVAILABLE');
+      }
+      intent = {
+        account,
+        generation: version,
+        technologyId: request.technologyId,
+        key,
+        content: structuredClone(request.input),
+        dispatched: false,
+        phase: 'saving',
+      };
+      proposalIntent = intent; // Synchronous admission, before any collaborator/await.
+      wire = {
+        kind: 'capture',
+        input: {
+          ...structuredClone(intent.content),
+          technologyId: intent.technologyId,
+          operationId: key,
+        },
+      };
+    } else if (request.kind === 'recover') {
+      if (proposalLost) throw new ProposalError('CONTEXT_LOST');
+      if (
+        !intent ||
+        intent.account !== account ||
+        intent.generation !== version ||
+        !['uncertain', 'unresolved'].includes(intent.phase) ||
+        proposalReading
+      )
+        throw new ProposalError('RECOVERY_REQUIRED');
+      intent.phase = 'reconciling';
+      wire = {
+        kind: 'recover',
+        technologyId: intent.technologyId,
+        operationId: intent.key,
+      };
+      proposalReading = true;
+    } else {
+      if (
+        proposalReading ||
+        intent?.phase === 'saving' ||
+        intent?.phase === 'reconciling'
+      )
+        throw new ProposalError('RECOVERY_REQUIRED');
+      wire = request;
+      proposalReading = true;
+    }
+    let timedOut = false;
+    const cancel = () => abort.abort();
+    const remaining = () => 15000 - (now() - start);
+    const checkProposal = () => {
+      const left = remaining();
+      if (!Number.isFinite(left) || left <= 0 || left > 15000) {
+        timedOut = true;
+        abort.abort();
+      }
+      expireIfNeeded();
+      if (
+        disposed ||
+        !connected ||
+        version !== generation ||
+        accountId !== account ||
+        !token ||
+        state.status !== 'eligible' ||
+        state.pending ||
+        !coordination.supported() ||
+        abort.signal.aborted
+      )
+        throw new ProposalError(timedOut ? 'TIMEOUT' : 'CANCELLED');
+    };
+    const timer = setTimeout(() => {
+      timedOut = true;
+      abort.abort();
+    }, 15000);
+    external?.addEventListener('abort', cancel, { once: true });
+    if (external?.aborted) cancel();
+    let rejectAbort = () => {};
+    const lost = new Promise<never>((_, reject) => {
+      rejectAbort = () =>
+        reject(new ProposalError(timedOut ? 'TIMEOUT' : 'CANCELLED'));
+      abort.signal.addEventListener('abort', rejectAbort, { once: true });
+      if (abort.signal.aborted) rejectAbort();
+    });
+    void lost.catch(() => {});
+    const pending = Promise.resolve().then(() =>
+      coordination.run(async () => {
+        checkProposal();
+        if (!proposalClient) {
+          const { env } = await import('../env');
+          checkProposal();
+          proposalClient = createProposalClient(env.VITE_API_BASE_URL);
+        }
+        checkProposal();
+        if (request.kind === 'capture' && technologyRecoveryRequired)
+          throw new ProposalError('TECHNOLOGY_RECOVERY_REQUIRED');
+        const result = await proposalClient.execute(
+          wire,
+          token!,
+          abort.signal,
+          {
+            remaining,
+            dispatched() {
+              checkProposal();
+              if (
+                request.kind === 'capture' &&
+                intent &&
+                proposalIntent === intent
+              )
+                intent.dispatched = true;
+            },
+          },
+        );
+        checkProposal();
+        if (request.kind === 'capture') {
+          if (
+            !intent ||
+            proposalIntent !== intent ||
+            !matchesIntent(result, intent.technologyId, intent.content)
+          )
+            throw new ProposalError('INVALID_RESPONSE');
+          proposalIntent = undefined;
+          return proposalDto.parse(result);
+        }
+        if (request.kind === 'recover') {
+          const value = recoveryDto.safeParse(result);
+          if (!intent || proposalIntent !== intent || !value.success)
+            throw new ProposalError('INVALID_RESPONSE');
+          if (value.data.state === 'COMMITTED') {
+            if (
+              !matchesIntent(
+                value.data.proposal,
+                intent.technologyId,
+                intent.content,
+              )
+            )
+              throw new ProposalError('INVALID_RESPONSE');
+            proposalIntent = undefined;
+          } else intent.phase = 'unresolved';
+          return value.data;
+        }
+        const value = proposalDto.safeParse(result);
+        if (
+          !value.success ||
+          value.data.id !== request.id ||
+          value.data.technologyId !== request.technologyId
+        )
+          throw new ProposalError('INVALID_RESPONSE');
+        return value.data;
+      }, abort.signal),
+    );
+    business.set(abort, pending);
+    void pending.finally(() => business.delete(abort)).catch(() => {});
+    notifyProposal();
+    try {
+      return await Promise.race([pending, lost]);
+    } catch (error) {
+      if (intent && proposalIntent === intent) {
+        if (
+          request.kind === 'capture' &&
+          (!intent.dispatched ||
+            (error instanceof ProposalError &&
+              error.definitive &&
+              [400, 404, 413, 415, 429].includes(error.status)))
+        )
+          proposalIntent = undefined;
+        else if (request.kind !== 'detail')
+          intent.phase =
+            request.kind === 'recover' ? 'unresolved' : 'uncertain';
+      }
+      if (version === generation && !disposed) {
+        if (error instanceof ProposalError && [401, 403].includes(error.status))
+          invalidate(
+            error.status === 403 ? 'denied' : 'expired',
+            new AdminApiError(
+              error.status === 403
+                ? 'AUTH_FORBIDDEN'
+                : 'AUTH_ACCESS_TOKEN_EXPIRED',
+            ).message,
+          );
+        else if (error instanceof AdminCoordinationError)
+          invalidate('unsupported', new AdminCoordinationError().message);
+      }
+      if (error instanceof ProposalError) throw error;
+      throw new ProposalError('UNAVAILABLE');
+    } finally {
+      if (request.kind !== 'capture') proposalReading = false;
+      clearTimeout(timer);
+      external?.removeEventListener('abort', cancel);
+      abort.signal.removeEventListener('abort', rejectAbort);
+      abort.abort();
+      notifyProposal();
+    }
+  }
   return {
+    requestProposal,
+    getProposalIntent,
     requestLearningPath,
     requestTechnology: (
       account: string,
@@ -628,6 +928,7 @@ export function createAdminController(
       if (!ready()) return Promise.resolve();
       expireIfNeeded();
       if (!token || !accountId) return Promise.resolve();
+      loseProposalContext();
       const expectedId = accountId;
       const version = generation;
       for (const abort of business.keys()) abort.abort();
@@ -657,6 +958,7 @@ export function createAdminController(
           }
         }
       } else if (state.status === 'eligible') {
+        loseProposalContext();
         generation++;
         for (const abort of business.keys()) abort.abort();
         operationAbort?.abort();

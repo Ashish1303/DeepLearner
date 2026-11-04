@@ -179,6 +179,70 @@ test('F044 workspace navigation defaults to Technology Management and exposes re
   ).html();
   assert(!denied.includes('aria-label="Learning Path workspace"'));
 });
+test('U workspace navigation delegates to the mounted draft guard while logout remains independent', () => {
+  const changes: unknown[] = [];
+  const out = compile('../src/app/app.tsx', (name) => {
+    if (name === 'react')
+      return {
+        useState: (value: unknown) => [
+          value === 'technologies' ? 'learning-paths' : value,
+          (next: unknown) => changes.push(next),
+        ],
+        useRef: (current: unknown) => ({ current }),
+        useEffect() {},
+      };
+    if (name === 'react/jsx-runtime') return require(name);
+    if (name.endsWith('.module.css')) return { __esModule: true, default: {} };
+    if (name === '../hooks/use-admin-auth')
+      return {
+        isEligibleAdminState: () => true,
+        useAdminAuth: () => ({
+          state: eligible,
+          controller: blankController,
+          available: true,
+        }),
+      };
+    if (name === '../components/layout/admin-shell')
+      return { AdminShell: () => null };
+    if (name === '../components/auth/admin-access')
+      return { AdminAccess: () => null };
+    if (name === '../components/technologies/technology-manager')
+      return { TechnologyManager: () => null };
+    if (name === '../components/learning-paths/learning-path-manager')
+      return { LearningPathManager: () => null };
+    throw Error('Unexpected U app dependency');
+  });
+  const root = (out.App as () => ReactElement)();
+  const workspace = (root.props as { children: ReactElement }).children;
+  const tree = (workspace.type as (props: unknown) => ReactElement)(
+    workspace.props,
+  );
+  const manager = elements(tree).find(
+    (item) => typeof item.props.registerWorkspaceNavigation === 'function',
+  );
+  assert(manager);
+  const register = manager.props.registerWorkspaceNavigation as (
+    guard: (next: () => void) => void,
+  ) => void;
+  let blocked = 0;
+  register(() => {
+    blocked++;
+  });
+  const next = elements(tree).find(
+    (item) =>
+      item.type === 'button' && item.props.children === 'Technology Management',
+  );
+  assert(next);
+  (next.props.onClick as () => void)();
+  assert.deepEqual(changes, []);
+  assert.equal(blocked, 1);
+  register((action) => action());
+  (next.props.onClick as () => void)();
+  assert.deepEqual(changes, ['technologies']);
+  // Retain the existing app's actual logout wiring check below; no proposal callback owns logout.
+  const selected = (root.props as { session: Record<string, unknown> }).session;
+  assert.equal(typeof selected.onLogout, 'function');
+});
 const render = (state = initial, available = true) =>
   renderToStaticMarkup(
     createElement(view(), { state, controller: blankController, available }),
