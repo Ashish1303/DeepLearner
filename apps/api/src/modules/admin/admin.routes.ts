@@ -15,6 +15,9 @@ import type { TechnologyLimits } from './technologies/admin-technology-rate-limi
 import { createAdminLearningPathRouter } from './learning-paths/admin-learning-path.routes.js';
 import type { AdminLearningPathService } from './learning-paths/admin-learning-path.service.js';
 import type { LearningPathReadLimits } from './learning-paths/admin-learning-path-rate-limit.js';
+import { createAdminLearningPathProposalRouter } from './learning-paths/admin-learning-path-proposal.routes.js';
+import type { AdminLearningPathProposalService } from './learning-paths/admin-learning-path-proposal.service.js';
+import type { ProposalLimits } from './learning-paths/admin-learning-path-proposal-rate-limit.js';
 
 export function createAdminRouter(
   service: AdminAccessService = createAdminAccessService(),
@@ -23,6 +26,8 @@ export function createAdminRouter(
   technologyLimits?: TechnologyLimits,
   learningPaths?: AdminLearningPathService,
   learningPathLimits?: LearningPathReadLimits,
+  proposals?: AdminLearningPathProposalService,
+  proposalLimits?: ProposalLimits,
 ) {
   const router = Router();
   const limit = createAdminRateLimits(limits);
@@ -45,6 +50,10 @@ export function createAdminRouter(
   router.use(
     '/learning-paths',
     createAdminLearningPathRouter(learningPaths, learningPathLimits),
+  );
+  router.use(
+    '/learning-path-proposals',
+    createAdminLearningPathProposalRouter(tokens, proposals, proposalLimits),
   );
   return router;
 }

@@ -2,10 +2,12 @@
 
 ## Status, authority and source precedence
 
-Latest scoped extension: **C1 READY_FOR_REVIEW — offline only**.
-The dated C1 section below records the separately gated sequencing extension
-and resolution of the historical API/test TypeScript blocker. Earlier dated
-contracts and failure evidence remain intact.
+Latest scoped extension: **proposal API A READY_FOR_REVIEW — offline only; delivered**.
+Checkpoint U: **PROPOSED — PENDING OWNER APPROVAL; NOT_STARTED**.
+The dated evidence below records delivered P and proposal API A checkpoints.
+C1/S and historical read-only A/B remain READY_FOR_REVIEW — offline only; earlier
+contracts/evidence remain intact. Live authority/transactions, proposal UI and
+acceptance remain separately gated.
 
 Feature: **IN_PROGRESS**. Read-only contract approved 2026-11-02 as PARTIAL
 F044 progress. Backend Checkpoint A: **READY_FOR_REVIEW — offline only**, with the
@@ -1618,3 +1620,2155 @@ Next gate is owner review and, if desired, separately authorized development
 checkpoint delivery. A future proposal persistence/API checkpoint needs its own
 exact writer/auth/source/concurrency/audit contract and bounded sequencing approval;
 no automatic C2/F045, F054 generation, F049/F050 decision or F051 publication work.
+
+## C2 persistence/source-authority proposal — 2026-11-04
+
+**PROPOSED — PENDING APPROVAL. Implementation: BLOCKED on source-authority
+definition; NOT_STARTED. No sequencing exception is enacted.**
+
+C1 was delivered separately in d0a2e5a81023f613aa37a796c2df815446853178,
+normal fast-forward push with local/tracking/fresh remote HEAD equality and a
+clean tree/index before this proposal was appended. That commit contains only
+the eight approved C1 paths. This C2 section is uncommitted documentation for
+owner review, not part of C1 delivery or authority to persist.
+
+### Inspected dependencies: what exists and what does not
+
+- C1 implements local shape/digest/binding validation and an inert private model.
+  Its source is explicitly an immutable upstream curriculum brief/input artifact,
+  not an AI result, citation or approval. No source-artifact model, repository,
+  admission record, producer or current-consumption authority exists in C1.
+- Source/model filename and content inspection under apps/api/src/modules found
+  no curriculum-brief/source-family authority implementation. Existing Concept
+  source metadata belongs to Concept citation/validation; it is not the C1 source
+  family/revision or authoritative brief bytes. Documentation of aiGenerations is
+  a future data design, not an implemented producer or authority record.
+- Existing F038 rubric/Concept-policy authorities bind specific grading/completion
+  resources and independent decisions. They cannot authorize curriculum sources
+  or be relabelled as proposal provenance.
+- F043's admin-technology.service.ts/repository.ts provide an inspected pattern:
+  signed-context revalidation, transaction-local verified ACTIVE ADMIN lookup,
+  conditional User __v write fence, snapshot transaction, majority+journaled commit,
+  same-session append-only audit and bounded unknown-commit handling. F042/F043
+  mandatory real verification remains incomplete; reusable source is not accepted
+  transaction/security evidence. These are patterns, not a generic exported C2
+  transaction engine; do not refactor shared infrastructure merely for C2.
+- audit.model.ts currently permits Technology/Auth/User/rubric events only. There
+  is no proposal-persistence audit branch or curriculum-source admission event.
+  Existing event labels and metadata cannot be reused to manufacture that evidence.
+- The approved architecture assigns briefs to private authoring and F044 to Path
+  proposal structures. It does not allocate an exact implemented brief-authority
+  contract. Assigning that input foundation to a bounded F044 extension is a
+  proposed owner decision, not existing authority or a newly invented feature ID.
+
+Consequently a complete executable C2 writer cannot yet be contracted against
+actual authority. A caller-supplied tuple, matching hash, mock source row, Technology
+title or privileged session is not a substitute. The conditions below specify the
+smallest consumer-side persistence proposal, **not a fabricated source foundation**.
+
+### Required source authority and Technology relationship
+
+Before C2 implementation, separately approve an authoritative private curriculum-
+brief/source contract and its exact implementation inventory. At minimum it must
+establish these logical facts; this is not a new physical schema declaration:
+
+1. A server-owned immutable source-family id and revision resolve to actual stored
+   canonical artifact bytes and their exact SHA-256, bound to one Technology.
+2. The authenticated admission operation, actor attribution, integrity checks and
+   atomic admission audit are defined. Admission means trusted capture of the input
+   brief, **not editorial approval, factual verification or permission to generate**.
+3. Canonical payload/encoding, bounds, identity allocation, unique revisions,
+   private projection, retention and admission/revision concurrency are explicit.
+   An opaque digest alone cannot establish hash-to-artifact correspondence.
+4. Eligibility/withdrawal/deletion semantics are explicit. If source eligibility
+   can change, consuming its authority must conflict transactionally with that
+   change, or the approved policy must explicitly make admission irreversible.
+   A snapshot read alone is not a revocation/deletion fence. Do not add a mutable
+   field to an immutable source revision or invent a no-op fence to conceal this.
+5. Parent lifecycle races have a declared policy. The candidate C2 rule permits
+   new private proposals under DRAFT/PUBLISHED Technologies and refuses ARCHIVED/
+   absent parents; existing archived-parent read inspection stays unchanged.
+   This new write policy is pending owner approval. Whether eligibility is an
+   admission-time snapshot or needs a lifecycle fence must be resolved explicitly;
+   C2 may not silently increment Technology __v and change F043 revision semantics.
+
+The source contract must supply an actual transaction-compatible consume/check
+operation with those guarantees before C2 selects any implementation dependency.
+No ready-made capability or proof object is assumed to exist today. C2 loads the
+authoritative record/bytes itself through that approved dependency in the same
+transaction and derives C1's expected binding server-side; request/producer claims
+cannot fill it. Recompute the actual source digest and match source identity,
+revision and Technology before validating the proposal.
+
+F054 owns generation. If the owner instead intends source to identify a generated
+outline/job result, that conflicts with C1's approved **input-artifact** meaning and
+depends on F052/F053/F054 contracts. Stop for explicit reallocation/amendment;
+do not absorb provider calls, jobs, budgets or AI output admission into C2.
+F049/F050 retain editorial decisions; F051 retains publication. No APPROVED,
+AI_GENERATED, review/publication authority or later-feature sequencing is created.
+
+### Conditional internal persistence boundary
+
+After the source dependency and implementation/sequencing approvals exist, C2
+would persist **one new immutable C1 revision plus its audit**, with no endpoint,
+UI, update/delete, generation or Student/public-model change. It is an internal
+bounded service; no arbitrary collection writer, caller-supplied actor or raw
+transaction callback is exposed.
+
+Use the existing connected Mongoose client's explicit session and inspected F043
+transaction pattern. C1 registration remains disconnected-only and import-inert;
+do not relax it to attach a live writer or use refused Model.validate/static paths.
+An approved repository may insert only the fully validated new record using the
+same native-driver session, as F043 already does. Model guards do not replace
+repository authorization and are not database WORM.
+
+Inside one transaction, before any new insert:
+
+1. Revalidate the original signed ADMIN context. Read actor by JWT sub, require
+   stored ADMIN/ACTIVE/valid verified Date and a safe incrementable __v. Perform
+   the existing conditional User-version increment matching all observed fields;
+   require exactly one match/change. Change no profile, role, credential, session
+   or timestamp field. Fence failure/deletion/demotion refuses the operation;
+   ordinary version contention is not proof of demotion. Recheck deadline/context
+   at the existing admission/commit boundaries.
+2. Read/qualify the exact Technology and consume the real source authority using
+   the separately approved lifecycle/concurrency contract above.
+3. Read the actual greatest stored revision for this proposalId using the unique
+   family/revision index in reverse order, bounded to one row. Validate the stored
+   predecessor's shape/digest/source-family/Technology and the proposed exact
+   predecessor identity/revision/digest. First revision requires no stored family;
+   later revision must be immediate +1 without overflow. Never compute a new
+   revision from a caller's unverified snapshot or silently select a newer target.
+4. Run C1 record and creation validators with authoritative binding/predecessor.
+   Require immutable family/Technology/source-family identity and permitted source
+   revision progression. Insert a new _id; never modify the predecessor.
+5. Insert the validated matching audit in the same transaction; any actor fence,
+   source, index, validation, insert or audit failure aborts all precommit writes.
+   Unique proposalId/revision contention refuses; no retry or revision skipping.
+
+Use primary/snapshot reads, majority+journaled commit, remaining-time driver
+timeouts/cancellation and one 10-second monotonic business budget following F043;
+commit is one application call capped at min(2000ms, remaining). Preserve the
+existing five-second request-authorization cap, final deadline checks and bounded
+session release. No transaction-body callback replay, automatic retry, longer
+deadline or claim that driver commit retry repeats the business operation.
+
+### Atomic audit, idempotency and uncertainty — candidate decisions
+
+Proposed new audit branch: category CONTENT_MANAGEMENT, action
+LEARNING_PATH_PROPOSAL_REVISION_CREATED, resourceType LEARNING_PATH_PROPOSAL_REVISION,
+resourceId equal to the new proposal revision _id. Actor is the fenced current
+Admin; requestId follows the existing 1–128 correlation convention; createdAt is
+the fixed server operation time. Metadata is exactly proposalId, revision,
+sourceId and sourceRevision. No source/definition digest, body, token, account
+snapshot or raw error. Preserve every existing audit tuple/metadata invariant and
+append-only guard; the future branch requires explicit approval/tests, not a
+relabelled Technology/Auth/approval event.
+
+To avoid inventing a receipt subsystem, the candidate internal operation identity
+is the server-owned proposed revision _id, fixed with all candidate bytes/time
+before transaction submission. Its audit _id is the same id in the separate
+auditLogs collection, providing one implicit unique identity there. A trusted
+future caller must retain the exact prepared command; no user/client identity
+allocation or new idempotency endpoint is implied.
+
+An explicit read reconciliation may return an existing result only after fresh
+current-account eligibility and source/privacy checks, and only when both the
+stored revision and exact audit exist, match the complete immutable command
+(including createdAt, not merely definitionDigest) and the original actor.
+Reconciliation/replay reads create no audit or User-version write. A different
+payload/actor/source or a different id occupying the requested family/revision
+is a conflict; one missing side is corruption/uncertainty, never success or repair.
+No new index/receipt collection is proposed beyond C1's documented indexes and
+existing audit indexes. Audit _id collisions fail closed, never overwrite.
+
+Once commit has been attempted, lost acknowledgement, cancellation, timeout or
+cleanup uncertainty reports UNKNOWN via fixed private service outcome/sanitized
+failure. Do not compensate, claim rollback, allocate another id or replay writes.
+Subsequent separately admitted read reconciliation uses primary/majority evidence;
+absence observed once is not permission to resubmit. The future API must define
+its own safe external error/operation-handle mapping; no HTTP contract is enacted.
+
+Successful result remains the exact C1 private DTO allowlist, projected only after
+full validation; digests, source bytes, actors and audit internals stay private.
+Logs retain fixed classification/correlation only. No raw Mongo errors, duplicate
+key values, command data, token/session state or arbitrary exception causes escape.
+
+### Conditional consumer inventory and verification prerequisites
+
+The exact **candidate consumer-side** inventory is listed below. It is not a
+complete implementation-ready inventory because the source-authority dependency
+and its own source files/contract are absent; approve those separately first.
+No unimplemented source-authority file/interface is presented as available.
+
+CREATE:
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+apps/api/tests/admin-learning-path-proposal-persistence.integration.ts
+```
+
+MODIFY:
+
+```text
+apps/api/src/modules/audit/audit.model.ts
+docs/features/F044-admin-learning-path-management.md
+docs/DATABASE_DESIGN.md
+docs/DEVELOPMENT_ROADMAP.md
+```
+
+No C1 model/schema/DTO relaxation, router/startup/public model, UI, setup/bootstrap,
+generic transaction framework, new supervisor or dependency belongs in that list.
+AGENTS.md requires a separately approved C2 sequencing amendment before source
+implementation; this document does not supply or enact it. Any resulting inventory
+change must return for explicit approval, not be inferred from this proposal.
+
+Offline acceptance would require injected inert transaction tests for actual-
+record binding/predecessor selection, Admin/source fence refusal, revision races,
+unique-key classification, audit rollback, exact idempotent reconciliation,
+partial/corrupt outcomes, delayed cancellation/deadlines, unknown commit handling,
+session release and raw DTO/error privacy, plus full TypeScript/build/lint/format/
+scope checks and fresh independent security review. Mocks do not establish the
+source dependency, real transactions, concurrency or physical indexes.
+
+Before any live persistence require the approved authoritative source contract,
+canonical bytes/digest/admission/consume implementation, complete collection/index/
+privilege/retention and owned fixture manifest, exact source pins, qualified
+exclusive disposable replica set and separate execution/provisioning approval.
+Real tests must demonstrate concurrent demotion/deletion/source invalidation,
+same-family competing revisions, atomic proposal/audit rollback and committed
+reconciliation with authenticated RESULT/ACK, process/Job ownership, deadlines,
+protected baselines and owned cleanup. Do not reuse the existing nine read-only
+records as C2 evidence or invent an executed case count. No persistent development
+or production writes are authorized by this plan.
+
+### One next decision and bounded alternative
+
+**C2 persistence implementation is BLOCKED, not ready for approval.** The precise
+missing prerequisite is an implemented, owner-approved immutable curriculum-brief
+source/admission/consume authority matching C1's input-artifact semantics. A pure
+tuple validator, citation metadata or the existing Admin transaction pattern does
+not provide it. The current C1-only sequencing extension also excludes C2 writes.
+
+Recommended next authorization: **documentation-only definition of a bounded
+F044 curriculum-brief source-authority prerequisite**, covering the minimum logical
+facts and parent/source lifecycle policies above, exact model/producer/fence/audit
+inventory and offline/live gates. Amend this same feature contract and database
+design for review; leave AGENTS.md and the active sequencing rule unchanged until
+the owner approves an exact extension. No generation, editorial/publication
+workflow or infrastructure expansion is needed for that design decision.
+
+Estimate:45–90 minutes for that bounded source-authority contract; C2 consumer
+implementation/tests/review provisionally 1–2 engineering days only after the
+dependency exists and is separately approved. Real integration qualification is
+additional and cannot currently be estimated as executable. Do not start another
+model-only or infrastructure project automatically to conceal the dependency.
+
+F044 remains IN_PROGRESS; C1 READY_FOR_REVIEW — offline only; F042/F043 acceptance
+BLOCKED. Nine integration records and225 browser cases remain NOT_RUN; production
+readiness NOT_VERIFIED. This preparation ran no tests, DB calls, provisioning,
+runtime/browser/AI operation or C2 implementation, changed no acceptance status,
+and leaves only this proposed documentation uncommitted after C1 delivery.
+
+## Minimal Admin-authored curriculum-brief authority — 2026-11-04
+
+**PROPOSED — PENDING OWNER APPROVAL. Documentation only; implementation
+NOT_STARTED. No active sequencing extension, persistence, endpoint, UI, DDL or
+runtime permission is enacted.** This section supplies the missing source design
+for the preceding C2 draft; that draft and all historical evidence remain intact.
+Where its conditional choices differ, the specific choices below are the proposed
+replacement, not a claim that the earlier draft was approved.
+
+### Required guarantees versus proposed choices
+
+Already approved C1 requirements are immutable Technology/source-family binding,
+actual source revision/digest correspondence, strict bounded content and private
+DTOs. The existing security contracts require current-account Admin eligibility,
+mutation-time User-version fencing, atomic writes/audit, bounded failure handling
+and mandatory real verification. C1's caller-supplied expected tuple proves only
+local equality. Neither the tuple, its model nor Concept citation metadata supplies
+an admitted source record or proof that anyone authorized captured its content.
+F043 supplies transaction patterns, not a curriculum-source authority.
+
+The **new design recommendations**, requiring owner approval, are: one immutable
+Admin-authored brief revision per source family initially; atomic brief/first-
+proposal capture; permanent admission as historical input; snapshot parent
+eligibility; an actor-bound operation key for uncertain-save reconciliation; and
+the future API/UI below. These are not inherited acceptance requirements. AI
+sources, generic ingestion, provider adapters and a source-review state machine
+are unnecessary. Choosing this minimal foundation is optional; continuing to
+defer persistence remains safe. Once chosen, its integrity/privacy rules are
+mandatory. A digest detects inconsistent bytes; it is not a signature, factual
+verification or authority independent of authenticated admission/audit.
+
+### One immutable source record
+
+Proposed private collection `curriculumBriefRevisions`, model
+`AdminCurriculumBriefRevision`. All keys below are required, explicitly allocated
+and immutable. No defaults, timestamps plugin, `__v`, updatedAt, status, provider,
+approval, revocation or generation fields are added.
+
+| Field                                                                                       | Exact meaning and constraint                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `_id`                                                                                       | Server-generated ObjectId; also the source-family identity. Wire form, when allowed, is canonical lowercase 24-hex.                                                                                 |
+| `technologyId`                                                                              | Server-verified existing Technology; immutable canonical ObjectId. Never inferred from a title, slug or browser state.                                                                              |
+| `schemaVersion`, `revision`                                                                 | Both literal `1`. This first foundation admits exactly one revision per family. A changed brief is a new family; no brief-update/revise endpoint or successor machinery.                            |
+| `title`, `objectives`, `audience`, `depth`, `runtime`, `technologyVersion`, `prerequisites` | Exactly C1's exported content definitions, nullability, ordering, duplicate and Unicode rules; reuse them, do not fork their bounds.                                                                |
+| `createdBy`                                                                                 | Server-derived fenced Admin ObjectId, retained as attribution after account deletion; no copied email, name, role or session.                                                                       |
+| `createdAt`                                                                                 | Explicit finite server UTC Date, fixed with candidate IDs before the transaction attempt.                                                                                                           |
+| `operationId`                                                                               | Canonical lowercase RFC 4122 UUIDv4, 36 characters, cryptographically generated once by the restricted client for one explicit Save intent; correlation only, never authorization or a resource ID. |
+| `contentDigest`                                                                             | Lowercase 64-hex SHA-256 of the exact canonical source bytes below; computed server-side.                                                                                                           |
+
+There is no duplicated raw-byte/blob field or separate title/summary metadata.
+Canonical bytes are reconstructed from this complete stored record. Reusing C1
+means title 1–120 UTF-16 units; 1–20 distinct objectives each 1–240; audience
+1–500; depth BEGINNER/INTERMEDIATE/ADVANCED; runtime null or exact name 1–80 and
+version null/1–80; technologyVersion null/1–80; 0–20 distinct prerequisite objects
+with description 1–240. Text must already be trimmed, well-formed single-line
+Unicode; reject controls and unknown/operator fields, never silently normalize
+case, whitespace or Unicode. These existing bounds need no new product limits.
+
+Source digest is SHA-256 over UTF-8 `JSON.stringify` of this ordered array:
+
+```text
+["F044-admin-brief-v1", id, technologyId, 1, 1,
+ title, objectives, audience, depth,
+ runtime === null ? null : [runtime.name, runtime.version],
+ technologyVersion, prerequisites.map(p => p.description),
+ createdBy, createdAt.toISOString(), operationId]
+```
+
+All IDs in that array are lowercase strings. Do not hash BSON, object-key order,
+locale sorting, pretty JSON or the digest itself. Bound both canonical-array JSON
+and the complete canonical record JSON (ObjectIds as hex, Date as ISO) to 65,536
+UTF-8 bytes, reusing C1's aggregate ceiling to bound hashing/copying. Byte counts
+are not character counts. Server allocation can cause a boundary refusal; do not
+truncate content to fit. Fixed digest vectors include nulls, array order, Unicode,
+actor/time/operation changes and metadata inclusion. New domain separation avoids
+confusing a source digest with C1's proposal-definition digest.
+
+C1 binding is exactly `source:{id:brief._id,revision:1,digest:contentDigest}` and
+the same `technologyId`. Source and proposal family have different semantic roles;
+their IDs intentionally coincide only under the initial allocation policy below.
+Neither is a Technology ID or AI job ID. One initial brief can support later
+immutable revisions of its bound
+proposal family under the existing C1 rules. This first workflow creates only
+proposal revision 1; editing/revising proposals or replacing their source is not a
+UI/API capability in this plan. C2's stored-predecessor checks still apply to its
+internal revision consumer; they cannot authorize a new public workflow.
+
+Registration follows C1: explicit compilation only against the existing
+disconnected Mongoose instance, import-inert, strict throw, no implicit IDs/arrays,
+autoCreate/autoIndex/buffering/timestamps disabled. Guard instance, static, raw
+registered-model and bulk/update/delete validation paths consistently with C1;
+no claim of database WORM. Live inserts use only the approved native-driver
+transaction repository after full validation; registration is not a writer.
+
+Intended indexes, documentation only:
+
+- `_id_`: implicit unique identity; because revision is literal 1 and family is
+  `_id`, no redundant family/revision index.
+- `uq_curriculum_brief_actor_operation`: ordered `{createdBy:1,operationId:1}`,
+  unique, simple collation; one admitted Save intent per actor and a bounded exact
+  reconciliation lookup. No TTL, partial, sparse or hidden option.
+
+No browse/search index or brief inventory is needed initially. Together with C1's
+two explicit proposal indexes, this adds **two private collections and three
+explicit indexes plus their two implicit `_id_` indexes**, not yet provisioned.
+The historical 19-collection/27-explicit-index guarded fixture inventory remains
+historical and unchanged; future persistence needs a separately approved manifest
+including both collections, these exact indexes and existing audit dependencies.
+
+### Admission, consumption and lifecycle
+
+Only a valid ADMIN access context whose current stored User is verified, ACTIVE
+and ADMIN may admit a brief. Reverify the signed context and transactionally fence
+the observed User `__v`, role/status and verification fields using F043's actual
+conditional increment pattern. Caller actor, source digest/revision, dates,
+proposal IDs, role, approval/status and Mongo operators are rejected. Normal
+version contention refuses rather than silently retrying. Client-side eligibility
+and F042's request guard alone cannot authorize the mutation.
+
+The proposed initial admission is irreversible **as captured input**, not
+irrevocable permission for its author to act. There is no mutable source
+eligibility flag, withdrawal/delete endpoint or TTL. Later demotion, suspension,
+unverification or deletion of the author blocks that account's future operations,
+but does not erase or invalidate a previously atomically admitted brief. Every
+consumer/reconciliation/read independently checks its own current Admin access;
+author attribution is never a credential. Retain the source for as long as any
+proposal references it and retain its admission audit. No cascade on User or
+Technology deletion. Legal erasure/retention exceptions need a separately approved
+maintenance policy; this plan authorizes no deletion, including unreferenced
+records. Do not store secrets or personal data in brief content.
+
+For new brief/proposal writes the proposed parent rule is existing Technology in
+DRAFT or PUBLISHED at the transaction snapshot. Missing, invalid or ARCHIVED
+parents refuse. This deliberately means **snapshot admission eligibility**, not
+commit-time exclusion of concurrent archival/deletion. An archive/delete committed
+after that snapshot can coexist with the private draft commit; it grants no
+publication authority. Future writes use a fresh snapshot and refuse a now-
+ineligible parent. Do not modify Technology `__v`, add a lock field or claim a
+parent lifecycle fence. If the owner requires archival/deletion to prevent every
+overlapping commit, STOP for a separate coordinated Technology lifecycle design;
+the minimal inventory here cannot provide that stronger guarantee.
+
+Consumption resolves the actual exact source row in the same transaction, fully
+validates/recomputes its canonical digest and requires exact Technology/family/
+revision match plus a matching committed admission audit. The row's creator/time/
+operation must match that audit; missing/corrupt/one-sided evidence fails closed.
+Admission has no revocable state to race; no no-op source fence is invented.
+During first capture the source and audit are transaction-local inserts; a proposal
+cannot commit without them. Archived-parent read-only Learning Path inspection
+remains unchanged. New private proposal detail/reconciliation requires an existing
+parent; archived parents may be inspected, missing parents return sanitized 404
+while retained rows/audits remain intact.
+
+### One Save transaction, audit and uncertainty boundary
+
+Usable flow: **select Technology → enter brief → Save private proposal → inspect
+saved private proposal**. The user explicitly saves once. The server copies the
+validated C1 content into the initial proposal while retaining the immutable brief
+as the authoritative input snapshot. This content duplication is intentional:
+source evidence must survive later proposal revision changes. No AI call, editorial
+decision, LearningPath write or publishing action occurs.
+
+Reuse F043's primary/snapshot transaction, majority+journaled commit, explicit
+session, current-Admin fence and deadlines. Within one transaction insert exactly:
+
+1. One brief and `CURRICULUM_BRIEF_ADMITTED` audit.
+2. One C1 revision-1 proposal and `LEARNING_PATH_PROPOSAL_REVISION_CREATED` audit.
+
+Allocate two distinct IDs once server-side: brief `_id` and proposal revision
+`_id`. Set initial `proposalId=brief._id`; this explicit family-allocation policy
+provides indexed recovery without adding a redundant link field. C1 permits this
+identity equality but does not enforce the policy. Use each resource ID as its
+audit `_id` in the separate audit collection. Keep
+the complete prepared candidate fixed across this one transaction attempt. No
+standalone brief-admit endpoint, orphan staging collection or receipt subsystem.
+Any precommit failure aborts the whole pair and User-version change. Retain C2's
+actual stored-predecessor/unique-revision checks for internal later revisions.
+
+Both new audit branches use CONTENT_MANAGEMENT, fixed server actor/requestId/
+createdAt and exact resource linkage. Brief event resourceType
+CURRICULUM_BRIEF_REVISION has resourceId=brief ID and metadata exactly
+`{technologyId,revision:1,operationId}`. Proposal event retains C2's exact metadata
+`{proposalId,revision,sourceId,sourceRevision}` and resource type
+LEARNING_PATH_PROPOSAL_REVISION. Validate every old audit branch unchanged.
+No body/digest/token/account snapshot/raw exception is logged or audited.
+Audit admission proves authenticated capture only; never label it APPROVED,
+AI_GENERATED, scientifically verified or permission to generate/publish.
+
+Retain the 5-second request-authorization cap, 10-second total business budget,
+one application commit call capped at min(2000ms, remaining), cancellation/final
+deadline checks and bounded session cleanup. No transaction-body replay or automatic
+retry. Integration supervision remains 180/205 seconds, RPC/ACK 5 seconds and
+heartbeat 2 seconds; this design does not implement or qualify those controls.
+
+The operation key is the minimal **external** addition to C2's internal candidate-
+ID proposal. The unique actor/key index identifies a prior capture without a new
+receipt collection. A duplicate key is never success by itself: after fresh access
+checks, explicitly reconcile the full brief, its exact audit, the corresponding
+unique revision-1 proposal and its exact audit. Resolve it by exact
+`{proposalId:brief._id,revision:1}` through C1's unique index: **the brief ID is
+used as initial `proposalId`**.
+This is a proposed allocation policy, not C1 structural validation; the proposal
+revision `_id` remains distinct. Later revisions keep that family binding. No
+unindexed scan or arbitrary limit establishes uniqueness.
+
+Require matching complete canonical content/Technology, original actor/key and
+both resource/audit pairs, not merely a hash. Different content or parent under
+the same actor/key is 409 conflict. Corrupt or one-sided rows are UNKNOWN, not
+repairable success. Another Admin cannot claim that actor's operation key. A
+UUID is correlation, not authentication; private GET authorization is still needed.
+After commit is attempted, timeout/disconnect/cleanup ambiguity is UNKNOWN; never
+claim rollback, compensate, replay writes or allocate a replacement intent.
+Explicit reconciliation uses primary/majority reads and creates no audit/fence
+write. Absent evidence is UNRESOLVED, never proof that re-saving is safe.
+
+Check for a committed actor/key before beginning any new mutation/fence; that
+read path must never increment the User version. A racing unique-key refusal
+aborts its entire transaction, then permits only explicit read reconciliation,
+not another write attempt. A new key cannot reuse an existing source/proposal
+family. These rules avoid both duplicate saves and retries disguised as recovery.
+
+### Proposed usable API/UI boundary (later approval)
+
+These routes are proposals, not existing endpoints or implementation permission:
+
+- `POST /api/v1/admin/learning-path-proposals`: strict JSON exactly
+  `{technologyId,operationId,...C1 content fields}`; no query parameters. Successful
+  new save returns 201 with the existing success envelope and exact C1 private DTO.
+  A previously committed identical operation may return 200 only after complete
+  read reconciliation, with no new writes. No automatic POST replay.
+- `GET /api/v1/admin/learning-path-proposals/:id?technologyId=...`: exact canonical
+  proposal-revision ID and required parent binding; full validation then C1 DTO.
+- `GET /api/v1/admin/learning-path-proposals/operations/:operationId?technologyId=...`:
+  actor-bound explicit read recovery, registered before the ID route. Success data
+  is exactly `{state:'COMMITTED',proposal:<C1 DTO>}` or `{state:'UNRESOLVED'}`.
+  Never use a public operation registry or return another actor's existence.
+
+No source browse/revise endpoint, PATCH, DELETE, public route or LearningPath
+schema change. Reuse current protected namespace, envelopes/no-store/errors.
+Strict identity/query/body schemas reject extras; GET bodies refuse. Proposed
+route-local JSON ceiling 131,072 bytes, identity encoding/no inflation, before the
+existing generic parser: enough for the 65,536-byte canonical record plus JSON
+escaping/envelope without weakening the canonical bound. Oversized encodings
+refuse, not truncate. Use the existing namespace IP/account gates plus a separate
+bounded per-account proposal bucket matching Technology defaults (120 reads and
+60 saves per 60 seconds; capacity 10,000; fail closed), avoiding hidden global
+policy changes. Offline tests must verify parser/order and bounded operation lookup.
+
+Sanitized 400/401/403/404/409/413/415/429 remain distinct. Dependency/deadline failures
+use fixed 503; postcommit ambiguity uses fixed PROPOSAL_OUTCOME_UNKNOWN, no raw
+database/message details. Response codes alone never prove absence of a mutation.
+All DTOs validate raw stored data before projection. Briefs have no additional UI
+DTO: initial saved content is exposed through C1's 14-key private proposal DTO;
+digests, actors, operation keys, audit fields and raw source never enter it.
+
+Keep Technology Management the default. Under Learning Paths offer an explicit
+Create private proposal action only for eligible DRAFT/PUBLISHED selection; archived
+inspection stays read-only. Accessible bounded fields use C1 definitions, clear
+labels/null handling, field errors, disabled pending Save and a clear “private
+proposal — not approved or published” result. Render text safely. Reuse Stitch,
+keyboard/focus/responsive patterns and current Technology selector; no fake
+Generate/Approve/Publish buttons. Tokens remain in F042's controller. Add only fixed
+proposal save/detail/reconcile descriptors, never arbitrary URL/token callbacks.
+Bind operation key, form and results to account/session generation and Technology;
+cancel/suppress late responses on logout/switch. Key/content stay in memory only,
+not browser storage/logs. Uncertain Save blocks another mutation and offers only
+explicit read recovery. Loss of in-memory recovery context requires operator
+reconciliation before repeating the intent, not an automatic new key. That is an
+explicit limitation of avoiding durable client/receipt infrastructure.
+
+### Dependency order, exact proposed inventories and gates
+
+The lists below are exact proposed application/test inventories, not permission
+to implement them. Shared evidence changes for each checkpoint are limited to
+this feature document, DATABASE_DESIGN.md and DEVELOPMENT_ROADMAP.md. Enacting a
+sequencing extension would additionally change AGENTS.md only after approval.
+No new dependency, generic supervisor, provider framework or model relaxation.
+
+**S — source structure (3 CREATE paths):**
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.schema.ts
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.model.ts
+apps/api/tests/admin-curriculum-brief.test.ts
+```
+
+Offline acceptance: exact fields/bounds including literal revision 1; C1 schema
+reuse; deterministic source digest vectors/UTF-8 ceiling; operator/privacy rejection;
+immutable inert registration including C1's known validation-bypass regressions.
+This checkpoint alone **does not establish authenticated source authority**.
+
+**P — source admission and C2 internal persistence (4 CREATE + 2 MODIFY):**
+
+```text
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+CREATE apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-persistence.integration.ts
+MODIFY apps/api/src/modules/audit/audit.model.ts
+MODIFY apps/api/tests/auth-audit.test.ts
+```
+
+One feature-local repository owns the atomic capture/consume path; no separate
+brief writer/fence subsystem. This completes the previously conditional C2
+inventory with an explicit existing audit-regression path. Offline acceptance:
+inert transaction mocks prove call ordering, current-Admin/version refusal,
+authoritative source/audit recomputation, snapshot-parent policy, predecessor
+validation, unique-key/conflict classification, full pair/audit atomic intent,
+idempotency identity/content binding, no retry, delayed timeouts/unknown commit,
+session release and raw privacy. All historical audit tests retain their meaning.
+
+**A — bounded Admin API (7 CREATE + 3 MODIFY):**
+
+```text
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-request.schema.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-rate-limit.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.controller.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.routes.ts
+CREATE apps/api/tests/admin-learning-path-proposal-routes.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-requests.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-api.integration.ts
+MODIFY apps/api/src/modules/admin/admin.routes.ts
+MODIFY apps/api/src/app.ts
+MODIFY docs/API_DESIGN.md
+```
+
+Offline acceptance: fixed three-route contracts, request/parser/rate-limit ordering,
+no-store, actor-derived calls, strict parent binding, exact DTO/error envelopes and
+no unauthorized body fields. Record the exact API contract in API_DESIGN.md only
+as part of that separately approved checkpoint; use fixed route labels so operation
+keys do not enter request-path logs. Prepare live route tests; do not start listeners or
+label offline HTTP mocks as live evidence. Public F017 routes remain unchanged.
+
+**U — usable Admin flow (10 CREATE + 6 MODIFY):**
+
+```text
+CREATE apps/admin/src/lib/learning-path-proposals/contracts.ts
+CREATE apps/admin/src/lib/learning-path-proposals/proposal-client.ts
+CREATE apps/admin/src/lib/learning-path-proposals/proposal-controller.ts
+CREATE apps/admin/src/hooks/use-learning-path-proposal.ts
+CREATE apps/admin/src/components/learning-paths/learning-path-proposal-form.tsx
+CREATE apps/admin/src/components/learning-paths/learning-path-proposal-form.module.css
+CREATE apps/admin/tests/learning-path-proposal-client.test.ts
+CREATE apps/admin/tests/learning-path-proposal-controller.test.ts
+CREATE apps/admin/tests/learning-path-proposal-rendering.test.ts
+CREATE tests/browser/admin-learning-path-proposals.spec.ts
+MODIFY apps/admin/src/lib/auth/admin-controller.ts
+MODIFY apps/admin/tests/admin-controller.test.ts
+MODIFY apps/admin/src/components/learning-paths/learning-path-manager.tsx
+MODIFY apps/admin/tests/learning-path-rendering.test.ts
+MODIFY apps/admin/src/app/app.tsx
+MODIFY apps/admin/tests/admin-rendering.test.ts
+```
+
+Offline acceptance: valid/invalid form bounds, parent selection, fixed authenticated
+descriptors, no token exposure, account/session/Technology races, cancellation,
+double-submit refusal, explicit recovery/no mutation replay, safe text rendering,
+keyboard semantics and all existing default-workspace/read-only regressions.
+Prepare individually named browser cases without claiming execution. No unplanned
+edits to existing client/controller GET behavior are implied by this inventory.
+
+S precedes P; P precedes A; A's stable reviewed contract precedes U. Each source
+checkpoint requires focused offline tests, relevant full TypeScript/build, lint,
+format/encoding/scope/privacy checks and fresh independent review with findings
+resolved. Offline development eligibility is separate from live readiness.
+Each implementation approval and each Git commit/push remain separate decisions.
+
+Real guarantees require separately authorized isolated replica-set execution:
+physical collections/indexes/privileges; actual User demotion/deletion contention;
+same-operation and revision races; no partial source/proposal/audit commit;
+rollback; unknown commit/reconciliation; declared snapshot-parent concurrency;
+and owned cleanup/protected baselines/authenticated RESULT/ACK. Reuse the existing
+reviewed mechanism only after an approved persistence fixture/case/source manifest
+exists; the existing nine read-only records cannot prove these new writes. No new
+case count or runtime readiness is claimed. Usable acceptance additionally needs
+real save/read/recovery API evidence and separately authorized browser checks for
+login/selection/form/result/logout, responsive/focus behavior and stale-data refusal.
+
+### Proposed bounded sequencing extension — not enacted
+
+> **PROPOSED — PENDING OWNER APPROVAL: F044 Admin-authored brief/proposal extension.**
+> After separate approval of this exact contract, permit only the S/P/A/U
+> inventories above, each under separate implementation authorization, while
+> mandatory F042/F043 verification remains outstanding. Before each checkpoint
+> require stable reviewed dependencies, explicit field/transaction/parent policies,
+> no unresolved blocking security finding and an exact approved inventory.
+> Permit offline implementation/preparation only; no live persistence, provisioning,
+> source-authority claims from mocks or browser execution without separate approval
+> and the existing qualified ownership/isolation/cleanup gates. Existing protected
+> baselines, authenticated RESULT/ACK, deadlines and acceptance requirements remain.
+> F044 remains partial IN_PROGRESS; F042/F043 acceptance remains BLOCKED. Generation
+> stays F054, editorial decisions F049/F050, publication F051. No other slice/feature
+> progression, schema migration, generic ingestion or production authority follows.
+> Every commit and push requires separate explicit approval. This text has no effect
+> until the owner approves enactment through the prescribed documentation process.
+
+AGENTS.md is unchanged in this preparation. Its enacted read-only/C1 extensions
+still exclude these writers/endpoints/UI; this proposal cannot authorize them.
+
+### Effort, decisions and retained limitations
+
+The former **1–2 engineering days** was conditional C2 consumer implementation,
+tests and review **after source authority existed**. It did not include this new
+foundation, a usable API/UI, provisioning or live qualification. Revised separate
+estimates, assuming stable contracts and available offline tooling:
+
+| Work                                  | Estimate and boundary                                                                                                                                      |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Source structure/admission foundation | S: 0.5–1 day; P's source admission/audit portion: 0.5–1 day. Total 1–2 days, not authority after S alone.                                                  |
+| Proposal persistence                  | Remaining P consumer/predecessor/reconciliation tests and review: 1–2 days, excluding the admission portion counted above.                                 |
+| Usable Admin API/UI                   | A: 0.5–1 day; U: 1–2 days. Total 1.5–3 days.                                                                                                               |
+| Combined offline delivery             | 3.5–7 engineering days; security-review findings or contract changes can increase it. No parallelism or live execution assumed.                            |
+| Real database/browser qualification   | Additional; blocked on separately approved target/manifest/ownership and runtime access. No reliable elapsed estimate while those gates remain unresolved. |
+
+Smallest next decision: approve or revise this source/parent/idempotency policy
+and proposed inventories, then separately authorize enacting only its named
+sequencing extension and implementing **S** with offline review. P/A/U remain
+separately gated. If faster usable delivery is preferred, S and P may be proposed
+as one coherent backend authorization later; they are not authorized here.
+
+Historical C1's 127 focused PASS and resolved independent findings are retained,
+not rerun. No source implementation/test/runtime/database/AI operation occurs in
+this documentation task. F044 IN_PROGRESS; C1 and read-only checkpoints
+READY_FOR_REVIEW — offline only; F042/F043 acceptance BLOCKED; nine integration
+records and 225 browser cases NOT_RUN; production readiness NOT_VERIFIED.
+
+## Source-structure S authorization and policy decisions — 2026-11-04
+
+This later owner decision supersedes only the pending-policy/implementation gate
+for the three-path source-structure **S** checkpoint. The earlier C2/source drafts
+remain intact as history. The owner approved immutable initial brief revisions,
+historical admission surviving author demotion/deletion, actor-bound operation keys
+and explicit uncertain-save reconciliation, and atomic brief/proposal/two-audit
+Save as the intended future boundary. The owner authorized S implementation and
+offline verification only. Persistence P, API A and UI U remain NOT_STARTED and
+separately gated; the broad proposed extension above is **not enacted**.
+
+AGENTS.md enacts only the named S extension, exactly the schema/model/test CREATE
+inventory. No additional brief DTO is specified or exposed: C1's private proposal
+DTO remains the boundary; a pure validated brief-to-source binding is internal
+structural data, not an authenticated capability. Existing C1 files remain unchanged.
+
+Technology policy limitation is explicit: a future transaction admitting a private
+brief/proposal may commit if its DRAFT/PUBLISHED parent is archived or deleted
+after the transaction snapshot. There is no parent lifecycle fence or Technology
+version write. This grants no publication authority and performs no cascade.
+Stored source/proposal/audit evidence remains retained. With an archived parent,
+protected private inspection remains allowed but new writes refuse; with a deleted
+or unavailable parent, private detail/reconciliation returns sanitized 404 while
+retaining evidence. Every subsequent operation rechecks current account authority
+and applicable parent rules. Author demotion/deletion preserves a historical input,
+never permission for future actions. None of these database behaviors is proved
+by S's structural tests or implemented in S.
+
+Preflight matched dev at d0a2e5a81023f613aa37a796c2df815446853178, exactly three
+reviewed modified documents and empty index. Drafts/historical evidence are
+preserved. F044 IN_PROGRESS; C1/A/B READY_FOR_REVIEW — offline only; F042/F043
+acceptance BLOCKED; nine integration records and 225 browser cases NOT_RUN;
+production NOT_VERIFIED. No live execution or Git delivery is authorized.
+
+## Source-structure S implementation and independent offline review — 2026-11-04
+
+**S READY_FOR_REVIEW — offline only.** This later evidence supersedes S's earlier
+NOT_STARTED wording, not the unapproved P/A/U checkpoints. The enacted AGENTS.md
+extension remains limited to S. Original C1/C2/source proposals and historical
+tests/failures remain intact; only current summary pointers are reconciled.
+
+### Exact implemented scope
+
+CREATE only:
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.schema.ts
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.model.ts
+apps/api/tests/admin-curriculum-brief.test.ts
+```
+
+Reuse C1's exported content schemas, byte ceiling and inert-data snapshot rather
+than duplicate field definitions. Implement literal schema/revision 1, required
+canonical identities/date/UUIDv4 operation key, exact source digest over all
+specified fields, separate expected Technology validation and internal C1 binding.
+No extra brief DTO is exposed; pure tests connect the binding to C1's unchanged
+proposal validation/private DTO and check excluded brief metadata. Input/body
+validation and binding equality do not authenticate an actor or admit a source.
+
+The model is import-inert, explicitly registered only while disconnected, with
+autoCreate/autoIndex/buffering/timestamps/versionKey disabled and exact prospective
+index metadata. Construction validates raw content before casting; raw-registry
+async/sync/static/Standard-Schema validation fails closed without valid context.
+Immutable guards refuse supported updates/replacements/deletes/bulk operations.
+All Mongoose saves, including new documents with validation disabled, now refuse;
+the future P repository remains a separately approved native-driver insert boundary.
+No model is imported into application startup or connected to MongoDB by this work.
+
+### Checks actually executed
+
+- Initial default-context focused test launch failed in tsx before registering any
+  case: uv_os_get_passwd ENOMEM. The supported command-specific host context then
+  ran only the authorized synthetic file, with test isolation disabled and no
+  database/bootstrap/browser or child-runtime suite. No Windows elevation/policy
+  change or environment troubleshooting was performed.
+- Initial actual focused run: **105 PASS / 0 FAIL**. Independent-review corrections
+  added six fixed digest vectors; final command
+  `node --import tsx --test --test-isolation=none --test-reporter=spec apps/api/tests/admin-curriculum-brief.test.ts`
+  executed **111 PASS / 0 FAIL / 0 skipped / 0 cancelled**. Counts are not summed
+  across reruns. The byte-limit helper tests its exact UTF-8 boundary; tighter
+  content bounds mean no fabricated full-record 65,536-byte acceptance claim.
+- Full API/test TypeScript PASS, including after the corrected tests/model:
+  `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.test.json --noEmit --incremental false --pretty false`.
+  No new or baseline diagnostics; the earlier corrected TS2322 errors remain resolved.
+- API production build/typecheck PASS, including after the save-guard correction:
+  `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.json --incremental false --pretty false`.
+  Only normal ignored dist outputs; no application startup or deployment.
+- Three-file targeted ESLint with max-warnings=0 PASS. Scoped source/document
+  Prettier, strict UTF-8/LF/no-BOM, git diff --check, exact scope, historical content
+  preservation and sensitive-data review PASS. No unrelated passing suite or login
+  QA rerun. Mongoose validateSync deprecation warnings remain visible, not suppressed.
+- Tests use synthetic identities/content, disconnected models and inert hook doubles.
+  Refusal spies cover connections/collection operations, network/listeners, child
+  processes/timers and application-private environment/config access. No save/query
+  or DDL dispatch is used to test immutable hooks.
+
+### Independent findings and resolution
+
+A fresh independent reviewer context inspected the actual three files, C1 reuse
+and source/S contracts without editing or executing tests/live operations.
+Initial findings: Critical 0 / High 0 / Medium 1 / Low 1.
+
+- Medium: a new/raw-registry document could skip validation with
+  save({validateBeforeSave:false}) because the pre-save hook only refused existing
+  documents. S now refuses every Mongoose save; inert new/existing hook doubles
+  confirm refusal without dispatch. No C1 or future native-driver policy was changed.
+- Low: null/Unicode/order/admission-metadata variants used a mirrored JavaScript
+  digest oracle, with only one fixed baseline hash. Six independently derived
+  Python compact-UTF-8-JSON/hashlib constants now cover those variants individually.
+
+Independent closeout reread the actual corrections and reported **Critical 0 /
+High 0 / Medium 0 / Low 0 unresolved**. Executed test/build evidence above belongs
+to the implementation agent; no independent test rerun is claimed. Separate
+self-review checks scope, documentation consistency and retained limitations.
+
+### Guarantees and next boundary
+
+Established: local shape/bounds/digest integrity, inert-data handling, Technology
+equality on supplied context, private C1 projection compatibility and disconnected
+in-memory validation/guard behavior. An admissible-looking synthetic record is not
+an admitted source. Not established: stored existence/Technology eligibility,
+current-account authorization, operation uniqueness, transaction/concurrency,
+source/audit correspondence, atomicity, real indexes, retention or database WORM.
+The documented snapshot archive/delete race is a future policy, not a passing test.
+
+Smallest coherent next checkpoint is **P — source admission and internal C2 proposal
+persistence** under separate exact-inventory/sequencing authorization. It would
+connect S/C1 through the current-Admin transaction fence and atomic brief/proposal/
+two-audit boundary, plus explicit read reconciliation and prepared integration
+assertions. P still adds no API/UI or permission for live writes. A/U follow only
+after their own approvals. Generation F054, editorial F049/F050 and publication
+F051 remain unchanged.
+
+Git scope after S: seven pending paths (three new source/test files plus AGENTS.md
+and the three already modified documents), index empty; HEAD unchanged at
+d0a2e5a81023f613aa37a796c2df815446853178. No staging/commit/push. Guarded execution
+pins remain historical/stale; no refreeze or runtime qualification occurred.
+F044 IN_PROGRESS; C1/A/B/S READY_FOR_REVIEW — offline only; F042/F043 acceptance
+BLOCKED; nine integration records and 225 browser cases NOT_RUN; production
+readiness NOT_VERIFIED. No acceptance or other-feature status advances.
+
+## P internal persistence authorization — 2026-11-04
+
+S was delivered in f95e1bf025958527df2d75c73716d0ef1e406d24, normal fast-forward
+push with local/tracking/fresh remote equality and clean tree/index. The owner
+separately authorized P only, including the six-path application/test inventory,
+offline verification and independent review. AGENTS.md enacts only P's bounded
+offline extension. Earlier P NOT_STARTED/proposed-policy wording is historical.
+P implementation is IN_PROGRESS; it must remain uncommitted for review.
+
+P implements the approved internal capture/reconciliation and revision-consumer
+contract. Initial capture derives actor/IDs/time server-side. Later revision commands
+are prepared internally with fixed server identity/time, complete expected
+predecessor and original actor binding, then validated against actual stored source
+and greatest predecessor in the transaction. Prepared data is not source authority
+or authorization. Explicit reconciliation never writes/fences or retries a mutation.
+No endpoint/UI, additional collection/index, generic transport or supervisor.
+
+Snapshot DRAFT/PUBLISHED eligibility is not a concurrent archive/delete fence.
+An overlapping post-snapshot archival/deletion may coexist with private commit;
+no cascade/publication follows. Archived-parent protected inspection remains allowed,
+new writes refuse; missing-parent reads refuse while historical evidence remains.
+Historical admission survives author demotion/deletion; every consumer requires
+current account authorization. Existing C1/S model and DTO contracts stay unchanged.
+
+All live guarantees remain unverified. Nine read-only integration records and225
+browser cases remain NOT_RUN; F044 IN_PROGRESS; F042/F043 acceptance BLOCKED;
+production NOT_VERIFIED. P/API/UI/live execution and Git delivery are distinct gates.
+
+## P implementation and independent offline review — 2026-11-04
+
+**P READY_FOR_REVIEW — offline only; uncommitted.** The owner's exact-scope P
+authorization supersedes earlier P NOT_STARTED/pending-sequencing wording only.
+S remains separately delivered in f95e1bf025958527df2d75c73716d0ef1e406d24, whose
+parent is d0a2e5a81023f613aa37a796c2df815446853178. Exactly seven reviewed S paths
+were committed with offline limitations and pushed normally after a fresh fetch.
+Final local/tracking/freshly queried origin/dev all matched the S SHA, with clean
+tree/index before P began. No additional commit or push occurred during P.
+
+### Exact P implementation and scope
+
+CREATE:
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+apps/api/tests/admin-learning-path-proposal-persistence.integration.ts
+```
+
+MODIFY application/test paths only:
+
+```text
+apps/api/src/modules/audit/audit.model.ts
+apps/api/tests/auth-audit.test.ts
+```
+
+AGENTS.md enacts the P-only offline extension. This document, DATABASE_DESIGN.md
+and the roadmap record authorization/evidence/current pointers. No existing C1/S
+source, router, application startup, public LearningPath storage/API, dependency,
+runtime configuration, fixture/index setup or other feature source changed.
+
+The unmounted internal service implements capture, actor-bound operation recovery,
+server-prepared later-revision persistence and explicit prepared-revision recovery.
+It reuses C1/S validation, content/digest definitions and private DTOs. Initial
+capture derives actor/IDs/time on the server; strict input rejects caller-owned
+fields. The source ID also identifies the initial proposal family; its revision ID
+is distinct. One intended transaction writes brief, proposal and both exact audits
+after current signed-context/stored verified ACTIVE ADMIN checks and the conditional
+User-version fence. Duplicate actor/key checks precede any fence/write, including
+inside the transaction. Recovery never fences, audits or replays a write.
+
+Source consumption re-resolves the immutable brief and matching admission audit;
+current author eligibility is not substituted for historical admission. Consumers
+independently require current authorization. Later revisions require the actual
+greatest stored predecessor, complete expected-record equality including date,
+source/Technology binding and a matching prior audit. No silent latest selection,
+revision skipping or rebinding. Prepared revision handles retain fixed server
+candidate identity/time and original context in a service-local WeakMap; each
+permits one write attempt, then read recovery only. They are process/context-local,
+not a durable receipt or client authorization token; process loss requires explicit
+reconciliation/operator handling, not reconstruction/replay of an uncertain command.
+
+Repository calls use the existing connected Mongoose client's native driver only
+when explicitly invoked; imports do not connect. Primary/session/index metadata
+checks refuse missing prerequisites without DDL. Transactions use snapshot/primary,
+majority+journaled commit, one application commit call and existing bounded session
+cleanup. The service retains the 10-second business budget, 5-second authorization
+phase, commit min(2000ms, remaining), monotonic rechecks, cancellation and sanitized
+uncertainty. No callback/body retry. Guarded 180/205-second, RPC/ACK 5-second and
+heartbeat 2-second controls are unchanged and not qualified by these source checks.
+
+All new audit branches validate exact resource/actor/time/metadata and reject new
+metadata on legacy events. No bodies, private digests, tokens or raw database errors
+are returned/logged. Success projects C1's exact private DTO after raw validation.
+Known partial/corrupt recovery evidence is PROPOSAL_OUTCOME_UNKNOWN. A missing
+actor/key lookup is only UNRESOLVED; it proves neither absence of a prior attempt
+nor safe retry. Postcommit loss/cleanup uncertainty never compensates or replays.
+
+Technology eligibility remains the owner's explicit snapshot policy, not a parent
+version fence. Concurrent post-snapshot archival/deletion may coexist with private
+commit; no publication/cascade follows. Future writes refuse archived/absent
+parents. Archived-parent protected inspection is allowed; missing-parent recovery
+refuses while retaining source/proposal/audit evidence. Real races are unverified.
+
+### Executed offline checks and retained failures
+
+- Focused command:
+  `node --import tsx --test --test-isolation=none --test-reporter=spec apps/api/tests/admin-learning-path-proposal-persistence.test.ts apps/api/tests/auth-audit.test.ts`.
+  Executed through the supported command-specific host route, synthetic/in-memory
+  only, no child-runtime/bootstrap/database/browser suite. First actual result:
+  **53 PASS / 1 FAIL**. The failed test incorrectly expected a linked-row rejection
+  after changing the indexed actor, which instead removes the row from this actor/
+  key lookup. The corrected assertion requires UNRESOLVED, never success/safe retry.
+  Final expanded result: **65 PASS / 0 FAIL / 0 skipped / 0 cancelled**, not summed
+  across runs. Tests cover current authorization/fence refusal, strict input/source
+  binding, key conflicts, staged rollback intent, competing predecessor commands,
+  historical authors, cancellation/deadlines and explicit uncertain recovery.
+- Native-driver/session doubles additionally cover primary/index refusal before
+  session creation, transaction-start/body/final-verification failure, commit loss,
+  abort failure with endSession still attempted, endSession throw/hasEnded=false,
+  and delayed callback after cancellation without a second write or commit.
+  These are mocked boundaries, not actual resources or cleanup proof.
+- Initial full API/test TypeScript found one new TS2339: inferred embedded metadata
+  was a plain type without toObject. Using the root document's explicit plain
+  metadata view corrected it without a cast/compiler relaxation. Full command
+  `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.test.json --noEmit --incremental false --pretty false`
+  then PASS, including after the final prepared-assertion-only edit. Historical
+  baseline TS2322 errors remain resolved; no unrelated source was changed.
+- API production build/typecheck PASS:
+  `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.json --incremental false --pretty false`.
+  Only normal ignored dist outputs, no runtime startup/deployment. Six-file ESLint
+  with max-warnings=0 PASS; final prepared file lint PASS after its last edit.
+  Scoped Prettier, UTF-8/LF/no-BOM, whitespace, exact-scope/privacy and diff checks
+  PASS. No unrelated passing suite or desktop/login QA repeated.
+
+### Fresh independent review and resolutions
+
+A fresh reviewer context inspected all six actual files, dependent contracts and
+existing transaction/audit patterns, with no tests, edits or live execution.
+Four Medium findings were reported, no Critical/High/Low:
+
+1. Linked partial/corrupt recovery returned generic dependency failure. Recovery
+   now maps integrity/dependency uncertainty to PROPOSAL_OUTCOME_UNKNOWN while
+   preserving fixed authorization/parent/conflict refusals; focused regressions
+   check the exact code and prohibit false success.
+2. The prepared parent's timeout did not abort a delayed qualifier/ownership
+   callback. It now reuses the existing read-only integration lifetime helper,
+   installs parent loss before qualification, checks around awaits, carries child
+   cancellation and disposes in finally. A pure delayed-callback test passes.
+3. The prepared rollback assertion checked only source absence. It now fixes
+   source/revision IDs, proves the second-audit refusal was reached after staging
+   the proposal, and checks complete source/proposal/two-audit absence plus unchanged
+   User authority/version. The final assertion strengthening was source-reviewed,
+   typechecked and linted, **not executed against a database**.
+4. Native session failure/cleanup paths lacked direct doubles. The ten additional
+   refusal/cleanup/cancellation cases described above were added and passed.
+
+Final independent closeout reread corrections and reported **Critical 0 / High 0 /
+Medium 0 / Low 0 unresolved**. Test execution is the implementation agent's
+evidence, not an independent test rerun. Self-review separately checked final
+scope, privacy, historical documents and limitations.
+
+### Live gaps and next approval
+
+Five additional named P persistence cases are PREPARED ONLY: capture/two audits,
+actor-key reconciliation, predecessor conflict, audit rollback and injected
+acknowledgement-loss reconciliation. Importing their file registers/runs nothing.
+They are not bound to the existing nine read-only record IDs or authenticated
+execution manifest. Existing lifetime/process ownership is reused; no supervisor,
+target, fixture, index or credential was created. A future qualification must supply
+the full approved isolated target/source/fixture/index/record/privilege manifest,
+actual concurrent demotion/deletion and competing-transaction assertions, authentic
+RESULT/ACK, protected-baseline proof and ownership-safe cleanup. The prepared
+injected ACK-loss case does not qualify a real network/forced MongoDB timeout.
+
+Offline evidence establishes call ordering, validation and refusal behavior through
+doubles. Actual stored authority, physical uniqueness/indexes, transaction/audit
+atomicity, concurrency, latency/deadline feasibility and process/storage cleanup
+remain NOT_VERIFIED. Existing guarded pins are stale; no refreeze/qualification.
+
+Smallest next application checkpoint is separately approved proposal **API A**,
+before UI U: protected capture, actor-bound operation recovery and bound private
+detail. A's previously proposed inventory needs explicit owner reconciliation:
+plain by-ID detail inspection is not exposed by P, so add MODIFY of this service
+and its persistence test file for that current-Admin/source-audited read, alongside
+the already proposed A paths. This is a future inventory proposal only, not API
+implementation/enactment. Do not misuse process-local revision handles as an HTTP
+detail capability. U follows only its own scoped approval and stable API contract.
+
+P leaves ten pending paths: four new files, two audit/test modifications and four
+sequencing/evidence documents. Index empty; HEAD remains the delivered S SHA.
+P is uncommitted, no further push. F044 IN_PROGRESS; C1/A/B/S/P READY_FOR_REVIEW —
+offline only (A/B here are historical read-only checkpoints, not proposed API A);
+F042/F043 acceptance BLOCKED; nine integration records and 225 browser cases
+NOT_RUN; production NOT_VERIFIED. No feature acceptance or later-feature progress.
+
+## P delivery and protected proposal API A contract — 2026-11-04
+
+P was separately owner-authorized for delivery and committed as
+`594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc`, parent
+`f95e1bf025958527df2d75c73716d0ef1e406d24`. Exactly the ten reviewed P paths were
+committed. Fresh fetch established unchanged remote ancestry; normal dev:dev push
+succeeded, and local/tracking/fresh remote SHA matched. Tree/index were clean
+before this documentation-only preparation. The earlier uncommitted/no-delivery
+statements describe P's historical review state and are not acceptance decisions.
+The delivered commit retains offline-only, snapshot-race and unexecuted-integration
+limitations. No P tests were rerun: byte-identical reviewed source retains final
+65 focused PASS and resolved independent findings (0/0/0/0 unresolved).
+
+**API A: PROPOSED — PENDING OWNER APPROVAL. Documentation only; NOT_STARTED.**
+This dated contract supersedes only the earlier proposed A route/status/inventory
+choices where explicitly stated. It does not enact sequencing or authorize source,
+live persistence, provisioning, API startup, UI or Git delivery of this draft.
+Historical read-only checkpoints A/B are distinct from this proposal API A.
+
+### Actual P behavior and the smallest extension
+
+The delivered `capture(input, requestId, authority)` returns the same exact C1
+private DTO after either a new atomic capture or complete read validation of an
+already committed identical actor/key payload. It does not return a created flag.
+`reconcile(input, authority)` returns only COMMITTED plus that DTO, or UNRESOLVED;
+it never writes/fences. The native repository already provides bounded primary/
+majority actor, Technology, proposal-by-ID, brief, revision and audit reads.
+
+P has no ordinary by-ID detail service method. Add `get(id, technologyId,
+authority)` inside its existing service, reusing its authorization, parent,
+source/admission-audit and revision-audit validators and DTO projection. No new
+repository method, collection, index, receipt or writer is required. Do not change
+capture's return type merely to infer HTTP creation status. The revised proposal
+uses **200 for every fully verified capture success**, replacing the older draft's
+201-new/200-existing distinction. This gives the same usable Save result without
+a racy preflight lookup, a second mutation or an unnecessary P signature change.
+Owner approval of A includes this explicit HTTP-contract choice.
+
+### Exact business routes and request schemas
+
+All routes are below the existing authenticated `/api/v1/admin` namespace. The
+three business operations are exactly:
+
+| Method and path                                                                      | Exact request                                                                                                                  | Success data and status                                                                                        |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| POST `/api/v1/admin/learning-path-proposals`                                         | No query/params. Strict JSON CaptureInput below.                                                                               | 200, exact C1 ProposalDto; new capture and fully verified identical duplicate have identical public semantics. |
+| GET `/api/v1/admin/learning-path-proposals/operations/:operationId?technologyId=...` | Exactly one canonical operationId param and one required Technology query scalar; no body/other query. Register before `/:id`. | 200, exact `{state:'COMMITTED',proposal:ProposalDto}` or `{state:'UNRESOLVED'}`.                               |
+| GET `/api/v1/admin/learning-path-proposals/:id?technologyId=...`                     | Exactly one canonical proposal-revision ID param and one required Technology query scalar; no body/other query.                | 200, exact ProposalDto for that immutable revision; never interpret id as source/family/latest/handle.         |
+
+Use the existing request/query parser without coercion. All ObjectIds are exact
+lowercase 24-hex strings; operationId is canonical lowercase RFC 4122 UUIDv4 (36
+characters, version nibble 4, variant 8/9/a/b). Reject uppercase, whitespace,
+arrays, repeated query keys, nested/operator keys, extras, malformed/null IDs and
+numeric coercion. Accept only the repository's conventional optional trailing
+slash; it adds no operation. GET refuses nonzero Content-Length, any transfer
+encoding or a decoded body other than the existing empty/no-body representation.
+Do not add PATCH/PUT/DELETE, list/search, brief admission-only or revision editing
+routes. Unmounted business methods retain standard not-found behavior; do not
+silently expose an additional mutation. Existing CORS/OPTIONS behavior is unchanged.
+
+CaptureInput contains **exactly nine required keys**, including explicit nulls and
+an explicit prerequisites array:
+
+| Key               | Exact constraint, reusing C1/S definitions                                                         |
+| ----------------- | -------------------------------------------------------------------------------------------------- |
+| technologyId      | Canonical existing Technology identity, server-resolved.                                           |
+| operationId       | UUIDv4 allocated once by the restricted client for one explicit Save intent; correlation only.     |
+| title             | 1–120 UTF-16 code units.                                                                           |
+| objectives        | Ordered array, 1–20 distinct strings, each 1–240 code units.                                       |
+| audience          | 1–500 code units.                                                                                  |
+| depth             | BEGINNER, INTERMEDIATE or ADVANCED.                                                                |
+| runtime           | null or exact `{name,version}`; name 1–80, version null or 1–80 code units.                        |
+| technologyVersion | null or 1–80 code units.                                                                           |
+| prerequisites     | Ordered array of 0–20 exact `{description}` objects, each 1–240 code units, descriptions distinct. |
+
+All text must already be trimmed, well-formed single-line Unicode, excluding C1's
+controls/line separators. Equality/duplicates use the existing exact code-unit
+rules: no silent normalization, trimming, case folding, sorting or deduplication.
+Empty strings do not substitute for null. Reuse exported C1 content validation;
+never fork bounds or strip unknown fields before validation. Reject actor/role,
+status/approval, IDs other than technologyId/operationId, source, revisions,
+digests, timestamps, predecessor, session, audit and operator fields.
+
+Before the generic JSON parser, use only a proposal-route-local parser matching
+the three exact path shapes. POST requires application/json with absent or UTF-8
+charset and identity/absent content encoding; inflate=false, strict JSON object,
+**131,072 raw bytes** maximum. Malformed JSON is 400, excessive wire bytes 413,
+unsupported type/charset/compression 415. Existing 65,536 UTF-8-byte canonical
+record AND digest-input bounds remain enforced by P/C1/S after server ID/time
+allocation; exceeding them is content-free 400, never truncation. Escaped wire
+JSON may exceed the separate raw ceiling and refuse even when equivalent content
+would fit. The parser runs after existing early no-store/CORS and before global
+JSON parsing; it performs no authorization or database work. Other routes/parsers
+and global request limits remain unchanged.
+
+### Exact response DTOs, headers and errors
+
+Use `successResponse(data, requestId)` unchanged:
+`{success:true,data:<specified DTO>,message:null,meta:{requestId}}`. No pagination
+or operation IDs are added to success metadata. ProposalDto is the existing C1
+14-key allowlist, with no extra status/approval fields:
+
+```text
+{id, proposalId, technologyId, revision, schemaVersion,
+ title, objectives, audience, depth, runtime, technologyVersion,
+ prerequisites, source:{id,revision}, createdAt}
+```
+
+IDs are canonical strings, schemaVersion=1, revision a positive safe integer,
+createdAt exact ISO UTC; content/nested objects follow the definitions above.
+Capture and COMMITTED recovery return revision 1, source.revision=1 and
+proposalId=source.id, with distinct proposal-revision id. Ordinary detail may
+inspect a valid stored later revision written by an independently authorized
+internal consumer; it cannot create/revise it, return an inferred latest revision
+or claim the whole historical chain was re-audited. No source body/operation key,
+createdBy, raw `_id`, `__v`, audit/session data, contentDigest, source.digest,
+definitionDigest, internal paths or credentials enter any DTO. Raw integrity and
+binding checks precede projection; schema stripping cannot conceal corrupt rows.
+
+All success/error/parser/authorization/rate-limit responses retain
+`Cache-Control: no-store` and existing X-Request-Id behavior. Bearer authorization
+is mandatory; cookies alone do not authorize these business requests. Preserve
+existing CORS/origins, cookie and token semantics. No new auth header/transport.
+Use fixed route templates in logs, never URL/query/key/body/Authorization/error
+text; existing logger's before_route fallback is safe before mounting. No new
+request payload or private-result logging.
+
+Use the existing error envelope, never spread an Error or raw Zod/Mongo object:
+`{success:false,error:{code,message,details?},meta:{requestId}}`. Details are absent
+for business/dependency/unknown errors. Existing boundary-validation details may
+contain at most 20 fixed schema-field paths and constant messages from
+validateRequest; no rejected values, unknown key names, digests, internal paths or
+raw exception text. Error behavior is exactly:
+
+| Status | Code                                                                              | Meaning                                                                                                                                     |
+| ------ | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 400    | VALIDATION_ERROR                                                                  | Invalid request shape/IDs/query/content/canonical size; safe fixed validation messages only.                                                |
+| 401    | AUTH_ACCESS_TOKEN_MISSING / AUTH_ACCESS_TOKEN_INVALID / AUTH_ACCESS_TOKEN_EXPIRED | Existing fixed token failures; never echo token or rejection internals.                                                                     |
+| 403    | AUTH_FORBIDDEN                                                                    | JWT role or current stored account eligibility refuses. Existing ORIGIN_NOT_ALLOWED remains unchanged.                                      |
+| 404    | TECHNOLOGY_NOT_FOUND                                                              | Required parent absent/unavailable; retained rows are not deleted.                                                                          |
+| 404    | PROPOSAL_NOT_FOUND                                                                | New detail-only fixed message 'Private proposal is unavailable'; absent ID or row belongs to another Technology, with no wrong-parent data. |
+| 409    | TECHNOLOGY_READ_ONLY                                                              | New capture under ARCHIVED parent refuses.                                                                                                  |
+| 409    | PROPOSAL_CONFLICT                                                                 | Same actor/key with different content/parent or a recognized competing unique identity; never success or permission to replay.              |
+| 413    | PAYLOAD_TOO_LARGE                                                                 | Existing fixed streamed JSON limit failure.                                                                                                 |
+| 415    | UNSUPPORTED_MEDIA_TYPE                                                            | JSON/UTF-8/identity encoding required.                                                                                                      |
+| 429    | RATE_LIMIT_EXCEEDED                                                               | Existing fixed refusal; observe standard rate-limit headers before an explicit read retry.                                                  |
+| 503    | DEPENDENCY_UNAVAILABLE                                                            | Fixed dependency/deadline/integrity refusal; no claim that an earlier Save could not have committed.                                        |
+| 503    | PROPOSAL_OUTCOME_UNKNOWN                                                          | Fixed 'Save outcome is uncertain; use explicit read reconciliation'; partial/corrupt recovery or commit/cancellation/cleanup ambiguity.     |
+
+Existing uncaught 500 INTERNAL_ERROR remains sanitized and is never reclassified
+as successful Save or proof of rollback. Framework errors on other/unmounted
+routes remain unchanged. Preserve P's current error precedence: a current-actor
+refusal blocks access; linked actor/key payload/parent mismatch is conflict,
+missing parent is unavailable; multiple invalid conditions do not promise a
+different precedence. Cancellation may close transport with no response and
+must never be interpreted as proof of rollback.
+
+### Authorization, parent binding, rates and deadlines
+
+Reuse existing namespace order: no-store/fixed route label, IP bucket, JWT
+verification, account bucket, F042 current-account Admin guard. Under it apply
+proposal-local read/save bucket, strict request validation, controller and service.
+Parser rejection may precede auth as in the existing Technology parser; no service
+dispatch or sensitive data is allowed on that path. No public/student mounting.
+The controller derives actor/requestId, builds a transient signed-context verify
+callback like F043, and disposes request-abort/response-close listeners in finally.
+No tokens in repository inputs, results, model fields or persistent configuration.
+
+Every operation independently rechecks signed context and current stored verified
+ACTIVE ADMIN, preserving subject/session/plan context equality. Namespace guard
+alone never grants persistence authority. New capture retains P's exact in-
+transaction User-version conditional fence and final verification; reads/recovery
+do not increment User version or insert audit. No new session-revocation guarantee
+or author-current-role requirement is invented. Author demotion/deletion preserves
+historical admission but blocks that author's new operations. Another eligible
+Admin may inspect an ordinary proposal ID with correct Technology binding; that
+does not grant access to the author's actor/key recovery lookup.
+
+New capture requires DRAFT/PUBLISHED parent at transaction snapshot. Concurrent
+post-snapshot archive/delete may coexist with a private commit; no lifecycle fence
+or cascade is added. Later new writes refuse an ineligible parent. Archived-parent
+ordinary detail/recovery is allowed. A known identical POST is P's existing read
+reconciliation path and may return 200 under an archived parent; it creates no new
+record. A mismatched payload still conflicts. Missing parents refuse private reads
+while retaining evidence. No response implies approval/publication/Student exposure.
+
+Keep shared namespace limits unchanged: 300 requests/IP and 120/account per
+900,000ms, capacity 10,000 for each existing bucket. Proposed feature-local defaults
+reuse F043's bounded store/HMAC pattern with distinct proposal key domain: 120 reads
+and 60 capture requests per account per 60,000ms, capacity 10,000 per bucket,
+fail closed, no live-key eviction. Both GET routes share one read bucket; duplicate
+POSTs count as capture requests. All outer AND inner limits apply, so the shared
+15-minute account limit can refuse earlier. No per-key bucket, new dependency,
+global limit relaxation or claim of distributed enforcement.
+
+Retain independent existing namespace authorization <=5,000ms and P's service
+business budget <=10,000ms, including its <=5,000ms authorization phase(s), one
+application commit <=min(2,000ms, remaining), monotonic post-await checks and
+request-loss cancellation. New get reuses P's work/loss/authority lifetime rather
+than adding a timer framework. Retain bounded abort/endSession cleanup. These
+component budgets are not a new 10-second end-to-end HTTP watchdog: parsing,
+namespace work, transport and cleanup are separate existing phases. No callback/
+transaction replay or timeout increase. Guarded suite/supervisor 180/205 seconds,
+RPC/ACK five seconds and heartbeat two seconds stay unchanged and unqualified.
+
+### Operation identity, uncertainty and UI-facing outcomes
+
+Allocate one cryptographic UUIDv4 per explicit new intent in the future restricted
+client. Its scope is exactly stored actor ObjectId + operationId; bind content and
+Technology to it. requestId is separate server-controlled diagnostic correlation,
+not idempotency or actor authority. No Idempotency-Key alias, server-side key expiry,
+TTL, receipt collection, public registry or key reuse. The actor/key uniqueness
+record remains for the source/audit retention lifetime; this contract authorizes
+no deletion or recycling. A new future retention policy must address recovery
+before removing evidence; absence at any time never permits automatic replay.
+
+Same actor/key and exact validated payload/parent may return the existing initial
+DTO after full source/proposal/two-audit validation, with zero new fence/audit/
+mutation. Different content/parent is 409. A different actor searches only their
+own key; it returns UNRESOLVED if absent, never another account's existence/result.
+Full equality, not UUID knowledge, digest equality or unique-key collision alone,
+establishes a resolved duplicate. The POST service remains a single attempt; never
+issue another POST internally after collision, timeout or uncertain acknowledgement.
+
+Explicit GET recovery is primary/majority read-only and actor-bound. COMMITTED
+requires complete valid matching initial evidence. UNRESOLVED means lookup absent,
+not FAILED/NOT_SAVED or safe-to-save. Linked partial/corrupt evidence is UNKNOWN.
+The GET takes no payload; it returns actual saved content. A future UI must compare
+Technology/content with its account-bound in-memory intent before presenting that
+result as resolution of the intended Save. Different saved content needs conflict
+guidance, never a replacement key/replay. Normal detail GET neither resolves an
+unknown operation without its correct key nor grants mutation authorization.
+
+The API supports these explicit outcomes for a later separately approved UI:
+
+| Outcome    | Required evidence and safe next action                                                                                                                                       |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SAVED      | Complete 200 capture DTO, same bound account/selection; private only, not approved/published.                                                                                |
+| REFUSED    | Known request/auth/parent/conflict refusal; show safe guidance. A refusal does not erase any earlier uncertain intent or authorize its replay.                               |
+| UNCERTAIN  | 503 unknown, lost response, cancellation after dispatch or generic failure without proof; block another mutation for the intent and offer explicit read reconciliation only. |
+| RESOLVED   | Explicit GET COMMITTED with matching intent content/parent; display that existing DTO, no write.                                                                             |
+| UNRESOLVED | GET UNRESOLVED, partial evidence, lost key or unavailable authorization/parent; keep uncertainty, do not silently allocate another intent.                                   |
+
+No automatic polling/recovery loop. A user may explicitly retry the read within
+limits; no automatic POST retry after access-token refresh. If the later UI loses
+its in-memory actor/session/key/payload context, require a separately approved
+operator reconciliation procedure before repeating the intent. Do not store that
+context or tokens in browser storage/logs under this API contract. No prepared-
+revision WeakMap handle, server object reference or process-local ID is accepted
+as an HTTP capability, predecessor or source-authority receipt.
+
+### Ordinary private detail: exact service/repository addition
+
+The new get operation must use P's existing bounded reader, no transaction/fence/
+audit write. Validate ID/parent, verify current authority, resolve existing parent
+(including ARCHIVED), then resolve that exact proposal revision. Null or a different
+Technology yields fixed PROPOSAL_NOT_FOUND with no projection. Strictly validate
+the raw record and canonical definition digest, resolve exact source row and full
+admission audit, require Technology/source/family/revision/digest correspondence,
+then validate the proposal's exact audit ID/type/actor/request/date/resource and
+metadata. Historical author existence/current role is not a read precondition.
+For revision 1 additionally require P's initial source-content/time/original-actor/
+request correspondence and distinct revision/source identities. For an existing
+later revision require the stored record's C1 binding and matching revision audit;
+do not infer a predecessor chain or offer revision editing. Invalid/one-sided
+stored evidence fails closed as dependency/integrity refusal, not empty success.
+Project only the C1 DTO after validation, recheck lifetime and dispose correctly.
+
+The repository's `proposal`, `brief`, `revision`, `audit`, `actor`, `technology`
+and primary/majority `read` methods are sufficient. No repository source edit is
+in the proposed inventory; a discovered necessity requires separate scope review.
+Add PROPOSAL_NOT_FOUND to the service's fixed safe-error allowlist so the new
+detail refusal survives sanitization; do not change capture/recovery mappings.
+The existing read path still qualifies PRIMARY/session metadata and required
+physical indexes. API mounting must not bypass those prerequisites or create them.
+Native reads can observe concurrent changes across separate majority reads; current
+authorization/parent existence are checks at their actual read points, not a new
+cross-record snapshot/lifecycle fence. No live guarantee follows from mocks.
+
+### Reconciled exact implementation inventory and acceptance
+
+This replaces the prior proposed A inventory with **7 CREATE + 5 MODIFY = 12
+implementation/test/API-documentation paths**, plus the three existing evidence
+documents. It is not permission to edit them:
+
+```text
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-request.schema.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-rate-limit.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.controller.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.routes.ts
+CREATE apps/api/tests/admin-learning-path-proposal-routes.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-requests.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-api.integration.ts
+MODIFY apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+MODIFY apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+MODIFY apps/api/src/modules/admin/admin.routes.ts
+MODIFY apps/api/src/app.ts
+MODIFY docs/API_DESIGN.md
+```
+
+Shared authorization/evidence only after implementation approval:
+AGENTS.md for exact A-only enactment, this feature document, DATABASE_DESIGN.md and
+DEVELOPMENT_ROADMAP.md. Total potential implementation checkpoint **16 distinct
+repository paths**. No C1/S schema/model/DTO/audit/repository, existing UI/public
+API, unrelated regression file, dependency, fixture or runtime change is included.
+Stop for additional required paths rather than silently widening this inventory.
+
+Offline measurable acceptance after separate implementation authorization:
+
+1. Strict nine-key body, field/aggregate/wire boundaries, nulls, duplicate/query/
+   operator/unknown rejection; exact DTO/envelope/error allowlists. Privacy checks
+   inspect raw JSON before schema projection and never log rejection values.
+2. Exact parser placement, fixed route labels/no-store on early errors, operation
+   route precedence, unchanged namespace gates, all outer/inner limits and fail-
+   closed capacity. Disallowed requests never dispatch service/persistence.
+3. Signed/current-account verification, cancellation/disposal, five/ten-second
+   delayed-callback checks; captured/reconciled calls never trust a body actor.
+4. Single capture with two audits/fence at mocked boundaries; identical duplicate
+   zero new writes; conflict/uncertainty never retries/compensates. Existing 65-test
+   evidence is retained, with only affected regressions rerun after source changes.
+5. get success for eligible current Admin including a different historical author;
+   archived parent, missing/mismatched parent/ID, corrupt source/digests/audits,
+   later valid stored revision, no latest inference, lost authority/cancellation
+   and raw DTO privacy. Exactly zero get/reconcile writes and no handle exposure.
+6. Prepared real API assertions cover capture/status, actor-key conflict/recovery,
+   Technology-bound reads, archival/snapshot limitations and transaction/audit
+   evidence. Preparation/import does not start services or register a live run.
+7. Full API/test TypeScript, production build/typecheck, affected offline tests,
+   targeted lint/format/UTF-8/LF/diff/privacy/scope checks and fresh independent
+   review; resolve findings before checkpoint eligibility. Test doubles/direct
+   handler execution are offline evidence, never real HTTP/database PASS.
+
+API implementation authorization does not authorize live execution. Live API/P
+qualification separately requires approved exclusively owned replica-set target,
+physical brief/proposal/audit/User indexes and privileges, exact reviewed source/
+fixture/record/result manifest, current qualified runtime, retained process/Job
+ownership, safe isolated fixtures, unchanged protected baselines, authentic RESULT/
+ACK, deadlines and owned cleanup. No DDL/connection is implied by this document.
+UI U and its browser inventory require their own stable contract and approval.
+
+### Verification ledger: independent unexecuted groups
+
+| Group                               | Exact identities                                                                                                                                | Current evidence                                                                                                                                                               |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Original F044 read-only integration | PARENT, T01, T02, T03, T04, T05, T06, T07, T08                                                                                                  | 9 NOT_RUN; unchanged original manifest.                                                                                                                                        |
+| New P persistence assertions        | CAPTURE_AND_ATOMIC_AUDITS; ACTOR_KEY_RECONCILIATION; REVISION_PREDECESSOR_CONFLICT; AUDIT_FAILURE_ROLLBACK; ACKNOWLEDGEMENT_LOSS_RECONCILIATION | 5 NOT_RUN; prepared in a separate entry point, not bound to the original nine records or authenticated manifest. Injected ACK loss is not a real network/forced Mongo timeout. |
+| Prepared browser backlog            | 213 inherited plus 12 F044 cases                                                                                                                | 225 NOT_RUN; no browser invocation in P/delivery/this preparation.                                                                                                             |
+| Proposed API A integration          | Future assertions in the new API integration file                                                                                               | NOT_PREPARED; no new execution-record count or PASS claimed.                                                                                                                   |
+
+The five P cases do not exhaust real demotion/deletion, competing-transaction,
+rollback/unknown-commit and snapshot-parent qualification. Existing offline final
+65 PASS and resolved independent findings do not prove MongoDB transactions,
+uniqueness, physical indexes, authority, latency, resource cleanup or RESULT/ACK.
+Existing guarded pins remain stale; ignored support was not committed and does
+not reproduce clean-clone verification. No manifest refreeze occurred.
+
+### A-only sequencing text — not enacted
+
+> **PROPOSED — PENDING OWNER APPROVAL: F044 protected proposal API A offline extension.**
+> After separate exact-scope implementation authorization, permit only the 12
+> inventory paths and four scoped authorization/evidence documents above. Extend
+> the existing F044 exception solely to these three protected operations and the
+> ordinary read service addition, with stable C1/S/P contracts and no unresolved
+> blocking security finding. Require focused offline/static/privacy/scope checks
+> and fresh independent review, resolving findings before checkpoint eligibility.
+> No live database/API/browser execution, provisioning, new auth policy, API/UI
+> outside A, revision editing, generic framework, F054 generation, F049/F050
+> editorial decision, F051 publication, deletion or next-feature progression.
+> Existing authorization, snapshot limitation, ownership/isolation, RESULT/ACK,
+> timeouts, cleanup and final acceptance gates remain mandatory. Every later
+> implementation, commit, push and live qualification requires separate approval.
+> F044 remains IN_PROGRESS; F042/F043 acceptance BLOCKED; original nine and five P
+> assertions plus 225 browser cases remain unexecuted; production NOT_VERIFIED.
+> This text is inactive until owner-approved enactment in AGENTS.md.
+
+### Remaining decisions and estimate
+
+Approve/revise this A-only contract, uniform 200 capture semantics, cross-current-
+Admin ordinary detail access, rate/body bounds and the reconciled 16-path total
+inventory, then separately authorize A enactment/implementation plus focused
+offline verification and independent review. These choices are proposals, not new
+authority. Existing parent snapshot policy, historical admission and actor-bound
+keys remain owner-approved; no additional source-authority decision is fabricated.
+
+Estimate **1–2 engineering days** for A implementation/offline review, including
+the missing detail service/tests and prepared integration assertions; no UI,
+provisioning or live qualification included. U remains a later 1–2-day proposal,
+not authorized here. Real qualification has no reliable elapsed estimate until
+existing runtime/target/manifest/ownership gates are satisfied. No passing suite,
+login test or infrastructure investigation was repeated for this draft.
+
+## Protected proposal API A implementation authorization — 2026-11-04
+
+The owner approved the complete dated API A semantics and exact 16-path inventory,
+including uniform 200 capture, actor-bound recovery, ordinary Technology-bound
+private detail and current-Admin access to another historical author's record.
+The A-only extension is enacted in AGENTS.md. API A is IN_PROGRESS for offline
+implementation/review only. Historical proposed/draft/no-implementation wording
+above is retained as history and superseded only for the approved A inventory.
+
+P was delivered as594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc. Preflight: dev at
+that HEAD, exactly the three reviewed pending documents, empty index, unchanged
+delivered API sources and preserved planning content/history. No repository/model/
+index changes, UI, live persistence, listener, provisioning or runtime restart.
+New integration assertions are preparation only and remain separately inventoried.
+No staging, commit, push, final acceptance or next checkpoint is authorized.
+F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; original 9 integration records,
+five P assertions and225 browser cases NOT_RUN; production NOT_VERIFIED.
+
+## Protected proposal API A implementation and independent offline review — 2026-11-04
+
+**Proposal API A READY_FOR_REVIEW — offline only; uncommitted.** This is the
+proposal API checkpoint, distinct from historical read-only A/B. Owner-approved
+A semantics and sequencing were enacted only for the exact 16 paths below. F044
+remains partial IN_PROGRESS, acceptance BLOCKED; no UI or live execution followed.
+
+### Exact implemented inventory
+
+Seven CREATE:
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-request.schema.ts
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-rate-limit.ts
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.controller.ts
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.routes.ts
+apps/api/tests/admin-learning-path-proposal-routes.test.ts
+apps/api/tests/admin-learning-path-proposal-requests.test.ts
+apps/api/tests/admin-learning-path-proposal-api.integration.ts
+```
+
+Nine MODIFY (three were already approved pending documents):
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+apps/api/src/modules/admin/admin.routes.ts
+apps/api/src/app.ts
+docs/API_DESIGN.md
+AGENTS.md
+docs/features/F044-admin-learning-path-management.md
+docs/DATABASE_DESIGN.md
+docs/DEVELOPMENT_ROADMAP.md
+```
+
+HEAD stays594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc, dev, empty index. No
+repository/model/index/audit/C1/S implementation, public API, existing UI, dependency,
+runtime configuration, credential, fixture, ignored adapter or manifest changed.
+Normal compiler dist output is ignored, not runtime deployment. Earlier pending
+documentation content/history remains preserved apart from current scoped pointers.
+AGENTS.md historical bytes are retained; only its exact A-only extension is appended.
+
+### Implemented behavior and review boundaries
+
+- POST `/api/v1/admin/learning-path-proposals`: strict9-field C1/S content plus
+  parent/operation identity; uniform 200 exact C1 DTO for new or completely verified
+  identical existing capture. P capture's transaction/fence/audit/recovery behavior
+  and signature are preserved; no controller retry or guessed created flag.
+- GET `/api/v1/admin/learning-path-proposals/operations/:operationId?technologyId=...`:
+  actor-bound explicit read recovery, exact COMMITTED+DTO or UNRESOLVED, registered
+  before detail. Missing evidence never authorizes replay or a new intent.
+- GET `/api/v1/admin/learning-path-proposals/:id?technologyId=...`: exact immutable
+  revision detail. The added service method checks signed/current verified ACTIVE
+  ADMIN, parent existence, raw record/digests, actual source/admission audit and
+  exact revision audit before C1 projection. Initial revisions additionally require
+  exact original source content/time/actor/request correspondence. Later stored
+  revisions can be inspected without inferring latest or claiming whole-chain
+  verification. Different current eligible Admin may inspect; recovery stays actor-
+  scoped. Absent/wrong parent never projects another parent's private record.
+- Existing namespace IP/JWT/account/current-Admin guards remain in order. Separate
+  120-read/60-capture per-account minute buckets are bounded/fail-closed and do not
+  relax shared 300/IP/120-account per 15 minutes. No read/recovery fence or audit write.
+- New parser precedes generic JSON only for exact proposal shapes, streams at most
+  131,072 bytes, refuses unsupported media/compression/GET bodies and preserves early
+  no-store. C1/S content and canonical-byte bounds remain unchanged. Response DTOs
+  are strict before output; fixed allowlisted service errors cannot leak private
+  messages/details. Fixed route labels omit URLs, operation keys, tokens and bodies.
+- Request abort/response close cancels/suppresses late output and releases transient
+  authority listeners. Retain P 10-second service and 5-second authorization phases,
+  one bounded commit, monotonic rechecks and existing cleanup. No new end-to-end
+  watchdog or stronger session/lifecycle guarantee is claimed. Unsupported methods,
+  including Express's otherwise implicit HEAD, cannot dispatch proposal work.
+
+Archived-parent inspection and read-validated identical existing captures remain
+allowed; a new archived-parent capture refuses. Technology eligibility at the write
+snapshot is not a concurrent archive/deletion fence. Separate majority reads are
+checks at their read times, not a cross-record snapshot. Historical authors may be
+demoted/deleted without erasing input; each current consumer is independently
+authorized. No prepared-revision WeakMap handle is an HTTP capability.
+
+### Checks actually executed, including initial failures
+
+Initial focused run across the three changed/new proposal request/router/persistence
+test files returned **164 total:162 PASS/2 FAIL**. Both were test issues: a synchronous
+validation throw was incorrectly awaited as a rejected Promise, and a source-text
+middleware-order check depended on quote formatting. They were corrected to an
+explicit synchronous throw assertion and actual Express middleware dispatch over
+unconnected request streams. Repository-configured formatting restored the existing
+source style without changing unrelated behavior. Initial full TypeScript also
+found one new TS2379 for an explicit undefined optional token in tests; conditional
+property construction corrected it without casts/compiler relaxation.
+
+Final executed commands and outcomes:
+
+1. `node --import tsx --test --test-isolation=none --test-reporter=spec apps/api/tests/admin-learning-path-proposal-requests.test.ts apps/api/tests/admin-learning-path-proposal-routes.test.ts apps/api/tests/admin-learning-path-proposal-persistence.test.ts`
+   — **168 PASS/0 FAIL/0 cancelled/0 skipped** after the independent method fix.
+2. After adding one final explicit no-replay assertion, only that affected case ran:
+   `node --import tsx --test --test-isolation=none --test-reporter=spec --test-name-pattern="^uncertain POST" apps/api/tests/admin-learning-path-proposal-routes.test.ts`
+   — **1 PASS**; uncertain capture dispatches once, explicit recovery dispatches GET
+   only. Prior passing cases were not unnecessarily repeated for that addition.
+3. Shared Admin router changed, so inspected existing offline routing regressions:
+   `node --import tsx --test --test-isolation=none --test-reporter=spec apps/api/tests/admin-learning-path-routes.test.ts`
+   — **36 PASS**. Technology exact positive selection
+   `node --import tsx --test --test-isolation=none --test-reporter=spec --test-name-pattern="^(actual protected router|protected (GET|POST|PATCH))" apps/api/tests/admin-technology-routes.test.ts`
+   — **5 PASS**. The known real-app HTTP/listener test and unrelated cases were
+   excluded, not executed or relabelled. **210 distinct offline tests PASS** across
+   these four commands, not a sum of reruns or a newly executed browser/integration
+   suite. Historical P65 remains historical evidence, not an additional current65.
+4. Full API/test TypeScript PASS, including after the last test-only addition:
+   `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.test.json --noEmit --incremental false --pretty false`.
+   Production build/typecheck PASS:
+   `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.json --incremental false --pretty false`.
+   No production source changed after that build. Historical baseline TS2322 stays
+   resolved; no unrelated source correction or compiler relaxation.
+5. Targeted11-file ESLint max-warnings0 PASS; final affected test lint PASS after
+   its addition. Repository-configured TypeScript formatting PASS. New documentation
+   sections' formatting, strict UTF-8/LF/no-BOM, whitespace, exact-scope/history and
+   sensitive-content checks PASS. Existing ignored documentation formatting is
+   retained rather than broadly rewriting historical content.
+
+These tests use synthetic signing, disconnected Mongoose validation, mocked
+services/native sessions/transactions or unconnected IncomingMessage streams.
+Actual Express middleware can run in memory without opening a listener. No live
+HTTP server/API/database calls, application startup, fixtures, bootstrap, browser,
+network failure injection, account change, source-pin refreeze or Git writes ran.
+
+### Fresh independent review
+
+A fresh reviewer context read actual application/tests, approved contract and
+C1/S/P/F043 dependencies. It performed no edits/tests/live runtime/database/browser
+operations or Git mutations. Initial findings **Critical0/High0/Medium1/Low2**, all resolved:
+
+1. Medium: prepared child test errors could reveal raw assertion/request/ownership
+   failures before parent normalization. An outermost per-child fixed-error boundary
+   now covers setup/lifetime/observer failures; failure halts later cases. User
+   evidence projects only necessary identity/eligibility/version, never secrets.
+2. Low: Express's implicit HEAD could dispatch GET work beyond the exact method
+   contract. An explicit unsupported-method fallthrough and four method regressions
+   prevent business dispatch, preserving standard protected404 behavior.
+3. Low: prepared nonmutation evidence compared only the primary User. Before/after
+   sorted primary/majority fingerprints now cover both synthetic actors' relevant
+   identity/version state and all owned brief/proposal/audit rows. Each collection
+   is bounded at 100 (limit 101 then refuse); raw snapshots/digests never enter error
+   output. This is prepared proof, not a real executed database assertion.
+
+Final independent source closeout: **Critical0/High0/Medium0/Low0 unresolved**.
+Main-agent self-review separately checked privacy, precise routing/scope, unchanged
+dependencies and historical evidence. Independent source review is not an
+independent test rerun or live verification. The final documentation ledger and
+last no-replay regression were additionally provided for reviewer consistency check.
+
+### Current verification ledger, superseding earlier API NOT_PREPARED only
+
+| Group                          | Exact identities                                                                                                                                                                                                          | Current outcome                                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Original read-only integration | PARENT,T01,T02,T03,T04,T05,T06,T07,T08                                                                                                                                                                                    | 9 NOT_RUN; original manifest unchanged.                                                              |
+| P persistence assertions       | CAPTURE_AND_ATOMIC_AUDITS; ACTOR_KEY_RECONCILIATION; REVISION_PREDECESSOR_CONFLICT; AUDIT_FAILURE_ROLLBACK; ACKNOWLEDGEMENT_LOSS_RECONCILIATION                                                                           | 5 NOT_RUN; separate prepared entry point, no real transaction/timeout proof.                         |
+| New API assertions             | API_CAPTURE_200_AND_ATOMIC_EVIDENCE; API_IDENTICAL_CAPTURE_AND_KEY_CONFLICT; API_ACTOR_BOUND_OPERATION_RECOVERY; API_TECHNOLOGY_BOUND_PRIVATE_DETAIL; API_ARCHIVED_PARENT_INSPECTION; API_UNRESOLVED_AND_READ_NONMUTATION | 6 PREPARED/NOT_RUN; separate API file, not bound to old records or authenticated execution manifest. |
+| Browser backlog                | 213 inherited+12 read-only F044 cases                                                                                                                                                                                     | 225 NOT_RUN.                                                                                         |
+
+The new API entry point imports inertly and registers tests only on explicit future
+invocation. It reuses the existing supervision initialization/lifetime/loss helper;
+it is not an adapter/supervisor, ownership proof or authenticated result generator.
+Future qualification must supply both owned API and isolated replica set, two
+synthetic Admins, distinct eligible/mismatched/archived Technologies and a valid
+historically admitted archived-parent proposal. No fixture is created/altered here.
+The exact source/fixture/index/privilege/record manifest and reviewed private-channel
+API client remain prerequisites, not supplied capabilities. Forced loss, real
+demotion/deletion races, physical uniqueness and all cleanup/RESULT/ACK guarantees
+still need separately authorized qualification. Existing guarded pins remain stale;
+ignored support remains undelivered/not clean-clone reproducible.
+
+### Readiness and next boundary
+
+API A is ready for owner offline review only. No UI, real Save or feature acceptance
+is claimed. The smallest next application checkpoint is separately authorized U:
+restricted, account/session/Technology-bound brief form → explicit Save → private
+result/detail → explicit read-only uncertain-save recovery, using these three fixed
+API descriptors. Retain the proposed U inventory; do not invent token callbacks,
+automatic replay, durable browser intent storage or editorial/generation controls.
+U needs its own exact-scope sequencing/implementation approval and review. Live
+Save still needs the qualified physical prerequisites and separate execution gate.
+F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; original 9, P 5, new API 6 and browser 225
+unexecuted; production NOT_VERIFIED. All16 paths remain pending; index empty; no
+staging/commit/push or resources started/stopped/restarted in this checkpoint.
+
+## Proposal API A delivery and Checkpoint U contract — 2026-11-04
+
+Owner separately authorized delivery of the 16 reviewed API A paths. Commit
+`7b7c2cbb9c15190c3d5130815281ab3e22467c8c` has parent
+`594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc` and the approved title
+`feat(admin): checkpoint protected learning path proposal API`. Exact staged blobs
+matched retained reviewed hashes; staged whitespace/encoding/privacy/scope passed.
+After a fresh fetch, origin/dev was the unchanged starting parent; normal dev:dev
+push succeeded. Local/tracking/fresh remote SHA matched and tree/index were clean
+before this U documentation. The body preserves offline-only, snapshot-race,
+unexecuted-group, stale-pin and incomplete-acceptance limitations. Existing 210
+distinct offline PASS and independent 0/0/0/0 unresolved evidence was retained,
+not rerun. Historical uncommitted/no-delivery wording above remains historical.
+
+**U: PROPOSED — PENDING OWNER APPROVAL; NOT_STARTED. Documentation only.**
+This is the smallest proposed usable Admin-authored brief → private Save → result/
+explicit recovery UI for the delivered API A. It supersedes only earlier proposed
+U details where explicitly reconciled below. It enacts no sequencing, source/UI,
+live persistence, runtime, browser or Git authority. F044 remains partial
+IN_PROGRESS, acceptance BLOCKED; no other feature is unlocked.
+
+### Existing behavior reused and exact user-visible scope
+
+Admin currently has no browser router: the authenticated workspace is `/` at the
+configured Admin origin. Technology Management remains the default; Learning Paths
+is the existing second workspace. Keep the existing Technology chooser (20 records
+per page, current bounds), parent-bound Learning Path inventory/detail and archived
+read-only inspection unchanged. No new URL/history route, public Student endpoint,
+proposal inventory, source browser or Technology API is needed.
+
+In Learning Paths, add an explicit **Create private proposal** action for the
+currently selected existing DRAFT/PUBLISHED Technology. ARCHIVED permits only
+existing read-only inspection; show why create is unavailable. Missing/unavailable
+selection, unresolved Technology mutation uncertainty or ineligible Admin refuses
+capture. A stale selected status never grants server authority: API A/P still
+rechecks the parent and transactionally fences the current Admin. Technology
+eligibility is the approved transaction-snapshot policy, not a concurrent archive/
+deletion fence. PUBLISHED parent eligibility grants no LearningPath/publication
+mutation permission.
+
+Opening the form is explicit; no POST or proposal GET on login, initial workspace
+render, effect, Technology selection or page refresh. Preserve existing read-only
+selectors/headings and request defaults so existing browser mocks do not need
+unplanned edits. Use the parent snapshot already held by LearningPathManager;
+revalidate via its existing explicit reads when needed, without a new selector.
+Form and result stay inside Learning Paths, with Back to inventory navigation.
+
+Included: brief entry, one revision-1 capture, private saved/result inspection,
+explicit same-intent operation recovery and explicit refresh of a known result ID.
+Excluded: proposal browsing/search, brief/revision editing, approval/review decisions,
+generation, publication, deletion, uploads/imports, source ingestion, schemas/index
+changes, autosave and saving through an archived/unavailable parent. A saved item
+is labelled **Private proposal — not approved or published**, never an editorial
+DRAFT status inferred into a DTO that has no status field. F054/F049/F050/F051
+ownership is unchanged; no placeholder buttons suggest those capabilities exist.
+
+### Exact form and outbound validation
+
+Reuse A's nine-field capture wire contract and C1 Unicode/duplicate semantics;
+the user edits only its seven content fields. technologyId comes from the bound
+selection and operationId from the restricted controller, never text inputs.
+Frontend contracts reproduce these bounds with existing Zod; do not import backend
+Mongoose/Node crypto/models into the browser or create a shared package.
+
+| Field             | UI representation and exact accepted value                                                                                         |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| title             | Required single-line input, 1–120 UTF-16 units.                                                                                    |
+| objectives        | Ordered labelled input rows, 1–20 distinct entries, each 1–240; add/remove bounded, cannot submit zero.                            |
+| audience          | Required single-line input, 1–500 units.                                                                                           |
+| depth             | Required select: BEGINNER, INTERMEDIATE, ADVANCED; no fabricated default persisted before an explicit selection.                   |
+| runtime           | Explicit optional-runtime toggle; off sends null. On requires name 1–80 and version null/1–80, with an explicit no-version choice. |
+| technologyVersion | Explicit no-version choice sends null; otherwise 1–80. Empty string is not a wire substitute for null.                             |
+| prerequisites     | Ordered labelled description rows, 0–20 distinct entries, each 1–240; none sends an explicit empty array.                          |
+
+All nine wire fields are required. Strings must already be trimmed, well-formed,
+single-line Unicode with existing C1 controls/line separators rejected. Show field
+errors rather than silently trimming/case-folding/normalizing/truncating text.
+Duplicate checks are exact, case-sensitive and order-preserving. Existing
+TechnologyForm's trim-and-convert behavior is **not** a reusable proposal validator.
+Add/remove preserves item order, stable UI row keys and focus; do not use those
+keys as persistence identities. No multiline split/merge encoding is introduced.
+
+Validate before allocating an operation key/admitting a request. Construct exact
+nine-key JSON, <=131,072 UTF-8 wire bytes. C1/S's 65,536-byte canonical bounds still
+belong to server validation after server identity/time allocation; do not claim
+that a browser can compute the authoritative stored record/digest. No source or
+definition digests, actor, session, revision, timestamps, audit fields or operator
+keys are accepted from the form. Render only explicit DTO fields as text.
+
+### Restricted transport and authority boundary
+
+Add only three fixed proposal descriptors to the existing Admin controller:
+capture with validated Technology/content, operation recovery from the retained
+intent, and detail with canonical revision ID plus technologyId. The root Admin
+controller supplies the captured operation key and private access token internally.
+No arbitrary URL, method, headers, token callback, raw request executor, process
+handle or prepared-revision object is returned to components. Client transport
+is called only inside that controller. Keep tokens out of React UI state, the U
+controller snapshot, browser storage, form values, logs and result objects.
+
+Reuse ready/eligible/account checks, signed-session generation, expiry checks,
+existing browser coordination, business-operation registry and cancellation. Only
+a settled current verified ACTIVE ADMIN session admits U requests. Do not repeat
+the historical first-load race or weaken the session-settlement gate. Do not clear
+Technology uncertainty via proposal reads, or proposal uncertainty via Technology/
+Learning Path reads. The two mutation domains need separate bounded guards.
+
+New proposal-client uses the existing approved API-base origin rules, fixed
+`/api/v1/admin/learning-path-proposals` paths, credentials:omit, cache:no-store,
+redirect:error, and Bearer only from the root controller. GET always carries the
+required Technology query; recovery's operationId is the retained canonical UUID,
+detail id is the exact returned revision identity. No origin/path fallback.
+Use the existing 15-second monotonic client/controller budget as a whole-operation
+cap, not nested extra budgets; check after every awaited stage even when timer
+callbacks are late. It does not change A/P/guarded server deadlines. Stream-bound
+both Content-Length and actual decoded response bytes at 131,072, use fatal UTF-8,
+strict envelope/14-key DTO validation and exact200 success. Reject redirects,
+wrong parent/revision identity, unknown/private fields, oversized/malformed output
+and absent no-store. No raw server error message, body, key or URL enters logs.
+
+401/403 removes current authority even with an invalid body, preserving existing
+logout/expiry behavior. Other errors use fixed local messages and bounded known
+schema-field paths, never raw response text. An unverified response after POST
+dispatch is uncertain, not a safe client validation failure. No auto login/refresh
+followed by POST retry; an independently restored session can make only a newly
+admitted explicit operation within the remaining recovery rules.
+
+### One intent, duplicate-submission guard and lifetime
+
+Use a single bounded proposal intent slot in the root Admin controller, separate
+from general rendering state. On one explicit, valid Save, synchronously mark
+admission busy before any await, allocate native `crypto.randomUUID()` once and
+validate canonical UUIDv4; absent/failing secure UUID support refuses locally with
+no transport. Never Math.random, timestamps, regenerated-on-render keys or an
+automatic replacement key. Store in memory only: account identity, auth generation,
+Technology, key, exact validated content and whether transport may have started.
+No durable receipt, map of arbitrary intents, third-party state store or dependency.
+
+The U form/controller has its own synchronous submit latch plus disabled controls;
+the root capability independently refuses a second capture while one is pending
+or uncertain. Enter/double click/effect remount cannot send another POST. Register
+the pending promise before coordination can dispatch; use existing abort registry.
+Mark possible dispatch immediately before passing the request to fetch. Local
+refusal with positive proof of no dispatch is different from response loss. If
+phase cannot be proved, retain uncertainty. The key is correlation, not authority.
+
+After verified successful capture or matching COMMITTED recovery, clear the write
+guard and retained intent/key/content; the view may keep the private DTO while
+eligible. A new brief starts empty only after an explicit New private proposal
+action, never from a recovery error, timer, rerender or expired request. Retrying a
+known refused submission is an explicit new user decision, never an automatic
+POST loop. Do not reuse an operation key for changed Technology/content. A 409
+operation conflict requires explicit same-key read recovery/guidance; do not
+silently allocate a key to bypass it.
+
+Keep pending admission separate from uncertainty. A validated, request-specific
+definitive refusal with proof that this attempt did not commit may release that
+attempt's nonuncertain busy/intent state; it never clears an earlier uncertainty
+guard or claims no historical record exists. Local predispatch failures require
+positive proof of no dispatch. 409 conflict keeps its key for explicit recovery;
+any unverified/ambiguous POST result retains uncertainty. Authorization loss may
+require the conservative context-loss policy even when the request was refused.
+
+The root capability clears a proposal uncertainty guard **only** after its own
+strict validation of the same stored intent's recovery key/parent/content and
+COMMITTED DTO (or verified capture response). The UI cannot pass a clear/reset
+flag. Generic detail success, unrelated GET, rate-window expiry, a different
+account's response or UNRESOLVED cannot clear it. Preserve exact ordered content
+comparison, not object-key order, title similarity or digest knowledge alone.
+There is no automatic replay of POST during recovery, reauthentication, rerender
+or navigation.
+
+### State machine and safe actions
+
+Public U state contains no tokens or operation keys. It exposes bounded content,
+eligible parent, private DTO, field errors and a fixed message only while the
+current account/session generation remains eligible. Required states are:
+
+| State                       | Meaning                                                                                                                       | Enabled actions                                                                                                                                                              |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| idle / editing              | No admitted Save; unsaved form, no server claim.                                                                              | Edit valid fields, explicit Save, discard/back, eligible parent selection.                                                                                                   |
+| saving                      | One immutable intent may be in flight.                                                                                        | Keep visible bounded pending feedback; disable edits/Save/recovery/parent switch and workspace navigation until settle. Logout always remains usable.                        |
+| saved                       | Strict200 capture DTO verified against parent/content.                                                                        | Private detail/Refresh result GET, Back, explicit New private proposal; no edit/replay action for this revision.                                                             |
+| refused                     | Known local or verified400/401/403/404/409/413/415/429 refusal.                                                               | Fixed field/auth/parent/rate/conflict guidance. Local nondispatch keeps editable draft; a server refusal never erases earlier uncertainty. No automatic resubmit.            |
+| uncertain                   | Dispatched POST has503/500, network loss, timeout, cancellation, invalid success/error response, or another ambiguous result. | Freeze original intent, block capture and content edits; explicit Check save outcome only when current authority/context is intact; Back may hide UI but cannot reset guard. |
+| reconciling                 | One explicit actor/key GET is in flight.                                                                                      | No second recovery/capture; preserve uncertainty and use bounded status. Logout remains available.                                                                           |
+| resolved                    | GET COMMITTED plus exact bound intent content/parent matches.                                                                 | Display existing private DTO, clear guard; same actions as saved. No write occurred during resolution.                                                                       |
+| unresolved                  | GET UNRESOLVED or incomplete/uncertain recovery evidence.                                                                     | Keep guard/frozen intent. Explicit read retry when eligible and not rate-limited; no Start over/force-save/replacement key. Operator assistance may be required.             |
+| loading-detail / read-error | Explicit refresh of known result identity.                                                                                    | Read-only loading/retry; no Save replay. Missing/deleted/archived parent follows API semantics. A read failure does not erase a separate uncertain intent.                   |
+| denied / context-lost       | Account/session authority or required recovery context lost.                                                                  | Clear private display, use existing authentication flow; no automatic restoration of a mutation. Apply loss policy below.                                                    |
+
+The API deliberately cannot prove absence from UNRESOLVED. COMMITTED returns
+actual stored content; compare it against the exact retained intended content and
+Technology before presenting RESOLVED. A different payload, wrong identity or
+corrupt record is not success; keep a conflict/uncertainty state. Do not copy the
+Technology controller's broader error/GET reconciliation shortcut: unrelated reads
+cannot release this actor/key guard. No polling, background capture, optimistic
+server-success state, mutation compensation or unsafe replay.
+
+### Draft, navigation, logout and memory-loss policy
+
+**No localStorage, sessionStorage, IndexedDB, cookies, URL/history state, service
+worker cache or console is used for draft content, keys or private results.**
+
+- An editable unsaved draft belongs to the mounted form/current Technology only.
+  It does **not** survive leaving Learning Paths, switching Technology or reload.
+  In-app navigation that discards a dirty draft requires an accessible explicit
+  Keep editing / Discard draft choice. Refreshing a read of the same eligible parent
+  need not erase the draft; a returned ineligible/different parent disables Save
+  and requests explicit discard, never rebinding content automatically.
+- A known saved/result DTO is memory-only and cleared on leaving the result view,
+  changing Technology/account or reload. Server persistence is unaffected. U has
+  no private proposal inventory/bookmark/import-ID workflow; leaving loses that
+  convenience view. A still-visible known result can be refreshed by its exact ID.
+- For an uncertain Save, retain the **one frozen recovery intent** in the root
+  auth controller while the same authenticated generation remains valid, even if
+  LearningPathManager unmounts. This is transient in-memory recovery, not an
+  editable draft or durable storage. Returning exposes recovery only for the same
+  account/Technology; no new capture anywhere bypasses the root guard. Show a
+  content-free pending-recovery notice when another selection is shown.
+- Before leaving during saving/reconciling, disable the normal navigation buttons
+  until settlement; do not prevent logout, expiry, revocation, browser close or
+  forced navigation. Once a navigation/account generation changes, abort old reads
+  and suppress every late result using request generation, account and Technology
+  identity. A captured result from an old generation never repopulates the UI.
+- Logout, eligibility loss, account switch or auth-generation invalidation clears
+  all proposal payloads/results/keys and visible field errors, aborts business work
+  and preserves existing logout coordination. If capture may have been dispatched
+  without verification, keep only a content-free **unresolved-loss guard** for the
+  surviving root-controller lifetime. It discloses no previous actor, key, parent
+  or content to a different account and blocks new proposal captures in that root.
+  Do not clear it through another account's reads/login. Lost payload/key requires
+  separately approved operator reconciliation before repeating that intent; no
+  UI reset/override claims to repair it. If no prior uncertain capture existed,
+  ordinary clean login/navigation remains usable with an empty form.
+- Reload/closing the tab/disposal loses all in-memory intent **and that guard**.
+  Form reopens empty; there is no automatic GET or POST recovery and no claim of
+  cross-reload at-most-once detection. A standing clear notice says that if an earlier
+  Save was not confirmed, do not repeat it and obtain operator reconciliation.
+  A best-effort native beforeunload warning may be attached only while dirty/pending/
+  uncertain and removed on cleanup; it is not guaranteed interception or a safety
+  proof. Never sendBeacon/final-unload Save or a storage marker under this contract.
+
+This final limitation is genuine: without durable browser evidence or an additional
+server recovery/browse capability, a new page cannot distinguish a genuinely new
+brief from a human retyping a lost uncertain intent. U prevents automatic replay,
+not deliberate duplicate user submissions across memory loss. **Owner approval
+must explicitly accept this existing operator boundary**, or request a separately
+scoped durable-recovery design before implementation; do not silently add storage,
+new endpoints or an operator override. No operator procedure/authority is invented
+by this UI proposal. Such a procedure and live infrastructure remain separately
+gated. Normal login/logout effects are not newly authorized by a U offline slice.
+
+### Private result, errors and accessible Stitch presentation
+
+Reuse delivered charcoal/lavender/purple tokens, existing card/input/focus styles,
+bounded form CSS module and compact Technology success-feedback pattern. No global
+CSS, AdminShell, fonts, icons, design-import HTML or dependencies change. Success
+notification is a small nonobscuring polite status; persistent errors/conflicts/
+uncertainty stay inline. Do not copy demo approval/generation/publishing controls.
+
+Render the existing 14-key private DTO explicitly: title, objective list, audience,
+depth, runtime/version/null labels, prerequisite list and source/proposal revision
+identities/date as appropriate. Do not render raw JSON, operation keys, internal
+digests, actor/audit data, HTML/Markdown, executable content or token/session data.
+Detail uses the retained result revision ID and required Technology. An archived
+parent remains inspectable; missing parent/proposal shows sanitized unavailable
+state while retained database evidence is untouched. No revision editing action.
+
+Use a labelled form/fieldset, required indicators, per-field error IDs and
+aria-invalid/aria-describedby. Focus the first invalid field or bounded summary
+on submission; server unknown-field errors go to a generic summary without echo.
+Label every repeated row; add/remove focuses the new/adjacent row, preserves order
+and enforces counts. Save latch/disabled state has visible explanatory text and
+aria-busy; live regions announce state once without moving focus on stale reads.
+Use polite role=status for progress/success, role=alert for actionable refusal/
+uncertainty; no success toast hides an unresolved error. Back/Discard restores a
+predictable heading/action focus; Escape never silently submits/discards. Logout
+and existing authentication accessibility stay available.
+
+At 1440/768/390/320px and 200% zoom, form/result/actions wrap without viewport-wide
+horizontal overflow; single-column narrow layout, adequate tap targets, visible
+keyboard focus, semantic reading order, no color-only status or inaccessible
+overflow controls. Keep existing inventory table scrolling local to its container.
+Verify actual visual/screen-reader behavior separately, not through static markup
+assertions alone. Existing design references are inert, not a runtime scaffold.
+
+### Exact proposed implementation and documentation inventory
+
+Retain the earlier U's 16 application/test paths and add one necessary selection
+config: **11 CREATE + 6 MODIFY =17 application/test/config paths**. Existing
+playwright.config.ts selects chrome-smoke.spec.ts only; playwright.f044.config.ts
+selects admin-learning-paths.spec.ts only. Neither discovers the new proposal spec.
+This is an explicit inventory reconciliation for owner approval, not permission to
+change either existing default. All paths below are prospective; none is edited
+or created by this planning task:
+
+```text
+CREATE apps/admin/src/lib/learning-path-proposals/contracts.ts
+CREATE apps/admin/src/lib/learning-path-proposals/proposal-client.ts
+CREATE apps/admin/src/lib/learning-path-proposals/proposal-controller.ts
+CREATE apps/admin/src/hooks/use-learning-path-proposal.ts
+CREATE apps/admin/src/components/learning-paths/learning-path-proposal-form.tsx
+CREATE apps/admin/src/components/learning-paths/learning-path-proposal-form.module.css
+CREATE apps/admin/tests/learning-path-proposal-client.test.ts
+CREATE apps/admin/tests/learning-path-proposal-controller.test.ts
+CREATE apps/admin/tests/learning-path-proposal-rendering.test.ts
+CREATE tests/browser/admin-learning-path-proposals.spec.ts
+CREATE playwright.f044-proposals.config.ts
+MODIFY apps/admin/src/lib/auth/admin-controller.ts
+MODIFY apps/admin/tests/admin-controller.test.ts
+MODIFY apps/admin/src/components/learning-paths/learning-path-manager.tsx
+MODIFY apps/admin/tests/learning-path-rendering.test.ts
+MODIFY apps/admin/src/app/app.tsx
+MODIFY apps/admin/tests/admin-rendering.test.ts
+```
+
+Future enactment/evidence MODIFY only:
+
+```text
+AGENTS.md
+docs/features/F044-admin-learning-path-management.md
+docs/DATABASE_DESIGN.md
+docs/DEVELOPMENT_ROADMAP.md
+```
+
+Thus **21 distinct checkpoint paths** after separate approval. App modification
+coordinates navigation/dirty-state behavior and root account lifetime while
+Technology Management remains default. Existing renderer loaders/affected app
+assertions may need adapting to the new form import, preserving authentication,
+logout and read-only checks. No backend/API schema, auth-contract file, existing
+Technology implementation/CSS, other browser spec or public API change is included.
+If a new required path or API mismatch appears, stop for separate approval.
+
+### Measurable offline acceptance and prepared browser cases
+
+After separate implementation approval require:
+
+1. Client tests: exact three descriptors/origins/methods, omitted business cookies,
+   strict 9-field body, all individual bounds/Unicode/null/duplicate rules, canonical
+   IDs/UUID, streamed request/response limits, wrong parent/revision/private fields,
+   strict200/envelopes/no-store, sanitized statuses, delayed timeout and cancellation.
+2. Root/U controller tests: settled fresh-login/session restore admission; one UUID
+   and one capture for double click/Enter/remount; same intent through explicit
+   COMMITTED recovery; UNRESOLVED/conflict never clears guard; invalid/503/lost
+   response never retries; known nondispatch/refusal behavior; current authority,
+   generation, logout/account/Technology races and no stale/private cross-account
+   output. Test domain separation from Technology uncertainty and all loss policies.
+3. Render tests: required row labels/bounds/field errors/focus targets; disabled
+   pending controls and accessible messages; correct read-only archived/unavailable
+   behavior; compact success versus inline uncertainty; text-only private result,
+   no token/key/raw fields; no unavailable authoring/editorial controls. Preserve
+   default workspace, original inventory/navigation/auth/logout tests.
+4. Existing Admin regressions actually affected by U, full relevant TypeScript,
+   Admin build, targeted lint/format/CSS/UTF-8/LF/privacy/diff/exact-scope checks and
+   fresh independent security/test review. Resolve findings before checkpoint
+   eligibility. Do not rerun unchanged unrelated suites. No live API/browser claim
+   from mocks, static rendering, imported test files or a test configuration.
+
+Prepare exactly these **16 new U browser scenarios**, separate from the existing 225. No scenario is created/run/count-added by this documentation task:
+
+| ID  | Planned mocked-network scenario                                                                                                      |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| U01 | Eligible login lands on Technology Management; explicit Learning Paths/create flow only.                                             |
+| U02 | DRAFT/PUBLISHED parent selection enables form; archived/missing parent refuses creation.                                             |
+| U03 | Field bounds, null choices, ordered rows and exact duplicate/Unicode validation.                                                     |
+| U04 | Double click/Enter sends one POST/key, shows pending state, uniform200 private success.                                              |
+| U05 | Saved known-revision detail/Refresh preserves required Technology and read-only labels.                                              |
+| U06 | Validated400/413/415 field/refusal feedback is sanitized and not auto-resubmitted.                                                   |
+| U07 | 401/403 drops authority/private display; late responses never restore it.                                                            |
+| U08 | 409 payload/parent conflict requires explicit recovery/guidance, no new key bypass.                                                  |
+| U09 | 429 uses visible bounded waiting guidance, no automatic request loop.                                                                |
+| U10 | 503/lost/invalid POST response becomes uncertain, blocks another capture.                                                            |
+| U11 | Explicit same-intent COMMITTED recovery matches content and resolves without POST.                                                   |
+| U12 | UNRESOLVED/invalid recovery preserves guard; unrelated detail/Technology GET cannot clear it.                                        |
+| U13 | Dirty in-app navigation prompts; discard/refresh/reload follow exact memory policy.                                                  |
+| U14 | Technology switching/workspace return and logout/account change suppress stale data and preserve/lose only specified recovery state. |
+| U15 | Keyboard labels/focus/announcements and compact success/inline errors are observable.                                                |
+| U16 | Loaded1440/768/390/320px layout and no authoring/approval/publication/deletion controls.                                             |
+
+These would be mocked-network client/UI evidence, not real Save/transaction proof.
+Primary-host Playwright stays prohibited until its existing ownership-safe execution
+gate is separately satisfied; test preparation/configuration cannot qualify it.
+After U implementation, ledger newly prepared 16 separately; inherited 225 never
+silently becomes 241 executed or changes its historical outcome.
+
+The proposed selection config extends the existing F044 configuration and changes
+only testMatch to admin-learning-path-proposals.spec.ts. Preserve one worker,
+zero retries, maxFailures 1, existing 600-second global cap/individual deadlines,
+127.0.0.1:5173 base origin, disabled tracing/video/screenshots and no webServer.
+No launcher, supervisor, host qualification or timeout increase is introduced.
+Once separately approved/implemented, offline discovery is exactly
+`node node_modules/@playwright/test/cli.js test --config=playwright.f044-proposals.config.ts --list`.
+Do not run the execution form of that command until its separate browser/runtime
+approval and ownership gate pass. Existing smoke/F044 read-only config bytes stay
+unchanged; discovery is not execution or evidence that a browser is qualified.
+
+### Separately authorized live acceptance, sequencing and decisions
+
+Real UI/API smoke after a stable U implementation needs a separately approved
+qualified local runtime and authorized synthetic/disposable persistence fixtures/
+indexes/privileges. A real Save is content mutation and **not** covered by existing
+read-only owner smoke/login approval. Explicitly approve its target, permitted
+brief/proposal/audit/User fence writes, isolated cleanup and protected baselines
+before Save testing. No persistent development content is silently adopted as
+disposable test data. Verify one real Save/result/recovery with true API evidence,
+then actual keyboard/responsive/announcement behavior; controlled failure/race
+tests need their own safe isolated qualification. Existing integration RESULT/ACK,
+ownership/Job/deadline/cleanup and acceptance rules remain mandatory.
+
+> **PROPOSED — PENDING OWNER APPROVAL: F044 restricted proposal UI U offline extension.**
+> After explicit approval of this contract, memory-loss/operator limitation and
+> exact 21-path inventory, permit only that U implementation, focused offline tests,
+> browser-case preparation and fresh independent review under stable delivered A/P
+> contracts. Keep tokens in the established root controller/internal transport;
+> preserve current authorization, no replay, bounded single-intent guard, parent
+> snapshot limitation and account/session isolation. No live Save/API/browser,
+> new storage/dependency/schema/index, generation/editorial/publication/deletion or
+> later feature authority. Existing qualified runtime, private channel, RESULT/ACK,
+> baselines, deadlines and cleanup remain separate gates. F044 stays IN_PROGRESS;
+> F042/F043 acceptance BLOCKED; original 9 / P 5 / API 6 and browser 225 remain unexecuted.
+> Every Git delivery and live operation needs separate approval. This text is not
+> active until separately approved enactment in AGENTS.md.
+
+Current groups remain exactly: original PARENT+T01–T08 **9 NOT_RUN**; P's five
+named assertions **5 NOT_RUN**; A's six named assertions **6 PREPARED/NOT_RUN**;
+prepared browser backlog **225 NOT_RUN**. No group is a combined qualified suite.
+Stale guarded pins/undelivered ignored support, real authority/transaction/index/
+concurrency/cleanup and RESULT/ACK limitations remain. No refreeze or live attempt.
+
+Remaining owner decision: approve/revise this U-only contract, exact 21 inventory,
+memory-only draft/recovery behavior and operator handling after lost context, then
+separately authorize U enactment/implementation/offline review. If cross-reload
+automatic recovery or enforced prevention of deliberate duplicate re-entry is
+required, defer U for a separately scoped durable-recovery decision; it does not
+fit this no-storage/no-new-API design. No other source-authority or editorial
+decision is outstanding for the bounded UI proposed here.
+
+Estimate **1–2 engineering days** for U implementation, focused offline tests,
+browser preparation and independent review, assuming no material findings. Existing
+A/P deployment/index/ownership qualification and real Save/browser execution are
+additional and not reliably timed while blocked. No passing suite, login QA,
+credential lookup or infrastructure investigation is repeated for this contract.
+
+This U draft receives documentation consistency/privacy/scope/format review only.
+The retained zero-unresolved independent review applies to delivered API A, not
+an independently executed U design review or implementation test. No U source,
+runtime configuration, browser case or active AGENTS.md rule is changed here.
+
+## F044 U owner-authorized offline implementation — 2026-11-04
+
+The owner approved the preceding U contract, exact 21-path inventory and memory-only
+limitations, and separately authorized U-only enactment/implementation/offline
+verification and fresh independent review. The preceding PROPOSED/NOT_STARTED text
+is retained as historical planning evidence; U implementation is now IN_PROGRESS.
+The named active extension is limited to U in AGENTS.md. No live verification,
+backend change, Git delivery or acceptance is implied. Operator reconciliation
+after lost uncertain intent remains a separate approval; no procedure is invented.
+
+Keep original 9 integration records, P 5 and API 6 assertions and 225 existing browser
+cases NOT_RUN; new 16 U browser cases are prepared separately, not executed. F044
+IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED. Historical
+guarded/source-pin and clean-clone reproducibility limitations remain unchanged.
+
+### U implementation and offline review evidence — 2026-11-04
+
+Checkpoint U is READY_FOR_REVIEW — offline only. This supersedes only its earlier
+secondary implementation-progress field, not feature/slice acceptance. F044 stays
+IN_PROGRESS. The owner-approved memory-only policy and exact 21-path inventory are
+implemented: 11 CREATE, six application/test MODIFY and four sequencing/evidence
+MODIFY. Existing Technology Management remains default; existing Learning Path
+inventory/detail remain read-only. U adds only an explicit private brief workflow.
+
+The browser validates exact content bounds without normalization and allocates no
+key before successful validation. The root Admin controller alone holds one native
+UUIDv4 operation identity, token, current account/generation and bounded intent.
+Fixed capture/recovery/detail transport uses the existing whole 15-second budget,
+strict 131072-byte JSON/UTF-8/envelope/DTO/no-store checks and existing coordination.
+Uncertain/409 outcomes freeze the intent; only exact matching capture/COMMITTED
+evidence clears it. Recovery is GET-only; UNRESOLVED/unrelated reads never permit
+another POST. Both admission and dispatch respect Technology uncertainty.
+
+Same-generation ordinary workspace return retains only a frozen uncertain intent;
+dirty editable drafts require an explicit discard choice. Unavailable/refreshed
+parents preserve dirty content with Save disabled until discard. Pending inventory
+and workspace controls are disabled; logout remains usable. Authority loss clears
+private state and retains only a content-free loss guard in a surviving root.
+No localStorage/sessionStorage/IndexedDB/URL or durable recovery material is added.
+Reload loses context and guard. Native unload warnings are best effort only; a
+lost uncertain intent requires separately approved operator reconciliation before
+repeating it. No available operator procedure/reset capability is claimed.
+
+Actually executed offline checks:
+
+- Final affected six-file Node/tsx run: 231 distinct tests PASS, 0 FAIL/cancel/skip.
+  Three U suites plus Admin-controller, Admin-rendering and Learning-Path-rendering
+  regressions use injected fetch/coordination/timers and inert React rendering;
+  there are no network listeners, real API calls, database connections or browsers.
+- Comprehensive Admin source/test TypeScript, including the new prepared browser
+  spec/config:PASS. Admin production build/source TypeScript:PASS. The existing
+  ineffective dynamic env import warning remains nonblocking; no chunk split is
+  promised. No backend test suite was rerun or claimed as new evidence.
+- Targeted lint and formatting:PASS. CSS source checks:PASS, not actual responsive
+  layout/contrast/screen-reader verification. UTF-8/LF, exact scope, privacy and
+  git diff --check:PASS. Index remains empty; no Git delivery.
+- Discovery only with `node node_modules/@playwright/test/cli.js test
+--config=playwright.f044-proposals.config.ts --list`:exactly 16 U01–U16 cases in
+  one file. These are newly PREPARED/NOT_RUN mocked-network cases, separate from
+  the existing 225 NOT_RUN. The config changes only testMatch and grants no browser
+  ownership qualification or execution permission.
+
+Initial offline run:226 PASS/1 FAIL. The synthetic astral-Unicode boundary exposed
+that installed Zod counts code points; explicit UTF-16-unit checks now enforce the
+approved browser bounds. Initial test-only TS2352 and prepared-browser TS2551 were
+corrected with proper type annotations/native-element narrowing. Initial lint
+reported two render-time-ref accesses and one prefer-const; bounded stable row keys
+now use React state. These initial outcomes remain historical, not erased by PASS.
+
+Fresh-context independent read-only source/test review first found three Medium
+application issues (Technology uncertainty, refused-draft dirty flag, unavailable
+parent draft loss), later one Low pending inventory-control issue and one Medium
+prepared-coverage gap. All were resolved within scope and narrowly re-reviewed.
+Final unresolved:Critical 0 / High 0 / Medium 0 / Low 0. The reviewer wrote nothing and
+executed no tests/build/runtime; actual check results above belong to the primary.
+Self-review separately inspected the complete diff, boundaries and exact inventory.
+
+Deferred evidence remains explicit:original nine integration records NOT_RUN;
+five P assertions NOT_RUN; six API assertions NOT_RUN; existing 225 browser cases
+NOT_RUN; new 16 U cases PREPARED/NOT_RUN. No real transaction/uniqueness/audit/current-
+authority/concurrency guarantee, live UI/API Save/recovery, browser layout/focus/
+screen-reader or runtime ownership/cleanup evidence is supplied by these doubles.
+Existing guarded pins remain stale after source changes; no manifest refreeze,
+ignored-support delivery or clean-clone guarded reproducibility is claimed.
+
+Next gate: separate owner approval for U development-checkpoint delivery and/or a
+bounded Desktop QA scope with qualified owned applications, securely approved
+application credentials/session and explicit authorization for any private Save
+writes to an approved test target. Automated browser execution retains its existing
+host-ownership gate. Operator reconciliation for a lost intent and real integration
+execution remain separately approved. F042/F043 acceptance BLOCKED; production
+readiness NOT_VERIFIED. No runtime restart, credential access, live API/DB/browser
+execution, staging, commit or push occurred during U.

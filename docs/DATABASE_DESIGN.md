@@ -2047,3 +2047,338 @@ production database access is approved.
 F054 generation, F049/F050 editorial decisions and F051 publication remain with
 those features. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine F044 real
 integration records and225 browser cases NOT_RUN; production NOT_VERIFIED.
+
+## Proposed F044 Admin-authored curriculum brief — 2026-11-04
+
+**PROPOSED — PENDING OWNER APPROVAL; no implementation, DDL or active sequencing
+change.** See [the exact source-authority contract](features/F044-admin-learning-path-management.md#minimal-admin-authored-curriculum-brief-authority--2026-11-04).
+This adds a proposed input authority, not an implemented source or approval state.
+Existing LearningPath/public storage and all historical manifests remain unchanged.
+
+Proposed collection `curriculumBriefRevisions`, model `AdminCurriculumBriefRevision`:
+immutable explicit `_id` (source family), `technologyId`, `schemaVersion:1`,
+`revision:1`, the exact shared C1 content fields, server `createdBy`/UTC `createdAt`,
+actor-bound UUIDv4 `operationId` and `contentDigest`. One revision per source family;
+changed input is a new family. No source-update/delete/TTL, ingestion, provider,
+approval or generation machinery. C1's exact content bounds and 65,536-byte UTF-8
+aggregate ceiling apply. The feature contract defines the ordered, domain-separated
+digest including identity, content, actor, timestamp and operation key; canonical
+bytes are reconstructed, not stored a second time. No personal/account snapshots.
+
+Registration remains explicit/disconnected/import-inert with automatic collection/
+index creation and buffering disabled, immutable guards and full validation before
+an approved native-driver insert. No schema defaults create IDs or arrays.
+
+| Index                                 | Keys/options                                            | Purpose                                                                     |
+| ------------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `_id_`                                | Implicit unique `_id`                                   | Immutable source identity.                                                  |
+| `uq_curriculum_brief_actor_operation` | `{createdBy:1,operationId:1}`, unique, simple collation | Exact actor-bound Save/reconciliation; no TTL/sparse/partial/hidden option. |
+
+Together with C1 this proposes two private collections and three explicit indexes,
+plus two implicit identity indexes. No physical index or privilege is established.
+The historical 19-collection/27-explicit-index fixture manifest is not refrozen or
+silently extended. Live persistence requires a separately approved owned target,
+privileges, complete fixture/index/source manifest and qualified execution.
+
+One bounded transaction admits a brief, creates C1 proposal revision 1 and appends
+two audits, with a current verified ACTIVE Admin User-version fence. Allocate two
+distinct server IDs: source `_id` also becomes initial `proposalId`; proposal
+revision `_id` differs. This makes exact initial-result lookup use C1's existing
+unique `{proposalId,revision}` index without a new link field/collection. C1 source
+is `{id:brief._id,revision:1,digest:contentDigest}`; Technology must match. The source
+and admission audit must fully validate on later consumption. Future predecessor
+checks remain C2's responsibility, not model-only concurrency claims.
+
+Proposed audit additions are CONTENT_MANAGEMENT / CURRICULUM_BRIEF_ADMITTED /
+CURRICULUM_BRIEF_REVISION, resource=brief ID, metadata exactly
+`{technologyId,revision:1,operationId}`; and C2's proposal-created event with exact
+`{proposalId,revision,sourceId,sourceRevision}` metadata. Each audit `_id` equals its
+resource ID in the separate audit collection. Actor/request/time are server-derived;
+no content/digests/secrets. Admission is authenticated capture, not editorial approval.
+
+Admission is irreversible as historical input. Retain source/audit while referenced;
+no account/Technology cascade or deletion API, no automatic erasure of unreferenced
+briefs. Separate approved retention/privacy maintenance is required for exceptions.
+Author demotion/deletion invalidates future author actions, not historical capture.
+Consumers independently require current Admin eligibility/fencing. Proposed parent
+write eligibility is DRAFT/PUBLISHED at transaction snapshot; concurrent archival/
+deletion after that snapshot does not prevent a private commit. Future writes
+re-read/refuse an ineligible parent. This is explicitly not a parent lifecycle fence
+and changes no Technology `__v`/F043 revision semantics. Stronger exclusion requires
+a different owner-approved lifecycle design. Archived-parent inspection persists;
+missing-parent private reads refuse while retaining stored evidence.
+
+One actor/operation key identifies one immutable Save. Full source/proposal/audit
+comparison is required for reconciliation; unique collision or a matching digest
+alone is not success. Postcommit uncertainty never triggers replay/compensation.
+Read recovery is primary/majority, current-Admin and actor-bound, no audit/User write;
+missing evidence remains UNRESOLVED. Retain existing deadlines and session cleanup.
+No new receipt subsystem, automatic retry or connection/provisioning is authorized.
+
+F044 IN_PROGRESS; C1 READY_FOR_REVIEW — offline only; F042/F043 acceptance BLOCKED;
+nine integration records and 225 browser cases NOT_RUN; production NOT_VERIFIED.
+Offline structure/call-order tests cannot establish real atomicity, uniqueness,
+concurrent demotion safety, indexes, lifecycle races or cleanup. F054 generation,
+F049/F050 editorial decisions and F051 publication remain excluded.
+
+
+## F044 source-structure S implementation authorization — 2026-11-04
+
+The owner approved the source-policy choices in the proposed brief contract and
+only the three-path offline S schema/model/test checkpoint. The active AGENTS.md
+extension is limited to S. No authenticated admission, persistence, audit branch,
+endpoint/UI, DDL or live verification is authorized. Future snapshot parent
+eligibility explicitly permits concurrent post-snapshot archive/deletion to coexist
+with a private commit; no parent fence or cascade is claimed. Archived-parent
+inspection remains allowed, new writes refuse; deleted-parent private reads refuse
+while historical source/proposal/audit evidence is retained. Author demotion/deletion
+does not invalidate historical admission but all future actions need current
+authorization. S can establish structure/digest/in-memory guards only. See the
+feature's dated authorization/evidence. Historical proposals remain intact.
+
+## F044 source-structure S offline evidence — 2026-11-04
+
+S is READY_FOR_REVIEW — offline only: the three authorized schema/model/test files
+implement strict immutable brief structure, shared C1 content bounds, canonical
+source digest and inert disconnected registration. No extra brief DTO; private
+C1 proposal projection is reused through a pure structural binding. All Mongoose
+saves refuse, including validation-disabled new documents; a future separately
+approved P repository would use validated native-driver inserts.
+
+Final 111 synthetic offline tests PASS; full API/test TypeScript, API production
+build/typecheck and targeted lint/format/encoding/diff/scope/privacy checks PASS.
+Initial sandbox tsx ENOMEM occurred before test registration; an actual 105-PASS
+run preceded the final expanded suite. Fresh independent source review found one
+Medium save bypass and one Low fixed-digest-vector gap, both corrected/rereviewed;
+Critical/High/Medium/Low unresolved: 0/0/0/0. No independent test execution claimed.
+
+No source admission/current-Admin authorization, stored existence/uniqueness,
+physical collections/indexes, transaction/audit atomicity, concurrency, retention
+or live database guarantee is established. Snapshot parent race limitations remain
+explicit and untested in a real database. No provisioning, connection, DDL,
+writer/API/UI, integration execution or acceptance change. Existing source pins
+are not refrozen. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine integration
+records and 225 browser cases NOT_RUN; production NOT_VERIFIED.
+
+## F044 P offline implementation authorization — 2026-11-04
+
+The owner authorized only P internal admission/persistence implementation and
+offline checks after S delivery. The exact proposed brief/proposal/audit/index
+definitions above apply, without DDL or live execution. P's source authority must
+come from actual immutable source plus matching admission audit, never a caller
+tuple. Current actor authorization/fencing remains transactional; historical author
+demotion/deletion does not erase admitted input. Parent eligibility remains snapshot
+only with the documented archive/delete race, no parent version write/cascade.
+No endpoint/UI, provisioning, collection/index change or database operation is
+authorized by this source checkpoint. F042/F043 acceptance BLOCKED; nine records
+and225 browser cases NOT_RUN; F044 IN_PROGRESS; production NOT_VERIFIED.
+
+## F044 P internal persistence offline evidence — 2026-11-04
+
+P READY_FOR_REVIEW — offline only, uncommitted. The exact six-path P implementation
+uses native-driver snapshot/primary transactions, majority+journaled commit,
+current-Admin User-version fencing, immutable source/admission-audit resolution,
+greatest stored predecessor checks and atomic brief/proposal/two-audit capture.
+No collection/index is created and C1/S schemas/model guards are unchanged. The
+two new CONTENT_MANAGEMENT audit branches have exact metadata/resource/actor/time
+rules; legacy branches reject their metadata. Recovery is actor-bound, read-only,
+and maps known partial/corrupt evidence to UNKNOWN; missing lookup is UNRESOLVED,
+never proof of safe replay. Later revision commands are process/context-local
+prepared handles with one write attempt; no durable receipt framework is added.
+
+Actual offline P/audit tests: initial53 PASS/1 FAIL (incorrect lookup-corruption
+expectation), final65 PASS/0 FAIL, not summed. Initial new TS2339 metadata typing
+error corrected within audit.model.ts; final full API/test TypeScript, production
+build/typecheck and targeted lint/format/encoding/diff/privacy checks PASS.
+Independent review: four Medium findings resolved, final0/0/0/0 unresolved;
+reviewer executed no tests/live operations. Prepared rollback proof requires its
+second-audit injection after staged proposal, complete row absence and unchanged
+User; the real case has NOT_RUN. Existing lifetime/deadline handling is reused.
+
+No real admission/transaction/uniqueness/index/ownership/cleanup guarantee is
+established from doubles. Five named additional assertions are prepared only,
+not bound to the old nine-record manifest. Physical prerequisites, real concurrent
+demotion/deletion/competing transactions, authenticated RESULT/ACK and protected
+baselines need separately approved qualification/execution. Snapshot parent races
+remain explicit, no cascade/publication or parent fence. No new target/provisioning,
+database call, runtime restart, API/UI or manifest refreeze occurred. F044 remains
+IN_PROGRESS; F042/F043 acceptance BLOCKED; nine existing records and225 browser
+cases NOT_RUN; production NOT_VERIFIED. P remains uncommitted for owner review.
+
+## F044 P delivery and proposal API A contract preparation — 2026-11-04
+
+P was separately approved and delivered as
+594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc with exactly ten reviewed paths,
+normal fast-forward push and matching local/tracking/fresh remote SHA. Earlier
+uncommitted wording remains historical. The implementation still has offline-only
+evidence: final65 focused PASS and independent0/0/0/0 unresolved, not rerun here.
+No actual transaction, authority, physical index/uniqueness or cleanup is proved.
+
+The feature contract's dated protected proposal API A is PROPOSED — PENDING OWNER
+APPROVAL. Three operations only: capture brief plus initial proposal, actor/key
+read reconciliation and Technology-bound ordinary private revision detail. The
+proposed uniform200 capture response reflects P's actual DTO-only return for both
+new and identical known saves; no created flag is guessed. C1 DTO fields remain
+unchanged. Existing native readers suffice; A would add the ordinary read service
+method/tests, no repository/model/audit/index change. Current Admin checks remain
+mandatory. Ordinary detail may be read by any eligible current Admin; actor/key
+recovery remains scoped to the current actor. Archived-parent inspection and the
+documented transaction-snapshot archive/delete race are unchanged.
+
+Operation keys have no TTL/recycling under current retention; one actor/key binds
+immutable content/Technology. No receipt or new durable client state is added.
+UNRESOLVED never proves safe replay; read recovery never fences or writes. No
+prepared-revision process handle is an HTTP identity/capability. Proposed A-only
+sequencing is inactive; no source, schema, live write, DDL or provisioning authority.
+See the feature contract for exact requests/errors, limits and12 implementation
+paths plus four future scoped authorization/evidence documents.
+
+Separate current ledger: original PARENT+T01–T08 =9 NOT_RUN; new P assertions
+CAPTURE_AND_ATOMIC_AUDITS, ACTOR_KEY_RECONCILIATION,
+REVISION_PREDECESSOR_CONFLICT, AUDIT_FAILURE_ROLLBACK and
+ACKNOWLEDGEMENT_LOSS_RECONCILIATION =5 NOT_RUN; browser225 NOT_RUN. The five are
+prepared separately, not authenticated integration records in the old manifest.
+API assertions are not yet prepared. Real concurrent demotion/deletion, competing
+transactions, rollback/uncertainty, snapshot races, physical prerequisites,
+authenticated RESULT/ACK, owned cleanup and protected baselines require their own
+qualified manifest/execution. Guarded pins stay stale; ignored support is neither
+delivered nor clean-clone reproducible. No refreeze, runtime or database operation.
+F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED.
+
+## F044 protected proposal API A offline authorization — 2026-11-04
+
+The owner approved the exact API contract/inventory and A-only offline enactment.
+Use existing P repository/model/audit/index contracts without modification. Add
+only the ordinary private-detail service operation using bounded primary/majority
+reads, current Admin authorization, exact parent/source/admission/revision-audit
+validation and C1 private projection. No read/recovery fence/audit/content write.
+Capture retains atomic brief/proposal/two-audit intent and the User-version fence;
+uniform 200 success also covers fully read-validated identical existing captures.
+Missing recovery is UNRESOLVED, never automatic mutation replay. Snapshot parent
+race and separate-majority-read limitations remain explicit. No DDL, connection,
+provisioning, real transaction or cleanup qualification is authorized/proved.
+Original 9 records, five P assertions and225 browser cases remain NOT_RUN; new API
+assertions are listed separately. F044 IN_PROGRESS, F042/F043 acceptance BLOCKED,
+production NOT_VERIFIED. Preserve historical evidence and stale guarded pins.
+
+## F044 protected proposal API A offline evidence — 2026-11-04
+
+Proposal API A READY_FOR_REVIEW — offline only, uncommitted. Added ordinary detail
+uses existing P readers and validates raw proposal/digest, parent/source and both
+admission/revision audits before private projection. P capture/recovery/fencing
+remain unchanged; no repository/model/index/audit source edit or DDL. Current
+eligible Admins may inspect historical records; actor/key recovery remains scoped.
+No read/recovery transaction/User-version/audit write. Retain snapshot-parent and
+separate-majority-read limitations, no parent lifecycle fence or cascade.
+
+Actual focused/current routing regressions: 210 distinct offline PASS (168+1+36+5,
+not repeated runs). Initial 162 PASS/2 test failures corrected; initial TS2379
+test typing corrected. Final full API/test TypeScript, production build/typecheck,
+targeted lint/format/encoding/privacy/diff/scope checks PASS. Fresh independent
+source review resolved one Medium/two Low, final 0/0/0/0 unresolved; reviewer ran
+no tests/live operations. See the feature evidence for exact commands and limits.
+
+Original 9 PARENT+T01–T08 NOT_RUN and P 5 persistence assertions NOT_RUN are retained.
+Six additional API assertions are PREPARED/NOT_RUN in the separate API entry point:
+API_CAPTURE_200_AND_ATOMIC_EVIDENCE; API_IDENTICAL_CAPTURE_AND_KEY_CONFLICT;
+API_ACTOR_BOUND_OPERATION_RECOVERY; API_TECHNOLOGY_BOUND_PRIVATE_DETAIL;
+API_ARCHIVED_PARENT_INSPECTION; API_UNRESOLVED_AND_READ_NONMUTATION.
+Prepared snapshots bound each collection to 100 (limit 101 then refuse), include
+both synthetic actors' relevant authority/version state and all owned private
+brief/proposal/audit rows, and expose neither raw data nor fingerprints on failure.
+Child exceptions are fixed/sanitized and later cases halt after failure. This is
+prepared test support, not executed transaction/nonmutation/ownership evidence.
+
+Future API+replica-set qualification requires approved synthetic accounts,
+eligible/mismatched/archived parent fixtures and admitted archived proposal,
+physical P indexes/privileges, exact source/fixture/result manifest, current
+ownership/private channel, authenticated RESULT/ACK, baselines and cleanup. No
+database call, provisioning, live API or manifest refreeze occurred. Browser 225
+NOT_RUN; F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED.
+The smallest next application checkpoint U needs separate implementation approval.
+
+## F044 API A delivery and U memory-only UI proposal — 2026-11-04
+
+API A delivered as 7b7c2cbb9c15190c3d5130815281ab3e22467c8c, exact 16 reviewed
+paths, normal fast-forward push, matching local/tracking/fresh remote SHA and clean
+tree/index before this uncommitted documentation. Historical uncommitted wording
+describes earlier review state; no acceptance advancement. Existing 210 distinct
+offline PASS/independent 0/0/0/0 unresolved retained without reruns.
+
+Checkpoint U is PROPOSED — PENDING OWNER APPROVAL, NOT_STARTED. The feature's
+dated U contract defines the restricted Admin form, explicit capture, same-intent
+read recovery and known private result/detail. No backend/model/index/schema or
+source-authority change. Existing actor/key uniqueness and historical admission,
+current-operation authorization/fence, atomic pair/two audits, retention and
+snapshot parent race remain mandatory; private admission is not editorial approval.
+
+No browser persistence is proposed for content, keys or results. One root-controller
+in-memory intent supports same-authority workspace return and no automatic replay;
+editable drafts are discarded only through specified navigation/loss behavior.
+Logout/account or authority-generation loss clears private material. A content-free
+guard may survive in that root, but reload loses all context/guards. An absent
+lookup or lost key cannot prove no Save exists; repeating a lost uncertain intent
+requires separately approved operator reconciliation. A new page cannot enforce
+cross-reload deduplication without durable evidence; owner must accept that explicit
+boundary or separately scope another design. No storage/receipt/recovery endpoint
+or procedure is invented here. No database writes from planning or offline U approval.
+
+Proposed U inventory is 17 application/test/config paths plus four enactment/evidence
+documents, 21 total. The one addition to the earlier 16-file UI inventory is
+playwright.f044-proposals.config.ts: existing configs select other filenames.
+It would extend existing F044 discovery settings with only a new testMatch,
+preserving deadlines/defaults/ownership gates, not qualifying browser execution.
+No config/source is created by this documentation.
+
+Keep groups separate: original 9 integration records NOT_RUN, P 5 NOT_RUN, API 6
+PREPARED/NOT_RUN, browser 225 NOT_RUN. Proposed 16 U browser scenarios are not yet
+prepared or added to that count. Real Save requires a separate qualified target/
+fixture/index/source/result manifest and explicit mutation approval, ownership,
+baselines, authenticated RESULT/ACK and cleanup. Guarded pins remain stale; ignored
+support is undelivered/not clean-clone reproducible. F044 IN_PROGRESS;
+F042/F043 acceptance BLOCKED; production NOT_VERIFIED. U sequencing inactive.
+
+## F044 U owner-authorized offline implementation — 2026-11-04
+
+The owner approved the preceding U contract, exact 21-path inventory and memory-only
+limitations, and separately authorized U-only enactment/implementation/offline
+verification and fresh independent review. The preceding PROPOSED/NOT_STARTED text
+is retained as historical planning evidence; U implementation is now IN_PROGRESS.
+The named active extension is limited to U in AGENTS.md. No live verification,
+backend change, Git delivery or acceptance is implied. Operator reconciliation
+after lost uncertain intent remains a separate approval; no procedure is invented.
+
+Keep original 9 integration records, P 5 and API 6 assertions and 225 existing browser
+cases NOT_RUN; new 16 U browser cases are prepared separately, not executed. F044
+IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED. Historical
+guarded/source-pin and clean-clone reproducibility limitations remain unchanged.
+
+### U offline checkpoint evidence — 2026-11-04
+
+U is READY_FOR_REVIEW — offline only, within the approved 21 paths. Final affected
+offline tests: 231/231 PASS. Comprehensive Admin source/test and prepared-browser
+TypeScript, Admin build/typecheck, targeted lint/format/CSS/encoding/privacy/scope
+and whitespace checks PASS. Initial failures and their corrections are retained in
+the feature record, alongside check details and independent review evidence.
+Fresh-context independent source/test review: zero unresolved Critical/High/Medium/
+Low findings after resolving all findings. The reviewer executed no tests/runtime.
+
+The root retains one actor-bound intent in memory only; only exact capture or
+matching COMMITTED recovery clears uncertainty. GET UNRESOLVED never permits
+replay. Dirty drafts require explicit discard; authority loss clears private data.
+Reload loses intent and guard; warnings are not guaranteed. A lost uncertain Save
+requires separately approved operator reconciliation, with no invented UI reset.
+
+Browser discovery found 16 new U mocked cases, PREPARED/NOT_RUN, separate from the
+existing 225 NOT_RUN. Original nine integration records, five P assertions and six
+API assertions stay NOT_RUN. No live persistence/transactions/indexes/audit,
+browser/UI/API behavior or runtime ownership/cleanup is proved by offline doubles.
+Guarded pins remain stale; ignored support remains undelivered/not clean-clone
+reproducible. No refreeze or runtime/Git delivery occurred. See the dated U evidence
+in docs/features/F044-admin-learning-path-management.md for full detail.
+
+Next: separate owner approval for checkpoint delivery and/or bounded qualified
+Desktop QA, explicitly including private Save writes if desired. Current-account
+credentials/session, owned applications and approved test data/target are required;
+browser host safety and all real-integration gates remain unchanged. F044 remains
+IN_PROGRESS; F042/F043 acceptance BLOCKED; production readiness NOT_VERIFIED.

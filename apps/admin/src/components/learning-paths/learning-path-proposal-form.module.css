@@ -1,0 +1,119 @@
+.panel {
+  min-width: 0;
+  max-width: 100%;
+  margin-block: 1.5rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  border: 1px solid var(--studio-border-decorative);
+  border-radius: var(--studio-card-radius);
+  background: var(--studio-panel);
+  box-shadow: var(--studio-card-shadow);
+  overflow-wrap: anywhere;
+}
+.header,
+.actions,
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.header {
+  justify-content: space-between;
+}
+.fields,
+.rows,
+.result {
+  min-width: 0;
+  display: grid;
+  gap: 0.75rem;
+  margin-block: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--studio-border-decorative);
+  border-radius: var(--studio-card-radius);
+}
+.row > div {
+  flex: 1 1 18rem;
+  min-width: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.panel input:not([type='checkbox']),
+.panel select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--studio-border-control);
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  color: var(--studio-ink);
+  background: var(--studio-panel);
+  font: inherit;
+}
+.panel button {
+  min-height: 44px;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.panel :focus-visible {
+  outline: 3px solid var(--studio-focus);
+  outline-offset: 3px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+}
+.check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+.notice {
+  color: var(--studio-ink-secondary);
+  line-height: 1.6;
+}
+.fieldError {
+  color: var(--studio-danger);
+}
+.warning {
+  border-left: 4px solid var(--studio-action);
+  padding: 1rem;
+  background: var(--studio-panel-subtle);
+}
+.success {
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid var(--studio-border-decorative);
+  padding: 0.75rem 1rem;
+  border-radius: var(--studio-card-radius);
+  background: var(--studio-panel-subtle);
+}
+.result dl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 0.75rem 1rem;
+}
+.result dt {
+  font-weight: 600;
+}
+.result dd {
+  min-width: 0;
+  margin: 0;
+}
+@media (max-width: 48rem) {
+  .header,
+  .actions,
+  .row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .row > div {
+    flex-basis: auto;
+  }
+  .result dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

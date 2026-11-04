@@ -2160,6 +2160,184 @@ acceptance BLOCKED; nine integration records and225 browser cases NOT_RUN;
 production NOT_VERIFIED. Existing owner-observed login PASS is not repeated or
 converted to automated evidence. No Git delivery, guarded run or next slice approved.
 
+**F044 source-authority proposal — 2026-11-04: PROPOSED — PENDING OWNER APPROVAL.**
+The [minimal Admin-authored brief contract](features/F044-admin-learning-path-management.md#minimal-admin-authored-curriculum-brief-authority--2026-11-04)
+fills C2's missing input-authority design without AI ingestion or approval machinery.
+Proposed flow: select Technology → enter brief → atomically save one immutable
+brief, private proposal and two audits → inspect private proposal. Admission is
+not editorial approval. Proposed irreversible historical capture, snapshot parent
+eligibility and actor-bound uncertain-save recovery require owner decisions.
+
+Exact proposed checkpoint inventories are in that contract: S source structure
+(3 CREATE), P source admission/C2 persistence (4 CREATE/2 MODIFY), A bounded Admin
+API (7 CREATE/3 MODIFY), U usable restricted Admin UI (10 CREATE/6 MODIFY), plus
+three shared evidence documents. S alone does not establish authenticated authority.
+All are NOT_STARTED; AGENTS.md and active read-only/C1 sequencing are unchanged.
+No implementation, persistence, DDL, runtime or Git permission follows from this
+documentation. Separately approve policies/sequencing and each checkpoint first.
+
+Estimates: source structure/admission 1–2 days; proposal persistence 1–2 more days;
+usable API/UI 1.5–3 days; total 3.5–7 engineering days offline, with no overlap counted.
+The earlier conditional C2 1–2-day estimate excluded source authority and API/UI.
+Real database/browser qualification is additional and blocked on separately
+approved execution prerequisites. F044 stays IN_PROGRESS, C1/A/B READY_FOR_REVIEW —
+offline only; F042/F043 acceptance BLOCKED; nine integration records and 225 browser
+cases NOT_RUN; production NOT_VERIFIED. Existing history/evidence is preserved.
+
+**F044 S-only source foundation authorization — 2026-11-04:** owner approved
+the source-policy choices and only the exact three-path offline source-structure
+checkpoint S, with fresh independent review. AGENTS.md enacts S only; broad P/A/U
+sequencing remains proposed and those checkpoints are NOT_STARTED. Snapshot parent
+eligibility is explicitly not a concurrent archive/deletion fence. Authenticated
+admission/persistence/audit/physical indexes remain deferred. No runtime or Git
+delivery approval. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine integration
+records and 225 browser cases NOT_RUN; production NOT_VERIFIED.
+
+**F044 source-structure S offline review — 2026-11-04:** S is
+READY_FOR_REVIEW — offline only. Exactly three CREATE files reuse C1 content and
+private DTO boundaries and implement strict brief/digest/binding validation plus
+disconnected immutable model registration. No authenticated admission, writer,
+API/UI, database or DDL operation. Four scoped documents record the S-only enacted
+extension, owner policies and evidence; historical drafts remain preserved.
+
+Final111 focused synthetic PASS (initial105 PASS, not summed); full API/test
+TypeScript, API production build/typecheck, targeted lint/format/encoding/diff/
+scope/privacy PASS. Initial sandbox tsx ENOMEM was before test registration.
+Independent source review: one Medium save-validation bypass and one Low fixed-
+vector coverage gap resolved; final Critical0/High0/Medium0/Low0 unresolved. Reviewer
+did not execute tests. All Mongoose saves now refuse; future P is native-driver
+only after separate approval. Snapshot parent concurrency limitations are explicit.
+
+P persistence/admission and API/UI remain NOT_STARTED and separately gated. Current
+feature pointer reconciles S only. F044 IN_PROGRESS, C1/A/B/S READY_FOR_REVIEW —
+offline only; F042/F043 acceptance BLOCKED; nine integration records and 225 browser
+cases NOT_RUN; production NOT_VERIFIED. No Git delivery or runtime approval follows.
+
+**F044 P-only implementation authorization — 2026-11-04:** S committed/pushed
+as f95e1bf025958527df2d75c73716d0ef1e406d24 with matching fresh remote. The owner
+authorized exact six-path P internal persistence/audit work and offline review,
+plus its bounded sequencing extension. P IN_PROGRESS; no API/UI/live execution,
+provisioning or P Git delivery. All mandatory acceptance and source/parent policies
+remain. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine integration records
+and225 browser cases NOT_RUN; production NOT_VERIFIED. History remains preserved.
+
+**F044 P internal persistence offline review — 2026-11-04:** P is
+READY_FOR_REVIEW — offline only, uncommitted. S delivered normally as
+f95e1bf025958527df2d75c73716d0ef1e406d24, local/tracking/fresh remote verified.
+The six authorized P source/test paths implement internal capture, current-Admin
+transaction fencing, source/audit/predecessor checks and explicit uncertain-save
+reconciliation. Four scoped documents retain sequencing/policies/evidence. No API/UI,
+connection/provisioning/live operation or P Git delivery. Current pointer is P review.
+
+Focused P/audit tests: final65 PASS (initial53 PASS/1 failed test assumption retained).
+New TS2339 corrected; final full API/test TypeScript, production build/typecheck,
+lint/format/encoding/diff/scope/privacy PASS. Fresh independent review's four Medium
+findings resolved, final Critical0/High0/Medium0/Low0; no independent test rerun.
+Five additional persistence assertions PREPARED ONLY; existing nine-record manifest
+does not cover the new writes. Actual transaction/concurrency/index/ownership/cleanup
+and RESULT/ACK remain unverified. Snapshot parent policy is not a lifecycle fence.
+
+Next proposal API A needs separate approval and explicit inventory addition for
+P service/test by-ID detail-read support; it is not implemented here. UI U remains
+separately gated. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine integration
+records and225 browser cases NOT_RUN; production NOT_VERIFIED. No next feature or
+acceptance advance. History and stale execution pins remain preserved.
+
+**F044 P delivered; proposal API A contract prepared — 2026-11-04:** P committed
+and pushed normally as 594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc (ten reviewed
+paths); local/tracking/fresh remote SHA matched with clean tree/index before this
+uncommitted documentation draft. P remains READY_FOR_REVIEW — offline only;
+development delivery is not acceptance. Historical no-delivery statements above
+describe the earlier authorization/review state and are preserved.
+
+Protected proposal API A is **PROPOSED — PENDING OWNER APPROVAL; NOT_STARTED**.
+Its exact dated [contract](features/F044-admin-learning-path-management.md#p-delivery-and-protected-proposal-api-a-contract--2026-11-04)
+specifies capture, actor-bound read recovery and Technology-bound ordinary private
+detail. Uniform200 capture is proposed because P returns the same fully validated
+DTO for new/known saves. No API/UI/source implementation or active sequencing
+change. A's reconciled inventory is7 CREATE/5 MODIFY plus four future scoped
+authorization/evidence documents (16 distinct paths), including the missing P
+service/detail tests; no repository/schema/index change. Separately approve this
+contract and A-only enactment/implementation/offline review before coding. Estimate
+1–2 engineering days excluding UI, provisioning and live qualification. UI U remains
+separately gated; no next-feature progression.
+
+Verification groups stay separate: original9 PARENT+T01–T08 NOT_RUN; five named P
+persistence assertions NOT_RUN; browser225 NOT_RUN (213 inherited+12 F044). Proposed
+API integration assertions are not prepared or counted as executed cases. The P
+five do not replace or complete the original manifest and do not prove real
+transactions, concurrency, cleanup or authenticated RESULT/ACK. Retain final65
+offline PASS and resolved independent findings without reruns. Guarded pins remain
+stale; ignored support not delivered/clean-clone reproducible. Current implementation
+pointer remains P offline review. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED;
+production NOT_VERIFIED. No live verification, status advance or draft Git delivery.
+
+**F044 protected proposal API A authorized — 2026-11-04:** owner approved
+the exact dated API contract and16-path inventory, A-only sequencing enactment,
+implementation/focused offline verification and fresh independent review. API A
+IN_PROGRESS; current pointer changed only within F044. P delivered as
+594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc. Existing three pending documents/history
+preserved. No UI/live persistence/provisioning/runtime or Git delivery authority.
+Keep original 9 integration records, five P assertions and225 browser cases
+NOT_RUN, with new API preparation counted separately. F044 IN_PROGRESS;
+F042/F043 acceptance BLOCKED; production NOT_VERIFIED. No U/F045 progression.
+
+**F044 protected proposal API A offline review — 2026-11-04:**
+READY_FOR_REVIEW — offline only, uncommitted; exact 16 approved paths. Protected
+capture 200, actor/key COMMITTED/UNRESOLVED recovery and Technology-bound private
+detail implemented without P repository/model/index/audit changes or API/UI scope
+expansion. Strict DTOs, no-store, limits/deadlines, current Admin/mutation fence,
+snapshot-parent limitation and no mutation replay remain. Existing pending drafts
+and historical evidence preserved. No live runtime/database/browser operation or Git mutation.
+
+Executed 210 distinct offline PASS:168 focused,1 final no-replay regression,
+36 existing Learning Path routing and5 positively selected Technology dispatch
+cases; known live-listener case excluded. Initial 162 PASS/2 test failures and
+new TS2379 were corrected and retained in feature evidence. Final full TypeScript,
+production build/typecheck, lint/format/encoding/privacy/diff/scope PASS. Fresh
+independent source review: original 0 Critical/0 High/1 Medium/2 Low, all resolved;
+final 0/0/0/0 unresolved, no independent test rerun/live proof.
+
+Current unexecuted groups are separate: original 9 integration records NOT_RUN,
+P 5 assertions NOT_RUN, new API 6 assertions PREPARED/NOT_RUN, browser 225 NOT_RUN.
+The six exact API names/qualifications are recorded in the feature/database
+evidence. Old API NOT_PREPARED wording is historical and superseded only by this
+preparation result; no existing record is relabelled. Physical transactions,
+concurrency/indexes, owned process cleanup/protected baselines and RESULT/ACK
+remain unverified; guarded pins remain stale. F044 IN_PROGRESS; F042/F043 acceptance
+BLOCKED; production NOT_VERIFIED. U is the next proposed application checkpoint,
+not authorized; no next-feature or acceptance advancement, staging/commit/push.
+
+**F044 API A delivered; U contract proposed — 2026-11-04:** exact 16 reviewed
+API paths committed/pushed as 7b7c2cbb9c15190c3d5130815281ab3e22467c8c; parent
+594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc. Fresh remote ancestry/normal push and
+matching local/tracking/remote SHA verified; clean tree/index before U drafting.
+API A remains READY_FOR_REVIEW — offline only. Retain 210 distinct offline PASS and
+independent 0/0/0/0 unresolved evidence; no passing tests/runtime QA rerun.
+
+U is **PROPOSED — PENDING OWNER APPROVAL; NOT_STARTED**. See the exact
+[U contract](features/F044-admin-learning-path-management.md#proposal-api-a-delivery-and-checkpoint-u-contract--2026-11-04).
+Keep Technology Management default; add explicit eligible-parent brief entry,
+Save/private result and actor-bound explicit recovery, no automatic mutation replay.
+No browser persistence; editable drafts are not retained across navigation/reload.
+Frozen uncertain intent survives only specified same-authority in-memory workspace
+navigation. Private context is cleared on account/authority loss; reload cannot
+detect a lost uncertain Save. Owner must accept the operator-reconciliation boundary
+before implementation, or separately scope durable recovery; do not invent storage.
+
+Exact proposed inventory: 11 CREATE/6 MODIFY application/test/config paths plus four
+scoped enactment/evidence documents = 21 paths. Includes only one new browser
+selection config in addition to the earlier 16-file UI plan, because current configs
+exclude the U spec; existing defaults/deadlines/ownership rules stay unchanged.
+U estimate 1–2 engineering days offline including review, excluding real Save/browser
+qualification. U-only sequencing is proposed, not enacted; implementation/live
+writes/Git delivery require separate approvals. Current implementation pointer stays
+API A offline review. No F045/later progression or acceptance advancement.
+
+Original 9 / P 5 / API 6 and browser 225 remain separate unexecuted groups; proposed 16 U
+browser cases are not prepared/count-added. F044 IN_PROGRESS; F042/F043 acceptance
+BLOCKED; production NOT_VERIFIED. Stale guarded pins and undelivered support remain.
+
 ### F045 — Admin Module Management
 Status: `NOT_STARTED`
 
@@ -2575,7 +2753,7 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F044 - Admin Learning Path Management (C1 proposal foundation, offline review)
+**Current Feature:** F044 - Admin Learning Path Management (protected proposal API A, offline review)
 **Current Status:** `IN_PROGRESS`
 **Next Feature:** F044 verification/owner review (no additional slice or F045 progression)
 
@@ -3246,3 +3424,48 @@ of final hashes, exact receipt content and bounded runtime scope after independe
 review. This offline amendment creates no private receipt and grants no runtime
 permission. B remains BLOCKED; C–F NOT_RUN; F042/F043 acceptance unchanged;
 F044 NOT_STARTED, production NOT_VERIFIED. No Git staging, commit or push.
+
+## F044 U owner-authorized offline implementation — 2026-11-04
+
+The owner approved the preceding U contract, exact 21-path inventory and memory-only
+limitations, and separately authorized U-only enactment/implementation/offline
+verification and fresh independent review. The preceding PROPOSED/NOT_STARTED text
+is retained as historical planning evidence; U implementation is now IN_PROGRESS.
+The named active extension is limited to U in AGENTS.md. No live verification,
+backend change, Git delivery or acceptance is implied. Operator reconciliation
+after lost uncertain intent remains a separate approval; no procedure is invented.
+
+Keep original 9 integration records, P 5 and API 6 assertions and 225 existing browser
+cases NOT_RUN; new 16 U browser cases are prepared separately, not executed. F044
+IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED. Historical
+guarded/source-pin and clean-clone reproducibility limitations remain unchanged.
+
+### U offline checkpoint evidence — 2026-11-04
+
+U is READY_FOR_REVIEW — offline only, within the approved 21 paths. Final affected
+offline tests: 231/231 PASS. Comprehensive Admin source/test and prepared-browser
+TypeScript, Admin build/typecheck, targeted lint/format/CSS/encoding/privacy/scope
+and whitespace checks PASS. Initial failures and their corrections are retained in
+the feature record, alongside check details and independent review evidence.
+Fresh-context independent source/test review: zero unresolved Critical/High/Medium/
+Low findings after resolving all findings. The reviewer executed no tests/runtime.
+
+The root retains one actor-bound intent in memory only; only exact capture or
+matching COMMITTED recovery clears uncertainty. GET UNRESOLVED never permits
+replay. Dirty drafts require explicit discard; authority loss clears private data.
+Reload loses intent and guard; warnings are not guaranteed. A lost uncertain Save
+requires separately approved operator reconciliation, with no invented UI reset.
+
+Browser discovery found 16 new U mocked cases, PREPARED/NOT_RUN, separate from the
+existing 225 NOT_RUN. Original nine integration records, five P assertions and six
+API assertions stay NOT_RUN. No live persistence/transactions/indexes/audit,
+browser/UI/API behavior or runtime ownership/cleanup is proved by offline doubles.
+Guarded pins remain stale; ignored support remains undelivered/not clean-clone
+reproducible. No refreeze or runtime/Git delivery occurred. See the dated U evidence
+in docs/features/F044-admin-learning-path-management.md for full detail.
+
+Next: separate owner approval for checkpoint delivery and/or bounded qualified
+Desktop QA, explicitly including private Save writes if desired. Current-account
+credentials/session, owned applications and approved test data/target are required;
+browser host safety and all real-integration gates remain unchanged. F044 remains
+IN_PROGRESS; F042/F043 acceptance BLOCKED; production readiness NOT_VERIFIED.

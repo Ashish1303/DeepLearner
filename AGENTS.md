@@ -941,3 +941,167 @@ of final hashes, exact receipt content and bounded runtime scope after independe
 review. This offline amendment creates no private receipt and grants no runtime
 permission. B remains BLOCKED; C–F NOT_RUN; F042/F043 acceptance unchanged;
 F044 NOT_STARTED, production NOT_VERIFIED. No Git staging, commit or push.
+
+## Named F044 source-structure S offline sequencing extension — 2026-11-04
+
+The owner approved implementation and offline verification of only checkpoint S
+in F044's minimal Admin-authored curriculum-brief contract. This extension permits
+exactly these three CREATE paths:
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.schema.ts
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.model.ts
+apps/api/tests/admin-curriculum-brief.test.ts
+```
+
+Permit pure structural/digest/Technology-binding helpers, reuse of C1 content and
+private proposal DTO boundaries, explicit disconnected model registration and
+synthetic in-memory tests. No additional brief DTO or endpoint is introduced.
+Imports must remain inert; automatic collection/index creation and buffering are
+disabled. This supersedes the existing read-only/C1 exclusions only for that
+three-path offline foundation. No generic ingestion, provider or lifecycle system.
+
+The owner's source-policy decisions are recorded in the feature contract. They
+describe future authenticated admission, not authority supplied by a structurally
+valid record. Snapshot Technology eligibility is not a concurrent archive/deletion
+fence; historical admission is not perpetual authority for the author to act.
+S cannot establish source existence, admission, transaction atomicity, audit,
+physical indexes or concurrency. No P/A/U checkpoint, repository/writer, endpoint,
+UI, live persistence, database connection, provisioning/migration, runtime change,
+generation/editorial/publication or later feature is authorized by this extension.
+
+Require exact approved Git baseline/scope, stable C1 contract and no unresolved
+blocking security defect. After implementation require meaningful focused offline
+tests, full API/test TypeScript, relevant build/typecheck, targeted lint/format,
+encoding/diff/scope/privacy checks and fresh independent review, with findings
+resolved before checkpoint eligibility. Live verification remains separately gated.
+
+F044 remains IN_PROGRESS, partial development only; F042/F043 acceptance remains
+BLOCKED. Nine integration records and 225 browser cases remain NOT_RUN; production
+readiness NOT_VERIFIED. Existing mandatory authorization, isolation, process/Job
+ownership, protected baselines, RESULT/ACK, deadlines, cleanup and acceptance gates
+are unchanged. Each additional implementation checkpoint and every commit/push
+requires separate explicit owner approval. No automatic progression follows S.
+
+## Named F044 P internal persistence offline extension — 2026-11-04
+
+The owner separately approved P implementation, focused offline verification and
+fresh independent review after S delivery. Permit only these application/test paths:
+
+```text
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+CREATE apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-persistence.integration.ts
+MODIFY apps/api/src/modules/audit/audit.model.ts
+MODIFY apps/api/tests/auth-audit.test.ts
+```
+
+This extends S only to the reviewed internal source-admission/proposal transaction,
+stored predecessor/source validation, current-Admin User-version fence, exact two
+new audit branches and explicit actor-bound uncertain-save reconciliation. Model
+registration remains disconnected; persistence code may be inspected/tested only
+through inert offline doubles. Integration assertions may be prepared, not invoked.
+No live database connection/write, provisioning/index creation, endpoint, UI,
+startup import, generic framework, generation/editorial/publication or other slice.
+The source contract's snapshot parent policy is not an archive/deletion fence.
+
+Require the S/C1 source contracts, expected Git baseline, exact inventory and no
+blocking security defect. Require meaningful offline success/refusal/rollback/
+uncertainty tests, full API/test TypeScript, production build/typecheck, targeted
+lint/format/encoding/scope/privacy/diff checks and independent review with findings
+resolved. Mocks establish neither real transactions/indexes nor source admission.
+Live qualification still needs its own approved isolated target, manifest, ownership,
+deadlines, authenticated RESULT/ACK, cleanup and protected-baseline verification.
+
+P remains uncommitted for owner review; no P Git delivery is approved. F044 stays
+IN_PROGRESS; F042/F043 acceptance BLOCKED; nine existing integration records and
+225 browser cases NOT_RUN; production NOT_VERIFIED. Every later implementation,
+live execution, commit and push requires separate explicit owner approval.
+
+## Named F044 protected proposal API A offline extension — 2026-11-04
+
+The owner approved the dated protected proposal API A contract, uniform 200 capture
+semantics and exact inventory, and separately authorized A implementation, focused
+offline verification and fresh independent review. Extend the prior F044 exception
+only to the following seven CREATE and five MODIFY paths:
+
+```text
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-request.schema.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-rate-limit.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.controller.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.routes.ts
+CREATE apps/api/tests/admin-learning-path-proposal-routes.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-requests.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-api.integration.ts
+MODIFY apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+MODIFY apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+MODIFY apps/api/src/modules/admin/admin.routes.ts
+MODIFY apps/api/src/app.ts
+MODIFY docs/API_DESIGN.md
+```
+
+AGENTS.md and the existing F044 feature, database and roadmap documents complete
+the exact 16-path checkpoint. Preserve prior pending drafts and historical evidence.
+Permit only protected capture, actor-bound operation recovery and Technology-bound
+ordinary private detail, plus inert prepared integration assertions. No prepared-
+revision handle is an HTTP capability. Current-account authorization, P mutation
+fencing, historical source admission, snapshot parent limitations, strict DTOs,
+rates/deadlines, no-store and no automatic replay remain mandatory.
+
+Require stable C1/S/P contracts and no unresolved blocking security finding. Run
+meaningful focused offline mocked-boundary/request-stream tests, full API/test
+TypeScript, production build/typecheck, targeted lint/format/UTF-8/LF/privacy/scope/
+diff checks and fresh independent review; resolve findings before checkpoint
+eligibility. Unconnected in-memory HTTP streams are offline evidence, not live
+HTTP, database transactions, physical uniqueness/indexes or resource cleanup proof.
+
+No live database/API connection, listener/service startup/restart, provisioning,
+schema/index/repository change, UI, new dependency, auth-policy change, revision
+editing, AI generation, editorial decision, publication, deletion or later feature.
+Integration and browser execution still require separate approval and existing
+qualified target/process/Job ownership, private channel, authenticated RESULT/ACK,
+protected baseline, deadlines and cleanup. Guarded180/205-second, RPC/ACK5-second
+and heartbeat2-second limits remain unchanged. No new framework or supervisor.
+
+This A-only enactment supersedes earlier endpoint prohibitions only for that scope.
+F044 stays IN_PROGRESS, partial progress; F042/F043 acceptance BLOCKED. Original
+nine integration records, five P assertions and225 browser cases stay NOT_RUN.
+New API assertions must be listed separately, prepared only until qualified actual
+execution. Production NOT_VERIFIED. No staging, commit or push is authorized in
+this checkpoint; every Git delivery, next slice and live operation needs separate
+explicit owner approval. No automatic U/F045 progression or acceptance follows A.
+
+## Named F044 U restricted proposal UI offline extension — 2026-11-04
+
+The owner separately approved U's exact 21-path inventory and memory-only policy,
+U-only enactment, implementation, focused offline verification and fresh independent
+review. Permit only the 17 application/test/config and four sequencing/evidence
+paths listed in the dated U contract. This supersedes earlier UI prohibitions only
+for brief entry, explicit private capture, actor-bound GET recovery and known
+private result/detail. Technology Management remains the default workspace.
+
+Require settled current-account Admin authority, restricted fixed requests, one
+root-controller intent, exact parent/content validation, bounded transport and no
+automatic POST replay. Keep uncertainty separate from Technology recovery. Editable
+draft navigation needs explicit discard; uncertain intent survives only the same
+authenticated generation. Authority loss clears private material and retains only
+a content-free loss guard where possible. Reload loses context and guard; warnings
+are best effort, not guaranteed. The owner accepted the documented requirement for
+separately approved operator reconciliation before repeating a lost uncertain Save.
+No browser persistence or invented operator/reset/reconciliation capability.
+
+Require focused offline tests, Admin build/typecheck, applicable test TypeScript,
+targeted lint/format/CSS/encoding/privacy/scope/diff checks and fresh independent
+review with blocking findings resolved. Prepare the 16 U mocked browser cases and
+selection config; discovery is allowed without launching a browser. No live API/
+database write, browser execution, startup/restart, backend change, new dependency,
+generation/editorial/publication or further slice is authorized. Live verification
+still requires separate scope/target/data approval and all existing ownership,
+baselines, deadlines, authenticated RESULT/ACK and cleanup gates.
+
+F044 remains IN_PROGRESS, partial development; F042/F043 acceptance BLOCKED.
+Original nine integration records, five P assertions, six API assertions and 225
+existing browser cases remain NOT_RUN. Newly prepared16 U cases stay separately
+NOT_RUN. Production readiness NOT_VERIFIED. No staging, commit or push; every Git
+delivery, live operation and next slice requires separate explicit owner approval.

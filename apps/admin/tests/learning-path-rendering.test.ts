@@ -154,6 +154,13 @@ function load(
   const out: Record<string, unknown> = {};
   new Function('require', 'exports', js)((name: string) => {
     if (name === 'react/jsx-runtime') return require(name);
+    if (name === 'react')
+      return {
+        useRef: (current: unknown) => ({ current }),
+        useSyncExternalStore: () => false,
+      };
+    if (name === './learning-path-proposal-form')
+      return { LearningPathProposalForm: () => null };
     if (name === '../../hooks/use-learning-paths')
       return {
         useLearningPaths: () => ({
@@ -184,7 +191,7 @@ function load(
 const render = (snapshot = state) =>
   renderToStaticMarkup(
     React.createElement(load(snapshot), {
-      auth: {} as never,
+      auth: { getProposalIntent: () => ({ phase: 'none' }) } as never,
       accountId: 'f'.repeat(24),
     }),
   );
@@ -294,7 +301,10 @@ test('native chooser/detail/retry handlers invoke only the matching controller a
     detail: (id: string) => calls.push(['detail', id]),
     refresh: () => calls.push(['refresh']),
   });
-  const tree = Component({ auth: {} as never, accountId: 'f'.repeat(24) });
+  const tree = Component({
+    auth: { getProposalIntent: () => ({ phase: 'none' }) } as never,
+    accountId: 'f'.repeat(24),
+  });
   const buttons: React.ReactElement<{
     onClick?: () => void;
     children?: React.ReactNode;

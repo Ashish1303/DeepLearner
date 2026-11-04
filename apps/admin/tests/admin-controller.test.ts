@@ -1,3 +1,7 @@
+import {
+  ProposalError,
+  type ProposalClient,
+} from '../src/lib/learning-path-proposals/proposal-client';
 import assert from 'node:assert/strict';
 import { test, type TestContext } from 'node:test';
 import { createAdminController } from '../src/lib/auth/admin-controller';
@@ -280,6 +284,7 @@ function fixture(
     coordination?: AdminCoordination;
     technologies?: TechnologyClient;
     learningPaths?: LearningPathClient;
+    proposals?: ProposalClient;
   } = {},
 ) {
   const calls: string[] = [];
@@ -336,6 +341,7 @@ function fixture(
     options.now,
     options.technologies,
     options.learningPaths,
+    options.proposals,
   );
   const disconnect = controller.connect();
   t.after(() => controller.dispose());
@@ -1657,4 +1663,167 @@ test('suspend during mutation retains only uncertainty through revalidation and 
   assert.equal(reads, 1);
   assert(!second.getSnapshot().needsReconciliation);
   assert(!f.controller.hasTechnologyUncertainty());
+});
+
+test('U restricted capture refuses unsettled authority and caller-supplied operation capabilities', async (t) => {
+  let sends = 0;
+  const f = fixture(
+    t,
+    {},
+    {
+      proposals: {
+        async execute() {
+          sends++;
+          throw new ProposalError('UNAVAILABLE');
+        },
+      },
+    },
+  );
+  const input = {
+    title: 'Synthetic',
+    objectives: ['Goal'],
+    audience: 'Developers',
+    depth: 'BEGINNER' as const,
+    runtime: null,
+    technologyVersion: null,
+    prerequisites: [],
+  };
+  await assert.rejects(
+    f.controller.requestProposal(user.id, {
+      kind: 'capture',
+      technologyId: 'b'.repeat(24),
+      input,
+    }),
+    ProposalError,
+  );
+  await f.controller.restore();
+  await assert.rejects(
+    f.controller.requestProposal(user.id, {
+      kind: 'recover',
+      operationId: 'private-capability',
+    } as never),
+    ProposalError,
+  );
+  assert.equal(sends, 0);
+});
+test('U proposal admission refuses outstanding Technology uncertainty without clearing it', async (t) => {
+  let sends = 0;
+  const f = fixture(
+    t,
+    {},
+    {
+      technologies: {
+        async execute() {
+          throw new TechnologyError('NETWORK_ERROR');
+        },
+      },
+      proposals: {
+        async execute() {
+          sends++;
+          throw new ProposalError('UNAVAILABLE');
+        },
+      },
+    },
+  );
+  await f.controller.restore();
+  await assert.rejects(
+    f.controller.requestTechnology(user.id, {
+      kind: 'create',
+      input: { name: 'Synthetic', slug: 'synthetic' },
+    }),
+    TechnologyError,
+  );
+  assert(f.controller.hasTechnologyUncertainty());
+  const input = {
+    title: 'Synthetic',
+    objectives: ['Goal'],
+    audience: 'Developers',
+    depth: 'BEGINNER' as const,
+    runtime: null,
+    technologyVersion: null,
+    prerequisites: [],
+  };
+  await assert.rejects(
+    f.controller.requestProposal(user.id, {
+      kind: 'capture',
+      technologyId: 'b'.repeat(24),
+      input,
+    }),
+    (e: unknown) =>
+      e instanceof ProposalError && e.code === 'TECHNOLOGY_RECOVERY_REQUIRED',
+  );
+  assert.equal(sends, 0);
+  assert(f.controller.hasTechnologyUncertainty());
+  assert.deepEqual(f.controller.getProposalIntent(user.id), { phase: 'none' });
+});
+test('U rechecks Technology uncertainty after coordination queueing, before possible capture dispatch', async (t) => {
+  const held = deferred<void>();
+  let captures = 0;
+  const f = fixture(
+    t,
+    {},
+    {
+      technologies: {
+        async execute(request) {
+          if (request.kind !== 'detail')
+            throw new TechnologyError('NETWORK_ERROR');
+          await held.promise;
+          return {
+            id: 'b'.repeat(24),
+            name: 'Synthetic',
+            slug: 'synthetic',
+            description: null,
+            iconAssetId: null,
+            status: 'DRAFT',
+            order: 0,
+            revision: 0,
+            createdAt: '2026-11-04T00:00:00.000Z',
+            updatedAt: '2026-11-04T00:00:00.000Z',
+          };
+        },
+      },
+      proposals: {
+        async execute() {
+          captures++;
+          throw new ProposalError('UNAVAILABLE');
+        },
+      },
+    },
+  );
+  await f.controller.restore();
+  const read = f.controller.requestTechnology(user.id, {
+    kind: 'detail',
+    id: 'b'.repeat(24),
+  });
+  await flush();
+  const mutation = assert.rejects(
+    f.controller.requestTechnology(user.id, {
+      kind: 'create',
+      input: { name: 'Synthetic', slug: 'synthetic' },
+    }),
+    TechnologyError,
+  );
+  const capture = assert.rejects(
+    f.controller.requestProposal(user.id, {
+      kind: 'capture',
+      technologyId: 'b'.repeat(24),
+      input: {
+        title: 'Synthetic',
+        objectives: ['Goal'],
+        audience: 'Developers',
+        depth: 'BEGINNER',
+        runtime: null,
+        technologyVersion: null,
+        prerequisites: [],
+      },
+    }),
+    (e: unknown) =>
+      e instanceof ProposalError && e.code === 'TECHNOLOGY_RECOVERY_REQUIRED',
+  );
+  assert.equal(f.controller.getProposalIntent(user.id).phase, 'saving');
+  held.resolve();
+  await Promise.all([read, mutation, capture]);
+  assert.equal(captures, 0);
+  assert(f.controller.hasTechnologyUncertainty());
+  assert.equal(f.controller.getProposalIntent(user.id).phase, 'none');
 });
