@@ -20,6 +20,7 @@ import {
 } from '../src/modules/admin/learning-paths/admin-learning-path-proposal.repository.js';
 import {
   proposalData,
+  proposalDefinitionDigest,
   validateProposalStructure,
 } from '../src/modules/admin/learning-paths/admin-learning-path-proposal.schema.js';
 import {
@@ -1152,4 +1153,257 @@ test('prepared integration lifetime refuses delayed qualification and child comp
   await assert.rejects(late);
   assert.equal(second.signal.aborted, true);
   second.dispose();
+});
+
+test('ordinary detail returns the bound initial DTO with no transaction/fence/audit writes', async () => {
+  const f = await seeded(),
+    before = {
+      transactions: f.state.transactions,
+      fences: f.state.fences,
+      commits: f.state.commits,
+      audits: f.state.audits.size,
+    };
+  f.state.order = [];
+  assert.deepEqual(
+    await f.service.get(f.dto.id, technologyId, f.authority),
+    f.dto,
+  );
+  assert.deepEqual(
+    {
+      transactions: f.state.transactions,
+      fences: f.state.fences,
+      commits: f.state.commits,
+      audits: f.state.audits.size,
+    },
+    before,
+  );
+  assert(!f.state.order.includes('latest'));
+  assert(!f.state.order.includes('operation'));
+});
+test('detail is available to another current Admin after historical author deletion', async () => {
+  const f = await seeded(),
+    other = { ...actor, sub: 'd'.repeat(24), sid: 'e'.repeat(24) };
+  f.authority.actor = other;
+  f.state.account!._id = new Types.ObjectId(other.sub);
+  f.state.actorLookups = [];
+  assert.deepEqual(
+    await f.service.get(f.dto.id, technologyId, f.authority),
+    f.dto,
+  );
+  assert(f.state.actorLookups.every((value) => value === other.sub));
+  assert.deepEqual(
+    await f.service.reconcile(
+      { technologyId, operationId: input().operationId },
+      f.authority,
+    ),
+    { state: 'UNRESOLVED' },
+  );
+  assert.equal(f.state.transactions, 1);
+});
+test('detail permits archived parent, refuses absent parent while retaining rows', async () => {
+  const f = await seeded();
+  f.state.technology!.status = 'ARCHIVED';
+  assert.deepEqual(
+    await f.service.get(f.dto.id, technologyId, f.authority),
+    f.dto,
+  );
+  f.state.technology = null;
+  await assert.rejects(
+    f.service.get(f.dto.id, technologyId, f.authority),
+    failure('TECHNOLOGY_NOT_FOUND'),
+  );
+  assert.equal(f.state.proposals.size, 1);
+  assert.equal(f.state.audits.size, 2);
+});
+test('detail missing revision and wrong parent are fixed404, never unbound projection', async () => {
+  const f = await seeded();
+  await assert.rejects(
+    f.service.get('f'.repeat(24), technologyId, f.authority),
+    failure('PROPOSAL_NOT_FOUND'),
+  );
+  const parent = 'd'.repeat(24);
+  f.state.technology!._id = new Types.ObjectId(parent);
+  await assert.rejects(
+    f.service.get(f.dto.id, parent, f.authority),
+    failure('PROPOSAL_NOT_FOUND'),
+  );
+  assert.equal(f.state.transactions, 1);
+});
+for (const change of [
+  null,
+  { role: 'STUDENT' },
+  { status: 'DISABLED' },
+  { status: 'SUSPENDED' },
+  { status: 'PENDING_VERIFICATION' },
+  { emailVerifiedAt: null },
+])
+  test(
+    'ordinary detail current eligibility refusal ' + JSON.stringify(change),
+    async () => {
+      const f = await seeded();
+      if (change === null) f.state.account = null;
+      else Object.assign(f.state.account!, change);
+      f.state.order = [];
+      await assert.rejects(
+        f.service.get(f.dto.id, technologyId, f.authority),
+        failure('AUTH_FORBIDDEN'),
+      );
+      assert(!f.state.order.includes('proposal'));
+      assert.equal(f.state.transactions, 1);
+    },
+  );
+test('detail validates canonical IDs and JWT role before repository work', async () => {
+  const f = fixture();
+  for (const bad of ['D'.repeat(24), 'd'.repeat(24) + '\n', {}, null])
+    assert.throws(
+      () => f.service.get(bad, technologyId, f.authority),
+      failure('VALIDATION_ERROR'),
+    );
+  f.authority.actor = undefined;
+  await assert.rejects(
+    f.service.get('d'.repeat(24), technologyId, f.authority),
+    failure('AUTH_ACCESS_TOKEN_MISSING'),
+  );
+  assert.equal(f.state.reads, 0);
+});
+for (const corrupt of [
+  'proposalDigest',
+  'proposalExtra',
+  'sourceDigest',
+  'missingSource',
+  'missingAdmission',
+  'admissionActor',
+  'admissionRequest',
+  'missingRevisionAudit',
+  'revisionAuditActor',
+  'revisionAuditDate',
+  'revisionAuditMetadata',
+  'revisionAuditExtra',
+  'sourceFamily',
+])
+  test('detail fails closed on raw integrity failure ' + corrupt, async () => {
+    const f = await seeded(),
+      proposal = f.state.proposals.get(f.dto.id)!,
+      source = f.state.briefs.get(f.dto.source.id)!,
+      admission = f.state.audits.get(f.dto.source.id)!,
+      audit = f.state.audits.get(f.dto.id)!;
+    if (corrupt === 'proposalDigest')
+      proposal.definitionDigest = 'f'.repeat(64);
+    if (corrupt === 'proposalExtra') proposal.stack = 'SYNTHETIC_PRIVATE';
+    if (corrupt === 'sourceDigest') source.contentDigest = 'f'.repeat(64);
+    if (corrupt === 'missingSource') f.state.briefs.clear();
+    if (corrupt === 'missingAdmission') f.state.audits.delete(f.dto.source.id);
+    if (corrupt === 'admissionActor')
+      admission.actorId = new Types.ObjectId('f'.repeat(24));
+    if (corrupt === 'admissionRequest')
+      admission.requestId = 'different_request';
+    if (corrupt === 'missingRevisionAudit') f.state.audits.delete(f.dto.id);
+    if (corrupt === 'revisionAuditActor')
+      audit.actorId = new Types.ObjectId('f'.repeat(24));
+    if (corrupt === 'revisionAuditDate')
+      audit.createdAt = new Date(now.getTime() + 1);
+    if (corrupt === 'revisionAuditMetadata')
+      audit.metadata = {
+        proposalId: new Types.ObjectId('f'.repeat(24)),
+        revision: 1,
+        sourceId: new Types.ObjectId(f.dto.source.id),
+        sourceRevision: 1,
+      };
+    if (corrupt === 'revisionAuditExtra') audit.stack = 'SYNTHETIC_PRIVATE';
+    if (corrupt === 'sourceFamily') {
+      const row = validateProposalStructure(proposal);
+      const { definitionDigest: _ignored, ...body } = row;
+      void _ignored;
+      const changed = { ...body, proposalId: 'f'.repeat(24) };
+      f.state.proposals.set(f.dto.id, {
+        ...changed,
+        definitionDigest: proposalDefinitionDigest(changed),
+      });
+    }
+    await assert.rejects(
+      f.service.get(f.dto.id, technologyId, f.authority),
+      failure('DEPENDENCY_UNAVAILABLE'),
+    );
+    assert.equal(f.state.transactions, 1);
+  });
+test('detail reads exact later immutable revision without inferring latest or revalidating an entire chain', async () => {
+  const f = await seeded(),
+    handle = f.service.prepareRevision(
+      revisionInput(f.row),
+      'revision_request',
+      actor,
+    );
+  const second = await f.service.persistRevision(handle, f.authority);
+  f.state.order = [];
+  assert.deepEqual(
+    await f.service.get(f.dto.id, technologyId, f.authority),
+    f.dto,
+  );
+  assert.deepEqual(
+    await f.service.get(second.id, technologyId, f.authority),
+    second,
+  );
+  assert(!f.state.order.includes('latest'));
+  assert.equal(f.state.transactions, 2);
+});
+test('detail refuses first-revision content/time inconsistent with immutable source even with recomputed digest', async () => {
+  for (const change of [
+    { title: 'Changed but rehashed' },
+    { createdAt: new Date(now.getTime() + 1) },
+  ]) {
+    const f = await seeded(),
+      { definitionDigest: _ignored, ...body } = f.row;
+    void _ignored;
+    const changed = { ...body, ...change };
+    f.state.proposals.set(f.dto.id, {
+      ...changed,
+      definitionDigest: proposalDefinitionDigest(changed),
+    });
+    if (change.createdAt)
+      f.state.audits.get(f.dto.id)!.createdAt = change.createdAt;
+    await assert.rejects(
+      f.service.get(f.dto.id, technologyId, f.authority),
+      failure('DEPENDENCY_UNAVAILABLE'),
+    );
+  }
+});
+test('detail rechecks current authority and rejects expired/cancelled delayed callbacks', async () => {
+  const f = await seeded();
+  f.state.ticks = 0;
+  f.authority.verify = async () => {
+    f.state.ticks = 5000;
+    return actor;
+  };
+  await assert.rejects(
+    f.service.get(f.dto.id, technologyId, f.authority),
+    failure('DEPENDENCY_UNAVAILABLE'),
+  );
+  assert.equal(f.state.transactions, 1);
+  const g = await seeded(),
+    abort = new AbortController();
+  g.authority.signal = abort.signal;
+  g.state.sourceRead = () => abort.abort();
+  await assert.rejects(
+    g.service.get(g.dto.id, technologyId, g.authority),
+    failure('DEPENDENCY_UNAVAILABLE'),
+  );
+  assert.equal(g.state.transactions, 1);
+});
+test('detail monotonic business expiry and dependency throws remain sanitized503', async () => {
+  for (const ticks of [10000, Number.NaN, -1]) {
+    const f = await seeded();
+    f.state.sourceRead = () => {
+      f.state.ticks = ticks;
+    };
+    await assert.rejects(
+      f.service.get(f.dto.id, technologyId, f.authority),
+      failure('DEPENDENCY_UNAVAILABLE'),
+    );
+  }
+  const f = await seeded();
+  f.state.stage = 'proposal';
+  await assert.rejects(
+    f.service.get(f.dto.id, technologyId, f.authority),
+    failure('DEPENDENCY_UNAVAILABLE'),
+  );
 });

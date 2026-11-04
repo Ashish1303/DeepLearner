@@ -2204,3 +2204,95 @@ remain explicit, no cascade/publication or parent fence. No new target/provision
 database call, runtime restart, API/UI or manifest refreeze occurred. F044 remains
 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine existing records and225 browser
 cases NOT_RUN; production NOT_VERIFIED. P remains uncommitted for owner review.
+
+## F044 P delivery and proposal API A contract preparation — 2026-11-04
+
+P was separately approved and delivered as
+594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc with exactly ten reviewed paths,
+normal fast-forward push and matching local/tracking/fresh remote SHA. Earlier
+uncommitted wording remains historical. The implementation still has offline-only
+evidence: final65 focused PASS and independent0/0/0/0 unresolved, not rerun here.
+No actual transaction, authority, physical index/uniqueness or cleanup is proved.
+
+The feature contract's dated protected proposal API A is PROPOSED — PENDING OWNER
+APPROVAL. Three operations only: capture brief plus initial proposal, actor/key
+read reconciliation and Technology-bound ordinary private revision detail. The
+proposed uniform200 capture response reflects P's actual DTO-only return for both
+new and identical known saves; no created flag is guessed. C1 DTO fields remain
+unchanged. Existing native readers suffice; A would add the ordinary read service
+method/tests, no repository/model/audit/index change. Current Admin checks remain
+mandatory. Ordinary detail may be read by any eligible current Admin; actor/key
+recovery remains scoped to the current actor. Archived-parent inspection and the
+documented transaction-snapshot archive/delete race are unchanged.
+
+Operation keys have no TTL/recycling under current retention; one actor/key binds
+immutable content/Technology. No receipt or new durable client state is added.
+UNRESOLVED never proves safe replay; read recovery never fences or writes. No
+prepared-revision process handle is an HTTP identity/capability. Proposed A-only
+sequencing is inactive; no source, schema, live write, DDL or provisioning authority.
+See the feature contract for exact requests/errors, limits and12 implementation
+paths plus four future scoped authorization/evidence documents.
+
+Separate current ledger: original PARENT+T01–T08 =9 NOT_RUN; new P assertions
+CAPTURE_AND_ATOMIC_AUDITS, ACTOR_KEY_RECONCILIATION,
+REVISION_PREDECESSOR_CONFLICT, AUDIT_FAILURE_ROLLBACK and
+ACKNOWLEDGEMENT_LOSS_RECONCILIATION =5 NOT_RUN; browser225 NOT_RUN. The five are
+prepared separately, not authenticated integration records in the old manifest.
+API assertions are not yet prepared. Real concurrent demotion/deletion, competing
+transactions, rollback/uncertainty, snapshot races, physical prerequisites,
+authenticated RESULT/ACK, owned cleanup and protected baselines require their own
+qualified manifest/execution. Guarded pins stay stale; ignored support is neither
+delivered nor clean-clone reproducible. No refreeze, runtime or database operation.
+F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED.
+
+## F044 protected proposal API A offline authorization — 2026-11-04
+
+The owner approved the exact API contract/inventory and A-only offline enactment.
+Use existing P repository/model/audit/index contracts without modification. Add
+only the ordinary private-detail service operation using bounded primary/majority
+reads, current Admin authorization, exact parent/source/admission/revision-audit
+validation and C1 private projection. No read/recovery fence/audit/content write.
+Capture retains atomic brief/proposal/two-audit intent and the User-version fence;
+uniform 200 success also covers fully read-validated identical existing captures.
+Missing recovery is UNRESOLVED, never automatic mutation replay. Snapshot parent
+race and separate-majority-read limitations remain explicit. No DDL, connection,
+provisioning, real transaction or cleanup qualification is authorized/proved.
+Original 9 records, five P assertions and225 browser cases remain NOT_RUN; new API
+assertions are listed separately. F044 IN_PROGRESS, F042/F043 acceptance BLOCKED,
+production NOT_VERIFIED. Preserve historical evidence and stale guarded pins.
+
+## F044 protected proposal API A offline evidence — 2026-11-04
+
+Proposal API A READY_FOR_REVIEW — offline only, uncommitted. Added ordinary detail
+uses existing P readers and validates raw proposal/digest, parent/source and both
+admission/revision audits before private projection. P capture/recovery/fencing
+remain unchanged; no repository/model/index/audit source edit or DDL. Current
+eligible Admins may inspect historical records; actor/key recovery remains scoped.
+No read/recovery transaction/User-version/audit write. Retain snapshot-parent and
+separate-majority-read limitations, no parent lifecycle fence or cascade.
+
+Actual focused/current routing regressions: 210 distinct offline PASS (168+1+36+5,
+not repeated runs). Initial 162 PASS/2 test failures corrected; initial TS2379
+test typing corrected. Final full API/test TypeScript, production build/typecheck,
+targeted lint/format/encoding/privacy/diff/scope checks PASS. Fresh independent
+source review resolved one Medium/two Low, final 0/0/0/0 unresolved; reviewer ran
+no tests/live operations. See the feature evidence for exact commands and limits.
+
+Original 9 PARENT+T01–T08 NOT_RUN and P 5 persistence assertions NOT_RUN are retained.
+Six additional API assertions are PREPARED/NOT_RUN in the separate API entry point:
+API_CAPTURE_200_AND_ATOMIC_EVIDENCE; API_IDENTICAL_CAPTURE_AND_KEY_CONFLICT;
+API_ACTOR_BOUND_OPERATION_RECOVERY; API_TECHNOLOGY_BOUND_PRIVATE_DETAIL;
+API_ARCHIVED_PARENT_INSPECTION; API_UNRESOLVED_AND_READ_NONMUTATION.
+Prepared snapshots bound each collection to 100 (limit 101 then refuse), include
+both synthetic actors' relevant authority/version state and all owned private
+brief/proposal/audit rows, and expose neither raw data nor fingerprints on failure.
+Child exceptions are fixed/sanitized and later cases halt after failure. This is
+prepared test support, not executed transaction/nonmutation/ownership evidence.
+
+Future API+replica-set qualification requires approved synthetic accounts,
+eligible/mismatched/archived parent fixtures and admitted archived proposal,
+physical P indexes/privileges, exact source/fixture/result manifest, current
+ownership/private channel, authenticated RESULT/ACK, baselines and cleanup. No
+database call, provisioning, live API or manifest refreeze occurred. Browser 225
+NOT_RUN; F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED.
+The smallest next application checkpoint U needs separate implementation approval.

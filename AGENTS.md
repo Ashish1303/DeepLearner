@@ -1018,3 +1018,56 @@ P remains uncommitted for owner review; no P Git delivery is approved. F044 stay
 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine existing integration records and
 225 browser cases NOT_RUN; production NOT_VERIFIED. Every later implementation,
 live execution, commit and push requires separate explicit owner approval.
+
+## Named F044 protected proposal API A offline extension — 2026-11-04
+
+The owner approved the dated protected proposal API A contract, uniform 200 capture
+semantics and exact inventory, and separately authorized A implementation, focused
+offline verification and fresh independent review. Extend the prior F044 exception
+only to the following seven CREATE and five MODIFY paths:
+
+```text
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-request.schema.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-rate-limit.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.controller.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.routes.ts
+CREATE apps/api/tests/admin-learning-path-proposal-routes.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-requests.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-api.integration.ts
+MODIFY apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+MODIFY apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+MODIFY apps/api/src/modules/admin/admin.routes.ts
+MODIFY apps/api/src/app.ts
+MODIFY docs/API_DESIGN.md
+```
+
+AGENTS.md and the existing F044 feature, database and roadmap documents complete
+the exact 16-path checkpoint. Preserve prior pending drafts and historical evidence.
+Permit only protected capture, actor-bound operation recovery and Technology-bound
+ordinary private detail, plus inert prepared integration assertions. No prepared-
+revision handle is an HTTP capability. Current-account authorization, P mutation
+fencing, historical source admission, snapshot parent limitations, strict DTOs,
+rates/deadlines, no-store and no automatic replay remain mandatory.
+
+Require stable C1/S/P contracts and no unresolved blocking security finding. Run
+meaningful focused offline mocked-boundary/request-stream tests, full API/test
+TypeScript, production build/typecheck, targeted lint/format/UTF-8/LF/privacy/scope/
+diff checks and fresh independent review; resolve findings before checkpoint
+eligibility. Unconnected in-memory HTTP streams are offline evidence, not live
+HTTP, database transactions, physical uniqueness/indexes or resource cleanup proof.
+
+No live database/API connection, listener/service startup/restart, provisioning,
+schema/index/repository change, UI, new dependency, auth-policy change, revision
+editing, AI generation, editorial decision, publication, deletion or later feature.
+Integration and browser execution still require separate approval and existing
+qualified target/process/Job ownership, private channel, authenticated RESULT/ACK,
+protected baseline, deadlines and cleanup. Guarded180/205-second, RPC/ACK5-second
+and heartbeat2-second limits remain unchanged. No new framework or supervisor.
+
+This A-only enactment supersedes earlier endpoint prohibitions only for that scope.
+F044 stays IN_PROGRESS, partial progress; F042/F043 acceptance BLOCKED. Original
+nine integration records, five P assertions and225 browser cases stay NOT_RUN.
+New API assertions must be listed separately, prepared only until qualified actual
+execution. Production NOT_VERIFIED. No staging, commit or push is authorized in
+this checkpoint; every Git delivery, next slice and live operation needs separate
+explicit owner approval. No automatic U/F045 progression or acceptance follows A.

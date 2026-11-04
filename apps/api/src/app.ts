@@ -8,6 +8,9 @@ import { technologyBodyParser } from './modules/admin/technologies/admin-technol
 import type { AdminTechnologyService } from './modules/admin/technologies/admin-technology.service.js';
 import type { AdminLearningPathService } from './modules/admin/learning-paths/admin-learning-path.service.js';
 import type { LearningPathReadLimits } from './modules/admin/learning-paths/admin-learning-path-rate-limit.js';
+import { proposalBodyParser } from './modules/admin/learning-paths/admin-learning-path-proposal.routes.js';
+import type { AdminLearningPathProposalService } from './modules/admin/learning-paths/admin-learning-path-proposal.service.js';
+import type { ProposalLimits } from './modules/admin/learning-paths/admin-learning-path-proposal-rate-limit.js';
 import type { TechnologyLimits } from './modules/admin/technologies/admin-technology-rate-limit.js';
 import type { DashboardService } from './modules/progress/dashboard.controller.js';
 import type { DashboardLimits } from './modules/progress/dashboard-rate-limit.js';
@@ -90,6 +93,8 @@ export function createApp(
   adminTechnologyLimits?: TechnologyLimits,
   adminLearningPaths?: AdminLearningPathService,
   adminLearningPathLimits?: LearningPathReadLimits,
+  adminProposals?: AdminLearningPathProposalService,
+  adminProposalLimits?: ProposalLimits,
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -147,6 +152,7 @@ export function createApp(
     next();
   });
   app.use(technologyBodyParser);
+  app.use(proposalBodyParser);
   app.use(express.json({ limit: '256kb' }));
   app.use('/api/v1/health', healthRouter);
   app.use(
@@ -173,6 +179,8 @@ export function createApp(
       adminTechnologyLimits,
       adminLearningPaths,
       adminLearningPathLimits,
+      adminProposals,
+      adminProposalLimits,
     ),
   );
   app.use(

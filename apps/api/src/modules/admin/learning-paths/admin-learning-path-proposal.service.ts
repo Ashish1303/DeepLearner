@@ -119,6 +119,7 @@ const safeErrors: Record<string, readonly [number, string]> = {
   AUTH_FORBIDDEN: [403, 'Admin access required'],
   VALIDATION_ERROR: [400, 'Invalid private proposal request'],
   TECHNOLOGY_NOT_FOUND: [404, 'Technology is unavailable'],
+  PROPOSAL_NOT_FOUND: [404, 'Private proposal is unavailable'],
   TECHNOLOGY_READ_ONLY: [409, 'Technology is read-only'],
   PROPOSAL_CONFLICT: [409, 'Private proposal conflicts with current state'],
 };
@@ -219,7 +220,7 @@ async function recover<T>(operation: () => Promise<T>): Promise<T> {
   }
 }
 
-/** Internal only: no router/startup registration, credentials, connection or DDL. */
+/** Inert service: invoked by the protected API/internal consumers; no connect/DDL. */
 export function createAdminLearningPathProposalService(
   repository: ProposalRepository = adminLearningPathProposalRepository,
   clock = () => performance.now(),
@@ -506,6 +507,73 @@ export function createAdminLearningPathProposalService(
     return new Date(date.getTime());
   }
   return {
+    get(
+      rawId: unknown,
+      rawTechnologyId: unknown,
+      authority: ProposalAuthority,
+    ) {
+      const input = parse(z.strictObject({ id, technologyId: id }), {
+        id: rawId,
+        technologyId: rawTechnologyId,
+      });
+      return run(authority, (work, actor) =>
+        repository.read(work, async (reader) => {
+          await authorize(reader, work, actor);
+          await parent(reader, work, input.technologyId, false);
+          const raw = await reader.proposal(new Types.ObjectId(input.id));
+          work.check();
+          const unavailable = () =>
+            new AppError(
+              404,
+              'PROPOSAL_NOT_FOUND',
+              'Private proposal is unavailable',
+            );
+          if (raw === null) throw unavailable();
+          let row: ProposalRecord;
+          try {
+            row = validateProposalStructure(raw);
+          } catch {
+            throw proposalUnavailable();
+          }
+          if (row._id !== input.id) throw proposalUnavailable();
+          if (row.technologyId !== input.technologyId) throw unavailable();
+          const source = await admitted(
+            reader,
+            work,
+            await reader.brief(new Types.ObjectId(row.source.id)),
+            input.technologyId,
+          );
+          const binding = curriculumBriefProposalBinding(
+            source.row,
+            input.technologyId,
+          );
+          try {
+            row = validateProposalRecord(raw, binding);
+          } catch {
+            throw proposalUnavailable();
+          }
+          if (row.proposalId !== source.row._id || row._id === source.row._id)
+            throw proposalUnavailable();
+          const audit = await revisionAudit(reader, work, row);
+          if (row.revision === 1) {
+            try {
+              validateProposalRevisionCreation(raw, binding);
+            } catch {
+              throw proposalUnavailable();
+            }
+            if (
+              row.createdAt.getTime() !== source.row.createdAt.getTime() ||
+              !exact(fields(row), fields(source.row)) ||
+              audit.actorId !== source.row.createdBy ||
+              audit.requestId !== source.audit.requestId
+            )
+              throw proposalUnavailable();
+          }
+          work.check();
+          return adminLearningPathProposalDto(row, binding);
+        }),
+      );
+    },
     capture(raw: unknown, requestId: string, authority: ProposalAuthority) {
       const input = parse(captureInput, raw);
       parse(requestIdSchema, requestId);
@@ -812,3 +880,9 @@ export function createAdminLearningPathProposalService(
     },
   };
 }
+
+/** HTTP exposes only these three operations, never prepared-revision handles. */
+export type AdminLearningPathProposalService = Pick<
+  ReturnType<typeof createAdminLearningPathProposalService>,
+  'capture' | 'reconcile' | 'get'
+>;
