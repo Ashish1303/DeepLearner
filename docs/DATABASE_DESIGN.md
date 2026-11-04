@@ -2047,3 +2047,115 @@ production database access is approved.
 F054 generation, F049/F050 editorial decisions and F051 publication remain with
 those features. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine F044 real
 integration records and225 browser cases NOT_RUN; production NOT_VERIFIED.
+
+## Proposed F044 Admin-authored curriculum brief — 2026-11-04
+
+**PROPOSED — PENDING OWNER APPROVAL; no implementation, DDL or active sequencing
+change.** See [the exact source-authority contract](features/F044-admin-learning-path-management.md#minimal-admin-authored-curriculum-brief-authority--2026-11-04).
+This adds a proposed input authority, not an implemented source or approval state.
+Existing LearningPath/public storage and all historical manifests remain unchanged.
+
+Proposed collection `curriculumBriefRevisions`, model `AdminCurriculumBriefRevision`:
+immutable explicit `_id` (source family), `technologyId`, `schemaVersion:1`,
+`revision:1`, the exact shared C1 content fields, server `createdBy`/UTC `createdAt`,
+actor-bound UUIDv4 `operationId` and `contentDigest`. One revision per source family;
+changed input is a new family. No source-update/delete/TTL, ingestion, provider,
+approval or generation machinery. C1's exact content bounds and 65,536-byte UTF-8
+aggregate ceiling apply. The feature contract defines the ordered, domain-separated
+digest including identity, content, actor, timestamp and operation key; canonical
+bytes are reconstructed, not stored a second time. No personal/account snapshots.
+
+Registration remains explicit/disconnected/import-inert with automatic collection/
+index creation and buffering disabled, immutable guards and full validation before
+an approved native-driver insert. No schema defaults create IDs or arrays.
+
+| Index                                 | Keys/options                                            | Purpose                                                                     |
+| ------------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `_id_`                                | Implicit unique `_id`                                   | Immutable source identity.                                                  |
+| `uq_curriculum_brief_actor_operation` | `{createdBy:1,operationId:1}`, unique, simple collation | Exact actor-bound Save/reconciliation; no TTL/sparse/partial/hidden option. |
+
+Together with C1 this proposes two private collections and three explicit indexes,
+plus two implicit identity indexes. No physical index or privilege is established.
+The historical 19-collection/27-explicit-index fixture manifest is not refrozen or
+silently extended. Live persistence requires a separately approved owned target,
+privileges, complete fixture/index/source manifest and qualified execution.
+
+One bounded transaction admits a brief, creates C1 proposal revision 1 and appends
+two audits, with a current verified ACTIVE Admin User-version fence. Allocate two
+distinct server IDs: source `_id` also becomes initial `proposalId`; proposal
+revision `_id` differs. This makes exact initial-result lookup use C1's existing
+unique `{proposalId,revision}` index without a new link field/collection. C1 source
+is `{id:brief._id,revision:1,digest:contentDigest}`; Technology must match. The source
+and admission audit must fully validate on later consumption. Future predecessor
+checks remain C2's responsibility, not model-only concurrency claims.
+
+Proposed audit additions are CONTENT_MANAGEMENT / CURRICULUM_BRIEF_ADMITTED /
+CURRICULUM_BRIEF_REVISION, resource=brief ID, metadata exactly
+`{technologyId,revision:1,operationId}`; and C2's proposal-created event with exact
+`{proposalId,revision,sourceId,sourceRevision}` metadata. Each audit `_id` equals its
+resource ID in the separate audit collection. Actor/request/time are server-derived;
+no content/digests/secrets. Admission is authenticated capture, not editorial approval.
+
+Admission is irreversible as historical input. Retain source/audit while referenced;
+no account/Technology cascade or deletion API, no automatic erasure of unreferenced
+briefs. Separate approved retention/privacy maintenance is required for exceptions.
+Author demotion/deletion invalidates future author actions, not historical capture.
+Consumers independently require current Admin eligibility/fencing. Proposed parent
+write eligibility is DRAFT/PUBLISHED at transaction snapshot; concurrent archival/
+deletion after that snapshot does not prevent a private commit. Future writes
+re-read/refuse an ineligible parent. This is explicitly not a parent lifecycle fence
+and changes no Technology `__v`/F043 revision semantics. Stronger exclusion requires
+a different owner-approved lifecycle design. Archived-parent inspection persists;
+missing-parent private reads refuse while retaining stored evidence.
+
+One actor/operation key identifies one immutable Save. Full source/proposal/audit
+comparison is required for reconciliation; unique collision or a matching digest
+alone is not success. Postcommit uncertainty never triggers replay/compensation.
+Read recovery is primary/majority, current-Admin and actor-bound, no audit/User write;
+missing evidence remains UNRESOLVED. Retain existing deadlines and session cleanup.
+No new receipt subsystem, automatic retry or connection/provisioning is authorized.
+
+F044 IN_PROGRESS; C1 READY_FOR_REVIEW — offline only; F042/F043 acceptance BLOCKED;
+nine integration records and 225 browser cases NOT_RUN; production NOT_VERIFIED.
+Offline structure/call-order tests cannot establish real atomicity, uniqueness,
+concurrent demotion safety, indexes, lifecycle races or cleanup. F054 generation,
+F049/F050 editorial decisions and F051 publication remain excluded.
+
+
+## F044 source-structure S implementation authorization — 2026-11-04
+
+The owner approved the source-policy choices in the proposed brief contract and
+only the three-path offline S schema/model/test checkpoint. The active AGENTS.md
+extension is limited to S. No authenticated admission, persistence, audit branch,
+endpoint/UI, DDL or live verification is authorized. Future snapshot parent
+eligibility explicitly permits concurrent post-snapshot archive/deletion to coexist
+with a private commit; no parent fence or cascade is claimed. Archived-parent
+inspection remains allowed, new writes refuse; deleted-parent private reads refuse
+while historical source/proposal/audit evidence is retained. Author demotion/deletion
+does not invalidate historical admission but all future actions need current
+authorization. S can establish structure/digest/in-memory guards only. See the
+feature's dated authorization/evidence. Historical proposals remain intact.
+
+## F044 source-structure S offline evidence — 2026-11-04
+
+S is READY_FOR_REVIEW — offline only: the three authorized schema/model/test files
+implement strict immutable brief structure, shared C1 content bounds, canonical
+source digest and inert disconnected registration. No extra brief DTO; private
+C1 proposal projection is reused through a pure structural binding. All Mongoose
+saves refuse, including validation-disabled new documents; a future separately
+approved P repository would use validated native-driver inserts.
+
+Final 111 synthetic offline tests PASS; full API/test TypeScript, API production
+build/typecheck and targeted lint/format/encoding/diff/scope/privacy checks PASS.
+Initial sandbox tsx ENOMEM occurred before test registration; an actual 105-PASS
+run preceded the final expanded suite. Fresh independent source review found one
+Medium save bypass and one Low fixed-digest-vector gap, both corrected/rereviewed;
+Critical/High/Medium/Low unresolved: 0/0/0/0. No independent test execution claimed.
+
+No source admission/current-Admin authorization, stored existence/uniqueness,
+physical collections/indexes, transaction/audit atomicity, concurrency, retention
+or live database guarantee is established. Snapshot parent race limitations remain
+explicit and untested in a real database. No provisioning, connection, DDL,
+writer/API/UI, integration execution or acceptance change. Existing source pins
+are not refrozen. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine integration
+records and 225 browser cases NOT_RUN; production NOT_VERIFIED.

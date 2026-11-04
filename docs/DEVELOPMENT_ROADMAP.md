@@ -2160,6 +2160,59 @@ acceptance BLOCKED; nine integration records and225 browser cases NOT_RUN;
 production NOT_VERIFIED. Existing owner-observed login PASS is not repeated or
 converted to automated evidence. No Git delivery, guarded run or next slice approved.
 
+**F044 source-authority proposal — 2026-11-04: PROPOSED — PENDING OWNER APPROVAL.**
+The [minimal Admin-authored brief contract](features/F044-admin-learning-path-management.md#minimal-admin-authored-curriculum-brief-authority--2026-11-04)
+fills C2's missing input-authority design without AI ingestion or approval machinery.
+Proposed flow: select Technology → enter brief → atomically save one immutable
+brief, private proposal and two audits → inspect private proposal. Admission is
+not editorial approval. Proposed irreversible historical capture, snapshot parent
+eligibility and actor-bound uncertain-save recovery require owner decisions.
+
+Exact proposed checkpoint inventories are in that contract: S source structure
+(3 CREATE), P source admission/C2 persistence (4 CREATE/2 MODIFY), A bounded Admin
+API (7 CREATE/3 MODIFY), U usable restricted Admin UI (10 CREATE/6 MODIFY), plus
+three shared evidence documents. S alone does not establish authenticated authority.
+All are NOT_STARTED; AGENTS.md and active read-only/C1 sequencing are unchanged.
+No implementation, persistence, DDL, runtime or Git permission follows from this
+documentation. Separately approve policies/sequencing and each checkpoint first.
+
+Estimates: source structure/admission 1–2 days; proposal persistence 1–2 more days;
+usable API/UI 1.5–3 days; total 3.5–7 engineering days offline, with no overlap counted.
+The earlier conditional C2 1–2-day estimate excluded source authority and API/UI.
+Real database/browser qualification is additional and blocked on separately
+approved execution prerequisites. F044 stays IN_PROGRESS, C1/A/B READY_FOR_REVIEW —
+offline only; F042/F043 acceptance BLOCKED; nine integration records and 225 browser
+cases NOT_RUN; production NOT_VERIFIED. Existing history/evidence is preserved.
+
+**F044 S-only source foundation authorization — 2026-11-04:** owner approved
+the source-policy choices and only the exact three-path offline source-structure
+checkpoint S, with fresh independent review. AGENTS.md enacts S only; broad P/A/U
+sequencing remains proposed and those checkpoints are NOT_STARTED. Snapshot parent
+eligibility is explicitly not a concurrent archive/deletion fence. Authenticated
+admission/persistence/audit/physical indexes remain deferred. No runtime or Git
+delivery approval. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine integration
+records and 225 browser cases NOT_RUN; production NOT_VERIFIED.
+
+**F044 source-structure S offline review — 2026-11-04:** S is
+READY_FOR_REVIEW — offline only. Exactly three CREATE files reuse C1 content and
+private DTO boundaries and implement strict brief/digest/binding validation plus
+disconnected immutable model registration. No authenticated admission, writer,
+API/UI, database or DDL operation. Four scoped documents record the S-only enacted
+extension, owner policies and evidence; historical drafts remain preserved.
+
+Final111 focused synthetic PASS (initial105 PASS, not summed); full API/test
+TypeScript, API production build/typecheck, targeted lint/format/encoding/diff/
+scope/privacy PASS. Initial sandbox tsx ENOMEM was before test registration.
+Independent source review: one Medium save-validation bypass and one Low fixed-
+vector coverage gap resolved; final Critical0/High0/Medium0/Low0 unresolved. Reviewer
+did not execute tests. All Mongoose saves now refuse; future P is native-driver
+only after separate approval. Snapshot parent concurrency limitations are explicit.
+
+P persistence/admission and API/UI remain NOT_STARTED and separately gated. Current
+feature pointer reconciles S only. F044 IN_PROGRESS, C1/A/B/S READY_FOR_REVIEW —
+offline only; F042/F043 acceptance BLOCKED; nine integration records and 225 browser
+cases NOT_RUN; production NOT_VERIFIED. No Git delivery or runtime approval follows.
+
 ### F045 — Admin Module Management
 Status: `NOT_STARTED`
 
@@ -2575,7 +2628,7 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F044 - Admin Learning Path Management (C1 proposal foundation, offline review)
+**Current Feature:** F044 - Admin Learning Path Management (source-structure S, offline review)
 **Current Status:** `IN_PROGRESS`
 **Next Feature:** F044 verification/owner review (no additional slice or F045 progression)
 

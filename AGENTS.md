@@ -941,3 +941,44 @@ of final hashes, exact receipt content and bounded runtime scope after independe
 review. This offline amendment creates no private receipt and grants no runtime
 permission. B remains BLOCKED; C–F NOT_RUN; F042/F043 acceptance unchanged;
 F044 NOT_STARTED, production NOT_VERIFIED. No Git staging, commit or push.
+
+## Named F044 source-structure S offline sequencing extension — 2026-11-04
+
+The owner approved implementation and offline verification of only checkpoint S
+in F044's minimal Admin-authored curriculum-brief contract. This extension permits
+exactly these three CREATE paths:
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.schema.ts
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.model.ts
+apps/api/tests/admin-curriculum-brief.test.ts
+```
+
+Permit pure structural/digest/Technology-binding helpers, reuse of C1 content and
+private proposal DTO boundaries, explicit disconnected model registration and
+synthetic in-memory tests. No additional brief DTO or endpoint is introduced.
+Imports must remain inert; automatic collection/index creation and buffering are
+disabled. This supersedes the existing read-only/C1 exclusions only for that
+three-path offline foundation. No generic ingestion, provider or lifecycle system.
+
+The owner's source-policy decisions are recorded in the feature contract. They
+describe future authenticated admission, not authority supplied by a structurally
+valid record. Snapshot Technology eligibility is not a concurrent archive/deletion
+fence; historical admission is not perpetual authority for the author to act.
+S cannot establish source existence, admission, transaction atomicity, audit,
+physical indexes or concurrency. No P/A/U checkpoint, repository/writer, endpoint,
+UI, live persistence, database connection, provisioning/migration, runtime change,
+generation/editorial/publication or later feature is authorized by this extension.
+
+Require exact approved Git baseline/scope, stable C1 contract and no unresolved
+blocking security defect. After implementation require meaningful focused offline
+tests, full API/test TypeScript, relevant build/typecheck, targeted lint/format,
+encoding/diff/scope/privacy checks and fresh independent review, with findings
+resolved before checkpoint eligibility. Live verification remains separately gated.
+
+F044 remains IN_PROGRESS, partial development only; F042/F043 acceptance remains
+BLOCKED. Nine integration records and 225 browser cases remain NOT_RUN; production
+readiness NOT_VERIFIED. Existing mandatory authorization, isolation, process/Job
+ownership, protected baselines, RESULT/ACK, deadlines, cleanup and acceptance gates
+are unchanged. Each additional implementation checkpoint and every commit/push
+requires separate explicit owner approval. No automatic progression follows S.

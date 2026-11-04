@@ -2,10 +2,11 @@
 
 ## Status, authority and source precedence
 
-Latest scoped extension: **C1 READY_FOR_REVIEW — offline only**.
-The dated C1 section below records the separately gated sequencing extension
-and resolution of the historical API/test TypeScript blocker. Earlier dated
-contracts and failure evidence remain intact.
+Latest scoped extension: **source-structure S READY_FOR_REVIEW — offline only**.
+The dated S authorization/evidence below records the S-only sequencing extension,
+implementation and independent review. C1 remains READY_FOR_REVIEW — offline only;
+the historical TypeScript blocker is resolved. Earlier contracts/evidence remain
+intact. Authenticated admission/persistence P and API/UI remain separately gated.
 
 Feature: **IN_PROGRESS**. Read-only contract approved 2026-11-02 as PARTIAL
 F044 progress. Backend Checkpoint A: **READY_FOR_REVIEW — offline only**, with the
@@ -1618,3 +1619,821 @@ Next gate is owner review and, if desired, separately authorized development
 checkpoint delivery. A future proposal persistence/API checkpoint needs its own
 exact writer/auth/source/concurrency/audit contract and bounded sequencing approval;
 no automatic C2/F045, F054 generation, F049/F050 decision or F051 publication work.
+
+## C2 persistence/source-authority proposal — 2026-11-04
+
+**PROPOSED — PENDING APPROVAL. Implementation: BLOCKED on source-authority
+definition; NOT_STARTED. No sequencing exception is enacted.**
+
+C1 was delivered separately in d0a2e5a81023f613aa37a796c2df815446853178,
+normal fast-forward push with local/tracking/fresh remote HEAD equality and a
+clean tree/index before this proposal was appended. That commit contains only
+the eight approved C1 paths. This C2 section is uncommitted documentation for
+owner review, not part of C1 delivery or authority to persist.
+
+### Inspected dependencies: what exists and what does not
+
+- C1 implements local shape/digest/binding validation and an inert private model.
+  Its source is explicitly an immutable upstream curriculum brief/input artifact,
+  not an AI result, citation or approval. No source-artifact model, repository,
+  admission record, producer or current-consumption authority exists in C1.
+- Source/model filename and content inspection under apps/api/src/modules found
+  no curriculum-brief/source-family authority implementation. Existing Concept
+  source metadata belongs to Concept citation/validation; it is not the C1 source
+  family/revision or authoritative brief bytes. Documentation of aiGenerations is
+  a future data design, not an implemented producer or authority record.
+- Existing F038 rubric/Concept-policy authorities bind specific grading/completion
+  resources and independent decisions. They cannot authorize curriculum sources
+  or be relabelled as proposal provenance.
+- F043's admin-technology.service.ts/repository.ts provide an inspected pattern:
+  signed-context revalidation, transaction-local verified ACTIVE ADMIN lookup,
+  conditional User __v write fence, snapshot transaction, majority+journaled commit,
+  same-session append-only audit and bounded unknown-commit handling. F042/F043
+  mandatory real verification remains incomplete; reusable source is not accepted
+  transaction/security evidence. These are patterns, not a generic exported C2
+  transaction engine; do not refactor shared infrastructure merely for C2.
+- audit.model.ts currently permits Technology/Auth/User/rubric events only. There
+  is no proposal-persistence audit branch or curriculum-source admission event.
+  Existing event labels and metadata cannot be reused to manufacture that evidence.
+- The approved architecture assigns briefs to private authoring and F044 to Path
+  proposal structures. It does not allocate an exact implemented brief-authority
+  contract. Assigning that input foundation to a bounded F044 extension is a
+  proposed owner decision, not existing authority or a newly invented feature ID.
+
+Consequently a complete executable C2 writer cannot yet be contracted against
+actual authority. A caller-supplied tuple, matching hash, mock source row, Technology
+title or privileged session is not a substitute. The conditions below specify the
+smallest consumer-side persistence proposal, **not a fabricated source foundation**.
+
+### Required source authority and Technology relationship
+
+Before C2 implementation, separately approve an authoritative private curriculum-
+brief/source contract and its exact implementation inventory. At minimum it must
+establish these logical facts; this is not a new physical schema declaration:
+
+1. A server-owned immutable source-family id and revision resolve to actual stored
+   canonical artifact bytes and their exact SHA-256, bound to one Technology.
+2. The authenticated admission operation, actor attribution, integrity checks and
+   atomic admission audit are defined. Admission means trusted capture of the input
+   brief, **not editorial approval, factual verification or permission to generate**.
+3. Canonical payload/encoding, bounds, identity allocation, unique revisions,
+   private projection, retention and admission/revision concurrency are explicit.
+   An opaque digest alone cannot establish hash-to-artifact correspondence.
+4. Eligibility/withdrawal/deletion semantics are explicit. If source eligibility
+   can change, consuming its authority must conflict transactionally with that
+   change, or the approved policy must explicitly make admission irreversible.
+   A snapshot read alone is not a revocation/deletion fence. Do not add a mutable
+   field to an immutable source revision or invent a no-op fence to conceal this.
+5. Parent lifecycle races have a declared policy. The candidate C2 rule permits
+   new private proposals under DRAFT/PUBLISHED Technologies and refuses ARCHIVED/
+   absent parents; existing archived-parent read inspection stays unchanged.
+   This new write policy is pending owner approval. Whether eligibility is an
+   admission-time snapshot or needs a lifecycle fence must be resolved explicitly;
+   C2 may not silently increment Technology __v and change F043 revision semantics.
+
+The source contract must supply an actual transaction-compatible consume/check
+operation with those guarantees before C2 selects any implementation dependency.
+No ready-made capability or proof object is assumed to exist today. C2 loads the
+authoritative record/bytes itself through that approved dependency in the same
+transaction and derives C1's expected binding server-side; request/producer claims
+cannot fill it. Recompute the actual source digest and match source identity,
+revision and Technology before validating the proposal.
+
+F054 owns generation. If the owner instead intends source to identify a generated
+outline/job result, that conflicts with C1's approved **input-artifact** meaning and
+depends on F052/F053/F054 contracts. Stop for explicit reallocation/amendment;
+do not absorb provider calls, jobs, budgets or AI output admission into C2.
+F049/F050 retain editorial decisions; F051 retains publication. No APPROVED,
+AI_GENERATED, review/publication authority or later-feature sequencing is created.
+
+### Conditional internal persistence boundary
+
+After the source dependency and implementation/sequencing approvals exist, C2
+would persist **one new immutable C1 revision plus its audit**, with no endpoint,
+UI, update/delete, generation or Student/public-model change. It is an internal
+bounded service; no arbitrary collection writer, caller-supplied actor or raw
+transaction callback is exposed.
+
+Use the existing connected Mongoose client's explicit session and inspected F043
+transaction pattern. C1 registration remains disconnected-only and import-inert;
+do not relax it to attach a live writer or use refused Model.validate/static paths.
+An approved repository may insert only the fully validated new record using the
+same native-driver session, as F043 already does. Model guards do not replace
+repository authorization and are not database WORM.
+
+Inside one transaction, before any new insert:
+
+1. Revalidate the original signed ADMIN context. Read actor by JWT sub, require
+   stored ADMIN/ACTIVE/valid verified Date and a safe incrementable __v. Perform
+   the existing conditional User-version increment matching all observed fields;
+   require exactly one match/change. Change no profile, role, credential, session
+   or timestamp field. Fence failure/deletion/demotion refuses the operation;
+   ordinary version contention is not proof of demotion. Recheck deadline/context
+   at the existing admission/commit boundaries.
+2. Read/qualify the exact Technology and consume the real source authority using
+   the separately approved lifecycle/concurrency contract above.
+3. Read the actual greatest stored revision for this proposalId using the unique
+   family/revision index in reverse order, bounded to one row. Validate the stored
+   predecessor's shape/digest/source-family/Technology and the proposed exact
+   predecessor identity/revision/digest. First revision requires no stored family;
+   later revision must be immediate +1 without overflow. Never compute a new
+   revision from a caller's unverified snapshot or silently select a newer target.
+4. Run C1 record and creation validators with authoritative binding/predecessor.
+   Require immutable family/Technology/source-family identity and permitted source
+   revision progression. Insert a new _id; never modify the predecessor.
+5. Insert the validated matching audit in the same transaction; any actor fence,
+   source, index, validation, insert or audit failure aborts all precommit writes.
+   Unique proposalId/revision contention refuses; no retry or revision skipping.
+
+Use primary/snapshot reads, majority+journaled commit, remaining-time driver
+timeouts/cancellation and one 10-second monotonic business budget following F043;
+commit is one application call capped at min(2000ms, remaining). Preserve the
+existing five-second request-authorization cap, final deadline checks and bounded
+session release. No transaction-body callback replay, automatic retry, longer
+deadline or claim that driver commit retry repeats the business operation.
+
+### Atomic audit, idempotency and uncertainty — candidate decisions
+
+Proposed new audit branch: category CONTENT_MANAGEMENT, action
+LEARNING_PATH_PROPOSAL_REVISION_CREATED, resourceType LEARNING_PATH_PROPOSAL_REVISION,
+resourceId equal to the new proposal revision _id. Actor is the fenced current
+Admin; requestId follows the existing 1–128 correlation convention; createdAt is
+the fixed server operation time. Metadata is exactly proposalId, revision,
+sourceId and sourceRevision. No source/definition digest, body, token, account
+snapshot or raw error. Preserve every existing audit tuple/metadata invariant and
+append-only guard; the future branch requires explicit approval/tests, not a
+relabelled Technology/Auth/approval event.
+
+To avoid inventing a receipt subsystem, the candidate internal operation identity
+is the server-owned proposed revision _id, fixed with all candidate bytes/time
+before transaction submission. Its audit _id is the same id in the separate
+auditLogs collection, providing one implicit unique identity there. A trusted
+future caller must retain the exact prepared command; no user/client identity
+allocation or new idempotency endpoint is implied.
+
+An explicit read reconciliation may return an existing result only after fresh
+current-account eligibility and source/privacy checks, and only when both the
+stored revision and exact audit exist, match the complete immutable command
+(including createdAt, not merely definitionDigest) and the original actor.
+Reconciliation/replay reads create no audit or User-version write. A different
+payload/actor/source or a different id occupying the requested family/revision
+is a conflict; one missing side is corruption/uncertainty, never success or repair.
+No new index/receipt collection is proposed beyond C1's documented indexes and
+existing audit indexes. Audit _id collisions fail closed, never overwrite.
+
+Once commit has been attempted, lost acknowledgement, cancellation, timeout or
+cleanup uncertainty reports UNKNOWN via fixed private service outcome/sanitized
+failure. Do not compensate, claim rollback, allocate another id or replay writes.
+Subsequent separately admitted read reconciliation uses primary/majority evidence;
+absence observed once is not permission to resubmit. The future API must define
+its own safe external error/operation-handle mapping; no HTTP contract is enacted.
+
+Successful result remains the exact C1 private DTO allowlist, projected only after
+full validation; digests, source bytes, actors and audit internals stay private.
+Logs retain fixed classification/correlation only. No raw Mongo errors, duplicate
+key values, command data, token/session state or arbitrary exception causes escape.
+
+### Conditional consumer inventory and verification prerequisites
+
+The exact **candidate consumer-side** inventory is listed below. It is not a
+complete implementation-ready inventory because the source-authority dependency
+and its own source files/contract are absent; approve those separately first.
+No unimplemented source-authority file/interface is presented as available.
+
+CREATE:
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+apps/api/tests/admin-learning-path-proposal-persistence.integration.ts
+```
+
+MODIFY:
+
+```text
+apps/api/src/modules/audit/audit.model.ts
+docs/features/F044-admin-learning-path-management.md
+docs/DATABASE_DESIGN.md
+docs/DEVELOPMENT_ROADMAP.md
+```
+
+No C1 model/schema/DTO relaxation, router/startup/public model, UI, setup/bootstrap,
+generic transaction framework, new supervisor or dependency belongs in that list.
+AGENTS.md requires a separately approved C2 sequencing amendment before source
+implementation; this document does not supply or enact it. Any resulting inventory
+change must return for explicit approval, not be inferred from this proposal.
+
+Offline acceptance would require injected inert transaction tests for actual-
+record binding/predecessor selection, Admin/source fence refusal, revision races,
+unique-key classification, audit rollback, exact idempotent reconciliation,
+partial/corrupt outcomes, delayed cancellation/deadlines, unknown commit handling,
+session release and raw DTO/error privacy, plus full TypeScript/build/lint/format/
+scope checks and fresh independent security review. Mocks do not establish the
+source dependency, real transactions, concurrency or physical indexes.
+
+Before any live persistence require the approved authoritative source contract,
+canonical bytes/digest/admission/consume implementation, complete collection/index/
+privilege/retention and owned fixture manifest, exact source pins, qualified
+exclusive disposable replica set and separate execution/provisioning approval.
+Real tests must demonstrate concurrent demotion/deletion/source invalidation,
+same-family competing revisions, atomic proposal/audit rollback and committed
+reconciliation with authenticated RESULT/ACK, process/Job ownership, deadlines,
+protected baselines and owned cleanup. Do not reuse the existing nine read-only
+records as C2 evidence or invent an executed case count. No persistent development
+or production writes are authorized by this plan.
+
+### One next decision and bounded alternative
+
+**C2 persistence implementation is BLOCKED, not ready for approval.** The precise
+missing prerequisite is an implemented, owner-approved immutable curriculum-brief
+source/admission/consume authority matching C1's input-artifact semantics. A pure
+tuple validator, citation metadata or the existing Admin transaction pattern does
+not provide it. The current C1-only sequencing extension also excludes C2 writes.
+
+Recommended next authorization: **documentation-only definition of a bounded
+F044 curriculum-brief source-authority prerequisite**, covering the minimum logical
+facts and parent/source lifecycle policies above, exact model/producer/fence/audit
+inventory and offline/live gates. Amend this same feature contract and database
+design for review; leave AGENTS.md and the active sequencing rule unchanged until
+the owner approves an exact extension. No generation, editorial/publication
+workflow or infrastructure expansion is needed for that design decision.
+
+Estimate:45–90 minutes for that bounded source-authority contract; C2 consumer
+implementation/tests/review provisionally 1–2 engineering days only after the
+dependency exists and is separately approved. Real integration qualification is
+additional and cannot currently be estimated as executable. Do not start another
+model-only or infrastructure project automatically to conceal the dependency.
+
+F044 remains IN_PROGRESS; C1 READY_FOR_REVIEW — offline only; F042/F043 acceptance
+BLOCKED. Nine integration records and225 browser cases remain NOT_RUN; production
+readiness NOT_VERIFIED. This preparation ran no tests, DB calls, provisioning,
+runtime/browser/AI operation or C2 implementation, changed no acceptance status,
+and leaves only this proposed documentation uncommitted after C1 delivery.
+
+## Minimal Admin-authored curriculum-brief authority — 2026-11-04
+
+**PROPOSED — PENDING OWNER APPROVAL. Documentation only; implementation
+NOT_STARTED. No active sequencing extension, persistence, endpoint, UI, DDL or
+runtime permission is enacted.** This section supplies the missing source design
+for the preceding C2 draft; that draft and all historical evidence remain intact.
+Where its conditional choices differ, the specific choices below are the proposed
+replacement, not a claim that the earlier draft was approved.
+
+### Required guarantees versus proposed choices
+
+Already approved C1 requirements are immutable Technology/source-family binding,
+actual source revision/digest correspondence, strict bounded content and private
+DTOs. The existing security contracts require current-account Admin eligibility,
+mutation-time User-version fencing, atomic writes/audit, bounded failure handling
+and mandatory real verification. C1's caller-supplied expected tuple proves only
+local equality. Neither the tuple, its model nor Concept citation metadata supplies
+an admitted source record or proof that anyone authorized captured its content.
+F043 supplies transaction patterns, not a curriculum-source authority.
+
+The **new design recommendations**, requiring owner approval, are: one immutable
+Admin-authored brief revision per source family initially; atomic brief/first-
+proposal capture; permanent admission as historical input; snapshot parent
+eligibility; an actor-bound operation key for uncertain-save reconciliation; and
+the future API/UI below. These are not inherited acceptance requirements. AI
+sources, generic ingestion, provider adapters and a source-review state machine
+are unnecessary. Choosing this minimal foundation is optional; continuing to
+defer persistence remains safe. Once chosen, its integrity/privacy rules are
+mandatory. A digest detects inconsistent bytes; it is not a signature, factual
+verification or authority independent of authenticated admission/audit.
+
+### One immutable source record
+
+Proposed private collection `curriculumBriefRevisions`, model
+`AdminCurriculumBriefRevision`. All keys below are required, explicitly allocated
+and immutable. No defaults, timestamps plugin, `__v`, updatedAt, status, provider,
+approval, revocation or generation fields are added.
+
+| Field                                                                                       | Exact meaning and constraint                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `_id`                                                                                       | Server-generated ObjectId; also the source-family identity. Wire form, when allowed, is canonical lowercase 24-hex.                                                                                 |
+| `technologyId`                                                                              | Server-verified existing Technology; immutable canonical ObjectId. Never inferred from a title, slug or browser state.                                                                              |
+| `schemaVersion`, `revision`                                                                 | Both literal `1`. This first foundation admits exactly one revision per family. A changed brief is a new family; no brief-update/revise endpoint or successor machinery.                            |
+| `title`, `objectives`, `audience`, `depth`, `runtime`, `technologyVersion`, `prerequisites` | Exactly C1's exported content definitions, nullability, ordering, duplicate and Unicode rules; reuse them, do not fork their bounds.                                                                |
+| `createdBy`                                                                                 | Server-derived fenced Admin ObjectId, retained as attribution after account deletion; no copied email, name, role or session.                                                                       |
+| `createdAt`                                                                                 | Explicit finite server UTC Date, fixed with candidate IDs before the transaction attempt.                                                                                                           |
+| `operationId`                                                                               | Canonical lowercase RFC 4122 UUIDv4, 36 characters, cryptographically generated once by the restricted client for one explicit Save intent; correlation only, never authorization or a resource ID. |
+| `contentDigest`                                                                             | Lowercase 64-hex SHA-256 of the exact canonical source bytes below; computed server-side.                                                                                                           |
+
+There is no duplicated raw-byte/blob field or separate title/summary metadata.
+Canonical bytes are reconstructed from this complete stored record. Reusing C1
+means title 1–120 UTF-16 units; 1–20 distinct objectives each 1–240; audience
+1–500; depth BEGINNER/INTERMEDIATE/ADVANCED; runtime null or exact name 1–80 and
+version null/1–80; technologyVersion null/1–80; 0–20 distinct prerequisite objects
+with description 1–240. Text must already be trimmed, well-formed single-line
+Unicode; reject controls and unknown/operator fields, never silently normalize
+case, whitespace or Unicode. These existing bounds need no new product limits.
+
+Source digest is SHA-256 over UTF-8 `JSON.stringify` of this ordered array:
+
+```text
+["F044-admin-brief-v1", id, technologyId, 1, 1,
+ title, objectives, audience, depth,
+ runtime === null ? null : [runtime.name, runtime.version],
+ technologyVersion, prerequisites.map(p => p.description),
+ createdBy, createdAt.toISOString(), operationId]
+```
+
+All IDs in that array are lowercase strings. Do not hash BSON, object-key order,
+locale sorting, pretty JSON or the digest itself. Bound both canonical-array JSON
+and the complete canonical record JSON (ObjectIds as hex, Date as ISO) to 65,536
+UTF-8 bytes, reusing C1's aggregate ceiling to bound hashing/copying. Byte counts
+are not character counts. Server allocation can cause a boundary refusal; do not
+truncate content to fit. Fixed digest vectors include nulls, array order, Unicode,
+actor/time/operation changes and metadata inclusion. New domain separation avoids
+confusing a source digest with C1's proposal-definition digest.
+
+C1 binding is exactly `source:{id:brief._id,revision:1,digest:contentDigest}` and
+the same `technologyId`. Source and proposal family have different semantic roles;
+their IDs intentionally coincide only under the initial allocation policy below.
+Neither is a Technology ID or AI job ID. One initial brief can support later
+immutable revisions of its bound
+proposal family under the existing C1 rules. This first workflow creates only
+proposal revision 1; editing/revising proposals or replacing their source is not a
+UI/API capability in this plan. C2's stored-predecessor checks still apply to its
+internal revision consumer; they cannot authorize a new public workflow.
+
+Registration follows C1: explicit compilation only against the existing
+disconnected Mongoose instance, import-inert, strict throw, no implicit IDs/arrays,
+autoCreate/autoIndex/buffering/timestamps disabled. Guard instance, static, raw
+registered-model and bulk/update/delete validation paths consistently with C1;
+no claim of database WORM. Live inserts use only the approved native-driver
+transaction repository after full validation; registration is not a writer.
+
+Intended indexes, documentation only:
+
+- `_id_`: implicit unique identity; because revision is literal 1 and family is
+  `_id`, no redundant family/revision index.
+- `uq_curriculum_brief_actor_operation`: ordered `{createdBy:1,operationId:1}`,
+  unique, simple collation; one admitted Save intent per actor and a bounded exact
+  reconciliation lookup. No TTL, partial, sparse or hidden option.
+
+No browse/search index or brief inventory is needed initially. Together with C1's
+two explicit proposal indexes, this adds **two private collections and three
+explicit indexes plus their two implicit `_id_` indexes**, not yet provisioned.
+The historical 19-collection/27-explicit-index guarded fixture inventory remains
+historical and unchanged; future persistence needs a separately approved manifest
+including both collections, these exact indexes and existing audit dependencies.
+
+### Admission, consumption and lifecycle
+
+Only a valid ADMIN access context whose current stored User is verified, ACTIVE
+and ADMIN may admit a brief. Reverify the signed context and transactionally fence
+the observed User `__v`, role/status and verification fields using F043's actual
+conditional increment pattern. Caller actor, source digest/revision, dates,
+proposal IDs, role, approval/status and Mongo operators are rejected. Normal
+version contention refuses rather than silently retrying. Client-side eligibility
+and F042's request guard alone cannot authorize the mutation.
+
+The proposed initial admission is irreversible **as captured input**, not
+irrevocable permission for its author to act. There is no mutable source
+eligibility flag, withdrawal/delete endpoint or TTL. Later demotion, suspension,
+unverification or deletion of the author blocks that account's future operations,
+but does not erase or invalidate a previously atomically admitted brief. Every
+consumer/reconciliation/read independently checks its own current Admin access;
+author attribution is never a credential. Retain the source for as long as any
+proposal references it and retain its admission audit. No cascade on User or
+Technology deletion. Legal erasure/retention exceptions need a separately approved
+maintenance policy; this plan authorizes no deletion, including unreferenced
+records. Do not store secrets or personal data in brief content.
+
+For new brief/proposal writes the proposed parent rule is existing Technology in
+DRAFT or PUBLISHED at the transaction snapshot. Missing, invalid or ARCHIVED
+parents refuse. This deliberately means **snapshot admission eligibility**, not
+commit-time exclusion of concurrent archival/deletion. An archive/delete committed
+after that snapshot can coexist with the private draft commit; it grants no
+publication authority. Future writes use a fresh snapshot and refuse a now-
+ineligible parent. Do not modify Technology `__v`, add a lock field or claim a
+parent lifecycle fence. If the owner requires archival/deletion to prevent every
+overlapping commit, STOP for a separate coordinated Technology lifecycle design;
+the minimal inventory here cannot provide that stronger guarantee.
+
+Consumption resolves the actual exact source row in the same transaction, fully
+validates/recomputes its canonical digest and requires exact Technology/family/
+revision match plus a matching committed admission audit. The row's creator/time/
+operation must match that audit; missing/corrupt/one-sided evidence fails closed.
+Admission has no revocable state to race; no no-op source fence is invented.
+During first capture the source and audit are transaction-local inserts; a proposal
+cannot commit without them. Archived-parent read-only Learning Path inspection
+remains unchanged. New private proposal detail/reconciliation requires an existing
+parent; archived parents may be inspected, missing parents return sanitized 404
+while retained rows/audits remain intact.
+
+### One Save transaction, audit and uncertainty boundary
+
+Usable flow: **select Technology → enter brief → Save private proposal → inspect
+saved private proposal**. The user explicitly saves once. The server copies the
+validated C1 content into the initial proposal while retaining the immutable brief
+as the authoritative input snapshot. This content duplication is intentional:
+source evidence must survive later proposal revision changes. No AI call, editorial
+decision, LearningPath write or publishing action occurs.
+
+Reuse F043's primary/snapshot transaction, majority+journaled commit, explicit
+session, current-Admin fence and deadlines. Within one transaction insert exactly:
+
+1. One brief and `CURRICULUM_BRIEF_ADMITTED` audit.
+2. One C1 revision-1 proposal and `LEARNING_PATH_PROPOSAL_REVISION_CREATED` audit.
+
+Allocate two distinct IDs once server-side: brief `_id` and proposal revision
+`_id`. Set initial `proposalId=brief._id`; this explicit family-allocation policy
+provides indexed recovery without adding a redundant link field. C1 permits this
+identity equality but does not enforce the policy. Use each resource ID as its
+audit `_id` in the separate audit collection. Keep
+the complete prepared candidate fixed across this one transaction attempt. No
+standalone brief-admit endpoint, orphan staging collection or receipt subsystem.
+Any precommit failure aborts the whole pair and User-version change. Retain C2's
+actual stored-predecessor/unique-revision checks for internal later revisions.
+
+Both new audit branches use CONTENT_MANAGEMENT, fixed server actor/requestId/
+createdAt and exact resource linkage. Brief event resourceType
+CURRICULUM_BRIEF_REVISION has resourceId=brief ID and metadata exactly
+`{technologyId,revision:1,operationId}`. Proposal event retains C2's exact metadata
+`{proposalId,revision,sourceId,sourceRevision}` and resource type
+LEARNING_PATH_PROPOSAL_REVISION. Validate every old audit branch unchanged.
+No body/digest/token/account snapshot/raw exception is logged or audited.
+Audit admission proves authenticated capture only; never label it APPROVED,
+AI_GENERATED, scientifically verified or permission to generate/publish.
+
+Retain the 5-second request-authorization cap, 10-second total business budget,
+one application commit call capped at min(2000ms, remaining), cancellation/final
+deadline checks and bounded session cleanup. No transaction-body replay or automatic
+retry. Integration supervision remains 180/205 seconds, RPC/ACK 5 seconds and
+heartbeat 2 seconds; this design does not implement or qualify those controls.
+
+The operation key is the minimal **external** addition to C2's internal candidate-
+ID proposal. The unique actor/key index identifies a prior capture without a new
+receipt collection. A duplicate key is never success by itself: after fresh access
+checks, explicitly reconcile the full brief, its exact audit, the corresponding
+unique revision-1 proposal and its exact audit. Resolve it by exact
+`{proposalId:brief._id,revision:1}` through C1's unique index: **the brief ID is
+used as initial `proposalId`**.
+This is a proposed allocation policy, not C1 structural validation; the proposal
+revision `_id` remains distinct. Later revisions keep that family binding. No
+unindexed scan or arbitrary limit establishes uniqueness.
+
+Require matching complete canonical content/Technology, original actor/key and
+both resource/audit pairs, not merely a hash. Different content or parent under
+the same actor/key is 409 conflict. Corrupt or one-sided rows are UNKNOWN, not
+repairable success. Another Admin cannot claim that actor's operation key. A
+UUID is correlation, not authentication; private GET authorization is still needed.
+After commit is attempted, timeout/disconnect/cleanup ambiguity is UNKNOWN; never
+claim rollback, compensate, replay writes or allocate a replacement intent.
+Explicit reconciliation uses primary/majority reads and creates no audit/fence
+write. Absent evidence is UNRESOLVED, never proof that re-saving is safe.
+
+Check for a committed actor/key before beginning any new mutation/fence; that
+read path must never increment the User version. A racing unique-key refusal
+aborts its entire transaction, then permits only explicit read reconciliation,
+not another write attempt. A new key cannot reuse an existing source/proposal
+family. These rules avoid both duplicate saves and retries disguised as recovery.
+
+### Proposed usable API/UI boundary (later approval)
+
+These routes are proposals, not existing endpoints or implementation permission:
+
+- `POST /api/v1/admin/learning-path-proposals`: strict JSON exactly
+  `{technologyId,operationId,...C1 content fields}`; no query parameters. Successful
+  new save returns 201 with the existing success envelope and exact C1 private DTO.
+  A previously committed identical operation may return 200 only after complete
+  read reconciliation, with no new writes. No automatic POST replay.
+- `GET /api/v1/admin/learning-path-proposals/:id?technologyId=...`: exact canonical
+  proposal-revision ID and required parent binding; full validation then C1 DTO.
+- `GET /api/v1/admin/learning-path-proposals/operations/:operationId?technologyId=...`:
+  actor-bound explicit read recovery, registered before the ID route. Success data
+  is exactly `{state:'COMMITTED',proposal:<C1 DTO>}` or `{state:'UNRESOLVED'}`.
+  Never use a public operation registry or return another actor's existence.
+
+No source browse/revise endpoint, PATCH, DELETE, public route or LearningPath
+schema change. Reuse current protected namespace, envelopes/no-store/errors.
+Strict identity/query/body schemas reject extras; GET bodies refuse. Proposed
+route-local JSON ceiling 131,072 bytes, identity encoding/no inflation, before the
+existing generic parser: enough for the 65,536-byte canonical record plus JSON
+escaping/envelope without weakening the canonical bound. Oversized encodings
+refuse, not truncate. Use the existing namespace IP/account gates plus a separate
+bounded per-account proposal bucket matching Technology defaults (120 reads and
+60 saves per 60 seconds; capacity 10,000; fail closed), avoiding hidden global
+policy changes. Offline tests must verify parser/order and bounded operation lookup.
+
+Sanitized 400/401/403/404/409/413/415/429 remain distinct. Dependency/deadline failures
+use fixed 503; postcommit ambiguity uses fixed PROPOSAL_OUTCOME_UNKNOWN, no raw
+database/message details. Response codes alone never prove absence of a mutation.
+All DTOs validate raw stored data before projection. Briefs have no additional UI
+DTO: initial saved content is exposed through C1's 14-key private proposal DTO;
+digests, actors, operation keys, audit fields and raw source never enter it.
+
+Keep Technology Management the default. Under Learning Paths offer an explicit
+Create private proposal action only for eligible DRAFT/PUBLISHED selection; archived
+inspection stays read-only. Accessible bounded fields use C1 definitions, clear
+labels/null handling, field errors, disabled pending Save and a clear “private
+proposal — not approved or published” result. Render text safely. Reuse Stitch,
+keyboard/focus/responsive patterns and current Technology selector; no fake
+Generate/Approve/Publish buttons. Tokens remain in F042's controller. Add only fixed
+proposal save/detail/reconcile descriptors, never arbitrary URL/token callbacks.
+Bind operation key, form and results to account/session generation and Technology;
+cancel/suppress late responses on logout/switch. Key/content stay in memory only,
+not browser storage/logs. Uncertain Save blocks another mutation and offers only
+explicit read recovery. Loss of in-memory recovery context requires operator
+reconciliation before repeating the intent, not an automatic new key. That is an
+explicit limitation of avoiding durable client/receipt infrastructure.
+
+### Dependency order, exact proposed inventories and gates
+
+The lists below are exact proposed application/test inventories, not permission
+to implement them. Shared evidence changes for each checkpoint are limited to
+this feature document, DATABASE_DESIGN.md and DEVELOPMENT_ROADMAP.md. Enacting a
+sequencing extension would additionally change AGENTS.md only after approval.
+No new dependency, generic supervisor, provider framework or model relaxation.
+
+**S — source structure (3 CREATE paths):**
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.schema.ts
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.model.ts
+apps/api/tests/admin-curriculum-brief.test.ts
+```
+
+Offline acceptance: exact fields/bounds including literal revision 1; C1 schema
+reuse; deterministic source digest vectors/UTF-8 ceiling; operator/privacy rejection;
+immutable inert registration including C1's known validation-bypass regressions.
+This checkpoint alone **does not establish authenticated source authority**.
+
+**P — source admission and C2 internal persistence (4 CREATE + 2 MODIFY):**
+
+```text
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts
+CREATE apps/api/tests/admin-learning-path-proposal-persistence.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-persistence.integration.ts
+MODIFY apps/api/src/modules/audit/audit.model.ts
+MODIFY apps/api/tests/auth-audit.test.ts
+```
+
+One feature-local repository owns the atomic capture/consume path; no separate
+brief writer/fence subsystem. This completes the previously conditional C2
+inventory with an explicit existing audit-regression path. Offline acceptance:
+inert transaction mocks prove call ordering, current-Admin/version refusal,
+authoritative source/audit recomputation, snapshot-parent policy, predecessor
+validation, unique-key/conflict classification, full pair/audit atomic intent,
+idempotency identity/content binding, no retry, delayed timeouts/unknown commit,
+session release and raw privacy. All historical audit tests retain their meaning.
+
+**A — bounded Admin API (7 CREATE + 3 MODIFY):**
+
+```text
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-request.schema.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-rate-limit.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.controller.ts
+CREATE apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.routes.ts
+CREATE apps/api/tests/admin-learning-path-proposal-routes.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-requests.test.ts
+CREATE apps/api/tests/admin-learning-path-proposal-api.integration.ts
+MODIFY apps/api/src/modules/admin/admin.routes.ts
+MODIFY apps/api/src/app.ts
+MODIFY docs/API_DESIGN.md
+```
+
+Offline acceptance: fixed three-route contracts, request/parser/rate-limit ordering,
+no-store, actor-derived calls, strict parent binding, exact DTO/error envelopes and
+no unauthorized body fields. Record the exact API contract in API_DESIGN.md only
+as part of that separately approved checkpoint; use fixed route labels so operation
+keys do not enter request-path logs. Prepare live route tests; do not start listeners or
+label offline HTTP mocks as live evidence. Public F017 routes remain unchanged.
+
+**U — usable Admin flow (10 CREATE + 6 MODIFY):**
+
+```text
+CREATE apps/admin/src/lib/learning-path-proposals/contracts.ts
+CREATE apps/admin/src/lib/learning-path-proposals/proposal-client.ts
+CREATE apps/admin/src/lib/learning-path-proposals/proposal-controller.ts
+CREATE apps/admin/src/hooks/use-learning-path-proposal.ts
+CREATE apps/admin/src/components/learning-paths/learning-path-proposal-form.tsx
+CREATE apps/admin/src/components/learning-paths/learning-path-proposal-form.module.css
+CREATE apps/admin/tests/learning-path-proposal-client.test.ts
+CREATE apps/admin/tests/learning-path-proposal-controller.test.ts
+CREATE apps/admin/tests/learning-path-proposal-rendering.test.ts
+CREATE tests/browser/admin-learning-path-proposals.spec.ts
+MODIFY apps/admin/src/lib/auth/admin-controller.ts
+MODIFY apps/admin/tests/admin-controller.test.ts
+MODIFY apps/admin/src/components/learning-paths/learning-path-manager.tsx
+MODIFY apps/admin/tests/learning-path-rendering.test.ts
+MODIFY apps/admin/src/app/app.tsx
+MODIFY apps/admin/tests/admin-rendering.test.ts
+```
+
+Offline acceptance: valid/invalid form bounds, parent selection, fixed authenticated
+descriptors, no token exposure, account/session/Technology races, cancellation,
+double-submit refusal, explicit recovery/no mutation replay, safe text rendering,
+keyboard semantics and all existing default-workspace/read-only regressions.
+Prepare individually named browser cases without claiming execution. No unplanned
+edits to existing client/controller GET behavior are implied by this inventory.
+
+S precedes P; P precedes A; A's stable reviewed contract precedes U. Each source
+checkpoint requires focused offline tests, relevant full TypeScript/build, lint,
+format/encoding/scope/privacy checks and fresh independent review with findings
+resolved. Offline development eligibility is separate from live readiness.
+Each implementation approval and each Git commit/push remain separate decisions.
+
+Real guarantees require separately authorized isolated replica-set execution:
+physical collections/indexes/privileges; actual User demotion/deletion contention;
+same-operation and revision races; no partial source/proposal/audit commit;
+rollback; unknown commit/reconciliation; declared snapshot-parent concurrency;
+and owned cleanup/protected baselines/authenticated RESULT/ACK. Reuse the existing
+reviewed mechanism only after an approved persistence fixture/case/source manifest
+exists; the existing nine read-only records cannot prove these new writes. No new
+case count or runtime readiness is claimed. Usable acceptance additionally needs
+real save/read/recovery API evidence and separately authorized browser checks for
+login/selection/form/result/logout, responsive/focus behavior and stale-data refusal.
+
+### Proposed bounded sequencing extension — not enacted
+
+> **PROPOSED — PENDING OWNER APPROVAL: F044 Admin-authored brief/proposal extension.**
+> After separate approval of this exact contract, permit only the S/P/A/U
+> inventories above, each under separate implementation authorization, while
+> mandatory F042/F043 verification remains outstanding. Before each checkpoint
+> require stable reviewed dependencies, explicit field/transaction/parent policies,
+> no unresolved blocking security finding and an exact approved inventory.
+> Permit offline implementation/preparation only; no live persistence, provisioning,
+> source-authority claims from mocks or browser execution without separate approval
+> and the existing qualified ownership/isolation/cleanup gates. Existing protected
+> baselines, authenticated RESULT/ACK, deadlines and acceptance requirements remain.
+> F044 remains partial IN_PROGRESS; F042/F043 acceptance remains BLOCKED. Generation
+> stays F054, editorial decisions F049/F050, publication F051. No other slice/feature
+> progression, schema migration, generic ingestion or production authority follows.
+> Every commit and push requires separate explicit approval. This text has no effect
+> until the owner approves enactment through the prescribed documentation process.
+
+AGENTS.md is unchanged in this preparation. Its enacted read-only/C1 extensions
+still exclude these writers/endpoints/UI; this proposal cannot authorize them.
+
+### Effort, decisions and retained limitations
+
+The former **1–2 engineering days** was conditional C2 consumer implementation,
+tests and review **after source authority existed**. It did not include this new
+foundation, a usable API/UI, provisioning or live qualification. Revised separate
+estimates, assuming stable contracts and available offline tooling:
+
+| Work                                  | Estimate and boundary                                                                                                                                      |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Source structure/admission foundation | S: 0.5–1 day; P's source admission/audit portion: 0.5–1 day. Total 1–2 days, not authority after S alone.                                                  |
+| Proposal persistence                  | Remaining P consumer/predecessor/reconciliation tests and review: 1–2 days, excluding the admission portion counted above.                                 |
+| Usable Admin API/UI                   | A: 0.5–1 day; U: 1–2 days. Total 1.5–3 days.                                                                                                               |
+| Combined offline delivery             | 3.5–7 engineering days; security-review findings or contract changes can increase it. No parallelism or live execution assumed.                            |
+| Real database/browser qualification   | Additional; blocked on separately approved target/manifest/ownership and runtime access. No reliable elapsed estimate while those gates remain unresolved. |
+
+Smallest next decision: approve or revise this source/parent/idempotency policy
+and proposed inventories, then separately authorize enacting only its named
+sequencing extension and implementing **S** with offline review. P/A/U remain
+separately gated. If faster usable delivery is preferred, S and P may be proposed
+as one coherent backend authorization later; they are not authorized here.
+
+Historical C1's 127 focused PASS and resolved independent findings are retained,
+not rerun. No source implementation/test/runtime/database/AI operation occurs in
+this documentation task. F044 IN_PROGRESS; C1 and read-only checkpoints
+READY_FOR_REVIEW — offline only; F042/F043 acceptance BLOCKED; nine integration
+records and 225 browser cases NOT_RUN; production readiness NOT_VERIFIED.
+
+## Source-structure S authorization and policy decisions — 2026-11-04
+
+This later owner decision supersedes only the pending-policy/implementation gate
+for the three-path source-structure **S** checkpoint. The earlier C2/source drafts
+remain intact as history. The owner approved immutable initial brief revisions,
+historical admission surviving author demotion/deletion, actor-bound operation keys
+and explicit uncertain-save reconciliation, and atomic brief/proposal/two-audit
+Save as the intended future boundary. The owner authorized S implementation and
+offline verification only. Persistence P, API A and UI U remain NOT_STARTED and
+separately gated; the broad proposed extension above is **not enacted**.
+
+AGENTS.md enacts only the named S extension, exactly the schema/model/test CREATE
+inventory. No additional brief DTO is specified or exposed: C1's private proposal
+DTO remains the boundary; a pure validated brief-to-source binding is internal
+structural data, not an authenticated capability. Existing C1 files remain unchanged.
+
+Technology policy limitation is explicit: a future transaction admitting a private
+brief/proposal may commit if its DRAFT/PUBLISHED parent is archived or deleted
+after the transaction snapshot. There is no parent lifecycle fence or Technology
+version write. This grants no publication authority and performs no cascade.
+Stored source/proposal/audit evidence remains retained. With an archived parent,
+protected private inspection remains allowed but new writes refuse; with a deleted
+or unavailable parent, private detail/reconciliation returns sanitized 404 while
+retaining evidence. Every subsequent operation rechecks current account authority
+and applicable parent rules. Author demotion/deletion preserves a historical input,
+never permission for future actions. None of these database behaviors is proved
+by S's structural tests or implemented in S.
+
+Preflight matched dev at d0a2e5a81023f613aa37a796c2df815446853178, exactly three
+reviewed modified documents and empty index. Drafts/historical evidence are
+preserved. F044 IN_PROGRESS; C1/A/B READY_FOR_REVIEW — offline only; F042/F043
+acceptance BLOCKED; nine integration records and 225 browser cases NOT_RUN;
+production NOT_VERIFIED. No live execution or Git delivery is authorized.
+
+## Source-structure S implementation and independent offline review — 2026-11-04
+
+**S READY_FOR_REVIEW — offline only.** This later evidence supersedes S's earlier
+NOT_STARTED wording, not the unapproved P/A/U checkpoints. The enacted AGENTS.md
+extension remains limited to S. Original C1/C2/source proposals and historical
+tests/failures remain intact; only current summary pointers are reconciled.
+
+### Exact implemented scope
+
+CREATE only:
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.schema.ts
+apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.model.ts
+apps/api/tests/admin-curriculum-brief.test.ts
+```
+
+Reuse C1's exported content schemas, byte ceiling and inert-data snapshot rather
+than duplicate field definitions. Implement literal schema/revision 1, required
+canonical identities/date/UUIDv4 operation key, exact source digest over all
+specified fields, separate expected Technology validation and internal C1 binding.
+No extra brief DTO is exposed; pure tests connect the binding to C1's unchanged
+proposal validation/private DTO and check excluded brief metadata. Input/body
+validation and binding equality do not authenticate an actor or admit a source.
+
+The model is import-inert, explicitly registered only while disconnected, with
+autoCreate/autoIndex/buffering/timestamps/versionKey disabled and exact prospective
+index metadata. Construction validates raw content before casting; raw-registry
+async/sync/static/Standard-Schema validation fails closed without valid context.
+Immutable guards refuse supported updates/replacements/deletes/bulk operations.
+All Mongoose saves, including new documents with validation disabled, now refuse;
+the future P repository remains a separately approved native-driver insert boundary.
+No model is imported into application startup or connected to MongoDB by this work.
+
+### Checks actually executed
+
+- Initial default-context focused test launch failed in tsx before registering any
+  case: uv_os_get_passwd ENOMEM. The supported command-specific host context then
+  ran only the authorized synthetic file, with test isolation disabled and no
+  database/bootstrap/browser or child-runtime suite. No Windows elevation/policy
+  change or environment troubleshooting was performed.
+- Initial actual focused run: **105 PASS / 0 FAIL**. Independent-review corrections
+  added six fixed digest vectors; final command
+  `node --import tsx --test --test-isolation=none --test-reporter=spec apps/api/tests/admin-curriculum-brief.test.ts`
+  executed **111 PASS / 0 FAIL / 0 skipped / 0 cancelled**. Counts are not summed
+  across reruns. The byte-limit helper tests its exact UTF-8 boundary; tighter
+  content bounds mean no fabricated full-record 65,536-byte acceptance claim.
+- Full API/test TypeScript PASS, including after the corrected tests/model:
+  `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.test.json --noEmit --incremental false --pretty false`.
+  No new or baseline diagnostics; the earlier corrected TS2322 errors remain resolved.
+- API production build/typecheck PASS, including after the save-guard correction:
+  `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.json --incremental false --pretty false`.
+  Only normal ignored dist outputs; no application startup or deployment.
+- Three-file targeted ESLint with max-warnings=0 PASS. Scoped source/document
+  Prettier, strict UTF-8/LF/no-BOM, git diff --check, exact scope, historical content
+  preservation and sensitive-data review PASS. No unrelated passing suite or login
+  QA rerun. Mongoose validateSync deprecation warnings remain visible, not suppressed.
+- Tests use synthetic identities/content, disconnected models and inert hook doubles.
+  Refusal spies cover connections/collection operations, network/listeners, child
+  processes/timers and application-private environment/config access. No save/query
+  or DDL dispatch is used to test immutable hooks.
+
+### Independent findings and resolution
+
+A fresh independent reviewer context inspected the actual three files, C1 reuse
+and source/S contracts without editing or executing tests/live operations.
+Initial findings: Critical 0 / High 0 / Medium 1 / Low 1.
+
+- Medium: a new/raw-registry document could skip validation with
+  save({validateBeforeSave:false}) because the pre-save hook only refused existing
+  documents. S now refuses every Mongoose save; inert new/existing hook doubles
+  confirm refusal without dispatch. No C1 or future native-driver policy was changed.
+- Low: null/Unicode/order/admission-metadata variants used a mirrored JavaScript
+  digest oracle, with only one fixed baseline hash. Six independently derived
+  Python compact-UTF-8-JSON/hashlib constants now cover those variants individually.
+
+Independent closeout reread the actual corrections and reported **Critical 0 /
+High 0 / Medium 0 / Low 0 unresolved**. Executed test/build evidence above belongs
+to the implementation agent; no independent test rerun is claimed. Separate
+self-review checks scope, documentation consistency and retained limitations.
+
+### Guarantees and next boundary
+
+Established: local shape/bounds/digest integrity, inert-data handling, Technology
+equality on supplied context, private C1 projection compatibility and disconnected
+in-memory validation/guard behavior. An admissible-looking synthetic record is not
+an admitted source. Not established: stored existence/Technology eligibility,
+current-account authorization, operation uniqueness, transaction/concurrency,
+source/audit correspondence, atomicity, real indexes, retention or database WORM.
+The documented snapshot archive/delete race is a future policy, not a passing test.
+
+Smallest coherent next checkpoint is **P — source admission and internal C2 proposal
+persistence** under separate exact-inventory/sequencing authorization. It would
+connect S/C1 through the current-Admin transaction fence and atomic brief/proposal/
+two-audit boundary, plus explicit read reconciliation and prepared integration
+assertions. P still adds no API/UI or permission for live writes. A/U follow only
+after their own approvals. Generation F054, editorial F049/F050 and publication
+F051 remain unchanged.
+
+Git scope after S: seven pending paths (three new source/test files plus AGENTS.md
+and the three already modified documents), index empty; HEAD unchanged at
+d0a2e5a81023f613aa37a796c2df815446853178. No staging/commit/push. Guarded execution
+pins remain historical/stale; no refreeze or runtime qualification occurred.
+F044 IN_PROGRESS; C1/A/B/S READY_FOR_REVIEW — offline only; F042/F043 acceptance
+BLOCKED; nine integration records and 225 browser cases NOT_RUN; production
+readiness NOT_VERIFIED. No acceptance or other-feature status advances.
