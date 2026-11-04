@@ -1,10 +1,11 @@
+import { API_ORIGIN, WEB_ORIGIN } from './qa-test';
 import {
   expect,
   test,
   type BrowserContext,
   type Page,
   type Route,
-} from '@playwright/test';
+} from './qa-test';
 // Separately gated mounted tests. Mocked HTTP contracts, never a live database.
 const cid = 'a'.repeat(24),
   other = 'b'.repeat(24),
@@ -17,7 +18,7 @@ const envelope = (data: unknown) => ({
   meta: { requestId: 'f031-browser' },
 });
 const headers = {
-  'Access-Control-Allow-Origin': 'http://127.0.0.1:3000',
+  'Access-Control-Allow-Origin': WEB_ORIGIN,
   'Access-Control-Allow-Credentials': 'true',
   'Access-Control-Allow-Headers': 'authorization,content-type',
   'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
@@ -73,11 +74,11 @@ async function mock(context: BrowserContext) {
   await context.route('**/*', async (route) => {
     const request = route.request(),
       url = new URL(request.url());
-    if (url.origin === 'http://127.0.0.1:3000') {
+    if (url.origin === WEB_ORIGIN) {
       await route.continue();
       return;
     }
-    if (url.origin !== 'http://127.0.0.1:4000') {
+    if (url.origin !== API_ORIGIN) {
       state.external.push(url.origin);
       await route.abort();
       return;
@@ -295,6 +296,14 @@ for (const width of [1280, 768, 390])
       exact: true,
     });
     await expect(heading).toBeFocused();
+    for (const name of ['Output', 'Descriptive', 'Scenario', 'Coding']) {
+      await page.keyboard.press('Tab');
+      await expect(
+        page
+          .getByRole('group', { name: 'Question type' })
+          .getByRole('button', { name, exact: true }),
+      ).toBeFocused();
+    }
     await page.keyboard.press('Tab');
     await expect(
       page.getByRole('link', { name: /Reference/ }).first(),
@@ -376,9 +385,22 @@ test('prompt Markdown and starter code remain inert with no answer leakage or ex
     page.getByRole('region', { name: 'Question 1 code', exact: true }),
   ).toContainText('<script>inert</script>');
   expect(m.external).toEqual([]);
+  // F032/F036 added explicit submission. Empty drafts remain ineligible,
+  // with no revealed answers, unlock shortcut, scoring action or write request.
+  const submissions = page.getByRole('button', {
+    name: /^Submit Answer for Question \d+$/,
+  });
+  await expect(submissions).toHaveCount(10);
+  for (const submit of await submissions.all())
+    await expect(submit).toBeDisabled();
   await expect(
-    page.getByRole('button', { name: /submit|unlock|score/i }),
+    page.getByRole('region', { name: /^Revealed answer for Question/ }),
   ).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /unlock|score/i })).toHaveCount(
+    0,
+  );
+  expect(m.calls).toBe(1);
+  expect(m.unexpected).toEqual([]);
 });
 test('loading, failure and explicit Retry recover without implicit retries', async ({
   page,

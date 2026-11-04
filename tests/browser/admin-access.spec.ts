@@ -1,18 +1,19 @@
+import { ADMIN_ORIGIN, API_ORIGIN } from './qa-test';
 import {
   expect,
   test as base,
   type BrowserContext,
   type Page,
   type Route,
-} from '@playwright/test';
+} from './qa-test';
 import type { CurrentUser } from '../../apps/admin/src/lib/auth/contracts';
 
 // PREPARED ONLY — 20 NOT_RUN. Separate browser/environment approval is mandatory.
-// Requires the existing Admin runtime on localhost:5173, configured for the API
+// Requires the guarded QA Admin runtime, configured for the isolated API
 // origin below. All API responses are synthetic: no live API/MongoDB acceptance.
 // Do not launch services or change the primary-host Playwright policy from here.
-const APP = 'http://localhost:5173';
-const API = 'http://localhost:4000';
+const APP = ADMIN_ORIGIN;
+const API = API_ORIGIN;
 const fixtureUser: CurrentUser = {
   id: 'a'.repeat(24),
   firstName: 'Fixture',
@@ -277,9 +278,14 @@ test('F042-B02 sign-in requires current Admin eligibility before the Technology 
   await expect.poll(() => admin.held.length).toBe(1);
   await expect(welcome(page)).toHaveCount(0);
   await expect(page.getByLabel('Password', { exact: true })).toHaveValue('');
-  await expect(
-    page.getByRole('group', { name: 'Admin account credentials' }),
-  ).toBeDisabled();
+  const credentials = page.getByRole('group', {
+    name: 'Admin account credentials',
+  });
+  await expect(credentials).toHaveAttribute('disabled', '');
+  const controls = credentials.locator('input,button');
+  await expect(controls).toHaveCount(3);
+  for (const control of await controls.all())
+    await expect(control).toBeDisabled();
   await release(admin);
   await expect(welcome(page)).toBeVisible();
   expect(admin.calls).toEqual(['/auth/login', '/users/me']);
@@ -596,9 +602,11 @@ test('F042-B20 labelled fields and loading success error announcements retain se
   await expect(page.getByRole('status')).toHaveAttribute('aria-live', 'polite');
   await release(admin);
   await expect(welcome(page)).toBeVisible();
-  await expect(page.getByRole('status')).toContainText(
-    'No Technologies on this page.',
-  );
+  await expect(
+    page
+      .getByRole('status')
+      .filter({ hasText: 'No Technologies on this page.' }),
+  ).toBeVisible();
   admin.fault = 503;
   await page.getByRole('button', { name: 'Check current access' }).click();
   await expect(page.getByRole('alert')).toHaveAttribute(

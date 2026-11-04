@@ -1,10 +1,12 @@
+import { backgroundProgress, backgroundStudent } from './background-progress';
+import { API_ORIGIN, WEB_ORIGIN } from './qa-test';
 import {
   expect,
   test,
   type BrowserContext,
   type Page,
   type Route,
-} from '@playwright/test';
+} from './qa-test';
 // Separately gated mounted tests. Mocked HTTP contracts, never a live database.
 const cid = 'a'.repeat(24),
   other = 'b'.repeat(24),
@@ -17,7 +19,7 @@ const envelope = (data: unknown) => ({
   meta: { requestId: 'f037-browser' },
 });
 const headers = {
-  'Access-Control-Allow-Origin': 'http://127.0.0.1:3000',
+  'Access-Control-Allow-Origin': WEB_ORIGIN,
   'Access-Control-Allow-Credentials': 'true',
   'Access-Control-Allow-Headers': 'authorization,content-type',
   'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
@@ -74,11 +76,11 @@ async function mock(context: BrowserContext) {
   await context.route('**/*', async (route) => {
     const request = route.request(),
       url = new URL(request.url());
-    if (url.origin === 'http://127.0.0.1:3000') {
+    if (url.origin === WEB_ORIGIN) {
       await route.continue();
       return;
     }
-    if (url.origin !== 'http://127.0.0.1:4000') {
+    if (url.origin !== API_ORIGIN) {
       state.external.push(url.origin);
       await route.abort();
       return;
@@ -90,6 +92,15 @@ async function mock(context: BrowserContext) {
       return;
     }
     const path = url.pathname.slice('/api/v1'.length);
+    if (
+      await backgroundProgress(
+        route,
+        url,
+        backgroundStudent(state.user, true),
+        true,
+      )
+    )
+      return;
     if (path === '/auth/refresh' || path === '/auth/login') {
       await send(
         envelope({
@@ -298,7 +309,7 @@ test('F037 Concept activity preserves Read and Practice navigation', async ({
   const m = await mock(context);
   await open(page);
   await expect(
-    page.getByRole('link', { name: 'Practice output questions' }),
+    page.getByRole('link', { name: 'Practice output questions', exact: true }),
   ).toHaveAttribute('href', '/concepts/' + cid + '/practice');
   await expect(activity(page)).toContainText('No saved attempts');
   expect(m.unexpected).toEqual([]);

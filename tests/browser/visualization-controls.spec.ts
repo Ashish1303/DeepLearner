@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { WEB_ORIGIN } from './qa-test';
+import { expect, test, type Page } from './qa-test';
 
 const pageErrors = new WeakMap<Page, string[]>();
 const unexpectedRequests = new WeakMap<Page, string[]>();
@@ -20,7 +21,7 @@ test.beforeEach(async ({ page, context }) => {
     const request = route.request();
     const url = new URL(request.url());
     if (
-      url.origin === 'http://127.0.0.1:3000' &&
+      url.origin === WEB_ORIGIN &&
       request.method() === 'GET' &&
       !url.pathname.startsWith('/api/')
     )

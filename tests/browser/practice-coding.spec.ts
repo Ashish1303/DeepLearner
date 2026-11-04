@@ -1,10 +1,11 @@
+import { API_ORIGIN, WEB_ORIGIN } from './qa-test';
 import {
   expect,
   test,
   type BrowserContext,
   type Page,
   type Route,
-} from '@playwright/test';
+} from './qa-test';
 // Separately gated mounted tests. Mocked HTTP contracts, never a live database.
 const cid = 'a'.repeat(24),
   uid = '1'.repeat(24);
@@ -16,7 +17,7 @@ const envelope = (data: unknown) => ({
   meta: { requestId: 'f034-browser' },
 });
 const headers = {
-  'Access-Control-Allow-Origin': 'http://127.0.0.1:3000',
+  'Access-Control-Allow-Origin': WEB_ORIGIN,
   'Access-Control-Allow-Credentials': 'true',
   'Access-Control-Allow-Headers': 'authorization,content-type',
   'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
@@ -74,11 +75,11 @@ async function mock(context: BrowserContext) {
   await context.route('**/*', async (route) => {
     const request = route.request(),
       url = new URL(request.url());
-    if (url.origin === 'http://127.0.0.1:3000') {
+    if (url.origin === WEB_ORIGIN) {
       await route.continue();
       return;
     }
-    if (url.origin !== 'http://127.0.0.1:4000') {
+    if (url.origin !== API_ORIGIN) {
       state.external.push(url.origin);
       await route.abort();
       return;

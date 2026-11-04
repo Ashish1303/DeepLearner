@@ -1,10 +1,11 @@
-import { test as base, expect, type BrowserContext } from '@playwright/test';
+import { ADMIN_ORIGIN, API_ORIGIN } from './qa-test';
+import { test as base, expect, type BrowserContext } from './qa-test';
 import type { LearningPath } from '../../apps/admin/src/lib/learning-paths/contracts';
 
 // PREPARED ONLY: F044-B01-B12 NOT_RUN. No service startup or live API evidence.
 // Separate qualified, ownership-safe browser approval required before execution.
-const APP = 'http://127.0.0.1:5173',
-  API = 'http://127.0.0.1:4000';
+const APP = ADMIN_ORIGIN,
+  API = API_ORIGIN;
 const parentId = 'a'.repeat(24),
   otherId = 'c'.repeat(24);
 const parent = {
@@ -358,7 +359,11 @@ test('F044-B03 child pagination and empty later page', async ({
   await open(page);
   await select(page);
   await page.getByRole('button', { name: 'Next Learning Paths' }).click();
-  await expect(page.getByRole('status')).toContainText('No Learning Paths');
+  await expect(
+    page
+      .getByRole('region', { name: 'Learning Paths', exact: true })
+      .locator(':scope > [role="status"]'),
+  ).toContainText('No Learning Paths');
   await expect(
     page.getByRole('button', { name: 'Previous Learning Paths' }),
   ).toBeEnabled();
@@ -434,7 +439,11 @@ test('F044-B08 empty inventory is explicit', async ({ page, fixture }) => {
   fixture.empty = true;
   await open(page);
   await select(page);
-  await expect(page.getByRole('status')).toContainText('No Learning Paths');
+  await expect(
+    page
+      .getByRole('region', { name: 'Learning Paths', exact: true })
+      .locator(':scope > [role="status"]'),
+  ).toContainText('No Learning Paths');
 });
 test('F044-B09 rate limit and explicit retry without replay', async ({
   page,
@@ -459,9 +468,11 @@ test('F044-B10 logout refuses a late private read', async ({
   fixture.hold = true;
   await open(page);
   await select(page);
-  await expect(page.getByRole('status')).toContainText(
-    'Loading Learning Paths',
-  );
+  await expect(
+    page
+      .getByRole('region', { name: 'Learning Paths', exact: true })
+      .locator(':scope > [role="status"]'),
+  ).toContainText('Loading Learning Paths');
   await expect.poll(() => fixture.reads).toBe(1);
   await page.getByRole('button', { name: 'Sign out of this device' }).click();
   await expect(

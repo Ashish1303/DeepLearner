@@ -1,10 +1,11 @@
+import { API_ORIGIN, WEB_ORIGIN } from './qa-test';
 import {
   expect,
   test,
   type BrowserContext,
   type Page,
   type Route,
-} from '@playwright/test';
+} from './qa-test';
 // Separately gated mounted tests. Mocked HTTP contracts, never a live database.
 // Twelve PREPARED/NOT_RUN UI-contract cases. HTTP interception is not evidence
 // of real authentication, MongoDB transactions, rubric authority or durability.
@@ -18,7 +19,7 @@ const envelope = (data: unknown) => ({
   meta: { requestId: 'f037-browser' },
 });
 const headers = {
-  'Access-Control-Allow-Origin': 'http://127.0.0.1:3000',
+  'Access-Control-Allow-Origin': WEB_ORIGIN,
   'Access-Control-Allow-Credentials': 'true',
   'Access-Control-Allow-Headers': 'authorization,content-type,idempotency-key',
   'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
@@ -75,11 +76,11 @@ async function mock(context: BrowserContext) {
   await context.route('**/*', async (route) => {
     const request = route.request(),
       url = new URL(request.url());
-    if (url.origin === 'http://127.0.0.1:3000') {
+    if (url.origin === WEB_ORIGIN) {
       await route.continue();
       return;
     }
-    if (url.origin !== 'http://127.0.0.1:4000') {
+    if (url.origin !== API_ORIGIN) {
       state.external.push(url.origin);
       await route.abort();
       return;
@@ -621,6 +622,11 @@ test('F038 checkpoint refusal cannot reveal expected choices or qualify interact
 }) => {
   const m = await setup(context);
   await open(page);
+  await expect(
+    panel(page).getByRole('button', {
+      name: 'Request visualization checkpoint',
+    }),
+  ).toBeVisible();
   m.state.fault = 503;
   await panel(page)
     .getByRole('button', { name: 'Request visualization checkpoint' })
