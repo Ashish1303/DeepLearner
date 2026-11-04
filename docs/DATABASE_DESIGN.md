@@ -1977,3 +1977,73 @@ old log rows, timeout, rotation, truncation/regrowth and unknown closes are not 
 
 Recovery execution and B–F completion remain NOT_VERIFIED until actual qualified
 runs. F042/F043 acceptance BLOCKED; F044 NOT_STARTED; production NOT_VERIFIED.
+
+## F044 C1 private proposal revision definition — 2026-11-04
+
+Documentation-only contract; C1 source implementation requires separate approval.
+The authoritative exact fields, nullability, bounds, digest algorithm, DTO and
+four-file inventory are in [F044 C1](features/F044-admin-learning-path-management.md#c1-private-proposal-foundation-contract--2026-11-04).
+This section defines prospective model metadata, not DDL, a migration, a runtime
+binding or permission to persist. Existing learningPaths/public Student reads,
+progress and all current database/index manifests remain unchanged.
+
+Prospective collection `learningPathProposalRevisions`, private model
+`AdminLearningPathProposalRevision`: `_id`, `proposalId`, `technologyId`,
+`schemaVersion:1`, positive-safe-integer `revision`, exact `source:{id,revision,digest}`,
+`title`, `objectives`, `audience`, `depth`, nullable `runtime:{name,version}`,
+nullable `technologyVersion`, `prerequisites:[{description}]`, `definitionDigest`
+and UTC `createdAt`. Every key is required; runtime.version may be null. All
+persisted fields are immutable, with no __v, updatedAt, approval/publication/job
+state, actor snapshot, raw source payload, provider data or implicit defaults.
+Runtime names the software environment; technologyVersion names the technology
+target, neither is a course duration or proposal revision.
+
+Bounds: title1–120, objectives1–20 distinct entries of1–240, audience1–500,
+depth BEGINNER/INTERMEDIATE/ADVANCED, runtime.name1–80 and version null/1–80,
+technologyVersion null/1–80, prerequisites0–20 distinct descriptions of1–240.
+Text uses well-formed already-trimmed single-line Unicode measured in UTF-16
+units; no coercion/control characters. Canonical record JSON is at most65,536
+UTF-8 bytes. Canonical ids/digests use lowercase24/64hex respectively. The feature
+contract records the rationale for every bound and the exact ordered digest.
+
+One proposal family stays bound to one Technology/source family. In pure revision-
+creation validation, revision1 has no predecessor; later revisions require the
+validated immediate predecessor and
+separate expected Technology/source binding, no revision gaps/overflow, no source
+rollback or same-source-revision digest change. C1 equality/hash validation proves
+neither source existence nor authorization. New revisions are separate immutable
+documents; Mongoose/application guards are not database WORM. A future writer
+needs current-Admin transaction fencing, atomic audit and source/parent/revision
+concurrency checks under a separately approved contract. C1 has no writer.
+
+Explicit registration only on the existing disconnected database.ts Mongoose
+instance; imports perform no registration or I/O. Options: strict:'throw',
+versionKey:false, timestamps:false, autoCreate:false, autoIndex:false,
+bufferCommands:false; cast:false/immutable:true, explicit ids/date, nested _id:false.
+Disable implicit id/empty-array defaults; validate required key presence without
+rejecting the explicit nulls allowed by the field contract. Record/DTO inspection
+validates the expected binding and digest without loading revision history.
+No startup import, connection, query, save, bulkWrite, physical collection creation
+or explicit init/index call. Disconnected model compilation may create in-memory
+collection wrappers/metadata only; no driver effect is permitted.
+Full schema validation and private DTO allowlists follow the F044 contract; private
+source/definition digests never enter DTOs/logs/public projections.
+
+Intended indexes, **not provisioned**:
+
+| Name                                           | Ordered keys                                  | Options                                      |
+| ---------------------------------------------- | --------------------------------------------- | -------------------------------------------- |
+| `_id_`                                         | `{ _id: 1 }`                                  | Implicit unique MongoDB index.               |
+| `uq_learning_path_proposal_revision`           | `{ proposalId: 1, revision: 1 }`              | Explicit unique; simple binary collation.    |
+| `ix_learning_path_proposal_technology_created` | `{ technologyId: 1, createdAt: -1, _id: -1 }` | Explicit nonunique; simple binary collation. |
+
+No TTL/sparse/partial/search index. Two explicit declarations plus one implicit
+identity index do not alter the historical19-collection/27-explicit-index fixture
+inventory. New collection/index creation, roles, validation, retention/erasure,
+backup, real uniqueness/concurrency and protected-baseline verification require
+separate authorization before any persistence. No provisioning/reset/reseed or
+production database access is approved.
+
+F054 generation, F049/F050 editorial decisions and F051 publication remain with
+those features. F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; nine F044 real
+integration records and225 browser cases NOT_RUN; production NOT_VERIFIED.

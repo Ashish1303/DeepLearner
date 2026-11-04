@@ -2,6 +2,11 @@
 
 ## Status, authority and source precedence
 
+Latest scoped extension: **C1 READY_FOR_REVIEW — offline only**.
+The dated C1 section below records the separately gated sequencing extension
+and resolution of the historical API/test TypeScript blocker. Earlier dated
+contracts and failure evidence remain intact.
+
 Feature: **IN_PROGRESS**. Read-only contract approved 2026-11-02 as PARTIAL
 F044 progress. Backend Checkpoint A: **READY_FOR_REVIEW — offline only**, with the
 full API/test TypeScript limitation recorded below. Frontend Checkpoint B: **READY_FOR_REVIEW — offline only**, implementation and focused offline
@@ -1235,3 +1240,381 @@ acceptance BLOCKED; nine F044 integration records and225 browser cases NOT_RUN;
 manual observations unresolved; production NOT_VERIFIED. No installation, elevated
 operation, application/database/browser execution, provisioning, credential change,
 guarded invocation or Git write occurred. STOP after support reconciliation.
+
+## C1 private proposal foundation contract — 2026-11-04
+
+### Authority, current evidence and exclusions
+
+The owner authorizes this documentation and C1-only sequencing extension.
+**C1 implementation: NOT_STARTED — separate authorization required.** F044
+remains IN_PROGRESS; A/B remain READY_FOR_REVIEW — offline only; acceptance
+remains BLOCKED. The C1 extension in AGENTS.md supersedes earlier prohibitions
+only for the four future implementation paths below and their offline checks.
+No existing read endpoint, DTO, LearningPath model or Student behavior changes.
+
+The full API/test TypeScript blocker is resolved: the separately approved
+test-only narrowing was delivered in d8bbfd873ae05bf32da0645202a91cea01f269af.
+The executed full API/test no-emit command, targeted lint and formatting passed;
+those checks are retained evidence, not rerun here. Earlier TS2322 failures above
+remain historical. The owner reports observed fresh login, restoration, Learning
+Paths access and logout PASS; no additional login/browser run occurred here.
+Other unexercised live cases remain unresolved. Nine F044 real integration
+records and 225 prepared browser cases remain NOT_RUN; F042/F043 acceptance
+BLOCKED; production readiness NOT_VERIFIED. Guarded pins remain stale after later
+delivery/document changes; no refreeze or execution qualification is implied.
+
+C1 defines an AI-ready private proposal revision, separate from published content.
+It adds no endpoint, repository/write service, Admin UI, application import,
+provider/job, approval state, publication pointer, migration or live persistence.
+F054 retains generation; F049/F050 retain editorial decisions; F051 retains
+publication. A proposal is not an approved outline or a public LearningPath.
+There is no manual authoring workflow, hierarchy/module payload, job/budget state,
+reviewer/decision, source URL retrieval or future workflow placeholder in C1.
+
+### Exact identities and field contract
+
+Future collection: `learningPathProposalRevisions`; model name:
+`AdminLearningPathProposalRevision`. A proposal family has one server-owned
+`proposalId` permanently bound to one `technologyId`. Each immutable revision has
+its own `_id`. Neither identifier is a public LearningPath id. C1 does not create
+any of these records in a database or allocate ids from a request.
+
+Every key below is required, including nullable values and empty prerequisite
+arrays. There are no optional/unknown keys or implicit content defaults. Canonical
+input/DTO ids are exactly 24 lowercase hexadecimal characters; digests exactly
+64 lowercase hexadecimal characters, with strict end-of-input matching. No
+coercion, case normalization or whitespace repair. Persisted ids are actual
+Mongoose ObjectIds; adapters explicitly validate before converting.
+
+All text lengths count UTF-16 code units, as existing JavaScript/Zod conventions.
+Text is well-formed Unicode, nonblank, already outer-trimmed and single-line;
+reject C0 controls and DEL, lone surrogates, nonstrings and implicit coercion.
+Do not rewrite Unicode, case or internal spacing. Text is inert plain text, never
+HTML, Markdown execution, a runtime command or a source-verification assertion.
+
+| Stored field                        | Exact requirement and meaning                                                                                                        | Bound rationale                                                                                                                                                                           |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `_id`, `proposalId`, `technologyId` | Required ObjectIds; record, immutable family and selected Technology identities respectively.                                        | Reuses existing 24-hex/ObjectId convention; no arbitrary identifier namespace.                                                                                                            |
+| `schemaVersion`                     | Literal integer 1.                                                                                                                   | Fixes interpretation of this single contract; no migration selector.                                                                                                                      |
+| `revision`                          | Positive safe integer, 1 through Number.MAX_SAFE_INTEGER.                                                                            | Reuses immutable F038 version convention; reject overflow instead of wrapping.                                                                                                            |
+| `source`                            | Exact object `{ id, revision, digest }`: ObjectId source-family id, positive safe-integer source revision, canonical SHA-256 digest. | Binds one exact immutable input artifact without embedding a provider, job, URL or raw payload.                                                                                           |
+| `title`                             | Required string, 1–120.                                                                                                              | Existing LearningPath title limit, without changing that model.                                                                                                                           |
+| `objectives`                        | Required ordered array of 1–20 distinct strings, each 1–240.                                                                         | At least one reviewable outcome; 20 bounds a single Path brief; 240 keeps each outcome concise.                                                                                           |
+| `audience`                          | Required string, 1–500, describing intended learners and assumed background.                                                         | One short brief rather than personas, account data or an unbounded prompt.                                                                                                                |
+| `depth`                             | BEGINNER / INTERMEDIATE / ADVANCED.                                                                                                  | Reuses existing targetLevel vocabulary; means intended learning depth, not hierarchy depth or an earned level.                                                                            |
+| `runtime`                           | Required null or exact `{ name, version }`; name 1–80, version null or 1–80.                                                         | Names the intended software environment, e.g. browser or Node.js; 80 accommodates a readable label/version without command flags/configuration. Null means not specified, never inferred. |
+| `technologyVersion`                 | Required null or string 1–80.                                                                                                        | Technology/language/specification target, distinct from runtime version, proposal revision and schemaVersion. Allows non-SemVer targets without inventing a version resolver.             |
+| `prerequisites`                     | Required ordered array of 0–20 exact `{ description }` objects; description 1–240, distinct by exact text.                           | Empty means none declared, not verified absence; same concise/array bounds as objectives. No cross-Path graph, ids, proficiency scores or completion claims.                              |
+| `definitionDigest`                  | Required canonical SHA-256 digest, recomputed from the exact ordered definition below.                                               | Existing domain-separated immutable-definition pattern; integrity, never a signature or authority.                                                                                        |
+| `createdAt`                         | Required finite UTC Date, canonical ISO millisecond round-trip.                                                                      | Existing UTC timestamp convention; server-owned lifecycle metadata, no automatic clock/default or mutable updatedAt.                                                                      |
+
+`runtime.version` must be present even when null. No runtime/type enum restricts
+future Technologies to JavaScript, and C1 never probes or launches the named
+runtime. `technologyVersion` is an opaque declared target, not a SemVer range,
+installed-version assertion or authorization to fetch/install it. No duration
+field is introduced: PRD Section 13 and the approved Studio brief use runtime as
+the software execution environment, not study time.
+
+The validated canonical record represented with lowercase string ids and ISO
+createdAt must serialize to at most 65,536 UTF-8 bytes including digests. This
+64 KiB aggregate cap bounds validation/digest work and future transfer even for
+multibyte text; it does not authorize a request body/parser-limit change. Check
+raw unknown/private keys before projection. Accept only inert own-data records
+and bounded arrays; reject accessors, proxies, cycles, symbols and unexpected
+object prototypes without invoking supplied conversion methods. This is a
+structural library boundary, not a new authentication or transport mechanism.
+
+### Source binding, revision creation and immutability
+
+`source` identifies the exact immutable upstream curriculum brief/input artifact
+from which a proposal revision derives. It is not a citation, provider/job id,
+approval receipt, source URL or factual-verification result. Its digest is SHA-256
+of that artifact's exact immutable bytes; C1 stores neither those bytes nor a new
+source-artifact model. No producer or source repository is implemented in C1.
+
+Pure full-record validation requires a separately supplied expected binding
+`{ technologyId, source: { id, revision, digest } }`, with canonical string ids.
+All four binding values must exactly match the candidate. The caller supplying
+matching values gains no authority: future persistence must obtain them from
+authorized, verified records rather than request claims. C1 proves equality and
+shape only, not source existence, hash-to-artifact correspondence, Technology
+existence/status, current Admin eligibility or database consistency. All such live
+checks remain future writer/integration prerequisites, not mocked PASS claims.
+
+Keep record validation and revision-creation validation distinct. The record
+validator checks shape, digest and the expected binding for any positive revision;
+DTO inspection uses that validator without loading a predecessor. The separate
+pure creation validator additionally applies the predecessor rules below. Neither
+function reads a model or resolves missing context from a database. This avoids
+turning a later revision's read projection into a history scan.
+
+Revision 1 requires no predecessor. A later revision requires the complete
+validated predecessor in the pure creation-validation context; family and
+Technology must match, revision must equal predecessor.revision + 1, and createdAt
+must not precede it. A maximum-safe-integer predecessor refuses a successor.
+Source id stays the same within a proposal family. Source revision cannot go
+backwards; the same source revision must retain exactly the same source digest.
+A higher source revision may supply a new digest only when it exactly matches
+the separately supplied expected binding. A different source-family/Technology
+requires a new proposal family, never rebinding an existing one.
+
+An existing revision never changes, including metadata, source, text, ordering,
+digests or createdAt. Correction creates a new record/revision; same source may
+support a new proposal revision. C1 exposes no clone-to-save, latest selection,
+revision allocator, writer or unsafe replay. Concurrent revision allocation,
+source/Technology rechecks, current-Admin transaction fencing and atomic audit
+require a separately approved future writer contract. An intended unique index
+is not concurrency/authorization evidence without real provisioning/verification.
+
+Compute definitionDigest as lowercase SHA-256 of UTF-8 JSON.stringify of this
+ordered array, with canonical lowercase id strings and no text normalization:
+
+```text
+["F044-proposal-v1", id, proposalId, technologyId, revision,
+ source.id, source.revision, source.digest, title, objectives, audience, depth,
+ runtime === null ? null : [runtime.name, runtime.version], technologyVersion,
+ prerequisites.map(item => item.description)]
+```
+
+Here `id` is `_id.toHexString()`. schemaVersion is fixed by the domain tag.
+createdAt is validated lifecycle metadata outside the content digest, following
+the existing F038 definition convention. Array order is semantic; reordering
+objectives/prerequisites changes the digest. Exact duplicate strings are rejected
+without language-dependent case folding. Validation recomputes the digest; a
+matching digest alone does not replace expected binding or predecessor checks.
+
+### Private DTO and model behavior
+
+The private inspection DTO has exactly these keys:
+
+```text
+id, proposalId, technologyId, revision, schemaVersion, title, objectives,
+audience, depth, runtime, technologyVersion, prerequisites, source, createdAt
+```
+
+Ids are lowercase strings; createdAt is canonical UTC ISO milliseconds. Nested
+runtime/prerequisites retain their allowlists above; DTO source is exactly
+`{ id, revision }`. Never include source.digest, definitionDigest, raw source
+bytes, `_id`, `__v`, database internals, account/actor fields, credentials, tokens,
+cookies, provider payloads, internal messages/stacks or editorial/job metadata.
+This is a private library DTO, not a new HTTP/public export. Future delivery must
+remain protected by current-account Admin checks. No proposal content/digests or
+rejected raw values enter logs or validation-error messages.
+
+Validate a raw full record and the expected binding before projection can strip
+anything; reject unexpected nested fields. DTO output also receives strict
+allowlist validation, independent copied arrays/objects and no source-record
+references. A corrupt record fails with a fixed content-free error, never a
+partial/default-filled DTO. Only the documented private digest fields are omitted
+from an otherwise valid full record; unknown data is not silently discarded.
+
+The model uses the existing disconnected `mongoose` instance exported by
+config/database.ts. Export an explicit registration function and schema; imports
+must not register the model, connect, read env/private config, create timers,
+spawn processes or perform I/O. Calling registration on that disconnected instance
+only compiles `AdminLearningPathProposalRevision`; repeated calls reuse its exact
+schema/model, and a conflicting preexisting registration refuses. Do not import
+the module into app.ts, routers or startup/model registries during C1.
+
+Options: collection learningPathProposalRevisions, strict:'throw', versionKey:false,
+timestamps:false, autoCreate:false, autoIndex:false, bufferCommands:false. Required
+explicit ids/createdAt, cast:false, immutable:true for all persisted paths;
+nested objects use _id:false and strict rejection with no extra defaults. Full
+document validation must enforce the same text, aggregate and digest invariants
+as the pure schema; expected binding/predecessor validation remains an explicit
+creation boundary and is not fabricated by Mongoose middleware. No unvalidated
+partial document counts as a valid revision.
+
+Disable implicit ObjectId generation and implicit empty-array defaults. Validate
+required key presence separately from nullable-value validity: explicit null for
+runtime, runtime.version or technologyVersion is valid, but a missing key is not.
+Do not apply a Mongoose required-value rule that rejects those permitted nulls.
+Raw input validation must precede model construction/defaults/casting; otherwise
+model projection could conceal a missing or unexpected field.
+
+Follow existing immutable-definition guards: refuse supported updates,
+replacements/deletions and saves of existing revisions, including bulk update/
+replacement/deletion paths. C1 executes no insert/save/query/DDL path, including
+insertMany/bulkWrite. No repository or raw-collection API is introduced. Guards
+and immutable paths are application protections, not database WORM: privileged
+raw access is outside their guarantee. Future persistence needs its own owned
+writer/authorization/audit/retention contract and real integration qualification.
+
+### Intended indexes — declarations only
+
+Model metadata and database documentation must declare exactly:
+
+| Name                                           | Ordered keys                                  | Properties and reason                                                                            |
+| ---------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `_id_`                                         | `{ _id: 1 }`                                  | MongoDB implicit unique identity, not a third explicit declaration.                              |
+| `uq_learning_path_proposal_revision`           | `{ proposalId: 1, revision: 1 }`              | Unique, simple binary collation; one record per family/revision.                                 |
+| `ix_learning_path_proposal_technology_created` | `{ technologyId: 1, createdAt: -1, _id: -1 }` | Nonunique, simple binary collation; future bounded Technology inventory with deterministic ties. |
+
+No sparse/partial/TTL/text/vector index, collection creation or explicit
+syncIndexes/init/createIndexes/ensureIndexes call. Disconnected Mongoose model
+compilation may build in-memory collection wrappers/internal initialization
+metadata; that is not permission for a driver call or physical collection/index
+creation. These two explicit indexes and one implicit
+index are prospective, not additions to the existing 19-collection/27-explicit-
+index guarded manifest. Provisioning, validators/roles, persistent retention and
+live index verification need separate approval. No current database/index count
+or protected resource is changed by declaring the model.
+
+### Exact future implementation inventory and offline acceptance
+
+Four CREATE paths only; no existing application/model/test/document file is part
+of the future source implementation inventory:
+
+```text
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.schema.ts
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.dto.ts
+apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.model.ts
+apps/api/tests/admin-learning-path-proposal.test.ts
+```
+
+schema.ts owns strict canonical field/binding/predecessor validation and digest
+calculation; dto.ts owns full-record validation plus explicit private projection;
+model.ts owns inert schema/explicit registration and immutable guards; the single
+test file owns deterministic synthetic offline cases. No barrel/startup/route,
+public model, shared package, repository, dependency or extra helper change.
+
+After separate implementation approval require measurable evidence for:
+
+1. Valid first/successor records and nullable targets; every required field,
+   enum, numeric/string/array/byte boundary and one-over/under failure; malformed
+   Unicode, noncanonical ids/digests, duplicate text, unknown nested/private fields,
+   coercion/accessor/proxy/cycle rejection without leaked fixture values.
+2. Wrong Technology/source id/revision/digest refusal; missing/incorrect predecessor,
+   family rebinding, source rollback/same-revision changed digest, revision gap,
+   overflow and earlier timestamp refusal. Source availability/authority is not
+   asserted from synthetic context.
+3. Independently specified digest vector and changes to every bound field/order;
+   createdAt exclusion is intentional while its own validity is checked. DTO exact
+   top-level/nested keys, no private digests, immutable input/deep-copy output and
+   strict refusal before projection. Errors are content-free with synthetic canaries.
+4. Disconnected import/registration, exact schema options/index definitions,
+   repeat registration and conflicting-model refusal; in-memory document
+   validation and immutable guard behavior with inert doubles only. Spies must
+   refuse any database connection/query/write/DDL, env/private-file access,
+   process/listener/startup or timer effect. No DB, HTTP or browser execution.
+5. Existing test tooling, focused test-file execution, full API/test no-emit
+   TypeScript, targeted lint/format, UTF-8/LF, git diff --check, scope/privacy review.
+   Do not silently add child/runtime suites or repair unrelated failures.
+   Fresh independent Critical/High/Medium/Low review after implementation, with
+   all findings resolved before development-checkpoint eligibility.
+
+C1 offline completion means READY_FOR_REVIEW — offline only, never accepted
+persistence, a working review UI or full F044 completion. No new C1 real integration
+or browser cases are invented/executed by this contract; nine existing integration
+records and 225 browser cases remain NOT_RUN. Future live writer/API/UI scope must
+define its own additional assertions and exact approval boundary.
+
+### Next approval and estimate
+
+No unresolved field/bound decision blocks the four-file offline foundation.
+Separate explicit implementation authorization and a fresh exact-baseline/index/
+scope preflight are required. Estimated C1 source implementation, focused tests,
+static checks and independent review: 3–5 engineering hours; findings can change
+that estimate. Unknown protected MongoDB identity, stale execution pins, real
+source/Technology existence and concurrency/audit/persistence qualifications block
+future live work/acceptance, not this disconnected C1 definition. No execution
+architecture, timeout, ownership or security-policy relaxation is authorized.
+
+## C1 implementation and independent offline review — 2026-11-04
+
+The owner separately authorized exactly the four C1 CREATE paths and focused
+offline verification/review. Preflight matched dev at
+d8bbfd873ae05bf32da0645202a91cea01f269af, exactly the four reviewed documentation
+changes and an empty index. Those four document contents were fingerprinted;
+AGENTS.md and DATABASE_DESIGN.md remain byte-identical. Only this feature record
+and the roadmap receive implementation evidence/status notes under the owner's
+explicit documentation allowance. No existing application source changed.
+
+Implemented strict inert-data/schema validation, exact Technology/source binding,
+separate record and revision-creation validators, all declared field/array/UTF-8
+limits, domain-separated ordered digest and private deep-copied DTO allowlists.
+Input proxies/accessors/coercion/unknown nested fields fail before projection.
+Model imports do not register; explicit disconnected registration returns a
+raw-input-validating constructor. Both returned and raw-registry model validation
+paths fail closed, including validateSync. Automatic ids/array defaults, collection
+creation/indexing/buffering and timestamps/versionKey are disabled as contracted.
+All declared fields are immutable; supported update/replace/delete/save-existing,
+bulkWrite and insertMany guards are verified through inert hook execution only.
+No write/query method, database connection or physical index check executed.
+
+### Executed checks and historical failures
+
+- Initial default-context test startup failed in tsx with uv_os_get_passwd ENOMEM
+  before case registration. The same focused offline file was then executed through
+  the supported command-specific host context, with test-isolation=none and no
+  bootstrap/integration/HTTP suite selected. No sandbox policy or Windows permission
+  was changed.
+- First actual run:124 tests,121 PASS/3 FAIL. Two failures exposed an incorrect
+  older BSON buffer-layout assumption; the installed BSON instead stores four own
+  24-bit words. Source inspection and inert descriptor validation now support that
+  exact representation without supplied getters/conversion methods. The third
+  failure came from invoking Mongoose's built-in save hooks on a tiny double; the
+  test now selects the named immutable-save guard without dispatching a save.
+- Initial targeted lint found one control-character regex rule violation and two
+  unused test symbols. All were corrected within the four authorized files.
+- Final focused command:
+  `node --import tsx --test --test-isolation=none --test-reporter=dot apps/api/tests/admin-learning-path-proposal.test.ts`
+  executed **127 PASS / 0 FAIL**, no skipped/cancelled cases. Distinct counts are
+  not added across reruns. Tests use synthetic data/in-memory models and inert
+  hook doubles, plus refusal spies for driver operations, network/listeners,
+  child processes, timers, application environment and private-file access.
+- Full API/test TypeScript PASS:
+  `node node_modules/typescript/bin/tsc -p apps/api/tsconfig.test.json --noEmit --incremental false --pretty false`.
+  No new or baseline diagnostics; the previously corrected TS2322 errors stay
+  resolved. API production build/typecheck PASS with the existing tsconfig.json;
+  only normal ignored dist outputs were emitted, no deployment/runtime startup.
+- Four-file targeted ESLint and Prettier PASS; strict UTF-8/LF, byte-level BOM,
+  whitespace, exact-scope/privacy review and git diff --check PASS. An initial
+  read-only encoding helper falsely reported a BOM because culture-sensitive
+  StartsWith treats that character as ignorable; direct byte checking confirmed
+  no BOM and no source encoding correction was needed.
+- Existing Mongoose validateSync deprecation warnings were retained, not suppressed;
+  the current Mongoose9 synchronous path is deliberately tested. No unrelated
+  passing suite, login QA, live API/database or browser suite was rerun.
+
+### Fresh independent review and guarantees
+
+A separate reviewer context inspected all four implementation/test files and the
+contract without editing them. Initial findings:Critical0/High0/Medium1/Low1.
+The Medium finding was a raw-registry Base.validateSync bypass of middleware;
+wrappers on the compiled Base validation methods now refuse unbound/corrupt rows,
+with explicit async/sync regressions. The Low finding was acceptance of Unicode
+NEL/U+2028/U+2029 inside single-line text. All shared text fields now reject those
+separators, with otherwise-valid digest fixtures for each field. Inertness spies
+were expanded during review. Final closeout identified a second Medium:
+Mongoose static Model.validate and its Standard Schema adapter bypass document
+hooks and permit partial validation. That unsupported static entry now always
+refuses with the fixed error on both the compiled Base and returned subclass;
+explicit full/partial/path-skipping and adapter regressions pass. Supported
+callers use binding-aware pure validation or the validated constructor instead.
+A test-only TS2769 overload error in the new options-union assertion was corrected
+to explicit typed calls without removing assertions; the affected focused tests,
+full typecheck and lint were rerun. Cumulative findings: **Medium2/Low1, all
+resolved**. Final independent source rereview confirmed
+**Critical0/High0/Medium0/Low0 unresolved**. The reviewer did not run tests; the
+executed results above are the implementation agent's separate evidence.
+
+C1 is **READY_FOR_REVIEW — offline only**. The original contract's NOT_STARTED
+statements record its earlier documentation-only gate; this later authorization
+and evidence supersede that implementation state only. F044 remains IN_PROGRESS,
+partial progress, acceptance BLOCKED. Structural equality, digest validity,
+predecessor rules on supplied data and in-memory guards do not prove stored
+Technology/source existence, source-byte correspondence, authorization, persisted
+history/concurrency, uniqueness/physical indexes, transactional fencing/audit,
+retention or database WORM. The installed BSON representation is deliberately
+dependency-specific and fails closed on shape drift; upgrades need focused review.
+
+Exactly eight repository paths are pending: four new C1 files and the four existing
+documentation paths, with only the two evidence-document updates described above.
+Index empty; no staging/commit/push. Nine F044 integration records and225 browser
+cases remain NOT_RUN; F042/F043 acceptance BLOCKED; production NOT_VERIFIED.
+Guarded execution pins remain stale; no manifest refreeze or live execution.
+Next gate is owner review and, if desired, separately authorized development
+checkpoint delivery. A future proposal persistence/API checkpoint needs its own
+exact writer/auth/source/concurrency/audit contract and bounded sequencing approval;
+no automatic C2/F045, F054 generation, F049/F050 decision or F051 publication work.

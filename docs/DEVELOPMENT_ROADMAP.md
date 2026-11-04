@@ -2115,6 +2115,51 @@ Content-valid manifest is not execution readiness. F044 IN_PROGRESS;
 F042/F043 acceptance BLOCKED;9integration and225browser cases NOT_RUN; production
 NOT_VERIFIED; baseline TS2322/manual gaps preserved.
 
+**C1 contract/sequencing extension — 2026-11-04:** documentation finalized for the
+private proposal model/schema/DTO foundation. **C1 implementation NOT_STARTED;
+separate exact four-file implementation authorization required.** AGENTS.md's
+named C1 extension permits only that future disconnected implementation/offline
+verification. It grants no endpoint/UI, writer, persistence, provisioning, schema
+migration, generation, editorial decision, publication or F045 progression.
+
+The [exact C1 contract](features/F044-admin-learning-path-management.md#c1-private-proposal-foundation-contract--2026-11-04)
+defines Technology/proposal/source identities, immutable sequential revisions,
+bounded objectives/audience/depth/runtime/version/prerequisites, source binding,
+private DTOs, inert registration, two prospective explicit indexes, four CREATE
+paths and measurable offline acceptance. Existing LearningPath/public behavior
+is unchanged; F054/F049/F050/F051 retain their respective responsibilities.
+Implementation/offline verification/review estimate:3–5 engineering hours after
+approval. No C1 source, database or runtime effect occurred in this documentation task.
+
+Current maintenance evidence: d8bbfd873ae05bf32da0645202a91cea01f269af delivered
+the test-only duplicate-entry narrowing; the actually executed full API/test
+TypeScript, targeted lint and formatting PASS resolve the two historical TS2322
+errors. Earlier failure records remain intact; no repeated check is claimed here.
+Owner-reported login/restoration/Learning Paths access/logout PASS are supplemental
+observations, not guarded integration or prepared-browser evidence. Other
+unexercised live gaps remain unresolved. F044 IN_PROGRESS, A/B READY_FOR_REVIEW —
+offline only; F042/F043 acceptance BLOCKED; nine integration records and225 browser
+cases NOT_RUN; production NOT_VERIFIED. Guarded pins remain stale; no manifest
+refreeze, Git delivery, acceptance or runtime authorization is granted.
+
+**C1 implementation/offline review — 2026-11-04:** owner separately authorized
+the exact four CREATE paths; implementation is now **READY_FOR_REVIEW — offline
+only**. Earlier NOT_STARTED contract wording is historical. Strict proposal/source/
+revision/digest/DTO checks and explicit disconnected immutable model registration
+are implemented; no endpoints/writers/UI/database operation or new dependency.
+Final127 focused synthetic tests PASS; full API/test TypeScript and API production
+build/typecheck PASS; targeted lint/format/UTF-8/LF/scope/privacy/diff checks PASS.
+Initial tsx ENOMEM startup, actual121 PASS/3 FAIL, lint failures and corrected
+test/helper assumptions are retained in the feature record, never relabelled.
+Fresh independent source review found2Medium/1Low cumulatively, all corrected
+and rereviewed (including final static/Standard-Schema validation refusal):
+Critical0/High0/Medium0/Low0 unresolved. No independent test rerun is claimed.
+Stored source/Technology identity, persistence/concurrency/index/authorization/audit
+and real integration guarantees remain deferred. F044 IN_PROGRESS; F042/F043
+acceptance BLOCKED; nine integration records and225 browser cases NOT_RUN;
+production NOT_VERIFIED. Existing owner-observed login PASS is not repeated or
+converted to automated evidence. No Git delivery, guarded run or next slice approved.
+
 ### F045 — Admin Module Management
 Status: `NOT_STARTED`
 
@@ -2530,7 +2575,7 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F044 - Admin Learning Path Management (read-only frontend Checkpoint B)
+**Current Feature:** F044 - Admin Learning Path Management (C1 proposal foundation, offline review)
 **Current Status:** `IN_PROGRESS`
 **Next Feature:** F044 verification/owner review (no additional slice or F045 progression)
 

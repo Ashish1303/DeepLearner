@@ -398,6 +398,43 @@ schema expansion, F052–F054 implementation, other F044 slice or F045/later wor
 is authorized. See docs/features/F044-admin-learning-path-management.md for exact
 scope, deferred evidence and the two checkpoint inventories.
 
+## Named F044 C1 proposal-foundation sequencing extension — 2026-11-04
+
+The owner approved documentation of C1 and this narrow extension, not source
+implementation. After separate exact-scope implementation authorization, only
+the four CREATE paths in the F044 contract's C1 inventory may implement its private
+proposal model, structural/binding validation, DTO projection and offline tests.
+This supersedes the 2026-11-02 prohibition on another F044 slice/schema definition
+only for that inventoried, offline C1 foundation. The original A/B contracts and
+default one-feature-at-a-time rule otherwise remain unchanged.
+
+C1 is NOT_STARTED until separately authorized. No application import/registration,
+API/UI, repository/writer, database connection or persistence, provisioning/index
+creation, migration, account change, AI/provider call, editorial decision,
+publication, additional F044 slice or F045/later work is permitted. Model
+registration and document validation may be exercised only on the existing
+disconnected Mongoose instance with synthetic in-memory data. No new dependency.
+
+Before implementation require the reviewed C1 field/binding/index contract,
+exact Git baseline/inventory, stable F017/F042/F043 dependencies, retained relevant
+offline evidence and no unresolved shared security defect invalidating that work;
+Critical/High findings block continuation. After implementation require C1's
+focused offline/static/scope/privacy checks and fresh independent review, with all
+findings resolved before checkpoint eligibility. A passing digest or model check
+grants no authentication, source trust, approval or database authority.
+
+F044 stays IN_PROGRESS, partial development only; F042/F043 acceptance stays
+BLOCKED. All mandatory authentication/authorization, real integration, isolation,
+process/Job ownership, protected baselines, deadlines, authenticated RESULT/ACK,
+cleanup and owner-acceptance gates remain unchanged. Nine F044 integration
+records and 225 prepared browser cases remain NOT_RUN; production readiness stays
+NOT_VERIFIED. Existing observed login/restoration/Path-access/logout PASS evidence
+does not satisfy those gates and need not be repeated for C1. Every commit and
+push still requires separate explicit owner approval. See the dated C1 contract
+in docs/features/F044-admin-learning-path-management.md; no implementation is
+authorized by this amendment alone.
+
+
 ---
 
 ## Documentation-approved persistent LOCAL workflow — 2026-10-31
