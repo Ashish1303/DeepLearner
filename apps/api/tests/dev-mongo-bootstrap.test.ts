@@ -2100,7 +2100,9 @@ test('reusable Normal directory metadata refuses unknown links directories case 
     { name: 'mongod.next.cfg', file: true, link: false },
   ])
     assert.throws(() => assertNormalRuntimeEntries([...good, e]));
-  assert.throws(() => assertNormalRuntimeEntries([...good, good[0]]));
+  const duplicate = good[0];
+  assert.ok(duplicate);
+  assert.throws(() => assertNormalRuntimeEntries([...good, duplicate]));
 });
 test('reusable CLI selector authenticates only after fixed durable lineage validation and emits secret-safe failures', () => {
   const source = readFileSync(
