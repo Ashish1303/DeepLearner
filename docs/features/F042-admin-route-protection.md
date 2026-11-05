@@ -1217,3 +1217,31 @@ readiness remain NOT_VERIFIED. No browser exception transfers. No F044/other
 feature work or automatic Slice 2 implementation is permitted by this decision.
 Every commit and every push requires separate explicit owner approval. No F042
 acceptance, source, test, adapter or security control changes in this task.
+
+## Acceptance reconciliation — 2026-11-05
+
+Fresh isolated QA at `7683811c2c66a90d0a83c6aec1d1025460710b3e`: the eight
+HTTP regression files now pass **77/77**, with zero failures, cancellations or
+skips. API test typechecking/build and Admin source typechecking/build pass.
+Historical 43 EACCES observations and the one cancellation timeout remain intact;
+they are not relabelled. The new batch establishes current HTTP behavior with
+synthetic repositories, not MongoDB acceptance.
+
+The original owned-browser journals were revalidated: **F042-B01–B20 PASS**,
+zero retries, against unchanged source. These are retained mocked-browser results,
+not a fresh run or live account/database evidence. Earlier NOT_RUN tables retain
+their historical meaning. The observed November 4 login, explicit restoration and
+logout remain supplemental evidence.
+
+F042 stays **IN_PROGRESS**, acceptance **BLOCKED**. The exact nine-record real
+suite, authenticated RESULT/matching digest ACK and current protected-baseline/
+cleanup proof remain mandatory. Existing ignored adapters bind the primary root
+and stale inventories and require disposable fixture provisioning/account
+transitions outside this task. Generated synthetic credential support exists;
+the old human secure-input limitation is not asserted as the current blocker.
+No guard, fixture, private authority or runtime was changed.
+
+See the [criterion matrix and source-bound evidence](../qa/F042-F043-acceptance-2026-11-05.json)
+for executed commands, source/log hashes, retained-case identities, limitations,
+distinct-agent review provenance and exact next scope decision. Explicit final
+owner acceptance remains required after all mandatory checks pass.

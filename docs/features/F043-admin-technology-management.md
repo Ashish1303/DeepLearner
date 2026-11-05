@@ -1041,3 +1041,29 @@ F043 remains IN_PROGRESS and final acceptance BLOCKED. Production readiness is
 NOT_VERIFIED; F044 remains NOT_STARTED. Local development checkpoint, push,
 qualified browser/live integration and feature acceptance require their separate
 owner gates. No Git staging, commit, push, history rewrite or automatic progression.
+
+## Acceptance reconciliation — 2026-11-05
+
+Fresh isolated QA at `7683811c2c66a90d0a83c6aec1d1025460710b3e`: **84/84**
+backend service/router tests pass, using synthetic persistence/transport. The
+separate eight-file F042/Auth HTTP batch passes **77/77**. API test typechecking/
+build and Admin source typechecking/build pass. No application defect or source
+correction was established by this execution.
+
+The original owned-browser journals were revalidated: **F043-B01–B20 PASS**,
+zero retries, against unchanged source. These are historical mocked UI results;
+they do not prove real transactions, current eligibility, physical indexes,
+audit atomicity or live conflict persistence. Earlier NOT_RUN tables remain
+historical and are not rewritten.
+
+F043 stays **IN_PROGRESS**, final acceptance **BLOCKED** by its mandatory real
+15-record suite and the F042 prerequisite. Current read-only audit finds **54
+changed and zero missing of 580** frozen F043 source pins. Both ignored adapters
+force the primary root; their disposable 27018 fixture provisioning and synthetic
+account transitions require a separate scope decision. No automatic refreeze,
+private record change or persistent 27019 substitution was performed.
+
+See the [criterion matrix and source-bound evidence](../qa/F042-F043-acceptance-2026-11-05.json)
+for exact checks, unchanged historical case evidence, independent-agent review
+and remaining execution/owner gates. No final acceptance, merge, F044/F045
+progression or production readiness is implied.

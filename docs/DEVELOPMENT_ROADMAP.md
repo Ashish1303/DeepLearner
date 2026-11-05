@@ -3469,3 +3469,25 @@ Desktop QA, explicitly including private Save writes if desired. Current-account
 credentials/session, owned applications and approved test data/target are required;
 browser host safety and all real-integration gates remain unchanged. F044 remains
 IN_PROGRESS; F042/F043 acceptance BLOCKED; production readiness NOT_VERIFIED.
+
+## F042/F043 acceptance reconciliation — 2026-11-05
+
+Isolated QA from `7683811c2c66a90d0a83c6aec1d1025460710b3e` closes the current
+external HTTP regression gap with **77 PASS**, and freshly executes **84
+F043 backend tests PASS** using synthetic repositories. API test typechecking/
+build and Admin source typechecking/build pass. Retained source-bound journals
+support F042-B01–B20 and F043-B01–B20 **historical mocked PASS**, not new browser
+or real MongoDB execution. Historical failures and UNKNOWN evidence are preserved.
+
+F042/F043 remain **IN_PROGRESS**, acceptance **BLOCKED**: mandatory disposable
+real integration, current source authority/ownership/baselines, authenticated
+RESULT/digest ACK, cleanup and the F042 dependency remain unresolved. Existing
+adapters require primary-root/stale-pin reconciliation and fixture provisioning
+which this task does not authorize. Explicit owner acceptance remains a final
+gate after verification. No merge is eligible while either feature is blocked.
+
+The [acceptance matrix](qa/F042-F043-acceptance-2026-11-05.json) records each
+criterion, current checks/source hashes, exact gaps and distinct-agent review.
+F044/F045, U16 and their integration ledgers are unchanged; production readiness
+remains **NOT_VERIFIED**. Next Admin QA task: a separately scoped existing-adapter
+reconciliation and disposable execution decision, not another feature.
