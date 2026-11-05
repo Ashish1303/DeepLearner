@@ -3037,3 +3037,30 @@ Independent read-only source review resolved one Low test ambiguity and confirme
 zero unresolved findings; it did not run tests. No stored editorial decision,
 provider dispatch, AI content, publication or live guarantee follows. Full evidence
 and deferred consumer requirements are in the F049 contract. Acceptance unchanged.
+
+## 112. Current Admin dependency and delivery reconciliation — 2026-11-05
+
+The [F044–F054 roadmap ledger](DEVELOPMENT_ROADMAP.md#f044f054-current-product-and-delivery-ledger--2026-11-05)
+is the current implementation/delivery cross-reference. The dated sections above
+remain historical evidence where later owner decisions supersede their next-task
+or NOT_STARTED statements. This does not change product IDs, existing acceptance
+or any unmet formal dependency. docs/PRD.md remains the central approved product
+document; no duplicate Admin/AI Studio PRD is introduced.
+
+F044's manual brief/private Save, partial F045 read-only inspection and partial
+F049 P0 are distinct. Modules remain AI-led, M1 NOT SELECTED. P0 is proposed-state
+evaluation only, without authenticated AI provenance/current Admin authority,
+stored decisions/concurrency/audit/replay or CHANGES_REQUIRED resubmission. Editorial
+approval and publication remain separate. F047/full F049 are unmet; F052 O1 is
+PROPOSED — PENDING OWNER APPROVAL and NOT_STARTED, with no active exception or
+provider source. F053 controls precede any eventual separately approved live calls;
+F054 retains generation ownership. Newly linked planned feature records grant no
+API/schema/budget/acceptance or implementation decisions.
+
+The explicit dependencies and inferred AI-origin bootstrap cycle are recorded,
+not silently removed. The next recommendation is owner review of the exact F052
+O1 fake-only contract and its bounded exception, rather than an F054 demo. No new
+implementation is authorized by this reconciliation. F042/F043 acceptance BLOCKED,
+F044/F045/F049 partial, all unexecuted groups and historical UNKNOWN preserved;
+production readiness NOT_VERIFIED. Git authority is limited to the owner's three
+commits, one dependent branch/push and one draft PR; no merge or acceptance.

@@ -1,0 +1,277 @@
+# F052 — AI Provider Abstraction
+
+## Status and authority — 2026-11-05
+
+**PROPOSED — PENDING OWNER APPROVAL. Feature NOT_STARTED.** The owner authorized
+documentation-only definition of this minimum offline foundation, not provider
+implementation, an active sequencing exception, runtime configuration, keys,
+generation, live calls, Git delivery or feature acceptance.
+
+Sources: AGENTS.md; PRD13/44–48/51/107/110–111; SYSTEM_ARCHITECTURE13/32.2;
+DEVELOPMENT_ROADMAP F047/F049/F052/F053/F054; F044 private brief/proposal and F049 P0
+contracts. Existing F045 Module inspection remains partial; manual-origin M1 is
+NOT SELECTED. F044's approved manual brief workflow is unchanged. The F047/F053/F054 records are planning-only, not implementation-ready contracts;
+no implemented provider module or completed dependency is supplied by them.
+
+F052 explicitly depends on F049, which depends on unmet F047. F049 P0 is a local
+transition rule only: no authoritative AI origin, Admin authorization, stored
+decisions/concurrency/audit/replay or CHANGES_REQUIRED resubmission workflow. It
+does not complete F049/F047 or satisfy all F052 prerequisites. The proposed O1-only
+offline exception below defers those full-feature dependencies solely for an inert
+interface/executor and test fake. It is not active and does not unlock live calls.
+
+## Minimum checkpoint O1 and eventual benefit
+
+Define one backend-only provider-neutral structured-generation port, bounded
+execution wrapper and deterministic test fake. Purpose is initially only
+CURRICULUM_OUTLINE. Domain code can later request a bounded response without
+embedding a vendor SDK or provider selection. No plugin/registry, fallback list,
+provider discovery, job/worker/queue, configuration loader, persistent record,
+generic source authority or application/router registration is introduced.
+
+Eventual integrated outcome: an Admin's validated private brief can feed a bounded
+AI outline request, and cancellation/failures have predictable safe outcomes.
+O1 itself delivers no UI, real AI output, admitted candidate or usable generation
+button. Hand-authored test responses are labelled synthetic test evidence, never
+generated production curriculum. No vendor/model, endpoint, API key, SDK, new
+dependency or environment variable is needed for O1.
+
+## Exact request and provider port
+
+```ts
+type AiProviderRequest = {
+  schemaVersion: 1;
+  purpose: 'CURRICULUM_OUTLINE';
+  instructions: string;
+  inputJson: string;
+  maxOutputBytes: number;
+  maxOutputTokens: number;
+};
+interface AiProvider {
+  generate(
+    request: Readonly<AiProviderRequest>,
+    context: { signal: AbortSignal },
+  ): Promise<unknown>;
+}
+```
+
+All request keys are required and exact. Accept only own enumerable inert data on
+plain/null-prototype objects; reject accessors, proxies, symbols, unknown/operator
+keys, coercion and implicit defaults, following P0's safe local-validation pattern
+without editing/importing P0 internals or adding a shared framework.
+
+| Field                  | Exact bound and responsibility                                                                                                                                                                                                                                                                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| schemaVersion, purpose | Literal1 and CURRICULUM_OUTLINE. No arbitrary task, role, tool or provider selector.                                                                                                                                                                                                                                                                                                       |
+| instructions           | Nonblank string1–8192 UTF-8 bytes, well-formed Unicode; LF/tab permitted, other C0/DEL rejected. Trusted, reviewed domain instructions supplied by future backend code, never an Admin role/system-prompt override.8KiB bounds a single outline instruction.                                                                                                                               |
+| inputJson              | String2–65,536 UTF-8 bytes; well-formed Unicode text, syntactically valid JSON with object root (the smallest object is two bytes).64KiB matches the existing C1 aggregate input ceiling; oversized data refuses, never truncates or silently omits objectives. Domain constructs JSON from its validated allowlist; F052 does not serialize arbitrary objects or resolve private records. |
+| maxOutputBytes         | Explicit safe integer2–65,536, allowing at least an empty JSON object. Bounds one response to64KiB; no stream or unbounded transcript.                                                                                                                                                                                                                                                     |
+| maxOutputTokens        | Explicit safe integer1–4096. A bounded provider request hint, not a tokenizer/cost guarantee. Future vendor adapter must enforce the mapped vendor limit; F053 must independently reserve/settle exposure.                                                                                                                                                                                 |
+
+JSON syntax/root validation is technical only. No provider-supplied schema, URL,
+model name, headers, credentials, account/session identity, database handle or
+tool capability is accepted. No resource ID needs to be sent to a provider merely
+for local correlation. Internal Technology/brief/source binding and eligibility
+remain domain responsibilities. Do not send tokens, private configuration, Student
+personal data, answers or account details in instructions/input. O1's structural
+checks cannot prove arbitrary text is free of sensitive data; approved F053 privacy
+and domain minimization checks are mandatory before any eventual live egress.
+
+## Untrusted provider response and public outcome
+
+The port returns unknown because TypeScript cannot make provider output trusted.
+The executor accepts only this exact raw envelope after bounded inert validation:
+
+```ts
+{
+  text: string;
+  finishReason: 'COMPLETE' | 'OUTPUT_LIMIT' | 'REFUSED';
+  usage: {
+    inputTokens: number | null;
+    outputTokens: number | null;
+  }
+}
+```
+
+`text` is well-formed Unicode and at most the request's maxOutputBytes (also global
+64KiB). It is never executed as code, HTML, instructions or a tool request. For
+COMPLETE, require nonempty syntactically valid JSON with an object root. Reject
+malformed JSON, unsupported finish reasons, extra fields or oversized responses;
+do not strip unknown metadata to manufacture a valid envelope. OUTPUT_LIMIT and
+REFUSED never produce a successful outline. A truncated response is not repaired,
+concatenated or automatically regenerated. Raw response bytes must be bounded by
+a future real adapter while reading; checking an already allocated string alone
+is not a live transport memory-bound guarantee.
+
+Usage members are explicitly null or nonnegative safe integers; unknown is null,
+never fabricated zero. If reported outputTokens exceeds the request limit, refuse
+OUTPUT_LIMIT. Counts are provider-reported metadata, not trusted billing evidence
+or proof that the provider honored limits. F053 owns cost/exposure reconciliation;
+a failure must not imply zero charge or release an uncertain reservation.
+
+Success is exact `{ok:true,untrustedJson,usage,elapsedMs}`. It returns the bounded
+original JSON text, a detached two-field usage object, and finite nonnegative
+elapsed milliseconds within the local successful budget. No model/provider-native
+IDs, raw headers, error bodies, prompt echoes, HTTP details, secrets, parsed/admitted
+domain object, AI_GENERATED state, approval or publishing capability is included.
+
+Failure is exact `{ok:false,error:{code,message,invocation}}`, with one code:
+INVALID_REQUEST, CANCELLED, DEADLINE_EXCEEDED, PROVIDER_FAILED,
+MALFORMED_RESPONSE, OUTPUT_LIMIT or REFUSED. All messages are the fixed safe string
+`AI provider request could not be completed`. Invocation is NOT_STARTED or STARTED,
+describing whether the local port was invoked, not whether network dispatch or a
+charge occurred. Suppress provider exceptions, cause/stack/issues, arbitrary code,
+URLs, response bodies, usage claims and payloads from this error result. No logging
+is added. Follow existing safe allowlist/error-code patterns; the internal union
+has no HTTP status mapping, so AppError's HTTP transport semantics are not imported.
+
+## Domain versus provider validation boundary
+
+| Boundary                          | Must validate                                                                                                                                                                                                                      | Does not establish                                                                                                      |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Future domain before invocation   | Current-account authorization; actual stored Technology/brief/source binding and eligibility; C1 fields; data minimization/privacy; reviewed instructions; F053 live admission/reservation.                                        | A caller's asserted valid brief or P0 result cannot supply those facts.                                                 |
+| O1 executor                       | Exact technical request, bounded bytes/tokens, local cancellation/deadline, one invocation, exact raw response/usage envelope and JSON syntax/object root.                                                                         | No curriculum structure, factual/source quality, hierarchy completeness, lineage, authorization or AI-origin authority. |
+| Future F054 domain after response | Strict approved bounded outline schema, counts/depth/order/duplicates, objectives/prerequisites, parent identity mapping, version/source requirements, safe new immutable candidate admission and preserved generation provenance. | Syntactically valid JSON is not approved or publishable content. Unknown fields must be rejected before projection.     |
+| F049/F050 and F051                | Actual exact-revision review/edit/approval; separately qualified publication/release eligibility, transactions and audit.                                                                                                          | Generation never directly approves or publishes. P0 is only local policy.                                               |
+
+An escaped invalid Unicode value or schema-unknown instruction inside syntactically
+valid JSON remains untrusted and must fail the future domain schema as appropriate.
+O1 deliberately defines no new F054 outline/Module/Topic/Concept schema and no
+generic schema registry. Missing domain contracts block admission/integration,
+not fake-only validation of this technical port. Jobs/persistence, budget accounting,
+editorial decisions and publication stay with their assigned existing features.
+
+## Bounded executor, cancellation and uncertainty
+
+Proposed factory `createAiProviderExecutor(provider, {now?})` captures exactly one
+explicit provider port. Default monotonic clock is performance.now; optional clock
+injection follows existing service test patterns, not runtime configuration. Its
+`execute(request, {signal?,budgetMs})` requires budgetMs safe integer1–10,000.
+Ten seconds is a conservative component budget matching current protected-service
+patterns; it changes no RPC/ACK, suite, supervisor or application deadline.
+All request validation and pre/post-await checks consume this local budget.
+
+- Invalid request/budget or pre-aborted signal returns failure with NOT_STARTED and
+  zero provider calls. Check cancellation/deadline again immediately before the
+  one invocation; a cancelled queued microtask must not dispatch.
+- Use one child AbortController, one timer for remaining budget and one external
+  abort listener. Pass its signal to the port, race terminal cancellation/deadline
+  against the pending response, and recheck clock/signal after every await before
+  accepting output. Invalid/regressing/nonfinite clock observations fail closed as
+  PROVIDER_FAILED. Cancellation already observed takes precedence over timeout;
+  otherwise observed expiry is DEADLINE_EXCEEDED, never late success.
+- Observe every provider rejection, including late rejection after terminal loss;
+  ignore late resolution without changing the already returned outcome. Clear the
+  timer and remove the external listener in finally, including validation/port/
+  response failures. Abort the local child signal on terminal loss. Cleanup must
+  not leak raw errors or turn a failure into success.
+- Never retry, poll, replay, switch/fallback provider or generate another operation.
+  STARTED timeout/cancellation/failure is not proof the remote action stopped or
+  had no cost. Future F053 must retain uncertain exposure and reconcile explicitly.
+
+An AbortSignal is cooperative. An ignoring provider promise can outlive the local
+wrapper; O1 cannot kill a remote request or preempt synchronous JavaScript. This
+timer is not an external hard watchdog or real-provider termination proof. The
+contract requires late-work suppression and listener/timer cleanup, not fictitious
+remote cleanup or database/Job ownership evidence.
+
+## Deterministic fake and meaningful offline acceptance
+
+Fake lives only under tests/helpers, excluded from production compilation/imports.
+It implements the same port with explicit synthetic success/refusal/truncation/
+malformed/reject/deferred scenarios supplied by tests. Record invocation count and
+signal locally; no random/clock/network/config/file/child effects. Deferred scenarios
+are settled explicitly by the test; no internal queue, polling, retry or fake job.
+Never expose synthetic output in a production UI or mark it AI-generated evidence.
+
+Required tests:
+
+1. Exact request/UTF-8/token boundaries, unknown/accessor/proxy fields, invalid JSON/
+   root, invalid budget and pre-abort all refuse before invocation. Request copies
+   cannot be mutated by the port to alter validated caller facts.
+2. Valid synthetic envelope returns exact detached safe metadata/untrusted text;
+   null usage remains null. Invalid/oversized/extra-field/refused/truncated/over-token
+   and malformed JSON responses fail without exposing raw contents.
+3. Repeated identical fake inputs yield deterministic synthetic results; exactly one
+   invocation on success and each dispatched failure, zero retries/fallbacks. No
+   idempotency or remote at-most-once guarantee is inferred.
+4. Fake clock/timers exercise abort-before-dispatch, in-flight abort, deadline boundary,
+   late resolution/rejection and a port ignoring abort. No long sleeps; no unhandled
+   rejection, active executor timer or retained external abort listener after return.
+   Repeated cancellation and competing completion events settle only once.
+5. Safe errors retain no prompt/input/output, provider message, native ID, private
+   canary or stack/cause. Production import graph excludes test fake, database,
+   environment/configuration, SDKs, network/process modules and live registration.
+6. Focused Node tests, full API/test TypeScript, API build/typecheck, targeted lint/
+   source and new-document formatting, UTF-8/LF/privacy/scope/diff and fresh independent
+   source review. Tests use only local fakes; no browser, bootstrap, live provider,
+   HTTP listener, database, credentials or unrelated passing suite rerun.
+
+## Exact proposed implementation inventory and estimate
+
+CREATE:
+
+- apps/api/src/modules/ai/ai-provider.contract.ts
+- apps/api/src/modules/ai/ai-provider.executor.ts
+- apps/api/tests/helpers/fake-ai-provider.ts
+- apps/api/tests/ai-provider.test.ts
+
+MODIFY after separate approval:
+
+- docs/features/F052-ai-provider-abstraction.md (this draft, authority/evidence)
+- AGENTS.md (only the proposed O1-only sequencing exception)
+- docs/PRD.md (scoped authority/evidence)
+- docs/DEVELOPMENT_ROADMAP.md (scoped authority/evidence)
+
+Eight implementation-checkpoint paths. Do not edit F049 P0, F044/F045 or database
+schemas, existing APIs, app startup, shared packages, configuration, dependencies,
+lockfiles, harnesses or bindings. No other source path is necessary for this port.
+Implementation/offline verification/review estimate60–90 minutes, hard90-minute
+stop at a coherent boundary. Live adapter/domain integration is excluded and not
+represented as ready or timed. Routine names/bounds follow this exact contract;
+no vendor/model or additional product decision is needed for fake-only O1.
+
+## Proposed O1 sequencing exception — NOT ENACTED
+
+> PROPOSED — PENDING OWNER APPROVAL. After separate approval of this exact contract
+> and eight-path inventory, permit only F052 O1's offline types/technical validator,
+> single-port bounded executor, deterministic test fake and focused verification
+> ahead of full F047/F049 completion. Preserve F049 P0's limited guarantees and all
+> formal dependencies for full-feature acceptance. This authorizes no real provider
+> adapter/configuration/key, egress or generation; actual live calls require F053
+> privacy/budget/dispatch controls, domain/content/authorization contracts, appropriate
+> real verification and separate explicit owner approval. No automatic progression
+> to F053/F054, no provider registry/job/source authority, and no stored decisions,
+> editorial approval, publication, database operation/provisioning or runtime change.
+> Require exact Git/scope preflight, meaningful inert tests/build/typechecks/lint/
+> formatting/privacy/scope and fresh independent review. Preserve primary dev, PR #2/
+> #3, U16, parked support/evidence/bindings and all acceptance/NOT_RUN/UNKNOWN limits.
+> Every later live operation, feature slice, commit and push needs separate approval.
+
+No active AGENTS.md exception is changed by preparing this draft. F052 remains
+NOT_STARTED. The only next owner action required for implementation is approval of
+this O1 contract/inventory and its bounded offline sequencing exception. Vendor,
+model, price/token mapping, credentials, external endpoint and cost/FX assumptions
+are deliberately deferred until a concrete live adapter/F053 approval needs them.
+
+## Current evidence and preserved limits
+
+This task performs documentation consistency/privacy/format/diff review only.
+No O1 source/fake/tests exist yet and no provider test or live call is claimed.
+Unchanged F049 P0 retains121 focused offline PASS, its10-case subset and source-only
+independent review; those are not F052 results or proof of real AI provenance,
+Admin authorization, stored state/concurrency, audit, replay or resubmission.
+Original F044 nine/P five/API six integration groups and all unexecuted browser
+cases remain NOT_RUN. F042/F043 acceptance BLOCKED, F044/F045 incomplete acceptance,
+F047 unmet, F049 partial/offline; permanent historical UNKNOWN and failure records
+preserved; production readiness NOT_VERIFIED. No staged/committed/pushed/merged
+content or PR update is authorized by this preparation.
+
+## Documentation delivery reconciliation — 2026-11-05
+
+The owner separately authorized delivery of this proposed document with the
+roadmap/feature-record reconciliation. That Git authority supersedes only the
+preparation-time no-delivery wording above. O1 remains PROPOSED — PENDING OWNER
+APPROVAL and F052 remains NOT_STARTED. No F052 source, active AGENTS.md exception,
+provider/model selection, live dispatch or acceptance is enacted. Newly linked
+F047/F053/F054 planning records do not satisfy their missing contracts.

@@ -443,3 +443,14 @@ remain untouched. No F042_F043_OWNED_DISPOSABLE_V1 enactment, diagnostics, pin w
 runtime change or Git delivery. F042/F043 acceptance BLOCKED; F044 IN_PROGRESS;
 F045 acceptance incomplete; all unexecuted groups and historical UNKNOWN evidence
 preserved; production readiness NOT_VERIFIED.
+
+## Current product/delivery reconciliation — 2026-11-05
+
+Read-only Module inspection remains the only implemented F045 checkpoint, in draft
+PR #2 to dev at 1f687bd5f6c83252ed32a0dcf9411bbd3cb9ef2b. AI-led creation is the
+selected requirement; manual M1 and its exception remain NOT SELECTED. The older
+recommended-P0 wording above is historical: F049 P0 is now independently reviewed
+offline policy only, delivered on a separate dependent branch; it supplies neither
+F045 AI-origin candidates nor actual approval. PR #2's branch/content is unchanged.
+See the [current roadmap](../DEVELOPMENT_ROADMAP.md#f044f054-current-product-and-delivery-ledger--2026-11-05) for dependency/delivery boundaries.
+F045 remains IN_PROGRESS, partial, with incomplete live verification/acceptance.
