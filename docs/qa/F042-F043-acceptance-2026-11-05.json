@@ -1,0 +1,1084 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-05",
+  "timezone": "Asia/Calcutta",
+  "generatedUtc": "2026-11-05T04:57:30.914Z",
+  "purpose": "F042/F043 acceptance reconciliation and eligible verification; no production claim",
+  "baseline": {
+    "branch": "dev",
+    "originDev": "7683811c2c66a90d0a83c6aec1d1025460710b3e",
+    "qaBranch": "qa/close-f042-f043",
+    "isolated": true,
+    "primaryInitialState": "CLEAN_INDEX_EMPTY"
+  },
+  "featureStatus": {
+    "F042": "IN_PROGRESS",
+    "F043": "IN_PROGRESS",
+    "F042Acceptance": "BLOCKED",
+    "F043Acceptance": "BLOCKED",
+    "ownerAcceptance": "NOT_GRANTED",
+    "mergeAuthorizedNow": false,
+    "productionReadiness": "NOT_VERIFIED",
+    "F044": "UNCHANGED",
+    "F045": "UNCHANGED",
+    "U16": "UNCHANGED"
+  },
+  "initialMatrixSha256": "074296f2704ac10332cc22bcfdfe4160ed12ab1bfd0cd34ecd479ff090f70821",
+  "matrix": [
+    {
+      "id": "F042-01",
+      "criterion": "Existing Bearer middleware; verified JWT subject and JWT ADMIN plus current stored ACTIVE verified ADMIN on every dispatch",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh eight-file HTTP regression batch PASS; retained F042-B02–B06 mocked browser PASS",
+      "missingEvidence": "Real current-account authorization on the disposable fixture",
+      "exactCheck": "F042 PARENT/T01/T03/T04/T05"
+    },
+    {
+      "id": "F042-02",
+      "criterion": "Missing/invalid/expired token, Student, demoted/promoted, disabled/suspended/unverified/deleted/corrupt identity refusal",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh HTTP assertions PASS; historical mocked B03–B09 PASS",
+      "missingEvidence": "Real persistence eligibility transitions and corrupt/missing account evidence",
+      "exactCheck": "F042 T01/T03/T04/T05; fixture actor changes require separate approval"
+    },
+    {
+      "id": "F042-03",
+      "criterion": "Read-only primary projection; five-second authorization budget, cancellation/late-result refusal; sanitized no-store responses",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh HTTP batch PASS, including native loopback transport and synthetic repositories",
+      "missingEvidence": "Real MongoDB projection/nonmutation, disconnect and protected fixture signatures",
+      "exactCheck": "F042 T02/T06/T08"
+    },
+    {
+      "id": "F042-04",
+      "criterion": "Bounded IP/account rates, IPv6 grouping, capacity and no forwarded-IP trust",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh current admin-routes HTTP tests PASS; retained unit evidence",
+      "missingEvidence": "Real default quota read/nonmutation evidence",
+      "exactCheck": "F042 T07 plus guarded fixture signatures"
+    },
+    {
+      "id": "F042-05",
+      "criterion": "Explicit login/restoration/logout and memory-only identity; eligibility checked before workspace",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Retained Nov4 observed login/restoration/logout PASS; fresh HTTP auth contracts PASS; mocked B01/B02/B11–B14/B17 PASS",
+      "missingEvidence": "Complete source-bound integrated acceptance; no new live run this task",
+      "exactCheck": "Qualified live Admin session checks after safe runtime availability"
+    },
+    {
+      "id": "F042-06",
+      "criterion": "Account/generation, peer-tab invalidation, stale-response suppression and account/session isolation",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Historical mocked B15/B16 PASS; unchanged current frontend source matches merge",
+      "missingEvidence": "Real multi-account eligibility transitions/session isolation in approved disposable context",
+      "exactCheck": "F042 fixture T03–T05 and separately qualified live isolation; do not change persistent actors"
+    },
+    {
+      "id": "F042-07",
+      "criterion": "Responsive semantic boundary, labels, focus, announcements and safe navigation",
+      "status": "PASS_RETAINED_MOCKED",
+      "existingEvidence": "F042-B18/B19/B20 historical mocked browser PASS, zero retries",
+      "missingEvidence": "No new mandatory mocked browser execution gap for unchanged code; no claim of full accessibility conformance",
+      "exactCheck": "Retain exact B01–B20 journals and source binding"
+    },
+    {
+      "id": "F042-08",
+      "criterion": "Relevant external HTTP regressions",
+      "status": "PASS_FRESH_HTTP_MOCKED_REPOSITORIES",
+      "existingEvidence": "Fresh current eight-file batch:77 PASS/0FAIL/0cancelled/0skipped",
+      "missingEvidence": "Historical43EACCES and one timeout remain historical; current regression transport gap is closed",
+      "exactCheck": "Exact executed Node command in checks"
+    },
+    {
+      "id": "F042-09",
+      "criterion": "Authenticated exact nine-record RESULT and matching digest ACK; ownership, deadlines, source/protected baselines, cleanup",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Historical incomplete/UNKNOWN ledger and baseline discrepancy preserved",
+      "missingEvidence": "Fresh complete guarded result and cleanup; no current authority to refresh stale source pins/provision fixture",
+      "exactCheck": "Qualified source-bound F042 PARENT+T01–T08 with existing deadlines"
+    },
+    {
+      "id": "F042-10",
+      "criterion": "Final owner acceptance",
+      "status": "BLOCKED_OWNER_GATE",
+      "existingEvidence": "Workflow requires explicit owner approval after all mandatory verification",
+      "missingEvidence": "Owner acceptance cannot precede missing real verification",
+      "exactCheck": "Present READY_FOR_OWNER_ACCEPTANCE only after mandatory gates pass"
+    },
+    {
+      "id": "F043-01",
+      "criterion": "Inventory/detail/pagination including DRAFT/PUBLISHED/ARCHIVED and fixed DTO/privacy",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh84 backend tests PASS; retained mocked B01–B04/B08/B09 PASS; owner observations retained",
+      "missingEvidence": "Complete real API/database integration evidence",
+      "exactCheck": "F043 T01–T14 exact prepared assertions, source-bound live UI checks"
+    },
+    {
+      "id": "F043-02",
+      "criterion": "DRAFT creation/edit, immutable slug/provenance, validation/bounds and revision increment",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh backend synthetic transaction/router tests PASS; mocked B05–B07 PASS",
+      "missingEvidence": "Real actor fence, Technology and audit persistence atomically committed",
+      "exactCheck": "F043 eligible create/edit/no-op/validation integration assertions"
+    },
+    {
+      "id": "F043-03",
+      "criterion": "Published/archived read-only restrictions and unchanged public invariants",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh synthetic/router tests PASS; mocked B08/B09 PASS",
+      "missingEvidence": "Real immutable stored content and published-only visibility under mutation refusal",
+      "exactCheck": "F043 real read-only/public invariant assertions"
+    },
+    {
+      "id": "F043-04",
+      "criterion": "Stale revision refusal, newer-data preservation and explicit compare/reapply reconciliation",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh lost-CAS/revision rollback tests PASS; historical mocked conflict case PASS",
+      "missingEvidence": "Real competing transaction outcome, stored newer data and approved live two-client conflict interaction",
+      "exactCheck": "F043 concurrent CAS integration plus live approved disposable DRAFT reconciliation"
+    },
+    {
+      "id": "F043-05",
+      "criterion": "Current mutation-time eligibility, signed-token recheck, real User-version fence and both concurrent demotion/deletion orderings",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh84 tests prove mocked fence/budget/authority contracts only",
+      "missingEvidence": "Actual MongoDB write conflict/order/rollback proof; cannot manufacture with mocks",
+      "exactCheck": "F043 real transactional actor-fence/concurrency assertions"
+    },
+    {
+      "id": "F043-06",
+      "criterion": "Atomic audit and rollback, exact indexes, unique slugs and revisions",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh backend84 PASS; mocked browser assertions do not prove database effects",
+      "missingEvidence": "Actual required19collection25explicitindex fixture, transaction atomicity and physical uniqueness",
+      "exactCheck": "Qualified disposable F043 PARENT+T01–T14; fixture provisioning excluded now"
+    },
+    {
+      "id": "F043-07",
+      "criterion": "Uncertain writes, no replay, deadlines, session cleanup and explicit recovery",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Fresh mocked unknown-commit/cleanup/budget tests PASS; retained mocked B10/B11 PASS",
+      "missingEvidence": "Actual bounded real session/transaction cleanup; forced real fault test remains unverified and separately gated",
+      "exactCheck": "Existing guarded integration and separately scoped fault injection only if approved"
+    },
+    {
+      "id": "F043-08",
+      "criterion": "Authentication loss, quota/errors/privacy, account switching and logout cancellation",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "Historical mocked B12–B18 PASS; fresh router tests PASS",
+      "missingEvidence": "Complete real frontend/API database integration, no persistent-account changes allowed",
+      "exactCheck": "Qualified live non-destructive checks plus disposable actor transitions"
+    },
+    {
+      "id": "F043-09",
+      "criterion": "Keyboard/focus and responsive accessible escaped UI",
+      "status": "PASS_RETAINED_MOCKED",
+      "existingEvidence": "Historical mocked B19/B20 PASS, zero retries; unchanged source binding",
+      "missingEvidence": "No newly identified mocked-browser gap; does not imply full accessibility conformance",
+      "exactCheck": "Retain exact journals/source pins"
+    },
+    {
+      "id": "F043-10",
+      "criterion": "F042 prerequisite; exact15record authenticated RESULT/ACK; current source/owner/isolation/protected/cleanup evidence",
+      "status": "BLOCKED_REAL_INTEGRATION",
+      "existingEvidence": "F042 remains blocked; frozen F043 manifest has54changed/0missing of580pins",
+      "missingEvidence": "Prerequisite closure, supported worktree-scoped current source authority, real fixture/result/ACK and safe cleanup",
+      "exactCheck": "Separate bounded adapter/source-authority reconciliation decision and approved disposable execution"
+    },
+    {
+      "id": "F043-11",
+      "criterion": "Final owner acceptance",
+      "status": "BLOCKED_OWNER_GATE",
+      "existingEvidence": "Explicit owner approval required by AGENTS completion workflow",
+      "missingEvidence": "Cannot represent owner acceptance before mandatory F042/F043 real verification",
+      "exactCheck": "Present READY_FOR_OWNER_ACCEPTANCE only after all mandatory gates pass"
+    }
+  ],
+  "checks": [
+    {
+      "label": "f042-eight-http-regressions",
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "--test",
+        "--test-concurrency=1",
+        "apps/api/tests/admin-routes.test.ts",
+        "apps/api/tests/auth-routes.test.ts",
+        "apps/api/tests/authenticate.test.ts",
+        "apps/api/tests/login-routes.test.ts",
+        "apps/api/tests/logout-routes.test.ts",
+        "apps/api/tests/refresh-cookie.test.ts",
+        "apps/api/tests/user-profile-routes.test.ts",
+        "apps/api/tests/google-auth-routes.test.ts"
+      ],
+      "exitCode": 0,
+      "startUtc": "2026-11-05T04:51:54.776Z",
+      "endUtc": "2026-11-05T04:52:27.461Z",
+      "totals": {
+        "tests": 77,
+        "suites": 0,
+        "pass": 77,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "localLog": "f042-eight-http-regressions.log",
+      "logSha256": "d9b607d69fa75fe9b6f8a73c6a6584a5294a3df38088a456485932b578cb09b7"
+    },
+    {
+      "label": "f043-backend-offline",
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "--test",
+        "--test-concurrency=1",
+        "apps/api/tests/admin-technology.test.ts",
+        "apps/api/tests/admin-technology-routes.test.ts"
+      ],
+      "exitCode": 0,
+      "startUtc": "2026-11-05T04:52:27.466Z",
+      "endUtc": "2026-11-05T04:52:33.157Z",
+      "totals": {
+        "tests": 84,
+        "suites": 0,
+        "pass": 84,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "localLog": "f043-backend-offline.log",
+      "logSha256": "4fb607131c58fed637eec90d5e18ea37bee564cffc9ac9ab1347734625f0ba86"
+    },
+    {
+      "label": "api-test-typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "apps/api/tsconfig.test.json",
+        "--noEmit",
+        "--incremental",
+        "false",
+        "--pretty",
+        "false"
+      ],
+      "exitCode": 0,
+      "startUtc": "2026-11-05T04:52:33.159Z",
+      "endUtc": "2026-11-05T04:53:06.300Z",
+      "totals": {},
+      "localLog": "api-test-typecheck.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "api-production-build",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "apps/api/tsconfig.json",
+        "--incremental",
+        "false",
+        "--pretty",
+        "false"
+      ],
+      "exitCode": 0,
+      "startUtc": "2026-11-05T04:53:06.304Z",
+      "endUtc": "2026-11-05T04:53:24.919Z",
+      "totals": {},
+      "localLog": "api-production-build.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "admin-source-typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "apps/admin/tsconfig.app.json",
+        "--noEmit",
+        "--incremental",
+        "false",
+        "--pretty",
+        "false"
+      ],
+      "exitCode": 0,
+      "startUtc": "2026-11-05T04:53:24.920Z",
+      "endUtc": "2026-11-05T04:53:32.996Z",
+      "totals": {},
+      "localLog": "admin-source-typecheck.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "admin-production-build",
+      "command": [
+        "node",
+        "node_modules/vite/bin/vite.js",
+        "build",
+        "apps/admin"
+      ],
+      "exitCode": 0,
+      "startUtc": "2026-11-05T04:53:32.997Z",
+      "endUtc": "2026-11-05T04:53:35.030Z",
+      "totals": {},
+      "localLog": "admin-production-build.log",
+      "logSha256": "a3cff8b6d8e5e2e72851121be6d6115d7377568b7824a3a44da70fffd3cec875"
+    },
+    {
+      "label": "evidence-format",
+      "command": [
+        "node",
+        "node_modules/prettier/bin/prettier.cjs",
+        "--write",
+        "docs/qa/F042-F043-acceptance-2026-11-05.json"
+      ],
+      "exitCode": 0,
+      "startUtc": "2026-11-05T04:58:25.947Z",
+      "endUtc": "2026-11-05T04:58:26.085Z",
+      "localLog": "evidence-format.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "focused-source-lint",
+      "command": [
+        "node",
+        "node_modules/eslint/bin/eslint.js",
+        "--max-warnings=0",
+        "apps/api/tests/admin-routes.test.ts",
+        "apps/api/tests/auth-routes.test.ts",
+        "apps/api/tests/authenticate.test.ts",
+        "apps/api/tests/login-routes.test.ts",
+        "apps/api/tests/logout-routes.test.ts",
+        "apps/api/tests/refresh-cookie.test.ts",
+        "apps/api/tests/user-profile-routes.test.ts",
+        "apps/api/tests/google-auth-routes.test.ts",
+        "apps/api/tests/admin-technology.test.ts",
+        "apps/api/tests/admin-technology-routes.test.ts"
+      ],
+      "exitCode": 0,
+      "startUtc": "2026-11-05T04:58:26.087Z",
+      "endUtc": "2026-11-05T04:58:35.360Z",
+      "localLog": "focused-source-lint.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "evidence-format-check",
+      "command": [
+        "node",
+        "node_modules/prettier/bin/prettier.cjs",
+        "--check",
+        "docs/qa/F042-F043-acceptance-2026-11-05.json"
+      ],
+      "exitCode": 0,
+      "startUtc": "2026-11-05T04:58:35.360Z",
+      "endUtc": "2026-11-05T04:58:36.098Z",
+      "localLog": "evidence-format-check.log",
+      "logSha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    }
+  ],
+  "freshExecution": {
+    "httpFiles": 8,
+    "httpTestsPassed": 77,
+    "f043BackendTestsPassed": 84,
+    "uniqueTestsPassed": 161,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "newBrowserCasesExecuted": 0,
+    "newGuardedDatabaseRecordsExecuted": 0,
+    "newLiveLoginAttempts": 0,
+    "resourcesStarted": 0
+  },
+  "retainedEvidence": {
+    "browser": {
+      "kind": "HISTORICAL_MOCKED_NOT_FRESH_EXECUTION",
+      "run": "89d4e98a4abd49fca42fa622baa7544c",
+      "source": "75e875afbb1f5f3b25256692d68abe2fbfe25897",
+      "wholeOriginalRun": {
+        "passed": 222,
+        "failed": 3
+      },
+      "failuresOutsideF042F043": [
+        "F044-B03",
+        "F044-B08",
+        "F044-B10"
+      ],
+      "correctedLearningPathsRun": {
+        "id": "fc667149c3154bd1b9f1246f2b75d801",
+        "passed": 12,
+        "failed": 0,
+        "retries": 0
+      },
+      "F042Passed": 20,
+      "F043Passed": 20,
+      "cases": [
+        {
+          "id": "F042-B01",
+          "title": "F042-B01 mount is passive and restoration is explicit",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B02",
+          "title": "F042-B02 sign-in requires current Admin eligibility before the Technology workspace",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B03",
+          "title": "F042-B03 Student identity cannot expose Admin content",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B04",
+          "title": "F042-B04 disabled current account is denied",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B05",
+          "title": "F042-B05 suspended current account is denied",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B06",
+          "title": "F042-B06 unverified current account is denied",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B07",
+          "title": "F042-B07 expired access hides authority without automatic refresh",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B08",
+          "title": "F042-B08 unavailable dependency and missing account never imply authorization",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B09",
+          "title": "F042-B09 private or malformed DTO is refused without exposing its contents",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B10",
+          "title": "F042-B10 rate limiting has manual retry and no invented countdown",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B11",
+          "title": "F042-B11 ambiguous refresh cannot be replayed automatically or via restore",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B12",
+          "title": "F042-B12 manual recovery obtains newly checked eligibility",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B13",
+          "title": "F042-B13 current-device logout removes privileged content and session identity",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B14",
+          "title": "F042-B14 failed logout remains uncertain and requires explicit sign-out retry",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B15",
+          "title": "F042-B15 account invalidation discards a former-account response",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B16",
+          "title": "F042-B16 same-origin peer-tab sign-out invalidates the current Admin display",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B17",
+          "title": "F042-B17 untrusted return parameters never create navigation or restore authority",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B18",
+          "title": "F042-B18 native keyboard submission and access-loss focus are usable",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B19",
+          "title": "F042-B19 desktop tablet and mobile layouts keep labels and actions in bounds",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F042-B20",
+          "title": "F042-B20 labelled fields and loading success error announcements retain semantics",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B01",
+          "title": "F043-B01 inventory requires explicit authenticated restoration",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B02",
+          "title": "F043-B02 empty inventory has truthful zero count",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B03",
+          "title": "F043-B03 bounded pagination can return to the previous page",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B04",
+          "title": "F043-B04 DRAFT detail exposes revision and immutable slug",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B05",
+          "title": "F043-B05 create sends one draft operation and shows success",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B06",
+          "title": "F043-B06 edit submits current revision and displays increment",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B07",
+          "title": "F043-B07 field validation prevents malformed draft submission",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B08",
+          "title": "F043-B08 PUBLISHED records remain read-only",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B09",
+          "title": "F043-B09 ARCHIVED records remain read-only",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B10",
+          "title": "F043-B10 revision conflict requires explicit reload without replay",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B11",
+          "title": "F043-B11 unknown write result hides editor and never replays",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B12",
+          "title": "F043-B12 HTTP 401 invalidates eligible workspace",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B13",
+          "title": "F043-B13 HTTP 403 removes displayed authority",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B14",
+          "title": "F043-B14 missing detail is safely unavailable",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B15",
+          "title": "F043-B15 rate limit and dependency failure expose manual recovery only",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B16",
+          "title": "F043-B16 private response fields are refused before display",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B17",
+          "title": "F043-B17 cancellation and account-change signals discard late reads",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B18",
+          "title": "F043-B18 logout clears Technology data and leaves storage empty",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B19",
+          "title": "F043-B19 keyboard editor focus, labels and close restoration",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        },
+        {
+          "id": "F043-B20",
+          "title": "F043-B20 desktop tablet and mobile retain contained layout and escaped text",
+          "status": "PASS",
+          "kind": "HISTORICAL_MOCKED_BROWSER",
+          "retry": 0
+        }
+      ],
+      "validatedJournalEquality": true,
+      "validatedHistoricalCleanup": true,
+      "validatedHistoricalApiFallthrough": 0,
+      "trackedPinsCheckedPerRun": 263,
+      "rawArtifactsNotVersioned": true,
+      "validationLogSha256": "b6d686dd1912910c04a923a3df698716c3de52075b59f99e55999e925bbac7fe",
+      "limitation": "Local unsigned historical receipts were checked; producer provenance is not cryptographically authenticated and historical events were not rerun."
+    },
+    "liveSession": {
+      "date": "2026-11-04",
+      "source": "ce9e4d2542551d58755cba81482900d4b7753934",
+      "login": "OBSERVED_PASS_RETAINED",
+      "restoration": "OBSERVED_PASS_EXPLICIT_RESTORE_CONTROL",
+      "learningPaths": "OBSERVED_PASS_RETAINED",
+      "logout": "OBSERVED_PASS_UI_ACCESS_REMOVED",
+      "report": "observed-admin-login-2026-11-04/verification-report.txt",
+      "limitation": "Supplemental observed smoke, not qualified suite or stored-role/transaction acceptance."
+    }
+  },
+  "blockers": [
+    {
+      "code": "DISPOSABLE_FIXTURE_PROVISIONING_OUTSIDE_SCOPE",
+      "detail": "Existing suites require19collections and21(F042)/25(F043)explicitindexes, replica initialization and generated synthetic fixture-account state at127.0.0.1:27018/f021-test/deeplearner-f021-test. Current authorization expressly stops for provisioning/account changes. Persistent27019 is not a substitute."
+    },
+    {
+      "code": "ADAPTER_PRIMARY_ROOT_AND_SOURCE_AUTHORITY",
+      "detail": "Ignored adapters force E:/AI/DeepLearner and pinned536/557path source enumerations. Existing F043580pin manifest:54changed/0missing. No supported worktree transition is qualified; no source-pin writes or replacement authority performed."
+    },
+    {
+      "code": "MISSING_REAL_RESULT_ACK_BASELINE_CLEANUP",
+      "detail": "F042 nine-record and F043 fifteen-record real suites lack complete current authenticated RESULT/matching digest ACK and qualified current ownership/protected baseline/cleanup evidence. Historical failures/UNKNOWN remain unchanged."
+    },
+    {
+      "code": "NEW_BROWSER_RUNTIME_NOT_QUALIFIED",
+      "detail": "Current runner admits qa/f044-browser-backlog, not the new acceptance branch. Offline dependency junction contains unpatched Playwright core SHA2325ca4c1c83070e89dc49fb82525508f0a68e0cf12e2a624277968da216b7e0 instead of retained qualified c940637985a63463b50ddabf4d41f3c927380286afb877eea98e0cf86896f932. Initial historical validator correctly refused current installed-runtime equality. It subsequently fully validated the unchanged historical sources/receipts using their retained qualified checkout. No current browser launch or bypass."
+    }
+  ],
+  "historicalCorrections": [
+    "Generated synthetic fixture credentials already supersede the old human secure-input/HWND blocker in current ignored adapters; no focus investigation repeated.",
+    "Historical browser NOT_RUN statements remain preserved; the dated evidence here credits only the exact40cases actually executed previously.",
+    "Historical43EACCES/one timeout are not erased; a new77PASS HTTP regression batch now establishes current mocked-repository transport behavior."
+  ],
+  "independentReview": {
+    "reviewer": "/root/f042_f043_acceptance_review",
+    "provenance": "Distinct /root/f042_f043_acceptance_review agent; final read-only review completed2026-11-05 at04:59UTC/10:29Asia-Calcutta. Independently checked actualfourpathdiff,21criteria,all6executionloghashes,241sourcepins,historicalevidenceclassification and privacy. Reviewer executed no application tests/browser/database/runtime.",
+    "confirmedProductionDefects": {
+      "Critical": 0,
+      "High": 0,
+      "Medium": 0,
+      "Low": 0
+    },
+    "acceptanceDisposition": "BLOCKED",
+    "externalHumanOrCISignoff": false,
+    "finalDisposition": "EVIDENCE_ONLY_DELIVERY_APPROVED; FEATURE_ACCEPTANCE_AND_MERGE_BLOCKED",
+    "finalBlockingFindings": {
+      "Critical": 0,
+      "High": 0,
+      "Medium": 0,
+      "Low": 0
+    },
+    "clarityCorrection": "Roadmap now says freshly executes84 rather than independently executes84; no reviewer execution implied."
+  },
+  "changes": {
+    "applicationFixes": [],
+    "confirmedApplicationDefects": [],
+    "scope": "Evidence and documentation only; no reproduced F042/F043 application defect in executed checks."
+  },
+  "sourcePins": {
+    "apps/admin/src/app/app.tsx": "af564290052898c742befb78e35a5b7ddb1ac54ff1d8a5d600bb5a0f48251b93",
+    "apps/admin/src/components/auth/admin-access.tsx": "b9eb630244754dc9785ecc3a0b4089d7a8cb072170380162759dc2746d64d3b1",
+    "apps/admin/src/components/layout/admin-shell.tsx": "3d04ee84b4e8f1c0dba256a648d659ef48934192a22f6c16b0ca2260e16eaf1d",
+    "apps/admin/src/components/learning-paths/learning-path-manager.module.css": "df4160d6dfb14c07668e47632edce4ab6d76c37db812c9669195724807fa83d3",
+    "apps/admin/src/components/learning-paths/learning-path-manager.tsx": "98c6b0cdeb6de69cce884dc5fda1d298b0246af1d38203daf422f374c4209da8",
+    "apps/admin/src/components/learning-paths/learning-path-proposal-form.module.css": "cd3b75db657f753deeb614ba2845f4e232619f742b3dd30af82b0870498ccd25",
+    "apps/admin/src/components/learning-paths/learning-path-proposal-form.tsx": "b670f313aff493f82830834fda4fd57137b6050ef4960dfe46c292bcbcc4a28c",
+    "apps/admin/src/components/technologies/technology-manager.module.css": "619627dd2029750280cb9e79fc97801cb3b2e12326b85e82d2c29a68e58a0ef4",
+    "apps/admin/src/components/technologies/technology-manager.tsx": "620b3a029f89abad84503befb2c99e7fac082b6aa69340d747dd37e7837952e9",
+    "apps/admin/src/hooks/use-admin-auth.ts": "f4b5e0f2d3975ef60f1b1cba4128991fdf64517d4daddd1adfcab15c56b5a712",
+    "apps/admin/src/hooks/use-learning-path-proposal.ts": "0a81913099b350a7b66a5ccff5e60c368b99c5d13fbc1f2c16d22f95ccaf9378",
+    "apps/admin/src/hooks/use-learning-paths.ts": "e8f6a0299ef77875c46d69b00fc5dc7cfb8fe280bf708586a94def7a36f67db4",
+    "apps/admin/src/hooks/use-technologies.ts": "8b42e87d6abd199893956443424d91edd64055f27dc8d95b0564dacca727400d",
+    "apps/admin/src/lib/auth/admin-client.ts": "bf3d49df2bd041614c837dc733f3c007d9199009f7c71acc8344ff8d9eb0d264",
+    "apps/admin/src/lib/auth/admin-controller.ts": "3b0047abea19233958517d2da9c08576b18f3887f34b2bf526c91f33744df0f2",
+    "apps/admin/src/lib/auth/browser-coordination.ts": "a2f25865fa3efb534924c3dfbf89498ac018eb26f049d227c47898ce9262fbb7",
+    "apps/admin/src/lib/auth/contracts.ts": "96b3c8b0513c43dac580d268e122a740d0986f782096f6b74a4bba5c8a5846eb",
+    "apps/admin/src/lib/env.ts": "53a5af605cf2bfb4c3a7fddb37d84cb96ab0bc5ce010c844b72d2737d4ae7c6f",
+    "apps/admin/src/lib/learning-path-proposals/contracts.ts": "ef8615552306d37496612ef3d02f9a86af03d7255fec62c3021306955df49773",
+    "apps/admin/src/lib/learning-path-proposals/proposal-client.ts": "2ba983c17e99a3a93eacee5143ee44267e9f0c72ee162863775e628580099f31",
+    "apps/admin/src/lib/learning-path-proposals/proposal-controller.ts": "a3aac183847aeef5cad6b359f2fd6aa7ffcaab553ead204a64e25fcbcf44ec10",
+    "apps/admin/src/lib/learning-paths/contracts.ts": "4aff3a04d8b4b1af818ae098720a8a01fcb64243c4e599e5bf72880ec4f32376",
+    "apps/admin/src/lib/learning-paths/learning-path-client.ts": "8b06b4b0ebc99fe3d4be91a30736ca2e5a0772319e475ef2a4675418324007f0",
+    "apps/admin/src/lib/learning-paths/learning-path-controller.ts": "4bfbcdf80bd6438cb480909a43720511820efe4833abe5e0c529329b2a621d68",
+    "apps/admin/src/lib/technologies/contracts.ts": "cfde21dd4c42cd4dcd66b9d4e9e4bfa3bd2a52a37c4bf8a43b03394b33e793b9",
+    "apps/admin/src/lib/technologies/technology-client.ts": "edd2645bca76bc17f81c242a61257dcec65fae6319e7fc6861eb0d225ab0b977",
+    "apps/admin/src/lib/technologies/technology-controller.ts": "77fb03249228e564d677c9d8c6eb6afd267bf7b26be7d79fb1b1406eda2a23c9",
+    "apps/admin/src/main.tsx": "7de068a0e4dcff21d81dad0c52fd2d7646fd10e84fce3e6f62fb07a2f3127099",
+    "apps/admin/src/styles/globals.css": "78e3f26994a55e99f2120e30bc120f7245aad0bb91b84f463bfc6fa37ddce081",
+    "apps/admin/src/vite-env.d.ts": "0209610c59ec3f55fc39c3f3ff52882a1ea8f608985acbf070c7dc3182087d3c",
+    "apps/api/src/app.ts": "da82b7e03ee3acc16bc2d2ea2adabdff701ecf1291c73da9f2b3728ab06e04a2",
+    "apps/api/src/bootstrap.ts": "b421ad78cf99cc18149dd0567ace9b68c176d6742f5ce595eeeb89434f3e1f1f",
+    "apps/api/src/common/email/email.service.ts": "fe7260e3a4b1493518ab82e87fcb16338e38da7259899a2aa86ce03cf355233f",
+    "apps/api/src/common/email/password-recovery-email.ts": "a8b2ff656d34a0ad0c29de16a9cdad35aaf6ced48f5944a9b6e03ea4ca6a9c6a",
+    "apps/api/src/common/email/verification-email.ts": "c0a43c27653e71b84ffb68da6b27adb625c09b1ef10e23182cb5ab0c3c33dd67",
+    "apps/api/src/common/errors/app-error.ts": "01480278272bebc8b1667acf3743220bf82dd68dce397f68a7067f6c2f423231",
+    "apps/api/src/common/http/response.ts": "3f8075f2d4037f513c311aee09c5265243e948a89db64c59ddc470a91a97dc8b",
+    "apps/api/src/common/logging/logger.ts": "19f1ecf52011a90bb04799a4fbd86be6a4bf3ecb0933e3671eff6c23ab99b945",
+    "apps/api/src/config/auth.ts": "3fae2a4deb93fe1f2b8cd7924ddbcc10a2f5b11d4b7c5f7bf5636b52fcc9b790",
+    "apps/api/src/config/database.ts": "e7c452d709ec144775c6e68dbafc5577aaf9c069df0a4a350df23ab276bb5f70",
+    "apps/api/src/config/env.ts": "1b5d49fda6939bcaa4ca43618355de1f8b213aa5458c24e2210e0d9de31a2dee",
+    "apps/api/src/middleware/auth-origin.ts": "b9503e6374cfa0dc6026f010e3c0c4499bceb9b1ee697a3b504f7432fb5bd283",
+    "apps/api/src/middleware/authenticate.ts": "28dff54fcc034830f3e56a210f95a45c5f8d901253201297bb148a17cdf937c3",
+    "apps/api/src/middleware/error-handler.ts": "a4b19fd20cee90ee4c06b2c83763b32631b893aa8aed018b373b87db47573f0c",
+    "apps/api/src/middleware/not-found.ts": "26cf912f44a95565b746dce0784cb0edaea76e0b34dd24eb8b8599c83ab58ef5",
+    "apps/api/src/middleware/request-id.ts": "e1f6ab237da1d16b16be4ddb55d81c3445ece552aabed7e31b771d9435da8817",
+    "apps/api/src/middleware/request-logger.ts": "14d710ff0a69061f14cf2248259b13dd4470e53a55958f0fdf7dc0ff1f440c48",
+    "apps/api/src/middleware/require-admin.ts": "7c6326209d13ac6fa26adfb79f638e1d5a65f57da8d37a4fcba179e76f5ad9fb",
+    "apps/api/src/middleware/validate.ts": "a0347473fe67ee2fa2569aafa1e9cbfc5701145c3fa1f758d0cf2e2cafa075eb",
+    "apps/api/src/modules/admin/admin-access.repository.ts": "5a1d611f285e99686444e71115bdc1cf46eb9da724eefbdb850cf129f0b701aa",
+    "apps/api/src/modules/admin/admin-access.service.ts": "62342f94e9031640bdf04e920d574651af948aeb6bdf96c539c39bca70a57502",
+    "apps/api/src/modules/admin/admin-rate-limit.ts": "b199c495bd2338946ba81c85b6ef2b75881255f1f883e2f9085fd3660dbf8e64",
+    "apps/api/src/modules/admin/admin.routes.ts": "c2f7aee62ec779634362c7006aaaf07bb55dc53b2c8cd00eea73bc70112feb5d",
+    "apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.model.ts": "98bb115990329816ba1c021822634902c29915a45974c803e61bbb1f446e6246",
+    "apps/api/src/modules/admin/learning-paths/admin-curriculum-brief.schema.ts": "1a6bdb10942fc3afc30edff69b8261eb808dcbb2e8165be7f48e838ff84955b6",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-rate-limit.ts": "7eed1aab21e9301e6ea31b5e6c87574e78348b9d18688b6fa63c5ec7a89117a0",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal-request.schema.ts": "57831d3be8ea16236ed6135080acd5a3099091e603df3587aed312b934c5cb27",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.controller.ts": "4979d0722c2290d5e5ed7db2d96c55de05e3ead6af6ff9d8160ca8ab266d8e21",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.dto.ts": "3830193e4edad9f3f3d04fd1ceb7f5b7d19bab5889103f51ba3e724fa79464b3",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.model.ts": "7c773d4e3bb775b865880e1f2a8c65c6edb03c5505024e65540c8d3661a7834e",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts": "b3e58bc3ae23ccfa523316795bf79b97c27e8110081a59a59efa148cd8699e0c",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.routes.ts": "919ef7719c95bb5dec87be94242062e9405231c6d612a4ae71f193e896903083",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.schema.ts": "4e851ed6bf7c64cf1b481a7c8790536054cdc2238992362d2ff78ee1723e1f4d",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts": "b024e1907b2e64088a6f90d24ff808ae4a883cb68a644c0001c738a0aee4c133",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path-rate-limit.ts": "2c82ee843b22f82d0bddf98492bf7fbe1146c93ee257296fdd3da51f25459826",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path.controller.ts": "9bb9e54e1b6fb438a4ee0cca0aa12f5105b7b161af99d46587746325f8d10a1b",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path.dto.ts": "f8993a7da20c6ed317350b01c659c79aaa08b7dcd174b4edebeea10325a1818c",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path.repository.ts": "ddca0a615abc0233fa8bf5ad4a7e095fea8e3e6171406fcbf265fa3cb9a9a40f",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path.routes.ts": "d04fb6d753dd958ed24ed207bb31d0f6c71e35eb178e6a2717144db0bef6e3ee",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path.schema.ts": "ad00d3567951c4490ca480df5e08e9ff685a51d1ad8a2224d53b97208e1e4fde",
+    "apps/api/src/modules/admin/learning-paths/admin-learning-path.service.ts": "b9ed414c98ca0fbf41fd6e0b6d00677a33b819e7c5468cadd525e13d2833b250",
+    "apps/api/src/modules/admin/technologies/admin-technology-rate-limit.ts": "815ae2c6a336291f149814fcfa4474cfaea634708f5285ad719b068763bbcf1d",
+    "apps/api/src/modules/admin/technologies/admin-technology.controller.ts": "9042ffecd1dc4116106f9de1170b909b88a64cf848b33dfb5f1ee94a2fb12f9f",
+    "apps/api/src/modules/admin/technologies/admin-technology.dto.ts": "4e0608b49050968d007833b12b03530a409ca10ab69464a6d9e094d3de8909ca",
+    "apps/api/src/modules/admin/technologies/admin-technology.repository.ts": "dca2c233a22796e2782e80c979ed4aade44208e3eb1590fce5e55b2e45da0d36",
+    "apps/api/src/modules/admin/technologies/admin-technology.routes.ts": "be73d7755cdbc9f498ab63e2f38633a1f05b29ee0fb6ba6c313c8b66e42fe884",
+    "apps/api/src/modules/admin/technologies/admin-technology.schema.ts": "07ddad1e1bf3aba535efe8bbbe552f0d55977c1c8d78894cb13aa91dcecd8483",
+    "apps/api/src/modules/admin/technologies/admin-technology.service.ts": "c6679dbf4a1012c125afb6aea329ab6eea6f21426334dbe3144eca14de338b4b",
+    "apps/api/src/modules/audit/audit.model.ts": "2e649f0814c67075bf4ed0543cff68a6dfe42d8a40db43a568147da421a1ce5b",
+    "apps/api/src/modules/audit/audit.repository.ts": "0b0cebdd038bc68d6d2e715c94af979f450e9ad9709e28fe3ce8b6d145111529",
+    "apps/api/src/modules/auth/access-token.service.ts": "c878394d1d438d3c30afb741975d360583dc2341fe558ea9e9f96a0686bec6a5",
+    "apps/api/src/modules/auth/auth-rate-limit.ts": "a29fd51d58ba1baa381ceaebfd16b6e51c2f0dfc7c0472d3878d9ec9283e1d37",
+    "apps/api/src/modules/auth/auth.controller.ts": "5d35b43461a24dad286bb056559405cd7f6ce7f40aad696524e4805e3efcd126",
+    "apps/api/src/modules/auth/auth.routes.ts": "c4fd038e24df1f18b58c7dd91ee8b4ef38d78db0185b89d37475e7e53944b0c5",
+    "apps/api/src/modules/auth/auth.schema.ts": "407585e63edae5674bbd7b9d485852c7db0ede93a463eb339bd3cf88a91252f8",
+    "apps/api/src/modules/auth/email-verification-token.model.ts": "3e9b3c45bfc360cc292da0f7d55f23fd56ca02c71699a9c515374d9205c57810",
+    "apps/api/src/modules/auth/google-auth-rate-limit.ts": "67ae2532efe4629e1c636ac26ea9e7d3141a7a5ad47e4601e0a0961c98a49930",
+    "apps/api/src/modules/auth/google-auth.controller.ts": "d255671f4d07da818cc443ae73a206abaf0fa8c9b61a4b39af4c890e4be0bb5d",
+    "apps/api/src/modules/auth/google-auth.repository.ts": "561a867004c6126e076d8c920f955abf0164e664633726208854e736ee4d69e8",
+    "apps/api/src/modules/auth/google-auth.schema.ts": "b69f029cf93b0d431f61a6a1ee80b8437c83aca96786d75856b12295fe088f64",
+    "apps/api/src/modules/auth/google-auth.service.ts": "427f17cee2bf7d7464778dce3df047f59ae60ab28caf38f127fcbccea43cd91c",
+    "apps/api/src/modules/auth/google-identity.service.ts": "8e9ffab420fac6174097a4dc87704c1187b949b482b432faa82a7492902169b1",
+    "apps/api/src/modules/auth/login-rate-limit.ts": "8c928ceb3e09ce6b26e0b15e02c03530747820403371fa944ae2cb25dd9b4b49",
+    "apps/api/src/modules/auth/login.controller.ts": "f461dfcd88f45a20156f3f40c7dec699f6573d61c857e524fa0cae50d33f2d19",
+    "apps/api/src/modules/auth/login.repository.ts": "013617355f99c105d647d10af7b0633d67d90641482f96848703c09b01340437",
+    "apps/api/src/modules/auth/login.schema.ts": "6436b046289755e8c54d604c007d18f90e78a5e143072c5a4fc1b73a84b39b86",
+    "apps/api/src/modules/auth/login.service.ts": "04dd1756841bad825d9d87f24d922f946a6560ce9596343df950aa08a05def6b",
+    "apps/api/src/modules/auth/logout.controller.ts": "43094566901e3733b42619c07177cd030422b95748dc075331e2c19049ca840b",
+    "apps/api/src/modules/auth/logout.repository.ts": "71b95dfaf9e752685c180aa5ff1968679ec19594865b9af00193b41fe4c8ddd3",
+    "apps/api/src/modules/auth/logout.schema.ts": "0bb9e85de97944073ee3abffa47020051e9c70ec82fe30a23bf1fac3ac8dd9ab",
+    "apps/api/src/modules/auth/logout.service.ts": "071fe54d518c7ceab331e0e8c785555050a8fa631d59fe089eed788fc5db8c4b",
+    "apps/api/src/modules/auth/password-recovery-rate-limit.ts": "1e9df8f3525e36aeacc48fe2de91c229fb66b1805e592f8281d35f28218a94b1",
+    "apps/api/src/modules/auth/password-recovery.controller.ts": "13114d08c86c155082f043cb396a2fa0c4d7ce232984c3596b9abf51a1997734",
+    "apps/api/src/modules/auth/password-recovery.repository.ts": "2190f8e68d5497fbe0d9739d8a21fdf562f6a2020172e6de1dfaa0deecf2a070",
+    "apps/api/src/modules/auth/password-recovery.schema.ts": "f96366bdfd15da22fc645e87a3133b2180370b29aae17f44631ac4dbfcf8e93b",
+    "apps/api/src/modules/auth/password-recovery.service.ts": "849ce73f28a51a20e2162386a0454632a4afe12ed4113131fc7016e040704ff9",
+    "apps/api/src/modules/auth/password-reset-token.model.ts": "91e31131398f6c70f770f657d976d57a345f161958e541526d2fd8faa869e147",
+    "apps/api/src/modules/auth/password-reset-token.service.ts": "e21e470eb02a7ef0a2b8d0ace168a5b3076d46bd932810c2e47c1208368e8eef",
+    "apps/api/src/modules/auth/password.service.ts": "f64a381cf74d9938ec8b477283c077d3cca6ee9899673310b7e468d9010bd650",
+    "apps/api/src/modules/auth/refresh-cookie.ts": "014bcf4f12013fbf6fa0bd59fb2c72d64f87f6b274edba2ccba3730266169c9f",
+    "apps/api/src/modules/auth/refresh-token.service.ts": "cf676b399facac0982fdbb7a870ced213ae46b945d72e1bdd0b346f6488f5d6d",
+    "apps/api/src/modules/auth/registration.repository.ts": "bbd9f3e1a9fdf554a759f4cb161e735677cdbb473d348fc26fbdfb27ea456439",
+    "apps/api/src/modules/auth/registration.service.ts": "bf2c52a0c518ce3b6342befc7673f7c89cff0fe8adfb326cb7b8f54949c04415",
+    "apps/api/src/modules/auth/session.model.ts": "40114e8d52c654d16bfa059d5a8821a672046294bf17c39db4dae3b055d21fdb",
+    "apps/api/src/modules/auth/verification-token.service.ts": "4a938fd34602ee19a8352f2e8dde621f0b2a14b39e5789de53bff8e2b863d1d5",
+    "apps/api/src/modules/concepts/concept-rate-limit.ts": "1564b2dc2ad7829514d085f7ae31846ea8a8a7e9dbf6df6997f3c00f4baff05c",
+    "apps/api/src/modules/concepts/concept.controller.ts": "bf8599bfc43316f80d488a4ece00694984dd936c6367bee2a1e9520546e82c97",
+    "apps/api/src/modules/concepts/concept.dto.ts": "e11afeaae24f151fc9d0dcc1768cf3323c8cdc9196dd50b1262f1309404bc656",
+    "apps/api/src/modules/concepts/concept.model.ts": "87922abc37835789e7d7a8d8579303ec53b46bccb0336fa1fbc15062a52a17cd",
+    "apps/api/src/modules/concepts/concept.repository.ts": "3880ded1c3afeacf01fe2bd10710425ffdc65918a0bfa054e646edc27aa12383",
+    "apps/api/src/modules/concepts/concept.routes.ts": "c3b523c25111730eb226d16ae17d60a716fd94de3edc0682978e65b5a3458f19",
+    "apps/api/src/modules/concepts/concept.schema.ts": "52aedd6f303b9aa799a8627ee8cb419fcec4002a898d809c2e9e15e71ecacda1",
+    "apps/api/src/modules/concepts/concept.service.ts": "9c66e7f1fe0a8b58acd20e353b7ba9b5359739334c534ccfd6d35abfcafd21ee",
+    "apps/api/src/modules/health/health.controller.ts": "eb81da02b7017fbfe7ffa115dd6e4a28753fb5eebe12fb1e5fbc36adba0a2f6f",
+    "apps/api/src/modules/health/health.routes.ts": "50e7017fdfb8550c73336f4ed24181437849e4a5e3e94eb8692dc9749cb7a077",
+    "apps/api/src/modules/learning-paths/learning-path-rate-limit.ts": "c70c26ca94177b8aa68fbc165ac5a31f51d891a4b13b61cbb0d26eee33425ab7",
+    "apps/api/src/modules/learning-paths/learning-path.controller.ts": "9bd4fa879871e9f63970ab8c3fd9cefce2e08ac9e2e24088005c90be70ce551c",
+    "apps/api/src/modules/learning-paths/learning-path.dto.ts": "279880c28cb7ddf867ec0ea08c2c166007379131e974d952ba3a62f5daa8f847",
+    "apps/api/src/modules/learning-paths/learning-path.model.ts": "98157244cdc35deac78dcba4246241f143fa0c684409512f7ca05bf80353d37b",
+    "apps/api/src/modules/learning-paths/learning-path.repository.ts": "9b6dd43607a60f60b0a1b737b5a936eed723690342050321db8ba2a1187e8115",
+    "apps/api/src/modules/learning-paths/learning-path.routes.ts": "b611f1412acb282e5382be7445669bf16dee9fcca766fa57b70306ee4443f716",
+    "apps/api/src/modules/learning-paths/learning-path.schema.ts": "eae57f8da9921cc3fcdbb77eedb7febeb69d12e4af9c22fad1a11504170d3b66",
+    "apps/api/src/modules/learning-paths/learning-path.service.ts": "55e5284a011aa340610fa10999224f9e024b0775aa6a39fcaed143a6ae9408d2",
+    "apps/api/src/modules/modules/module-rate-limit.ts": "29b64f45ee80f7af957824f27f905894194e3015153fc03e7afa3428d5978527",
+    "apps/api/src/modules/modules/module.controller.ts": "45728eeea07950c23370ce0a1111cf637ab5d2edbab9ed61f1e4b5fd1b3b2311",
+    "apps/api/src/modules/modules/module.dto.ts": "61c1cdb49c023bf8f70356b77ec2b3ce32ab467b9c659aac0509dc8de1f9016b",
+    "apps/api/src/modules/modules/module.model.ts": "6786175540d294b6e23e2252e8a3d86ed314b29b4c5ac189cfaa7cee7b4421b6",
+    "apps/api/src/modules/modules/module.repository.ts": "64d58acb96bec8bd677cdc0cb714cd6fb85c56ab38dc00600e7d25ce63e86bd2",
+    "apps/api/src/modules/modules/module.routes.ts": "749c0daf8ec484fc9bcc129e8c3fa3b6328ad3a65213debb7ce1f71a637ad399",
+    "apps/api/src/modules/modules/module.schema.ts": "4fd1973790798d87b23f3be71597fe04c01e15020cdd9f86e7c7729885d3d899",
+    "apps/api/src/modules/modules/module.service.ts": "9957177eae313eb8823ffe7a3788b4de2a3eb78c633d538c0810ccb643957548",
+    "apps/api/src/modules/practice/completion-grading.service.ts": "1feae90cca245a620b6777b5643a0d89bfd4f55a3b21704c9882a79db8bb20a3",
+    "apps/api/src/modules/practice/output-grading.ts": "84537f1409c69b180892e567d1c1bee39bd8de450df8f333b186c2e586a5e135",
+    "apps/api/src/modules/practice/practice-assessment.model.ts": "6fc5eb3520db81a5ae88f3eae7fbc2fa0b5c3fee228ec09955c40107e2401a3e",
+    "apps/api/src/modules/practice/practice-assessment.repository.ts": "32bd88406ffcd86ce37514daba0cbd05fd9eac15902cf22cb77dd504416114d8",
+    "apps/api/src/modules/practice/practice-attempt.model.ts": "d48cd488ef7276a5bbfeb7c4005c6e6afed1df396fb3145f30f769d6d8375c50",
+    "apps/api/src/modules/practice/practice-attempt.repository.ts": "d72ee845e4a3c45e297f7e5a5d10d79579d67a1b12d608b139f0039e287704d9",
+    "apps/api/src/modules/practice/practice-grading.service.ts": "e6e6b07029a4831687b0d5f5f06e9767c1bb976fa7fbceaaa9a87aa5c0e22a2f",
+    "apps/api/src/modules/practice/practice-question.model.ts": "1b00a1b297252b3c7d959a3a2b86e14f5d81401d948fda970c0237d172512b1b",
+    "apps/api/src/modules/practice/practice-rate-limit.ts": "6445f55a42843b30221304fe9f09cac3ed4425155add0b88b3b3a194bb36297e",
+    "apps/api/src/modules/practice/practice-rubric.model.ts": "6eae5cb09b58db78fe956e306ec73f5f0497a064d68829cd2d89813117caa6cd",
+    "apps/api/src/modules/practice/practice-rubric.repository.ts": "69a3662f17e626029d546dd6c8a99b8872e57a7dd9908be9a02aadbb854a5a5c",
+    "apps/api/src/modules/practice/practice.controller.ts": "8ef133ab9f9da17ce71fc23dac71eb510a71bcd4062e3920948b59f4bdebd6b8",
+    "apps/api/src/modules/practice/practice.dto.ts": "a525f14cf85e680bec36d327b4711ff627c6225b72837fa6f44607435ae2cec0",
+    "apps/api/src/modules/practice/practice.repository.ts": "8760c0c475c650cd50a75a4739b866581a2ecaa7d72ac70e556fa5e33b786dc5",
+    "apps/api/src/modules/practice/practice.routes.ts": "8c445e4cf9e8dbcb676f416fa0566fa1a4fec84e409176a539bd49d96a973cc6",
+    "apps/api/src/modules/practice/practice.schema.ts": "807b891934bc893bbfbacf4cac434121ebb4afa705650a12cc2a5aefa0bbd1b8",
+    "apps/api/src/modules/practice/practice.service.ts": "0f9aba63d5b4f7a0e7035de4804aa3fc5ea8cf3e9f464d751dbaef531bacd5fc",
+    "apps/api/src/modules/progress/completion-evidence.service.ts": "6c0c4f959f3da42f59146b9c27090105baa65d2c6afdd6dc895900796e5b4ea1",
+    "apps/api/src/modules/progress/completion-policy.ts": "881cc7be9481fe6ceadac1466703388499854d01c62a05c6642952776eff7c51",
+    "apps/api/src/modules/progress/completion-request.model.ts": "9e4ec761006c17cc34170ca38d0349d8223479841955e9b8fc984bc2e0a77109",
+    "apps/api/src/modules/progress/completion.controller.ts": "e008ad964dccdb622ccc5414b333e582ec13850d7ae8770493ce917cc8fd3968",
+    "apps/api/src/modules/progress/completion.repository.ts": "07e0003c11ed5e1fac70b41bba2f9d756a9fb2ee71890637a2e0e29f331d2b64",
+    "apps/api/src/modules/progress/completion.schema.ts": "4e4f9d1a37bf57cf249d84b783a3a5ec6862b310df0e780a90a3f583e2f08253",
+    "apps/api/src/modules/progress/completion.service.ts": "11422315f4a63dbece652fd603294f18f32a84747d7effeff5dac106ad461beb",
+    "apps/api/src/modules/progress/dashboard-rate-limit.ts": "8ac77783e4b22e086a48a93e2c8ed6cb5e6c514139b3d681fa602b0b1fe525d5",
+    "apps/api/src/modules/progress/dashboard.controller.ts": "69d1b547c6a79e6ac361232dde2cf7eca89facab8b1b144629a60e39496ef29e",
+    "apps/api/src/modules/progress/dashboard.dto.ts": "89c07c0653dfd79ea8d4885009e17c7055571583d014afd8d1a6b5532407818c",
+    "apps/api/src/modules/progress/dashboard.repository.ts": "38d66e0f6b182faf58363061a0bc94dc66bc5948ccb84eb42ca110b501752ebf",
+    "apps/api/src/modules/progress/dashboard.routes.ts": "b806c224e4d145d3d3dc5bf21768025efb7f16c38548fe20a6e8554abdc36545",
+    "apps/api/src/modules/progress/dashboard.schema.ts": "8c955f82f0a301521f32e5692bf5b59a2e7c2ef8c2862cd0c13c14fb0feb889d",
+    "apps/api/src/modules/progress/dashboard.service.ts": "ad0c9a3abfc47ea944bf47c05d2aa6618444db334dd50888fa249cfe30a0a15e",
+    "apps/api/src/modules/progress/mastery-policy.ts": "972c64052e461d2ee522d84c528c2aba7914d7a5d146a590762117c96a68adb1",
+    "apps/api/src/modules/progress/mastery.service.ts": "d94aec9c483e03ebd21e3eb797087aa848f6df14f3130bdf47a790db881d592e",
+    "apps/api/src/modules/progress/progress-rate-limit.ts": "3ee20cec728b511e50f4a3e8a41d8f9a8ec58ec8f752fcc4527d9e5a5a25862b",
+    "apps/api/src/modules/progress/progress.controller.ts": "e4b7739ffb18a71787e1285e9d7a7f6d212c03161d66c82e6fa3c9667ef41098",
+    "apps/api/src/modules/progress/progress.dto.ts": "d3ff67c2229b71fe094711b297f8e4907168d1a675ed7ec11bd6f840ee9922a1",
+    "apps/api/src/modules/progress/progress.model.ts": "af6cc5e30db7e6f4be8c1dbd5bb3a8df3d73becbe7e9feb3666b13938d938d38",
+    "apps/api/src/modules/progress/progress.repository.ts": "13f6ff4cfd76f0e6c0109b8eb512fb3bef4a1d664cbd10dfc3cadd8b6b554e0a",
+    "apps/api/src/modules/progress/progress.routes.ts": "c256fe1c51caa9d00ac264736a1a2a8ce25486f1814111e831d4bb473c52969a",
+    "apps/api/src/modules/progress/progress.schema.ts": "0320613a8048b3d0dbc3fcf603d8302b46ae3ca0b9749efc6594ef8696e9dd48",
+    "apps/api/src/modules/progress/progress.service.ts": "a7143dc0a91250c5267f9197de9259560f927f7a1ced186207b65877d7df7d5f",
+    "apps/api/src/modules/progress/section-evidence-challenge.model.ts": "5f232a393c445f2bce6ede2b4abefeefff7015dada5fc0137005888e178e1982",
+    "apps/api/src/modules/progress/section-evidence-policy.ts": "e775e8aa711d80e9861994879550a43a606e29a02a36d9333fbe5b632bfd0fb6",
+    "apps/api/src/modules/progress/section-evidence-receipt.model.ts": "53a6072104ada0f9e2af9e4cd5caa552753bcf75f4940288aecff65d813c9d99",
+    "apps/api/src/modules/progress/section-evidence-revision.ts": "6bdf2c26aa614c28d95716cbb6176e207849ab31a01e3f5ab5d57adaa161acd6",
+    "apps/api/src/modules/progress/section-evidence.repository.ts": "ab451f7af90f44b57dd1e1ede83261e6ccfe3d47bcd811369e7cd9fba42d7006",
+    "apps/api/src/modules/progress/section-evidence.service.ts": "935e187a0d1aa60b4ee36f76e6edd76c69ec86d35dc97e83805316b786eeae7a",
+    "apps/api/src/modules/technologies/technology-rate-limit.ts": "7b495bf9670ebecf07cefee68f4627397d3f0cbba26fa1bd791ab3587fde8329",
+    "apps/api/src/modules/technologies/technology.controller.ts": "396710b8b3c48f3df5c6a09f48fc83d163bd2e564e02e2a9aea134bd18ae5f7d",
+    "apps/api/src/modules/technologies/technology.dto.ts": "a11825562c566ead2374b54d7b65158c89ee4e5e4c24b2b8f461a98bc033549c",
+    "apps/api/src/modules/technologies/technology.initial-data.ts": "0da3cd680e5fd370475fcdf6d355a9fc645cf465effb03567662cbd45d8848e0",
+    "apps/api/src/modules/technologies/technology.model.ts": "8e47493cc19dabc8f0aeb8eb7b4c987d41f7d96dac28f16a2c48150e37c13dbe",
+    "apps/api/src/modules/technologies/technology.repository.ts": "41824f8934c5acd2f37beceab501bff6a51e520cdc6f09b888a3c8c003a052e5",
+    "apps/api/src/modules/technologies/technology.routes.ts": "1ca6899730049c7a35cb02592a612d0ebbae2425ad7c579edb33f3145c156590",
+    "apps/api/src/modules/technologies/technology.schema.ts": "79a6e6e62085b892227d44e7eb0ac42b57fbaeb1fb7e9057f074fbe8cbca8642",
+    "apps/api/src/modules/technologies/technology.service.ts": "8421c663ac14b0591028917b5231bfc667739e5b34b9743d6cf9f5fbce694a0b",
+    "apps/api/src/modules/topics/topic-rate-limit.ts": "7113a713deb03e9cea917a1cabebedd6d1eb640c63cfac6adf3475391b20dd2f",
+    "apps/api/src/modules/topics/topic.controller.ts": "ea0ffebb726abb8e0ddffd3913567b85032ab3b876902b71012a7cc6c84259ea",
+    "apps/api/src/modules/topics/topic.dto.ts": "234e07d936c8030ed87d6fbbc9f4a4a8e1b75004785d647e2b30255c878f8817",
+    "apps/api/src/modules/topics/topic.model.ts": "1c45f91046addf31ba76ec676266e7240494f023e58e7f4a1dc58a8a347bb32c",
+    "apps/api/src/modules/topics/topic.repository.ts": "af163746e3248bf0f15521acd02449ac8394b8cec1fce89827db37a16c537073",
+    "apps/api/src/modules/topics/topic.routes.ts": "589766cc02e1a5db96ca40f9086f70c9a304b5b5db4fdf69271a08a81063a70f",
+    "apps/api/src/modules/topics/topic.schema.ts": "f415d080d6ed7027a9a96bb51369afe2ebb6fd80652012a398b6fc10f4b41dc2",
+    "apps/api/src/modules/topics/topic.service.ts": "089dd993e6a7ed589eceb56d9568e330958635b6813bfff9d409d0b90582bee2",
+    "apps/api/src/modules/users/user-rate-limit.ts": "d6e94edeb186c58781aa9eef4c30bf6d9531f576e69da0d3af7291f77545e5d0",
+    "apps/api/src/modules/users/user.controller.ts": "88aa997d13cef5752286e4ef12ef39e04b5a90ad7da2b158aa2d764045532e50",
+    "apps/api/src/modules/users/user.dto.ts": "a86765dd5bfa06f3c59d7451f5870496d910ba30b75443c8d4873937086b50a0",
+    "apps/api/src/modules/users/user.model.ts": "d6316d89ecf59c891f8ba234594bf3d3b1f7263029bf69866f8befe4851993ea",
+    "apps/api/src/modules/users/user.repository.ts": "cc47f133906090864b2b02994877ac91a2587b76d568c8321e6c8397430060b4",
+    "apps/api/src/modules/users/user.routes.ts": "0f8367db4afdb68cb3013fcf51aa90e7eae023a0de666465fcccbbba62a317d5",
+    "apps/api/src/modules/users/user.schema.ts": "110c5cc39b4a6e97c9216d43095d90896d1ce29e36fb148ebee3401b7c97a1fc",
+    "apps/api/src/modules/users/user.service.ts": "5de3dbbc45439a727dae8e7f9975b3c53739688cf17500450e1a541ef84bca9e",
+    "apps/api/src/modules/visualizations/checkpoint-verification.ts": "67ec5b93cfa2168d5ae16598512323db3532c3ce07a42b36d59d22c3237ce777",
+    "apps/api/src/modules/visualizations/visualization-checkpoint-definition.model.ts": "1c4cfe1618eabeed6091715ca29e29afef5c08b0233b54e6a9beadcf01b6da78",
+    "apps/api/src/modules/visualizations/visualization-checkpoint-revision.ts": "f8dd905879b88762e41a2e9788910596fd1ef100363ae1853620821a1cd919a2",
+    "apps/api/src/modules/visualizations/visualization-checkpoint.repository.ts": "544c6aa370ceb5322ebbb0cfaf4663615f065d31cdc89f70ce3adb2786a8d248",
+    "apps/api/src/modules/visualizations/visualization-checkpoint.service.ts": "26b14a3498f635358af056f4865402197e802d815af9de8325d3e5f565dfd328",
+    "apps/api/src/modules/visualizations/visualization.model.ts": "f8fb0471cb838843c4cc799c824f23d86d88208bd0870431a797e860ba231426",
+    "apps/api/src/server.ts": "dc0ea6399757810d28c0b11d88372a4698f01f8c5c13fcdc68e624f021493085",
+    "apps/api/src/types/express.d.ts": "d68582e0573a569c50752be22d0d1c624328d5f05cde0be47d64b64f83965b6c",
+    "apps/api/tests/admin-routes.test.ts": "f85e987f0711e596bc2f791dc1929786a1d1fddb2e861661dc4f44af38338f15",
+    "apps/api/tests/admin-technology-routes.test.ts": "d00465513fa705ed5e8780c5453b26bf3a9e935ca7369b7095b688a89e9e0e0f",
+    "apps/api/tests/admin-technology.test.ts": "69bca872e327a47c6524c3060bc4efaa1383ca582a82ffa5a80a69853f9e7fa0",
+    "apps/api/tests/auth-routes.test.ts": "f853755de9db8fcad9f84dd55d3de0f24cbfe824f53c207995c071990b3bb6b4",
+    "apps/api/tests/authenticate.test.ts": "d4c730d1e87509ada9af712ab8d689ef51dbf0797cbe200a8c4377be519196c1",
+    "apps/api/tests/google-auth-routes.test.ts": "340f952874411ae7ea9af8fd2a7c46772d11cdde9048313f9d68c0c2befccc21",
+    "apps/api/tests/login-routes.test.ts": "c9f140c675476436ec00c04a25a980582b1754bb4690b955c33a72eb0eca1f14",
+    "apps/api/tests/logout-routes.test.ts": "b47fb9b1547fa28e85d83dac32b9da21970d4a5d089300bc220fbe61a223e410",
+    "apps/api/tests/refresh-cookie.test.ts": "afb774d95e7bc91e8301de4b306121cb2aa80311fde0a0eded10e86ff0c63ccf",
+    "apps/api/tests/user-profile-routes.test.ts": "2a4c303ded7e03ea7576d327286a9c13eb311e1e38e7509da8659e9691aee522",
+    "packages/shared-types/package.json": "3e3d5ce4aefec5695c3ca2b21edd6fafa326e21da5b33ac91d21eb5b9fd4f629",
+    "packages/shared-types/src/api.ts": "e21bf98942c78f2a6a4a26580fd659be3c34b074c9aacccc8340a11e0fd00fe8",
+    "packages/shared-types/src/health.ts": "6015d1e26ce49975133dec56e6f483811560cf2ef12eb5dc9cc51d04a4787b18",
+    "packages/shared-types/src/index.ts": "3d0e4a59dbeb1d31260e99c266fbbd0adc220d415e62bb217b888b3a1a811c40",
+    "packages/shared-types/tsconfig.json": "0665437a1b30a09039d96c9f7ceb13c0df09fd2d1a810048f25270180166c679",
+    "packages/validation/package.json": "4aa4f96f51863ecf15b3115dbba07aa370adbf525d6436e3f74972bc50f84e37",
+    "packages/validation/src/index.ts": "e71ec5d74cf2c951598130499d98d7d01153285c0d19bb78215a24b51291a96a",
+    "packages/validation/tsconfig.json": "0665437a1b30a09039d96c9f7ceb13c0df09fd2d1a810048f25270180166c679",
+    "tests/browser/admin-access.spec.ts": "fa9bcfffa71191ad1c2435163a30dccacb5dd827d21ace0a43c68491f30d372d",
+    "tests/browser/admin-technologies.spec.ts": "1097a0c9629dd6d62cc58716f2f28cff479af4031a2dec265e319e2a68c9835b"
+  },
+  "dependencies": {
+    "installation": "NONE",
+    "newDependencies": "NONE",
+    "reuse": "Existing dependency junctions for offline checks only. Workspace package artifacts resolve to primary installed workspace packages; no hermetic install or current browser qualification claimed.",
+    "lockfileChanged": false
+  },
+  "runtime": {
+    "initialExpectedApplicationListeners": "NONE_OBSERVED",
+    "startup": "NOT_ATTEMPTED_UNDER_UNSATISFIED_ISOLATION_GATES",
+    "protectedResources": "No database connections/service changes or process termination",
+    "ownedResources": "Only bounded offline test/compiler children; all commands exited0; no persistent runtime launched",
+    "historicalU16Cleanup": "UNKNOWN_REMAINS_UNKNOWN; no exception transferred"
+  },
+  "delivery": {
+    "intendedBase": "dev",
+    "merge": "PROHIBITED_WHILE_EITHER_FEATURE_BLOCKED",
+    "ownerAction": "A separate scope decision is needed for existing-adapter worktree/source-authority reconciliation and designated disposable fixture provisioning/synthetic actor transitions. After mandatory successful execution and independent review, explicit final owner acceptance remains required."
+  },
+  "nextAdminTask": "Reconcile the existing F042/F043 guarded adapters for the isolated candidate and approve only their exact disposable fixture inventory/source pins. Then execute each mandatory suite once with unchanged ownership/deadline/RESULT-ACK/cleanup gates; do not advance acceptance or implement F044/F045 in this task.",
+  "finalOfflineVerification": {
+    "targetedLint": "PASS_ZERO_WARNINGS",
+    "formatContentEquivalence": "PASS",
+    "utf8Lf": "PASS",
+    "appendOnlyHistoricalDocuments": "PASS",
+    "diffWhitespace": "PASS",
+    "sourcePins": "241_OF_241_MATCH",
+    "boundedPrivacyScan": "PASS",
+    "newDependencies": 0,
+    "applicationSourceChanges": 0
+  },
+  "knownLimitations": [
+    "Same-profile Student/Admin cross-origin refresh-cookie coordination remains unresolved by same-origin locks. Separate browser profiles are existing local guidance only; no authentication architecture was changed.",
+    "Real forced-timeout/unknown-commit fault behavior remains unverified; no fault injection executed.",
+    "Historical evidence is local and unsigned; its log/source hashes are consistency evidence, not a cryptographic identity attestation or GitHub CI.",
+    "Runtime support manifests remain ignored and not clean-clone reproducible; this evidence-only PR does not deliver or activate a new authority."
+  ],
+  "githubPreflight": {
+    "observedUtc": "2026-11-05T04:55:03.196Z",
+    "authentication": "existing Git credential helper; material not retained",
+    "requests": [
+      {
+        "path": "/branches/dev",
+        "status": 200
+      },
+      {
+        "path": "/branches/dev/protection",
+        "status": 404
+      },
+      {
+        "path": "/rules/branches/dev",
+        "status": 200
+      },
+      {
+        "path": "/pulls?state=open&head=Ashish1303:qa%2Fclose-f042-f043&base=dev",
+        "status": 200
+      }
+    ],
+    "dev": {
+      "sha": "7683811c2c66a90d0a83c6aec1d1025460710b3e",
+      "protected": false
+    },
+    "protection": null,
+    "rules": [],
+    "existingPulls": []
+  },
+  "githubPreflightLimitation": "Read-only observation before PR creation; dev unprotected and no active rules returned.404protection is not a CI success. No merge may proceed while feature gates fail.",
+  "guardedSourceAudit": {
+    "frozenManifestSha256": "f2361434146fa0be03101401d72715e819f9cf2f889a2376a04c26f91224cdf0",
+    "frozenPins": 580,
+    "changed": 54,
+    "missing": 0,
+    "auditSha256": "dd33c7d240dd7d550ce922323a51612416029ad1b71fdab8d5a33a659c08fcdd",
+    "rawAuditNotVersioned": true,
+    "updated": false
+  }
+}
