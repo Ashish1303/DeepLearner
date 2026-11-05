@@ -1139,3 +1139,37 @@ persistence/security to unlock dependent mutations. Keep F042/F043 acceptance
 BLOCKED, F044 IN_PROGRESS, all unexecuted integration/U cases NOT_RUN and production
 NOT_VERIFIED. Existing qualified mocked results retain only their stated scope.
 Feature acceptance and every commit/push still require separate owner approval.
+
+
+## Named F049 P0 offline editorial-policy exception — 2026-11-05
+
+The owner approved F049 P0, its exact seven-path inventory and a P0-only offline
+sequencing exception ahead of unmet F047. Permit only the three source/test CREATE
+paths, new F049 contract and three MODIFY paths in
+docs/features/F049-content-status-workflow.md. This supersedes earlier no-F049
+progression only for pure, revision/digest-bound transition evaluation and its
+focused offline verification. It grants no completion of F047/F049 or satisfaction
+of all F052 prerequisites, and no automatic next-feature progression.
+
+Require the exact approved Git baseline, initial four-document fingerprints,
+unchanged pending F045/database drafts and no blocking dependency security finding.
+Use supplied origin AI_GENERATED as structural input only, not verified provenance.
+Preserve actual Admin authorization, stored content/source/quality verification,
+transactional state/concurrency/fencing, audit/idempotency/replay and publication
+requirements for all future consumers. No allowed pure-policy result is a stored
+approval or publishing capability. Repeated input evaluation is not at-most-once
+persistence proof. Keep the exact three approved transitions; refuse the rest.
+
+Require meaningful focused offline tests, full API/test TypeScript, production API
+build/typecheck, targeted lint/format/encoding/privacy/scope/diff and fresh independent
+source review with blocking findings resolved. No route/writer, model/schema/index
+provisioning, UI, provider/AI call, runtime/configuration/credential change, database/
+API connection, live approval or browser execution is permitted. No new dependency.
+Preserve primary dev, PR #2/#3, U16 and parked support candidates/bindings/evidence.
+Do not repair harnesses, reconcile pins, install candidates or enact the parked
+F042_F043_OWNED_DISPOSABLE_V1 proposal. No staging/commit/push/PR update.
+
+F049 IN_PROGRESS only as partial offline P0; F042/F043 acceptance BLOCKED, F044/F045
+acceptance incomplete, F047 unmet. All unexecuted groups and historical UNKNOWN
+remain; production NOT_VERIFIED. Every next implementation/live/Git operation still
+requires its separate explicit authorization. No manual-origin M1 is authorized.

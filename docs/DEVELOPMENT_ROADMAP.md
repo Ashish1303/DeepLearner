@@ -2362,7 +2362,7 @@ Status: `NOT_STARTED`
 ### F049 — Content Status Workflow
 **States:** DRAFT, AI_GENERATED, IN_REVIEW, CHANGES_REQUIRED, APPROVED, PUBLISHED, ARCHIVED  
 **Dependencies:** F047  
-**Status:** `NOT_STARTED`
+**Status:** `IN_PROGRESS` — partial P0 offline policy only; acceptance incomplete.
 
 ### F050 — Approval Queue
 Status: `NOT_STARTED`
@@ -3673,3 +3673,45 @@ F042/F043 acceptance BLOCKED; F044 IN_PROGRESS; F045 acceptance incomplete; F047
 F054 NOT_STARTED. U16/support work remains parked. All unexecuted integration/
 browser groups and permanent historical UNKNOWN evidence retained; production
 readiness NOT_VERIFIED. No tests or runtime outcomes are upgraded by this proposal.
+
+
+## F049 P0 authorized offline implementation — 2026-11-05
+
+The owner approved the preceding P0 proposal and exact seven-path inventory,
+P0-only sequencing enactment, implementation, focused offline verification and
+fresh independent review. Current product checkpoint is F049 P0 only; unmet F047
+is deferred solely for this pure policy, not completed or accepted. The dedicated
+contract is features/F049-content-status-workflow.md. Older PROPOSED/NOT_STARTED
+P0 wording and earlier no-F049 progression remain historical outside this exception.
+
+Required current.origin:'AI_GENERATED' explicitly validates the supplied origin
+claim, addressing the current authorization's origin tests while preserving the
+three approved transitions and exact ID/revision/digest binding. It does not
+authenticate AI provenance, resolve content, grant Admin authority, mutate state,
+record approval/audit or establish idempotency/at-most-once writes. Future consumers
+must enforce all actual authorization, content/source/quality, transaction/concurrency,
+audit/replay and publication prerequisites. No endpoint, writer, provider, UI or
+F052 implementation is activated. The formal F047→F049→F052→F053 dependencies
+are preserved for full-feature progression. P0 does not complete F047/F049 or
+satisfy every F052 prerequisite. No F054 demo or manual-origin Module M1 is approved.
+
+Initial state: isolated product/admin-module-inspection at
+1f687bd5f6c83252ed32a0dcf9411bbd3cb9ef2b, four pending documentation paths,
+empty index. Seven P0 paths plus the two preserved pre-existing F045/database drafts
+yield nine combined pending paths. Primary dev, PR #2/#3, U16's12 pending files and
+parked support candidates remain untouched; no Git delivery or runtime changes.
+F042/F043 acceptance BLOCKED; F044/F045 acceptance incomplete; F049 partial/offline
+only; original9/P5/API6 integration groups and all unexecuted browser cases remain
+NOT_RUN. Historical UNKNOWN remains; production readiness NOT_VERIFIED.
+
+### P0 offline checkpoint evidence
+
+P0 READY_FOR_REVIEW — offline only, full F049 acceptance incomplete. Final121/121
+focused tests PASS; the separate10/10 origin selection is a subset, not extra
+distinct coverage. Initial independent Low negative-origin test ambiguity resolved;
+unconditional inert setup also preserves standard test selection. Full API/test
+TypeScript, production API build/typecheck, targeted ESLint/format PASS. Fresh
+independent source/document/test-quality review:0 unresolved Critical/High/Medium/
+Low; no independent execution. See the dedicated F049 contract for commands,
+historical initial run, corrections and exact limitations. No live/runtime/provider/
+database/browser check, Git delivery, feature acceptance or F052 activation.

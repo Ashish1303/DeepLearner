@@ -3009,3 +3009,31 @@ requires separate contract/implementation approval and a named P0-only sequencin
 exception ahead of unmet F047; no such exception is enacted in AGENTS.md now.
 Provider/model selection is unnecessary for that checkpoint. Production, feature
 acceptance, all unexecuted groups and permanent UNKNOWN history remain unchanged.
+
+
+## 111. F049 P0 owner-authorized offline policy — 2026-11-05
+
+The owner approved P0 implementation and a P0-only offline exception ahead of unmet
+F047. Only the exact seven-path contract in features/F049-content-status-workflow.md
+is enacted; no general editorial API/UI, writer, database or provider authority.
+The earlier proposed P0 text remains historical. Current-account authority, actual
+stored origin/revision, source/quality, transactions/audit and replay guarantees
+are future consumer prerequisites, not established by this pure function.
+
+The exact input now includes required current.origin:'AI_GENERATED', clarifying
+the current owner's explicit origin-validation requirement. It is a supplied claim,
+not authenticated AI provenance. The three transitions and next-state-only output
+are unchanged. Module creation remains AI-led; manual M1 remains NOT SELECTED;
+F044's approved manual brief remains unchanged. Review/editing and even later
+editorial approval do not themselves publish content. No feature acceptance or
+automatic F052/F053/F054 progression follows P0. All prior verification limitations,
+blocked acceptance, unexecuted groups and historical UNKNOWN evidence remain.
+
+P0 implementation evidence: the local matrix, strict origin/reference validation
+and inert policy are implemented/offline reviewed only. Final121 focused tests
+PASS, with a10-case subset separately selected after the negative-origin correction;
+full API/test TypeScript, production API build and targeted lint/format PASS.
+Independent read-only source review resolved one Low test ambiguity and confirmed
+zero unresolved findings; it did not run tests. No stored editorial decision,
+provider dispatch, AI content, publication or live guarantee follows. Full evidence
+and deferred consumer requirements are in the F049 contract. Acceptance unchanged.
