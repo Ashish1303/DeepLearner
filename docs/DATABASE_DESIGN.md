@@ -2382,3 +2382,60 @@ Desktop QA, explicitly including private Save writes if desired. Current-account
 credentials/session, owned applications and approved test data/target are required;
 browser host safety and all real-integration gates remain unchanged. F044 remains
 IN_PROGRESS; F042/F043 acceptance BLOCKED; production readiness NOT_VERIFIED.
+
+
+## F045 M1 private initial Module candidate — proposed, 2026-11-05
+
+> **HISTORICAL PROPOSAL — NOT SELECTED by the owner on 2026-11-05.**
+> Module creation remains AI-led. Manual-origin M1 and its sequencing extension
+> were not approved; no implementation authority exists. The original proposal
+> below is retained as historical evidence, not an outstanding approval request.
+
+
+**PROPOSED — PENDING OWNER APPROVAL. No physical schema/DDL or writer authorized.**
+The exact M1 record/digest/DTO/inert-model contract is in
+features/F045-admin-module-management.md, dated remaining-F045 reconciliation.
+Proposed private collection moduleProposalRevisions/model AdminModuleProposalRevision:
+explicit _id, technologyId, learningPathId, schemaVersion1, revision1,
+origin ADMIN_AUTHORED, title, slug, nullable description, order, objectives,
+createdBy, createdAt, definitionDigest. Existing catalogue modules remain unchanged.
+Sole private candidate identity is _id; no generic source/family/admission framework,
+AI payload, editorial state, release membership or automatic lifecycle is added.
+
+Approval of a manual initial origin is the one outstanding product decision.
+Existing F044 proposal identities cannot stand in for catalogue LearningPath IDs.
+Both-parent tuple validation is local only, not foreign-key/authority evidence.
+Proposed16KiB UTF-8 aggregate, C1 reused title/objective rules and F018-aligned
+metadata bounds, canonical digest and strict private projection are specified in
+the feature contract; actor/digest fields are excluded from response DTOs.
+Only normal _id uniqueness is intended; no new secondary/TTL/slug index is declared.
+Registration, if later approved, is disconnected/explicit; autoCreate, autoIndex,
+buffering, timestamps and versionKey disabled. No DB call, index/collection creation,
+provisioning, migration, writer, audit change or catalogue/public change occurs.
+Actual parent existence/lifecycle eligibility, fenced Admin capture, transactions,
+audit, operation recovery, retention and stored concurrency require a later exact
+capture contract and separately qualified real evidence, never inferred from M1.
+All existing F044/F042/F043 acceptance and historical verification limits remain.
+
+
+## F045 manual-origin M1 not selected; no replacement schema — 2026-11-05
+
+The owner confirmed AI-led Module creation and did not approve independent manual
+Module authoring. The preceding M1 collection/model/ADMIN_AUTHORED record/index/
+digest proposal is historical, **NOT SELECTED**, not a pending physical-schema or
+implementation approval. No M1 model, collection, index or provisioning is enacted.
+F044's existing manual curriculum-brief/private-proposal structures and authority
+are unchanged. Catalogue modules/public projections remain unchanged.
+
+Future AI-origin Module candidates still need a bounded generation/admission,
+parent identity mapping and immutable revision/provenance contract. Neither a
+caller-provided AI label nor a digest proves provider origin, authorization, source
+quality or editorial approval. Review/editing creates no publication authority;
+F049/F050 decisions and F051 publication remain separately contracted operations.
+
+The proposed next F049 P0 is pure local transition validation with a revision
+identity/digest reference, not an approval record, database schema, source authority
+or persistence framework. It declares no collection/index, transaction, audit,
+retention, actor or job model. Stored decisions must later bind actual content,
+authority, source/quality evidence and atomic audit under qualified persistence.
+No existing schema, physical database prerequisite or acceptance gate is weakened.

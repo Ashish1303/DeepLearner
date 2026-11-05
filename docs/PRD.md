@@ -2953,3 +2953,59 @@ remain NOT_RUN; do not combine them into a qualified suite. U16 forced containme
 recorded resource releases and permanent UNKNOWN Job-empty/retained-exit proof are
 preserved. Running resources and their bindings remain owned by the original
 checkout; this isolated branch is not runtime-qualified. No source-pin refreeze.
+
+
+## 109. F045 dependency-first continuation — 2026-11-05
+
+> **HISTORICAL PROPOSAL — NOT SELECTED by the owner on 2026-11-05.**
+> Module creation remains AI-led. Manual-origin M1 and its sequencing extension
+> were not approved; no implementation authority exists. The original proposal
+> below is retained as historical evidence, not an outstanding approval request.
+
+
+The owner directed continued F045 work rather than a jump to F054. PR #2 contains
+offline-reviewed protected read-only Module inspection, not complete Module
+Management. Earlier F054 next-task recommendations are historical and superseded
+as development priority only; no feature ownership or formal dependency is changed.
+
+PRD13/44/105/107 still describe AI-origin outlines and human review. F044's explicit
+Admin-authored Learning Path brief exception does not supply Module candidates or
+a private-proposal-to-catalogue-Path mapping. Remaining F045 candidate creation
+therefore needs one product decision: permit explicitly Admin-authored private
+Module candidates under existing catalogue Technology/LearningPath before AI, or
+retain AI-only origin. The first option is recommended, not approved here.
+See features/F045-admin-module-management.md for exact proposed M1 fields, bounds,
+four-file offline implementation inventory, acceptance and proposed sequencing.
+No manual-origin exception, source code, endpoints or write authority is enacted.
+Existing catalogue/public models, F049/F050 editorial, F051 publication and F054
+generation remain unchanged. U16/support remediation is parked; its failure does
+not become an application defect or block independent inert work after approval.
+F042/F043 acceptance BLOCKED; F044 IN_PROGRESS; F045 acceptance incomplete; all
+unexecuted groups/historical UNKNOWN evidence retained; production NOT_VERIFIED.
+
+
+## 110. Owner-confirmed AI-led Modules and dependency proposal — 2026-11-05
+
+The owner resolved section109's question: **Module creation remains AI-led;
+independent manual-origin Module authoring is not approved.** The earlier M1
+recommendation/definition is historical and not selected, with no implementation
+or sequencing authority. F044's approved manual curriculum-brief workflow is
+unchanged. Admin review/edit of AI-origin proposals belongs to separately defined
+editorial workflows, not a manual-origin or publication bypass. Changed payloads
+need new exact revisions/digests and do not inherit approval. No current editorial
+API/UI is established by this direction. F045 read-only inspection stays partial.
+
+The target remains Technology → authorized private brief → bounded AI outline → Admin
+review/edit of AI-origin candidates → exact-revision approval → separately eligible
+publication. “Authorized private brief” means the existing authorized private capture,
+not editorial approval of its curriculum content. F049/F050, F051 and F054 retain
+their distinct responsibilities; no feature is renamed or absorbed into F044.
+
+The roadmap records the explicit dependency chain and an inferred bootstrap cycle
+if full private authoring is incorrectly required to have real AI outputs before
+its policy dependencies can be built. Recommended next: a proposed, pure F049 P0
+transition policy with no stored decisions, endpoints, UI, provider or writer. It
+requires separate contract/implementation approval and a named P0-only sequencing
+exception ahead of unmet F047; no such exception is enacted in AGENTS.md now.
+Provider/model selection is unnecessary for that checkpoint. Production, feature
+acceptance, all unexecuted groups and permanent UNKNOWN history remain unchanged.
