@@ -1,4 +1,14 @@
 import {
+  moduleRequest,
+  type ModuleRequest,
+  type ModuleResult,
+} from '../modules/contracts';
+import {
+  createModuleClient,
+  ModuleError,
+  type ModuleClient,
+} from '../modules/module-client';
+import {
   proposalRequest,
   operationId,
   matchesIntent,
@@ -87,6 +97,7 @@ export function createAdminController(
   technologies?: TechnologyClient,
   learningPaths?: LearningPathClient,
   proposals?: ProposalClient,
+  modules?: ModuleClient,
 ) {
   let state = initial;
   let token: string | undefined;
@@ -103,6 +114,7 @@ export function createAdminController(
   const business = new Map<AbortController, Promise<unknown>>();
   let technologyClient = technologies;
   let learningPathClient = learningPaths;
+  let moduleClient = modules;
   let technologyRecoveryRequired = false;
   let proposalClient = proposals;
   let proposalLost = false;
@@ -576,6 +588,107 @@ export function createAdminController(
       abort.abort();
     }
   }
+  /** Fixed read-only Module capability; never reconciles Technology mutations. */
+  async function requestModule(
+    account: string,
+    raw: ModuleRequest,
+    external?: AbortSignal,
+  ): Promise<ModuleResult> {
+    if (!ready()) throw new ModuleError('FORBIDDEN', 403);
+    expireIfNeeded();
+    const parsed = moduleRequest.safeParse(raw);
+    if (!parsed.success) throw new ModuleError('VALIDATION_ERROR', 400);
+    if (
+      state.status !== 'eligible' ||
+      state.pending ||
+      accountId !== account ||
+      state.user?.id !== account ||
+      !token ||
+      flight ||
+      loggingOut
+    )
+      throw new ModuleError('FORBIDDEN', 403);
+    const request = parsed.data,
+      version = generation,
+      start = now(),
+      abort = new AbortController();
+    let timedOut = false;
+    const cancel = () => abort.abort();
+    const checkBusiness = () => {
+      const elapsed = now() - start;
+      if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed >= 15000) {
+        timedOut = true;
+        abort.abort();
+      }
+      expireIfNeeded();
+      if (
+        disposed ||
+        !connected ||
+        generation !== version ||
+        accountId !== account ||
+        !token ||
+        state.status !== 'eligible' ||
+        !coordination.supported() ||
+        abort.signal.aborted
+      )
+        throw new ModuleError(timedOut ? 'TIMEOUT' : 'CANCELLED');
+    };
+    const timer = setTimeout(() => {
+      timedOut = true;
+      abort.abort();
+    }, 15000);
+    external?.addEventListener('abort', cancel, { once: true });
+    if (external?.aborted) cancel();
+    let rejectAbort = () => {};
+    const lost = new Promise<never>((_, reject) => {
+      rejectAbort = () =>
+        reject(new ModuleError(timedOut ? 'TIMEOUT' : 'CANCELLED'));
+      abort.signal.addEventListener('abort', rejectAbort, { once: true });
+      if (abort.signal.aborted) rejectAbort();
+    });
+    void lost.catch(() => {});
+    // Admission is deferred so the entry exists before any operation can run.
+    const pending = Promise.resolve().then(() =>
+      coordination.run(async () => {
+        checkBusiness();
+        if (!moduleClient) {
+          const { env } = await import('../env');
+          checkBusiness();
+          moduleClient = createModuleClient(env.VITE_API_BASE_URL);
+        }
+        checkBusiness();
+        const value = await moduleClient.execute(request, token!, abort.signal);
+        checkBusiness();
+        return value;
+      }, abort.signal),
+    );
+    business.set(abort, pending);
+    void pending.finally(() => business.delete(abort)).catch(() => {});
+    try {
+      return await Promise.race([pending, lost]);
+    } catch (error) {
+      if (generation === version && !disposed) {
+        if (error instanceof ModuleError && [401, 403].includes(error.status))
+          invalidate(
+            error.status === 403 ? 'denied' : 'expired',
+            new AdminApiError(
+              error.status === 403
+                ? 'AUTH_FORBIDDEN'
+                : 'AUTH_ACCESS_TOKEN_EXPIRED',
+            ).message,
+          );
+        else if (error instanceof AdminCoordinationError)
+          invalidate('unsupported', new AdminCoordinationError().message);
+      }
+      if (error instanceof ModuleError) throw error;
+      throw new ModuleError('UNAVAILABLE');
+    } finally {
+      clearTimeout(timer);
+      external?.removeEventListener('abort', cancel);
+      abort.signal.removeEventListener('abort', rejectAbort);
+      abort.abort();
+    }
+  }
   /** Three fixed proposal capabilities. An uncertain intent is never a UI-resettable flag. */
   async function requestProposal(
     account: string,
@@ -810,6 +923,7 @@ export function createAdminController(
     requestProposal,
     getProposalIntent,
     requestLearningPath,
+    requestModule,
     requestTechnology: (
       account: string,
       request: TechnologyRequest,

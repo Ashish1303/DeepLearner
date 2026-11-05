@@ -1,4 +1,8 @@
 import {
+  ModuleError,
+  type ModuleClient,
+} from '../src/lib/modules/module-client';
+import {
   ProposalError,
   type ProposalClient,
 } from '../src/lib/learning-path-proposals/proposal-client';
@@ -285,6 +289,7 @@ function fixture(
     technologies?: TechnologyClient;
     learningPaths?: LearningPathClient;
     proposals?: ProposalClient;
+    modules?: ModuleClient;
   } = {},
 ) {
   const calls: string[] = [];
@@ -342,6 +347,7 @@ function fixture(
     options.technologies,
     options.learningPaths,
     options.proposals,
+    options.modules,
   );
   const disconnect = controller.connect();
   t.after(() => controller.dispose());
@@ -1826,4 +1832,56 @@ test('U rechecks Technology uncertainty after coordination queueing, before poss
   assert.equal(captures, 0);
   assert(f.controller.hasTechnologyUncertainty());
   assert.equal(f.controller.getProposalIntent(user.id).phase, 'none');
+});
+
+test('F045 restricted Module read keeps token private and cancels on authority loss', async (t) => {
+  let calls = 0,
+    resolve!: (value: {
+      items: never[];
+      pagination: typeof emptyPaths.pagination;
+    }) => void,
+    signal!: AbortSignal;
+  const delayed = new Promise<{
+    items: never[];
+    pagination: typeof emptyPaths.pagination;
+  }>((yes) => {
+    resolve = yes;
+  });
+  const f = fixture(
+    t,
+    {},
+    {
+      modules: {
+        async execute(request, access, ownedSignal) {
+          calls++;
+          signal = ownedSignal;
+          assert.equal(access, token);
+          assert.equal(request.kind, 'list');
+          return delayed;
+        },
+      },
+    },
+  );
+  await f.controller.login(user.email, 'synthetic-password');
+  const request = {
+    kind: 'list',
+    query: {
+      technologyId: 'b'.repeat(24),
+      learningPathId: 'c'.repeat(24),
+      page: 1,
+      limit: 20,
+    },
+  } as const;
+  await assert.rejects(
+    f.controller.requestModule('f'.repeat(24), request),
+    ModuleError,
+  );
+  const pending = f.controller.requestModule(user.id, request);
+  await flush();
+  f.controller.cancel();
+  assert(signal.aborted);
+  resolve(emptyPaths);
+  await assert.rejects(pending, ModuleError);
+  assert.equal(calls, 1);
+  assert(!JSON.stringify(f.controller.getSnapshot()).includes(token));
 });

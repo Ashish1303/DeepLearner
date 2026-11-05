@@ -1,3 +1,4 @@
+import { ModuleInspector } from '../modules/module-inspector';
 import { useRef, useSyncExternalStore } from 'react';
 import {
   LearningPathProposalForm,
@@ -323,6 +324,18 @@ export function LearningPathManager({
             editorial actions are unavailable in this workspace.
           </p>
         </section>
+      )}
+      {state.detail && (
+        <ModuleInspector
+          key={
+            accountId + ':' + state.detail.technologyId + ':' + state.detail.id
+          }
+          auth={auth}
+          accountId={accountId}
+          technologyId={state.detail.technologyId}
+          learningPathId={state.detail.id}
+          disabled={proposalBusy}
+        />
       )}
       <LearningPathProposalForm
         auth={auth}

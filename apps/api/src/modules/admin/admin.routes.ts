@@ -1,3 +1,6 @@
+import type { AdminModuleService } from './modules/admin-module.service.js';
+import type { ModuleReadLimits } from './modules/admin-module-rate-limit.js';
+import { createAdminModuleRouter } from './modules/admin-module.routes.js';
 import { Router } from 'express';
 import { env } from '../../config/env.js';
 import { authenticate } from '../../middleware/authenticate.js';
@@ -28,6 +31,8 @@ export function createAdminRouter(
   learningPathLimits?: LearningPathReadLimits,
   proposals?: AdminLearningPathProposalService,
   proposalLimits?: ProposalLimits,
+  modules?: AdminModuleService,
+  moduleLimits?: ModuleReadLimits,
 ) {
   const router = Router();
   const limit = createAdminRateLimits(limits);
@@ -43,6 +48,7 @@ export function createAdminRouter(
     limit.account,
     requireAdmin(service),
   );
+  router.use('/modules', createAdminModuleRouter(modules, moduleLimits));
   router.use(
     '/technologies',
     createAdminTechnologyRouter(tokens, technologies, technologyLimits),

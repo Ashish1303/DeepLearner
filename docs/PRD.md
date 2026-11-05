@@ -2902,3 +2902,54 @@ For UI work require implementation -> offline checks -> genuine local demonstrat
 requires an explicit named exception; mock previews are not live integration.
 Manual evidence supplements, never replaces, automated security/database/browser
 acceptance. Do not retroactively relabel earlier results or unlock F044.
+
+
+## 108. Product-development reset — 2026-11-05
+
+This is a current implementation reconciliation, not feature acceptance. The
+authoritative central product document is **docs/PRD.md**, especially sections
+1, 13, 27, 45–52, 105 and 107. There is no separate central Admin/AI Studio PRD;
+section 107 already consolidates that approved direction, so no duplicate PRD is
+introduced. Feature contracts refine it. The approved visual reconciliation is
+docs/design/stitch/SCREEN_MAP.md with shared/DESIGN.md. Its delivered charcoal,
+lavender and purple implementation is the reuse baseline; historical teal/proposed
+wording is not authority for another redesign.
+
+Owner-approved requirements remain: select Technology → enter audience/depth/goals/
+runtime/version → bounded AI outline → Admin review and exact outline approval →
+selected lesson generation → review → publication. F044 currently supplies a
+private Admin-authored brief/proposal, not AI generation or editorial approval.
+F049/F050 own editorial decisions, F051 publication and F054 generation. Provider,
+usage controls and interview work retain their existing IDs/dependencies.
+
+| Feature | Actual implemented behavior | Remaining product work | Verification debt | Real dependencies | Next deliverable |
+| --- | --- | --- | --- | --- | --- |
+| F043 Technology / F044 Learning Paths / F045 Modules | Technology inventory/detail and revision-controlled draft create/edit; protected read-only Paths; this branch adds read-only Module inspection. | F044 full proposal/inspection completion; F045 Module proposals/review, then F046 Topics. | F042/F043 acceptance BLOCKED; F043 15 database records unexecuted; F044 original nine records unexecuted; current new Module live checks unexecuted. | Current verified ACTIVE Admin boundary, consistent stored hierarchy, existing schemas and qualified live target/indexes. | Review this F045 read-only vertical slice; keep authoring separate. |
+| F044 private brief/proposal Save and recovery | C1/S structures, P internal atomic-save design, API A and UI U with explicit Save, private result and actor-bound GET recovery are committed. | Qualified live Save/uncertainty acceptance and any separately contracted proposal inspection improvements. | Original nine / P five / API six integration groups remain distinct and NOT_RUN; U01–U16 NOT_RUN, runner BLOCKED. | Current Admin transaction fence, physical brief/proposal/audit indexes and atomic transaction verification before real Save. | Separately qualify live Save prerequisites; no new persistence machinery here. |
+| F054 AI Studio brief → curriculum outline | Admin-authored brief entry exists in F044; static AI Studio preview exists. No provider-backed outline generation. | Bounded outline generation, source policy, exact-revision review/correction flow. | No live AI-generation evidence; preview is not generated content. | F052 provider abstraction (formal dependency F049); F053 usage/privacy/budget controls; source authority; approved outline schema and F049/F050 review contract. | Finalize a bounded F054 outline contract and explicit prerequisite order before implementation. |
+| F047/F048/F054–F057 lesson generation/review presentation | Existing Student renderers/modes and inert Lesson Review Studio design; no complete Admin lesson generator. | Private lesson revisions, safe preview, bounded five-mode generation and validation. | No generated-content, source/quality or preview acceptance. | Approved outline revision; F047 private content, F048 safe preview, F049/F050 review, F052/F053 controls; supported renderer contracts. | Define the smallest F047 private lesson scope after Module/Topic interfaces are settled. |
+| F049 Content Status Workflow / F050 Approval Queue | Existing catalog DRAFT/PUBLISHED/ARCHIVED fields and private proposals; no general editorial queue or decisions. | Exact-revision/digest review, reject/changes-required/approve and controlled correction requests. | No editorial transaction/concurrency acceptance. | F049 formal dependency F047; source/revision identities, current Admin authority and atomic audit. | Contract the bounded editorial decision boundary; authenticated brief admission is not approval. |
+| F051 Publish / Archive Flow | Public APIs filter existing published catalog; no general Admin publication workflow. | Reviewed module manifests, eligibility rechecks, atomic publication/audit, unknown-outcome reconciliation. | No real publication guarantees established. | Reviewed exact revisions from F049/F050, complete hierarchy, immutable manifests and qualified transactions/indexes. | Publication preflight contract after review semantics exist. |
+| F058–F061 Interview | Standalone preview only; no live Interview bank/UI or isolated Coding Run/Test. | Technology-owned question bank, Student browse/reveal, Admin per-question review and eligible selection publication. | Preview does not establish functional or browser acceptance. | Question/revision contract; individual review/publication invariants; coding execution separately qualified. F060 personal classifications remain separate. | Define F058 bank/API contract; do not add interview behavior to F044. |
+
+The owner authorizes an independent product lane and one eligible bounded slice.
+The selected implementation recommendation is **F045 read-only Module inspection**,
+reusing existing hierarchy/storage and Admin components. This is an intentionally
+partial first F045 slice, not approval of Module proposal/review persistence.
+Alternative B would build Module authoring/proposals and release membership now;
+its extra value is editable reviewable module definitions, but it needs new model,
+transaction, audit and editorial decisions. Those are not needed to inspect existing
+Modules. No new AI/provider/ingestion framework is introduced.
+
+Existing F054/F052/F053 dependency order is a genuine blocker to generation, unlike
+the unrelated U16 runner failure. A provider/model is not selected here. UI preview
+metrics, mocked output or offline PASS must never be presented as generated product
+content or live security/database proof. Final feature acceptance remains blocked.
+
+Evidence ledger: 213 unaffected plus 12 corrected mocked-browser results cover 225
+stable identities, as combined historical evidence, not a fresh full-suite run.
+All 16 U cases remain NOT_RUN. F044 original nine, P five and API six database groups
+remain NOT_RUN; do not combine them into a qualified suite. U16 forced containment,
+recorded resource releases and permanent UNKNOWN Job-empty/retained-exit proof are
+preserved. Running resources and their bindings remain owned by the original
+checkout; this isolated branch is not runtime-qualified. No source-pin refreeze.

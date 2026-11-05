@@ -2903,3 +2903,13 @@ cleanup/protected baselines and authenticated RESULT/ACK are not established by
 mocks or prepared assertions. Snapshot parent race remains; no lifecycle fence.
 F044 IN_PROGRESS; F042/F043 acceptance BLOCKED; production NOT_VERIFIED. U/live
 verification and every Git delivery still require their own approval.
+
+## F045 protected Module inspection — partial offline checkpoint, 2026-11-05
+
+Add protected GET /api/v1/admin/modules inventory and /:id detail, both requiring
+technologyId AND learningPathId. The exact query/DTO/pagination/deadline/error and
+authorization contract is in features/F045-admin-module-management.md. Existing
+F018 public published-only endpoints, models and F044 proposal Save/recovery are
+unchanged. All three stored statuses and archived ancestors permit Admin inspection;
+cross-parent, orphan and corrupt records fail closed. No Module write endpoints.
+Physical indexes/live read behavior are unverified; declarations are not provisioning.

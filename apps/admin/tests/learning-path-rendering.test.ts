@@ -153,6 +153,8 @@ function load(
   }).outputText;
   const out: Record<string, unknown> = {};
   new Function('require', 'exports', js)((name: string) => {
+    if (name === '../modules/module-inspector')
+      return { ModuleInspector: () => null };
     if (name === 'react/jsx-runtime') return require(name);
     if (name === 'react')
       return {
