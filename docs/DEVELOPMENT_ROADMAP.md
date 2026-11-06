@@ -16,11 +16,57 @@ is authorized by this update. F044 remains NOT_STARTED and not authorized.
 
 ## F053 G2.2 offline implementation — 2026-11-06
 
-**G2.2 READY_FOR_REVIEW — offline only; delivery pending. Full F053 IN_PROGRESS; acceptance incomplete.** Owner approval `7e0a761c-9e39-40bd-8ea5-053d725b6398/Pasted text.txt` enacted only the exact ten-path exception in AGENTS. Implementation began IN_PROGRESS on clean primary `dev`, `E:\AI\DeepLearner`, HEAD `7170516f08b914594d84605bbaa7e5771576a7f7`; HEAD/index unchanged, no branch or Git delivery. Historical G2.1/G2 planning/delivery sections below retain their dated meaning.
+**G2.2 bounded offline development/review/delivery checklist: complete. Full F053 IN_PROGRESS; feature acceptance incomplete.** Implemented on primary `dev`, `E:\AI\DeepLearner`, from clean base `7170516f08b914594d84605bbaa7e5771576a7f7` under approval `7e0a761c-9e39-40bd-8ea5-053d725b6398/Pasted text.txt`. The earlier READY_FOR_REVIEW checkpoint was separately approved for delivery and pushed as recorded below. Historical sections retain their dated meaning.
+
+### G2.2 verified development-checkpoint delivery - 2026-11-06
+
+Owner approval `b22c239d-79ff-4db8-b2be-41427c2bee73/Pasted text.txt` authorized
+this direct-dev delivery and factual two-document follow-up. Implementation commit
+`16bb8d36518650da58639a4451ad5de1bd093858` has parent `7170516f08b914594d84605bbaa7e5771576a7f7` and contains
+exactly the ten reviewed paths. Normal fast-forward push to `origin/dev` succeeded;
+local, tracking and freshly queried remote dev matched the implementation commit
+at `2026-11-06T13:40:12.402061+00:00`. No PR exists for this direct delivery.
+
+The bounded G2.2 implementation, offline verification, separate-agent review and
+required development-delivery checklist is complete. Full F053 stays IN_PROGRESS;
+feature acceptance and production readiness remain incomplete. Source/test bytes
+match the approved fingerprints: 55 persistence/control-flow tests plus 10 audit
+regressions PASS, full API/test TypeScript and production API build/typecheck PASS,
+targeted lint/format/static checks PASS. These application results are retained,
+not rerun for delivery. Reviewer `/root/f053_g22_source_review` performed fresh
+source/test/documentation review in this assistant session, APPROVE with zero
+unresolved findings, and did not independently execute tests. Actual artifact:
+external `f053-g22-20261106T123319Z/independent-review.txt`, created
+`2026-11-06T13:26:34.582745+00:00`, factual follow-up `13:27:17.801247+00:00`.
+No separately authenticated human or submitted GitHub approval is claimed.
+
+Delivery checks actually executed: reviewed fingerprints and exact staged scope,
+affected formatting/local links, UTF-8/no BOM/LF, privacy/history/whitespace,
+`git diff --cached --check`, approved origin/fresh ancestry and applicable GitHub
+rules. No branch protection or applicable branch rules blocked direct delivery;
+zero/pending checks are not CI PASS. Other eleven worktrees and their pending
+files are preserved. No application-source correction or runtime/pin change.
+
+This follow-up changes only F053 and DEVELOPMENT_ROADMAP. Its commit, normal push,
+final identity reconciliation and remaining pending state are recorded in external
+`f053-g22-delivery-20261106T133655Z` receipts and the final handoff; no self-referential
+commit hash is invented here. Current users retain the existing private brief/Save
+workspace and gain no live Generate capability. Internal coordinator code remains
+unregistered/inactive; stored claims grant no dispatch authority. Authoritative
+resolvers, privacy/retention/spending policy, physical indexes, real transaction/
+concurrency/audit/cleanup and live-accounting gates remain open. New prepared
+`F053_G22_PARENT` and `G22-I01`-`I08` remain NOT_RUN, as do every previously
+unexecuted group. Mocks establish control flow, not database or billing truth.
+
+**Proposed next task, separate authorization required:** define the authoritative
+resolver/activation contract and the remaining G2 real-acceptance prerequisites,
+including explicit retention and spending decisions, exact fixture/index/case
+coverage and existing ownership/RESULT-ACK/cleanup gates. Documentation only;
+no automatic implementation, activation, qualification, provider call or F054.
 
 Implemented internal injected repository/service for actor-bound reservation/recovery, claim, cancellation, settlement, uncertainty and reconciliation; native primary snapshot reads, User-version fencing, control/pointer/period/operation CAS and strict append-only audit boundaries. No production resolver registration, endpoint/UI, actual dispatch or user-facing Generate capability. Current users retain existing private brief/Save functionality.
 
-Exact ten paths: four CREATE `apps/api/src/modules/ai/ai-usage-ledger.repository.ts`, `apps/api/src/modules/ai/ai-usage-ledger.service.ts`, `apps/api/tests/ai-usage-ledger-persistence.test.ts`, `apps/api/tests/ai-usage-ledger.integration.ts`; six MODIFY `apps/api/src/modules/audit/audit.model.ts`, `apps/api/tests/auth-audit.test.ts`, `AGENTS.md`, F053, DATABASE_DESIGN and this roadmap. All remain pending and unstaged. Delivered G1/O1/G2.1 and the other11 worktrees are preserved.
+Exact ten paths: four CREATE `apps/api/src/modules/ai/ai-usage-ledger.repository.ts`, `apps/api/src/modules/ai/ai-usage-ledger.service.ts`, `apps/api/tests/ai-usage-ledger-persistence.test.ts`, `apps/api/tests/ai-usage-ledger.integration.ts`; six MODIFY `apps/api/src/modules/audit/audit.model.ts`, `apps/api/tests/auth-audit.test.ts`, `AGENTS.md`, F053, DATABASE_DESIGN and this roadmap. These ten paths were committed and pushed; only the separately authorized two-document factual follow-up remained pending during its preparation, with final Git state recorded in the external delivery receipt. Delivered G1/O1/G2.1 and the other11 worktrees are preserved.
 
 Executed final checks: **65 focused tests PASS** (55 persistence/control-flow +10 affected audit), full API/test TypeScript and production API build/typecheck PASS, targeted lint/format/UTF-8/LF/links/privacy/scope/history/diff PASS. These use synthetic resolvers and inert driver/session doubles. Fresh separate-agent source review APPROVE with zero unresolved findings; reviewer executed no tests and is not an authenticated human/GitHub review. Source/error/deadline/replay fixes and actual provenance are recorded in the [canonical G2.2 handoff](features/F053-ai-security-usage-controls.md#f053-g22-offline-implementation--2026-11-06); external receipts/review are under `f053-g22-20261106T123319Z`. No unchanged G1/O1/G2.1 suites or completed reviews were repeated.
 
@@ -28,7 +74,7 @@ Critical limitation: installed driver abort resolution does not prove a server A
 
 New prepared `F053_G22_PARENT` + `G22-I01`–`I08` remain **NOT_RUN**, distinct from original9/P5/API6 and browser evidence. Import is inert. The uncertain rollback case is last; an uncertain race stops later cases, never replays a key. Two owned Admins/six distinct synthetic intents, exact physical indexes/target/baseline, source/runtime/result manifests and existing authenticated RESULT/ACK/cleanup qualification need separate approval; preparation proves none of them. No live persistence/provider/network/credential/DDL/provisioning/runtime/harness/pin/dependency operation occurred.
 
-Keep F042/F043 acceptance BLOCKED, F044/F045/F049/F052 incomplete, all unexecuted groups including U01–U16 NOT_RUN, historical combined225 identity evidence separate from new execution, permanent U16 Job-empty/retained-exit UNKNOWN and production NOT_VERIFIED. Full-feature acceptance is unchanged. **Next action:** owner review/authorize ten-path G2.2 checkpoint delivery only; no automatic live verification, activation, F054 or further implementation.
+Keep F042/F043 acceptance BLOCKED, F044/F045/F049/F052 incomplete, all unexecuted groups including U01–U16 NOT_RUN, historical combined225 identity evidence separate from new execution, permanent U16 Job-empty/retained-exit UNKNOWN and production NOT_VERIFIED. Full-feature acceptance is unchanged. **Next action:** separately authorize the documentation-only authoritative-resolver/activation and remaining real-acceptance contract task proposed above; no automatic live verification, activation, spending, F054 or further implementation.
 
 ## F053 G2.1 offline implementation — 2026-11-06
 
