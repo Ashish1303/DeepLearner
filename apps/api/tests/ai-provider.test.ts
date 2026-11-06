@@ -390,6 +390,74 @@ for (const [i, budgetMs] of [
     assert.equal(fake.calls.length, 0);
   });
 }
+test('changing budget getter is read once and cannot widen the validated deadline', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let reads = 0;
+  let time = 0;
+  const fake = createFakeAiProvider({ kind: 'deferred' });
+  const executor = createExecutor(fake.provider, { now: () => time });
+  const result = executor.execute(request(), {
+    get budgetMs() {
+      return ++reads === 1 ? 100 : 100_000;
+    },
+  });
+  await Promise.resolve();
+  assert.equal(reads, 1);
+  assert.equal(fake.calls.length, 1);
+  time = 20_000;
+  fake.resolve(envelope());
+  refusal(await result, 'DEADLINE_EXCEEDED', 'STARTED');
+  assert.equal(reads, 1);
+  assert.equal(fake.calls.length, 1);
+  assert.equal(fake.calls[0]?.signal.aborted, true);
+});
+
+test('changing budget getter cannot widen the scheduled timer', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let reads = 0;
+  const fake = createFakeAiProvider({ kind: 'deferred' });
+  const result = createExecutor(fake.provider, { now: () => 0 }).execute(
+    request(),
+    {
+      get budgetMs() {
+        return ++reads === 1 ? 100 : 100_000;
+      },
+    },
+  );
+  let settled = false;
+  void result.then(() => {
+    settled = true;
+  });
+  await Promise.resolve();
+  assert.equal(reads, 1);
+  assert.equal(fake.calls.length, 1);
+  t.mock.timers.tick(99);
+  assert.equal(fake.calls[0]?.signal.aborted, false);
+  assert.equal(settled, false);
+  t.mock.timers.tick(1);
+  assert.equal(fake.calls[0]?.signal.aborted, true);
+  refusal(await result, 'DEADLINE_EXCEEDED', 'STARTED');
+  fake.resolve(envelope());
+  await Promise.resolve();
+  assert.equal(reads, 1);
+  assert.equal(fake.calls.length, 1);
+});
+
+test('invalid first budget getter value refuses without reading a later valid value', async () => {
+  let reads = 0;
+  const { executor, fake } = ready();
+  refusal(
+    await executor.execute(request(), {
+      get budgetMs() {
+        return ++reads === 1 ? 10_001 : 100;
+      },
+    }),
+    'INVALID_REQUEST',
+  );
+  assert.equal(reads, 1);
+  assert.equal(fake.calls.length, 0);
+});
+
 test('maximum local budget is accepted without introducing a live call', async () => {
   const { executor } = ready();
   assert((await executor.execute(request(), { budgetMs: 10_000 })).ok);

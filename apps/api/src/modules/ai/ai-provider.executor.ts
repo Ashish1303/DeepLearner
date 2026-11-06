@@ -212,8 +212,9 @@ export function createAiProviderExecutor(
     async function run(): Promise<AiProviderOutcome> {
       let request: Readonly<AiProviderRequest>;
       try {
-        if (!integer(options.budgetMs, 1, 10_000)) throw new Error();
-        budget = options.budgetMs;
+        const requestedBudget = options.budgetMs;
+        if (!integer(requestedBudget, 1, 10_000)) throw new Error();
+        budget = requestedBudget;
         external = options.signal;
       } catch {
         return failure('INVALID_REQUEST');
