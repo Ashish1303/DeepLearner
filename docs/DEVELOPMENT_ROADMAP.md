@@ -14,6 +14,130 @@ is authorized by this update. F044 remains NOT_STARTED and not authorized.
 
 ---
 
+## F053 G2.1 offline implementation — 2026-11-06
+
+**G2.1 READY_FOR_REVIEW — offline only. Full F053 IN_PROGRESS; acceptance incomplete; Git delivery pending.** Implementation started IN_PROGRESS under owner approval `48487282-8157-4502-a9a8-f3d3728c8266/Pasted text.txt`, which accepts the four reviewed pending documents as the working baseline. Branch/worktree: primary `dev`, `E:\AI\DeepLearner`, unchanged HEAD `29aa57b3395e1eaf51d5bc68af5de943d6351c61`, empty index. Starting fingerprints and other-worktree snapshots: external `f053-g21-20261106T101636Z/before.json`.
+
+### Implemented capability and exact inventory
+
+G2.1 supplies internal strict native-record/quote/command validators, exact integer-paise/BSON Long/bigint conversion and conservative rounding, four fixed-vector fingerprints, immutable identity/quote/claim/evidence guards, private DTO projection and deterministic transition proposals. ObjectId `activeOperationId` binds the matching open operation; only matching-pointer clearing is proposed. Every proposal has `dispatchAuthorized: false`.
+
+New files (five):
+
+- `apps/api/src/modules/ai/ai-usage-ledger.schema.ts`
+- `apps/api/src/modules/ai/ai-usage-ledger.model.ts`
+- `apps/api/src/modules/ai/ai-usage-ledger.dto.ts`
+- `apps/api/src/modules/ai/ai-usage-ledger.transitions.ts`
+- `apps/api/tests/ai-usage-ledger.test.ts`
+
+Accepted pre-existing pending documents (four): `AGENTS.md`, `docs/features/F053-ai-security-usage-controls.md`, `docs/DATABASE_DESIGN.md`, `docs/DEVELOPMENT_ROADMAP.md`. Only this combined nine-path inventory changes. Earlier preparation/proposed-only sections below retain their historical meaning; the enacted exception in AGENTS authorizes only this G2.1 implementation.
+
+Frozen/prior-month liabilities refuse prohibited admission/claim but retain explicitly permitted known-evidence cancellation/accounting/reconciliation. Unknown usage remains fully held. Reconciliation updates the original period, clears only the applicable uncertainty reason and retains independent holds. Identical terminal-evidence replay is read-only; conflicts/unlisted state-action pairs refuse. Late claimed outcomes require uncertainty/reconciliation rather than normal late settlement.
+
+Models register only through the explicit disconnected factory, with no import-time application registration, connection, buffering or automatic collection/index creation. Schema-level immutable fields plus strict native validation guard the offline models; save/update/bulk/DDL entry points refuse. Eleven required indexes are declarations, including existing dependencies, not physical evidence. Native ObjectId validation matches the installed BSON 7 representation and fails closed if that representation changes; dependency upgrades require compatibility review.
+
+### Executed checks and review
+
+- Focused `node --import tsx --test --test-reporter=tap apps/api/tests/ai-usage-ledger.test.ts`: **159 PASS, 0 FAIL, 0 skipped** after final source correction. Deterministic synthetic tests only; no database/provider/runtime execution.
+- Full API/test `tsc -p apps/api/tsconfig.test.json --noEmit --incremental false --pretty false`: **PASS**; no remaining errors.
+- Production API `tsc -p apps/api/tsconfig.json --incremental false --pretty false`: **PASS** (build/typecheck).
+- Targeted five-file ESLint and Prettier, new Markdown-fragment formatting, UTF-8/no BOM/LF, local links/anchors, privacy, exact scope/history/worktree preservation and `git diff --check`: **PASS**. External final check receipt retains exact fingerprints; it is not a guarded execution-manifest refreeze.
+- Fresh separate-agent source review: **APPROVE**, zero unresolved Critical/High/Medium/Low findings. Reviewer `/root/f053_g21_source_review` is a separate agent in this assistant session, not a separately authenticated human or GitHub reviewer; it reviewed source/tests/contract and root-run evidence, and did not independently execute tests. Actual timestamped artifact: external `f053-g21-20261106T101636Z/independent-review.txt`.
+
+Review resolved two Medium findings: explicitly refuse over-cap exposure on dispatch claim; refuse normal settlement at/after the observation deadline and require the defined uncertainty/reconciliation path. Regression tests cover both. Defensive follow-ups harden native comparison against caller hooks, require UNCERTAIN/control-reason consistency and reject contradictory/future DTO snapshots. In-scope typing/lint findings were corrected and affected checks passed; no compiler relaxation or unrelated baseline repair.
+
+### Established limits and next action
+
+All actor/source/profile/pricing/evidence/authorization flags are **supplied structural facts**, not authenticated truth. No result authenticates an Admin, admits a request, writes an audit event or grants dispatch. DTOs are private projections, not persisted RECORDED receipts. No repository/service/audit-model writer, HTTP/UI/config activation, connection/DDL, provisioning, spending, live profile, provider call, dependency/runtime/harness/pin change, G2.2 or F054 work occurred. Users gain no live Generate capability; the existing private brief/Save workflow is unchanged.
+
+Stored existence, current-account/session authorization and transactional User fencing, authoritative source/pricing/evidence resolution, atomic counters/audits, idempotency/concurrency/uniqueness, actual BSON storage/indexes, missing-period service reads, commit uncertainty and real cleanup remain unverified and belong to separately approved durable work/qualification. Retention, live spending/privacy/provider decisions remain open. Local timeouts cannot establish remote cancellation or billing guarantees.
+
+Preserve F042/F043 acceptance BLOCKED; F044/F045/F049/F052 incomplete acceptance; original nine integration records, five P assertions and six API assertions NOT_RUN. Preserve all unexecuted browser groups including U01–U16, historical combined 225-identity evidence as combined (not a fresh full-suite run), parked U16 and permanent Job-empty/retained-exit UNKNOWN. Production NOT_VERIFIED. No staging, commit, push or merge.
+
+**Exact next action:** owner review and separate authorization for development-checkpoint delivery of these nine paths. G2.2 remains NOT_STARTED and requires its own implementation approval; this READY_FOR_REVIEW does not authorize it or live verification.
+
+## F053 G2 contract preparation — 2026-11-06
+
+**Full F053: IN_PROGRESS; acceptance incomplete. G1 bounded offline implementation,
+review and required delivery complete. G2 contract: READY_FOR_REVIEW;
+implementation: NOT_STARTED. No G2 exception is active.**
+
+### G2 focused contract correction and re-review — 2026-11-06
+
+Desktop findings G2-01 Medium and optional G2-02 Low are resolved in the
+[focused F053 record](features/F053-ai-security-usage-controls.md#g2-focused-correction-and-re-review--2026-11-06):
+operation-specific acceptance permits only defined, evidenced accounting/uncertainty
+transitions while prohibited admission/dispatch still refuses; the active pointer
+references the operation document ObjectId with exact linkage and CAS clearing.
+Fresh separate-agent review `/root/f053_g2_focused_rereview`: **APPROVE**, zero
+remaining findings in this scope; not a human/GitHub approval or full G2 re-review.
+Its timestamped external report is `f053-g2-correction-20261106T100030Z/focused-review.txt`.
+
+Affected documentation format/links/anchors/consistency/UTF-8/LF/privacy checks
+PASS; applied scope/whitespace are verified in the correction receipt. No application
+tests or unchanged G1 suites rerun. Only F053, DATABASE_DESIGN and roadmap change
+in this pass; AGENTS is unchanged within the existing four-path pending inventory.
+Prior preparation/self-review evidence below retains its as-of meaning and hashes.
+User capability and full F053 IN_PROGRESS status are unchanged.
+
+Exact next action: owner authorizes the unchanged nine-path G2.1 checkpoint and
+its still-inactive PROPOSED — PENDING OWNER APPROVAL exception, explicitly
+reconciling the four pending documents into its implementation baseline first.
+G2.1 remains NOT_STARTED. All acceptance blocks, NOT_RUN groups, historical UNKNOWN
+and production NOT_VERIFIED remain. No implementation or Git delivery follows here.
+
+Current preparation runs directly on `dev`, primary `E:\AI\DeepLearner`, starting
+HEAD `29aa57b3395e1eaf51d5bc68af5de943d6351c61`, initially clean tree/empty index.
+No branch/worktree creation or switch. PR #6 merge
+`784f01e6030ae5919c950d713b1d999d517a5c69` and the G1 delivery below are retained;
+older “next G2 preparation” notes are historical, not an instruction to repeat G1.
+
+The [canonical G2 contract](features/F053-ai-security-usage-controls.md#g2-authoritative-reservation-contract--2026-11-06)
+now defines trusted actor/profile/time/usage, User-version fencing, actor/key and
+request/quote fingerprints, three bounded ledgers, exact11-index prerequisites,
+atomic admission/counters/audit, no-replay state transitions, uncertainty and
+cross-month liabilities. The [database appendix](DATABASE_DESIGN.md#f053-g2-proposed-usage-storage--2026-11-06)
+is proposed storage only. AGENTS contains an inactive G2.1-only proposal because
+the enacted G1 exception does not authorize a durable successor.
+
+Users gain no new Generate capability from documentation. Existing F044 private
+brief/Save remains distinct from actual AI output. Future private outline/review
+milestone and F049/F050/F051 ownership are unchanged. A G1 proposal/O1 outcome is
+never live dispatch authority; remote exactly-once, cancellation and billing are
+not guaranteed by local transactions/deadlines.
+
+Proposed next implementation checkpoint **G2.1**, exact nine paths in the canonical
+inventory: four inert schema/model/DTO/transition files, their focused test and
+AGENTS/F053/DATABASE_DESIGN/roadmap evidence. Estimate60–90min, hard90, after
+separate owner contract/implementation/sequencing approval. No writer, audit-model
+edit, endpoint/UI, live profile or execution. G2.2's internal transactional service,
+repository/audit extension and prepared DB assertions follow only with separate
+approval; estimate two60–90min bounded sessions, hard90 each. Combined proposed
+source inventory15 paths, source effort3–4.5hours; real qualification is additional.
+
+Required owner/live decisions: accounting/evidence retention/access/erasure,
+reconciliation policy, approved trusted profile/quote sources and physical storage;
+before egress also vendor/model/context/all-in pricing, admission-month versus
+invoice attribution, privacy/provider retention and bounded spending. INR1000/80%
+is testing design, not spending permission or a production default. None of these
+needs a vendor choice for G2.1's synthetic offline tests.
+
+Preparation pending inventory is exactly four documents: `AGENTS.md`,
+`docs/features/F053-ai-security-usage-controls.md`, `docs/DATABASE_DESIGN.md`,
+`docs/DEVELOPMENT_ROADMAP.md`. Documentation formatting/link/consistency/UTF-8/LF/
+whitespace/scope/privacy checks PASS for the new text; historical bytes and the
+other11 worktrees' pending-file fingerprints/heads/indexes are preserved, and
+`git diff --check` PASS. G1 suites/review are not rerun. Review is this session's
+self-review, not independent implementation approval.
+Other worktrees, pending files, runtime bindings and Desktop context are untouched.
+
+Exact next action: owner reviews the contract and approves **G2.1 only** (including
+its inactive sequencing proposal) before any code starts. F053 stays IN_PROGRESS;
+F042/F043 acceptance BLOCKED, F044/F045/F049/F052 incomplete, original9/P5/API6 and
+other unexecuted integration/U groups NOT_RUN, U16 blocked/permanent Job-empty/
+retained-exit UNKNOWN, combined225 mocked identities not a new full-suite run, and
+production NOT_VERIFIED. No Git delivery, runtime or provider/DB action is authorized.
+
 ## Admin completion reconciliation and G1 review — 2026-11-06
 
 ### G1 integrated development checkpoint — 2026-11-06

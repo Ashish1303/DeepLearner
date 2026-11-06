@@ -1287,3 +1287,58 @@ rule; each retains its existing separate owner-approval/security gates.
 This governs new work without changing feature, security or acceptance gates.
 The owner separately authorized finishing the existing product/f053-control-contract
 branch in place as a one-time delivery; do not transfer its pending work to dev.
+
+## Proposed F053 G2.1 offline foundation exception — 2026-11-06
+
+**PROPOSED — PENDING OWNER APPROVAL. NOT ACTIVE.** Documentation preparation does
+not enact this text. The existing G1 exception does not authorize G2 implementation.
+If separately approved, permit only the exact nine-path G2.1 inventory in
+[F053's canonical contract](docs/features/F053-ai-security-usage-controls.md#g2-exact-proposed-implementation-inventory-and-completion-criteria):
+four new schema/model/DTO/pure-transition files, their focused test and the four
+AGENTS/F053/DATABASE_DESIGN/roadmap evidence documents. Work directly on clean dev
+under the single-writer rule, with exact baseline, stable delivered G1/O1,
+approved structural semantics and no blocking dependency security finding.
+
+This future exception would defer full F047/F049/F052 acceptance only for this
+inert offline foundation. Require meaningful synthetic boundary/privacy/inertness
+tests, full API/test TypeScript, API build/typecheck, targeted lint/format/UTF-8/LF/
+scope/diff and fresh independent review; resolve findings. Mark checkpoint readiness
+separately from partial full F053 IN_PROGRESS. Supplied facts, model/index declarations
+and pure transition results establish no authoritative admission or live guarantees.
+
+No G2.2 repository/service/audit-model writer, endpoint/UI, profile activation,
+database/network/provider operation, provisioning/DDL, spending, F054 progression,
+new dependency, runtime/harness/pin work, retry or fallback is permitted. Preserve
+current authority, transactions/physical indexes, privacy, ownership/RESULT-ACK,
+cleanup/deadlines and all acceptance gates; no unsafe reliance on unverified
+persistence. Preserve BLOCKED acceptance, NOT_RUN groups, permanent historical
+UNKNOWN and production NOT_VERIFIED. Default sequencing remains outside this named
+future checkpoint. Each later implementation, live operation and Git delivery
+requires separate owner approval; this proposal itself grants none.
+
+## Enacted F053 G2.1 offline foundation exception — 2026-11-06
+
+The owner approval `48487282-8157-4502-a9a8-f3d3728c8266/Pasted text.txt` activates
+only the named G2.1 exception proposed above: exact nine paths in F053, strict
+schema/model/DTO/pure-transition and test foundation plus four evidence documents.
+The four reviewed pending documents are explicitly accepted as the primary dev
+baseline at `29aa57b3395e1eaf51d5bc68af5de943d6351c61`, index empty. This supersedes
+the proposal's clean-tree prerequisite only for that accepted pending baseline;
+preserve it and history without discard/stash/commit or a new branch/worktree.
+
+Require corrected operation-specific accounting/uncertainty rules and ObjectId
+pointer binding, meaningful deterministic offline tests, full API/test TypeScript,
+API production build/typecheck, targeted lint/format/encoding/privacy/scope/diff,
+and fresh separate-agent source review with findings resolved. Record G2.1
+IN_PROGRESS when coding starts and READY_FOR_REVIEW only after its offline criteria
+pass. Full F053 stays IN_PROGRESS; delivery and acceptance remain separate.
+
+No G2.2 repository/service/audit writer, live persistence/configuration, startup
+registration, HTTP/UI, provisioning, database/network/provider call, spending,
+dependency, runtime/harness/pin changes, retry/fallback or F054 authority. Pure
+results grant no authenticated permission or remote billing/cancellation proof.
+Default sequencing and all User/transaction/index/privacy/ownership/RESULT-ACK/
+cleanup/acceptance gates remain. Preserve other worktrees, historical evidence,
+acceptance blocks, NOT_RUN groups, permanent UNKNOWN and production NOT_VERIFIED.
+No staging, commit, push or merge. Further checkpoints/live/Git actions need their
+own separate approval; the earlier inactive proposal remains historical.

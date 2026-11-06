@@ -2439,3 +2439,146 @@ or persistence framework. It declares no collection/index, transaction, audit,
 retention, actor or job model. Stored decisions must later bind actual content,
 authority, source/quality evidence and atomic audit under qualified persistence.
 No existing schema, physical database prerequisite or acceptance gate is weakened.
+
+## F053 G2 proposed usage storage — 2026-11-06
+
+**PROPOSED — PENDING OWNER APPROVAL. Contract preparation only; G2 implementation
+NOT_STARTED. Full F053 IN_PROGRESS, acceptance incomplete.** This appendix is the
+storage companion to the [canonical G2 contract](features/F053-ai-security-usage-controls.md#g2-authoritative-reservation-contract--2026-11-06).
+Its exact fields, hash frames, state transitions, internal signatures and test
+criteria are defined there. No collection/index/configuration is created here.
+Existing content, Student projections, auth policy and audit records remain intact.
+
+### G2 aggregates and exact representation
+
+Three bounded collections are proposed:
+
+- `aiUsageControls`: one shared scope, versioned approved-policy/profile references,
+  global open-operation pointer, freeze reasons and last admission time. This is
+  the cross-month write-conflict/freeze point, not a queue or pricing service.
+- `aiUsagePeriods`: unique scope/Kolkata month, settled/held counters and CAS version.
+  No automatic zero-reset, rollover release or separate duplicated uncertainty sum.
+- `aiUsageOperations`: immutable actor/key/intent/quote/source/admission identities,
+  exact reservation and period/minute, mutable CAS state/claim/terminal evidence,
+  held/actual amounts and latest append-only audit link. No raw brief/prompt/output,
+  credentials, access tokens, cookies or private configuration.
+
+`aiUsageControls.activeOperationId` is null or a BSON ObjectId reference to
+`aiUsageOperations._id`, never the actor-bound UUID `operationId`. String-only
+validated projections use exactly 24 lower-case hex characters. Resolve by `_id`
+and matching scope; require agreement with the sole validated open row and its
+stored actorId/operationId. Ordinary reads also bind the current authenticated
+actor; explicit reconciliation preserves original-actor identity and independently
+qualifies its performer. Missing/mismatched linkage refuses; no pointer-based
+adoption or competing identity. Admission sets the new document `_id` atomically.
+An open-to-terminal transaction clears only that exact ObjectId under control CAS
+with accounting/audit. A different pointer conflicts and is never cleared. An older
+terminal receipt has no pointer to itself; another valid operation may be active.
+
+All fields are exact allowlists from the canonical collection table; no arbitrary
+metadata bag. ObjectIds are canonical, UUID-v4 identities lower-case, hashes64-hex,
+versions nonnegative safe integers (operation versions start1), timestamps server
+UTC Dates and periods G1's YYYY-MM supported range. Each document <=64KiB encoded.
+No implicit registration, DDL/default activation or growing embedded event arrays.
+Disconnected models use `autoCreate:false`, `autoIndex:false`, `bufferCommands:false`,
+strict schemas and explicit timestamps/versions. Physical prerequisites must be
+verified separately; schema declarations do not prove stored BSON or indexes.
+
+Persist every paise amount as BSON signed Long, restricted0..9007199254740991;
+reservation/quote positive. Compute with bigint and check conversion/overflow/
+underflow. No binary floating-point price arithmetic or permissive model casting.
+Private DTO/audit amounts use canonical decimal strings and explicit null for
+unknown actual cost; null is never zero. G1 receives checked safe-integer numbers.
+Testing scope is SHARED_AI_TESTING/DEV, cap100000, warning80%, one open shared
+operation and one new actor admission per fixed UTC minute. These are testing
+design values, not production defaults or spending authorization.
+
+### G2 required index inventory — declarations only
+
+| Collection / name                               | Exact ordered key                                       | Constraint                                          |
+| ----------------------------------------------- | ------------------------------------------------------- | --------------------------------------------------- |
+| aiUsageControls / _id_                          | {_id:1}                                                 | built-in UNIQUE                                     |
+| aiUsageControls / uq_ai_usage_scope             | {scope:1}                                               | UNIQUE                                              |
+| aiUsagePeriods / _id_                           | {_id:1}                                                 | built-in UNIQUE                                     |
+| aiUsagePeriods / uq_ai_usage_period             | {scope:1,periodKey:1}                                   | UNIQUE                                              |
+| aiUsageOperations / _id_                        | {_id:1}                                                 | built-in UNIQUE                                     |
+| aiUsageOperations / uq_ai_usage_actor_operation | {scope:1,actorId:1,operationId:1}                       | UNIQUE                                              |
+| aiUsageOperations / uq_ai_usage_open            | {scope:1}                                               | UNIQUE, partial {open:true}                         |
+| aiUsageOperations / uq_ai_usage_actor_minute    | {scope:1,actorId:1,admissionWindowKey:1}                | UNIQUE, including terminal admitted operations      |
+| users / _id_                                    | {_id:1}                                                 | existing built-in UNIQUE                            |
+| auditLogs / _id_                                | {_id:1}                                                 | existing built-in UNIQUE                            |
+| auditLogs / uq_ai_usage_audit_version           | {resourceType:1,resourceId:1,'metadata.usageVersion':1} | UNIQUE, partial {resourceType:'AI_USAGE_OPERATION'} |
+
+Total11 required indexes: eight on three proposed collections, one proposed
+partial audit index, two existing `_id_` dependencies. Existing unrelated indexes
+are preserved, not removed/rebuilt. Require exact keys/order/options, simple
+collation, no sparse/hidden/TTL variants. A future qualifier must compare the two
+partial filters exactly; F044's existing non-partial matcher is not sufficient.
+No port/URI/PID establishes safe database identity or provisioning permission.
+
+### G2 accounting transactions and audit extension
+
+Use existing explicit primary snapshot transactions, majority+journaled commit,
+current-session verification and conditional current verified ACTIVE ADMIN User
+`__v` fencing. Every admission updates control+period, inserts the unique operation
+and audit atomically. Every later accounting transition CASes operation/control,
+updates the original period as applicable and appends one audit. Duplicate evidence
+returns the existing validated state without a second write; mismatches refuse.
+No automatic transaction callback/dispatch replay. Unknown commit/cleanup means
+explicit read reconciliation, not a new operation key or assumed rollback.
+
+RESERVED/DISPATCH_CLAIMED/UNCERTAIN remain open with full held reservation;
+SETTLED/RELEASED are closed with zero held and validated terminal evidence. Claim
+must commit before any separately authorized egress. A claim crash/timeout keeps
+liability even if actual dispatch is unknown. O1 NOT_STARTED, empty output or
+current process absence cannot independently prove no charge. Exact final all-in
+settlement subtracts held/adds actual once; an overrun is recorded and freezes new
+work, never clipped to cap. No accounting transition edits content/editorial state.
+
+Extend existing audit model/tests only under later G2.2 approval:
+
+- category CONTENT_MANAGEMENT; resourceType AI_USAGE_OPERATION;
+- actions AI_USAGE_RESERVED, AI_USAGE_DISPATCH_CLAIMED, AI_USAGE_UNCERTAIN,
+  AI_USAGE_SETTLED, AI_USAGE_RELEASED;
+- authenticated performer actorId, original actor in metadata, operation ObjectId
+  resourceId and unique resource/usageVersion event identity;
+- exact metadata/amount/null rules from the canonical G2 audit section. No raw
+  prompts/output, private digests, URLs, credentials or arbitrary provider errors.
+
+Audit failure rolls back all domain/counter writes. Existing action-specific
+metadata/privacy checks must remain unchanged for non-AI events. G2's new partial
+audit index is proposed, never automatically provisioned. Models/Mock tests cannot
+prove append-only database permissions, transaction rollback or actual uniqueness.
+
+### G2 time, retention and unverified prerequisites
+
+Use Asia/Kolkata calendar month via G1's fixed UTC+05:30 supported-range calculation;
+actor minute = floor(trusted Unix milliseconds/60000). Recheck month/minute before
+admission commit. Keep immutable admission-month attribution on all later counters;
+prior open liabilities freeze new work across rollover. This internal attribution
+must be approved against the actual invoice/FX/tax policy before live use. Unknown
+attribution/usage remains held; no automatic cost transfer or expiry. A local
+deadline cannot guarantee the provider's calendar billing month.
+
+Accounting/audit/quote retention, erasure/access/backups and provider content
+retention/training remain undecided, not implicitly infinite. No TTL/deletion job.
+Do not enable real persistence without an approved policy. Unresolved obligations,
+idempotency keys/minute markers and historical actor references cannot disappear
+on elapsed time, actor deletion or rollover. Historical admission is not current
+authorization; new protected actions still need a current eligible performer.
+
+Before real execution: approve exact storage/provisioning/target inventory,
+trusted profile/pricing/evidence sources, known baseline liabilities and exclusive
+authorized writers; qualify physical indexes, replica-set transactions, current
+Admin fencing, concurrent admissions, rollback, uncertainty and owned cleanup under
+existing execution/RESULT-ACK rules. No migration, baseline adoption, zero opening
+balance or application startup creates that authority. All G2 real checks remain
+NOT_RUN/unprepared; existing integration groups/UNKNOWN records are preserved.
+
+### G2.1 offline implementation evidence — 2026-11-06
+
+**G2.1 READY_FOR_REVIEW — offline only; full F053 IN_PROGRESS, delivery/acceptance pending.** The exact native validators, integer-paise/BSON Long conversions, immutable bindings/fingerprints, private DTO and pure transition proposals are implemented in the five approved source/test files. Explicit disconnected model registration disables automatic collection/index creation, buffering and persistence/DDL entry points. Eleven indexes remain declarations only; no connection, collection, index or accounting/audit writer was provisioned. Installed BSON 7 ObjectId representation is validated strictly and unsupported representations fail closed.
+
+Actual checks: 159 focused synthetic tests PASS; full API/test TypeScript and API production build/typecheck PASS; targeted lint/formatting/encoding/privacy/history/scope/diff checks PASS. Separate-agent source-only review APPROVE with both Medium findings resolved, no independent test execution. See the [canonical G2.1 implementation record](features/F053-ai-security-usage-controls.md#f053-g21-offline-implementation--2026-11-06) for paths, actual provenance, external receipts and limits.
+
+Native/structural validation does not prove stored predecessor/source truth, current Admin eligibility/fencing, transaction/CAS concurrency, real indexes/uniqueness, atomic counters/audits or commit/cleanup outcomes. Supplied facts and every transition proposal grant no dispatch authority. G2.2/live policy/retention/physical qualification remain separately gated. Earlier design and acceptance evidence is preserved; all existing acceptance blocks/NOT_RUN/UNKNOWN and production NOT_VERIFIED remain.

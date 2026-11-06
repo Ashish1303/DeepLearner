@@ -1,5 +1,747 @@
 # F053 — AI Security & Usage Controls
 
+## F053 G2.1 offline implementation — 2026-11-06
+
+**G2.1 READY_FOR_REVIEW — offline only. Full F053 IN_PROGRESS; acceptance incomplete; Git delivery pending.** Implementation started IN_PROGRESS under owner approval `48487282-8157-4502-a9a8-f3d3728c8266/Pasted text.txt`, which accepts the four reviewed pending documents as the working baseline. Branch/worktree: primary `dev`, `E:\AI\DeepLearner`, unchanged HEAD `29aa57b3395e1eaf51d5bc68af5de943d6351c61`, empty index. Starting fingerprints and other-worktree snapshots: external `f053-g21-20261106T101636Z/before.json`.
+
+### Implemented capability and exact inventory
+
+G2.1 supplies internal strict native-record/quote/command validators, exact integer-paise/BSON Long/bigint conversion and conservative rounding, four fixed-vector fingerprints, immutable identity/quote/claim/evidence guards, private DTO projection and deterministic transition proposals. ObjectId `activeOperationId` binds the matching open operation; only matching-pointer clearing is proposed. Every proposal has `dispatchAuthorized: false`.
+
+New files (five):
+
+- `apps/api/src/modules/ai/ai-usage-ledger.schema.ts`
+- `apps/api/src/modules/ai/ai-usage-ledger.model.ts`
+- `apps/api/src/modules/ai/ai-usage-ledger.dto.ts`
+- `apps/api/src/modules/ai/ai-usage-ledger.transitions.ts`
+- `apps/api/tests/ai-usage-ledger.test.ts`
+
+Accepted pre-existing pending documents (four): `AGENTS.md`, `docs/features/F053-ai-security-usage-controls.md`, `docs/DATABASE_DESIGN.md`, `docs/DEVELOPMENT_ROADMAP.md`. Only this combined nine-path inventory changes. Earlier preparation/proposed-only sections below retain their historical meaning; the enacted exception in AGENTS authorizes only this G2.1 implementation.
+
+Frozen/prior-month liabilities refuse prohibited admission/claim but retain explicitly permitted known-evidence cancellation/accounting/reconciliation. Unknown usage remains fully held. Reconciliation updates the original period, clears only the applicable uncertainty reason and retains independent holds. Identical terminal-evidence replay is read-only; conflicts/unlisted state-action pairs refuse. Late claimed outcomes require uncertainty/reconciliation rather than normal late settlement.
+
+Models register only through the explicit disconnected factory, with no import-time application registration, connection, buffering or automatic collection/index creation. Schema-level immutable fields plus strict native validation guard the offline models; save/update/bulk/DDL entry points refuse. Eleven required indexes are declarations, including existing dependencies, not physical evidence. Native ObjectId validation matches the installed BSON 7 representation and fails closed if that representation changes; dependency upgrades require compatibility review.
+
+### Executed checks and review
+
+- Focused `node --import tsx --test --test-reporter=tap apps/api/tests/ai-usage-ledger.test.ts`: **159 PASS, 0 FAIL, 0 skipped** after final source correction. Deterministic synthetic tests only; no database/provider/runtime execution.
+- Full API/test `tsc -p apps/api/tsconfig.test.json --noEmit --incremental false --pretty false`: **PASS**; no remaining errors.
+- Production API `tsc -p apps/api/tsconfig.json --incremental false --pretty false`: **PASS** (build/typecheck).
+- Targeted five-file ESLint and Prettier, new Markdown-fragment formatting, UTF-8/no BOM/LF, local links/anchors, privacy, exact scope/history/worktree preservation and `git diff --check`: **PASS**. External final check receipt retains exact fingerprints; it is not a guarded execution-manifest refreeze.
+- Fresh separate-agent source review: **APPROVE**, zero unresolved Critical/High/Medium/Low findings. Reviewer `/root/f053_g21_source_review` is a separate agent in this assistant session, not a separately authenticated human or GitHub reviewer; it reviewed source/tests/contract and root-run evidence, and did not independently execute tests. Actual timestamped artifact: external `f053-g21-20261106T101636Z/independent-review.txt`.
+
+Review resolved two Medium findings: explicitly refuse over-cap exposure on dispatch claim; refuse normal settlement at/after the observation deadline and require the defined uncertainty/reconciliation path. Regression tests cover both. Defensive follow-ups harden native comparison against caller hooks, require UNCERTAIN/control-reason consistency and reject contradictory/future DTO snapshots. In-scope typing/lint findings were corrected and affected checks passed; no compiler relaxation or unrelated baseline repair.
+
+### Established limits and next action
+
+All actor/source/profile/pricing/evidence/authorization flags are **supplied structural facts**, not authenticated truth. No result authenticates an Admin, admits a request, writes an audit event or grants dispatch. DTOs are private projections, not persisted RECORDED receipts. No repository/service/audit-model writer, HTTP/UI/config activation, connection/DDL, provisioning, spending, live profile, provider call, dependency/runtime/harness/pin change, G2.2 or F054 work occurred. Users gain no live Generate capability; the existing private brief/Save workflow is unchanged.
+
+Stored existence, current-account/session authorization and transactional User fencing, authoritative source/pricing/evidence resolution, atomic counters/audits, idempotency/concurrency/uniqueness, actual BSON storage/indexes, missing-period service reads, commit uncertainty and real cleanup remain unverified and belong to separately approved durable work/qualification. Retention, live spending/privacy/provider decisions remain open. Local timeouts cannot establish remote cancellation or billing guarantees.
+
+Preserve F042/F043 acceptance BLOCKED; F044/F045/F049/F052 incomplete acceptance; original nine integration records, five P assertions and six API assertions NOT_RUN. Preserve all unexecuted browser groups including U01–U16, historical combined 225-identity evidence as combined (not a fresh full-suite run), parked U16 and permanent Job-empty/retained-exit UNKNOWN. Production NOT_VERIFIED. No staging, commit, push or merge.
+
+**Exact next action:** owner review and separate authorization for development-checkpoint delivery of these nine paths. G2.2 remains NOT_STARTED and requires its own implementation approval; this READY_FOR_REVIEW does not authorize it or live verification.
+
+## G2 authoritative reservation contract — 2026-11-06
+
+### G2 preparation status and authority
+
+**Contract: READY_FOR_REVIEW. G2 implementation: NOT_STARTED. Full F053:
+IN_PROGRESS; acceptance incomplete. PROPOSED — PENDING OWNER APPROVAL.**
+The owner authorized this documentation preparation, not its implementation,
+persistence, provisioning, dispatch, spending or sequencing activation. Work is
+directly on primary `dev`, `E:\AI\DeepLearner`, starting HEAD
+`29aa57b3395e1eaf51d5bc68af5de943d6351c61`; initial tree/index were clean.
+G1's bounded offline checklist and required delivery are complete through PR #6
+merge `784f01e6030ae5919c950d713b1d999d517a5c69`. No G1 suite/review is repeated.
+
+Current users can use the existing private Admin brief/Save workspace; they cannot
+generate an AI outline through G1/O1. This contract adds no user capability. It
+defines only an internal durable gate for the later Technology → brief → controlled
+generation → private candidate → review/edit → exact-revision approval milestone.
+F054 retains domain validation/generated admission; F049/F050 retain editorial
+decisions and F051 publication. This is not a billing engine, job queue, scheduler,
+provider registry, new authentication system or public API.
+
+This current section governs the proposed G2 design; older next-step/proposed
+wording below retains its dated meaning. Requirements inherited from PRD60–62,
+delivered G1 and O1 are mandatory. The concrete storage layout, state machine,
+internal signatures and checkpoint split below are engineering recommendations
+submitted for approval, not previously implemented/approved mechanisms.
+
+### G2 focused correction and re-review — 2026-11-06
+
+The Desktop review `F053-G2-review-20261106T095809Z.md` identified G2-01 Medium
+and optional G2-02 Low. This documentation-only follow-up resolves both: the
+G2.1 criteria are operation-specific and test the existing permitted accounting/
+uncertainty transitions; activeOperationId is precisely the operation document's
+BSON ObjectId, with scope/actor/key/open linkage and matching-pointer CAS clearing.
+No general transition bypass, second operation identity or broader G2.1 scope.
+
+Focused fresh re-review: **APPROVE**, zero unresolved Critical/High/Medium/Low
+findings in this correction scope. Reviewer `/root/f053_g2_focused_rereview` is a
+separate subagent in this assistant session, not an authenticated human/GitHub
+approval. Its timestamped external `focused-review.txt` is retained under
+`f053-g2-correction-20261106T100030Z`; it records the reviewed normative candidate
+fingerprints before this factual note. The initial preparation's self-review and
+receipts below remain historical; their hashes do not describe the corrected text.
+
+Affected Markdown formatting, local links/anchors, consistency, UTF-8/no BOM/LF,
+whitespace, privacy and unchanged inventory/proposed-exception checks PASS.
+Final applied-content/scope and `git diff --check` evidence are retained in this
+correction's external receipt. No application/G1 suites or complete G2 review rerun.
+The reviewer caught one candidate-only transcription typo, removed before approval.
+
+This pass changes F053, DATABASE_DESIGN and roadmap only. AGENTS remains byte-
+identical; all four pre-existing pending documents remain unstaged on dev at
+`29aa57b3395e1eaf51d5bc68af5de943d6351c61`, index empty. Historical sections and
+other worktrees are preserved. Users gain no new capability. G2.1 implementation
+remains NOT_STARTED; the exact nine-path checkpoint is ready for owner authorization,
+with its exception still PROPOSED — PENDING OWNER APPROVAL. Before coding, explicitly
+reconcile these four pending documents into the owner-approved implementation
+baseline; do not discard them or silently claim a clean baseline. F053 remains
+IN_PROGRESS, with all existing acceptance blocks/NOT_RUN/UNKNOWN and production
+NOT_VERIFIED unchanged. No implementation, runtime, database/provider/network or
+Git delivery is authorized by this correction.
+
+### G2 authoritative inputs and reuse
+
+Reuse the F044 proposal repository/service's explicit primary/snapshot session,
+majority+journaled commit, bounded authorization verification, conditional User
+`__v` increment, strict audit validation and read reconciliation. Do not copy its
+index matcher unchanged: G2 needs an exact partial-index comparison that F044's
+non-partial manifest deliberately rejects. Existing `auditLogs` currently has no
+AI-usage action/resource branch; its scoped extension is a real dependency.
+
+| Fact           | Required authority and refusal boundary                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Actor          | Existing verified JWT/session context, both JWT and stored role ADMIN, stored ACTIVE account with verified email and valid non-exhausted `__v`. Derive actor from authentication, never a request field. Reverify the same actor/session before commit, within the existing five-second authorization ceiling.                                                                                                                                                                                                                                            |
+| Mutation fence | In every protected mutation transaction reread User and conditionally increment `__v` matching `_id`, ADMIN, ACTIVE, exact `emailVerifiedAt` and version. Zero matches, malformed row, overflow, observed demotion/deletion/revocation or conflict refuses. Increment serializes with User deletion/demotion; it is not a new editorial decision. Historical usage/actor references survive deletion, with no cascade.                                                                                                                                    |
+| Policy/profile | A server-owned resolver supplies an explicitly approved immutable policy/profile/pricing/privacy/spending reference. Match these against the current shared control document/version in the transaction. No request can supply an approval flag, rate, cap, alias or server time. A document/version label alone does not prove owner approval. The resolver and activation procedure do not exist yet; production composition must fail closed, with no permissive/default live profile.                                                                 |
+| Source/request | A future domain consumer resolves stored brief existence, exact revision/digest, Technology binding/eligibility and minimized allowed payload before asking for admission. G2 binds these facts and exact technical request bytes; it cannot authenticate F054 output or invent a source authority. Existing F044 snapshot eligibility does not prevent every concurrent Technology archival/deletion. Recheck observed eligibility before egress; retain history, refuse later new work if parent is missing/ineligible, and never cascade-delete usage. |
+| Usage          | Read control, period counters, the active operation and actor/minute admission from the same transaction snapshot; never use UI counts, O1 usage metadata or a caller's G1 proposal as stored authority. Validate every stored projection before arithmetic. Malformed/missing/contradictory records refuse, not zero.                                                                                                                                                                                                                                    |
+| Time           | Trusted server UTC milliseconds captured through an injected server clock; production does not accept caller time. Derive `periodKey` with delivered `aiUsageTimeAt` and `admissionWindowKey=floor(epochMs/60000)`. Recheck both immediately before admission commit; a month/minute boundary aborts without automatic retry. Clock regression relative to the control's last admission time refuses new admission pending operator investigation. Monotonic time bounds local work.                                                                      |
+
+All schema boundaries use exact own-data primitive fields before library parsing,
+following G1's hostile-value checks. Reject accessors, proxies, symbol/operator/
+unknown fields and coercion without invoking caller inspection code. Read stored
+BSON through explicit projections/type checks; never stringify an arbitrary row.
+
+### G2 identities, money, quote and fingerprints
+
+- Scope is exactly `SHARED_AI_TESTING`, shared by all participating Studios. Initial
+  purpose is only `CURRICULUM_OUTLINE`; adding Interview generation needs its own
+  contract but cannot create a second testing cap. Environment is exactly `DEV`;
+  G2 does not define a production budget. IDs follow existing lower-case 24-hex
+  ObjectIds and canonical lower-case UUID-v4 operation/version/receipt IDs.
+- Operation identity is `(scope, actorId, operationId)`. Allocate the operation UUID
+  once before requesting admission and retain it for explicit recovery. It is not
+  a bearer capability. Never replace it automatically after an uncertain result.
+- Currency is INR; values are integer paise, never floating-point rates/amounts.
+  Persist monetary fields as BSON signed `Long`, range `0..9007199254740991`;
+  quote/reservation must be positive. Compute with bigint, validate all sums and
+  differences before conversion, refuse overflow/underflow. Read/write Longs
+  explicitly; Mongoose number/string casting is not monetary validation. G1 gets
+  checked exact safe-integer numbers only. Private DTO/audit amounts are canonical
+  decimal strings (`0` or no-leading-zero digits), not bigint JSON or BSON objects.
+- Testing policy snapshot is cap `100000` paise, warning `80`, month timezone
+  `Asia/Kolkata`, global-open limit `1`, actor-minute limit `1`. The cap/warning
+  have design provenance in PRD61/G1; neither authorizes spending. G1 supports
+  exactly this profile; a different policy must refuse rather than silently pass
+  different constants into G1. No authorized production defaults are introduced.
+- A quote is immutable, exact and server-only:
+  `{id, periodKey, environment, purpose, policyVersion, profileVersion, pricingVersion,
+privacyVersion, spendingApprovalRef, providerAlias, modelAlias, templateVersion,
+requestDigest, requestBounds, inputTokenUpperBound, worstCasePaise,
+effectiveAtMs, expiresAtMs, assumptionsDigest}`.
+  Version/reference fields are UUID-v4, hashes 64 lower-case hex; aliases follow
+  existing F053's 1–64 ASCII alias rule. Times use G1's supported integer range,
+  `effectiveAtMs <= now < expiresAtMs`. Upper input-token bound is a positive safe
+  integer additionally constrained by the approved profile's actual context limit;
+  no guessed tokenizer or model limit is supplied. `requestBounds` is exactly G1's
+  five fields/ceilings, including full instructions bytes, input bytes, output
+  bytes/tokens and captured local budget. Quote must match every field and purpose.
+- `assumptionsDigest` binds the approved immutable pricing record/resolver snapshot:
+  provider/model/project alias, rate version, complete prompt/template token upper
+  bound, output ceiling, all allowed charge components, FX/tax/fee and rounding
+  rules. No tools/browsing/extra modalities. The immutable record must remain
+  retrievable by the trusted resolver; a digest without the record is insufficient.
+  This is a dependency interface, not a new pricing collection/framework. Unknown
+  rates, expiry, context, components or all-in bound refuse. Rational pricing math
+  uses integers, sums conservative charges and rounds upward with
+  `ceil(n/d)=(n+d-1)/d` for positive integer denominator. Never down-round unknown
+  cost, clamp it to the cap or treat provider token metadata as a priced invoice.
+
+Canonical hashing uses UTF-8 `JSON.stringify` of fixed ordered arrays, no arbitrary
+object-key sorting, trimming, Unicode normalization or evaluation of user methods:
+
+1. `requestDigest = SHA256(["AI_REQUEST",1,instructions,inputJson])`.
+   The notation means hash the serialized array, not concatenated strings. Preserve
+   exact validated input JSON text, including whitespace; equivalent reformatted
+   JSON is a different intent. Text remains in memory, never the usage ledger/audit.
+2. `intentFingerprint = SHA256(["AI_INTENT",1,scope,actorId,operationId,purpose,
+technologyId,sourceId,sourceRevision,sourceDigest,requestDigest,
+instructionBytes,inputJsonBytes,maxOutputBytes,maxOutputTokens,budgetMs])`.
+   Initial source revision is `1` for the existing immutable F044 brief family.
+3. `quoteDigest = SHA256(["AI_QUOTE",1,id,periodKey,environment,purpose,policyVersion,
+profileVersion,pricingVersion,privacyVersion,spendingApprovalRef,providerAlias,
+modelAlias,templateVersion,requestDigest,instructionBytes,inputJsonBytes,
+maxOutputBytes,maxOutputTokens,budgetMs,inputTokenUpperBound,
+worstCasePaiseDecimal,effectiveAtMs,expiresAtMs,assumptionsDigest])`.
+4. `reservationFingerprint = SHA256(["AI_RESERVATION",1,intentFingerprint,
+periodKey,admissionWindowKey,quoteDigest])`.
+
+Two fingerprints are necessary: an existing identical actor/key/intent returns its
+recorded reservation without a fresh quote, period or admission; a new quote after
+rollover/expiry must not turn recovery into a second Save. A different intent with
+the same key is `OPERATION_CONFLICT`. Recovery reads require no prompt resend.
+Only an uncommitted, definitely aborted admission may be explicitly reconsidered;
+absence in one read after commit uncertainty is not proof of abort.
+
+### G2 minimal storage and exact indexes
+
+Use three small aggregates, not per-user counters/queues: shared control provides
+one cross-month serialization/freeze point; monthly ledgers retain period history;
+operations provide actor/minute identity and immutable accounting receipts. A
+single document with indefinitely growing month/actor maps is deliberately avoided.
+The [G2 database appendix](../DATABASE_DESIGN.md#f053-g2-proposed-usage-storage--2026-11-06)
+is the exact storage/index companion; neither document provisions anything.
+
+| Collection          | Exact fields and invariants                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `aiUsageControls`   | `_id`, `schemaVersion:1`, `scope`, `version`, `policyVersion`, `policy:{capPaise,warningPercent:80,timezone:'Asia/Kolkata',maxOpen:1,maxActorMinute:1}`, nullable `profileVersion`, `pricingVersion`, `privacyVersion`, `spendingApprovalRef`, `dispatchEnabled:false` initially, `frozen`, `freezeReasons`, nullable `activeOperationId`, nullable `lastAdmissionAt`, `createdAt`, `updatedAt`. One scope row; current version CAS on every admission/transition. Explicit nonnegative safe integer versions, server UTC Dates, no implicit creation/default activation. `freezeReasons` is a sorted unique array, max5, from `ACCOUNTING_INVALID`, `OPERATOR_HOLD`, `OVERRUN`, `PRICE_UNKNOWN`, `UNCERTAIN`; `frozen` equals reasons.length>0. Independent holds cannot overwrite each other. |
+| `aiUsagePeriods`    | `_id`, `schemaVersion:1`, `scope`, `periodKey`, `version`, `settledPaise`, `heldPaise`, `createdAt`, `updatedAt`. Months use exact G1 YYYY-MM/range. No separate unresolved amount: uncertainty remains in held; never double-count it. Missing current month can be inserted at zero only after proving no existing row and validating shared/history consistency, inside the admission transaction. No zero-reset of an existing period.                                                                                                                                                                                                                                                                                                                                                      |
+| `aiUsageOperations` | `_id`, `schemaVersion:1`, `scope`, `actorId`, `operationId`, `purpose`, `environment:'DEV'`, `technologyId`, `source:{id,revision:1,digest}`, `requestDigest`, `requestBounds`, `intentFingerprint`, `reservationFingerprint`, immutable `quote` plus `quoteDigest`, immutable `periodKey`, `admissionWindowKey`, `admittedAt`, `reservationPaise`; mutable `version`, `state`, `open`, `heldPaise`, nullable `actualPaise`, nullable `claim`, nullable `terminalEvidence`, nullable `safeCode`, `lastAuditId`, `updatedAt`. No raw request/output, credentials, provider headers/URLs or token/session data. Immutable fields cannot be replaced through model save/update APIs. Mutations use only validated native-driver CAS.                                                               |
+
+`activeOperationId` is null or a BSON ObjectId reference to
+`aiUsageOperations._id`, never the actor-scoped UUID `operationId`. In validated
+string-only projections it is exactly 24 lower-case hexadecimal characters,
+converted only after ObjectId validation; do not coerce arbitrary stored values.
+Resolve it by `_id` and the same `scope`; require the uniquely validated open row
+to match that ObjectId, scope, stored actorId and operationId. Ordinary protected
+lookups additionally bind the authenticated actor; explicit reconciliation retains
+the original actor binding and separately verifies the current performer. A pointer
+is not authority to adopt another actor's operation. Pointer, compound actor/key
+identity and sole-open query must agree; missing/mismatched linkage refuses.
+Admission sets it to the newly inserted operation document's `_id` in the same
+transaction. An open-to-terminal transition clears it only by CAS matching that
+exact ObjectId and control version, atomically with accounting/audit; a different
+pointer is a conflict, never cleared. Reading/replaying an older terminal row
+requires no pointer to that row; a newer independently qualified operation may be
+active. Never require global null merely to read an old terminal receipt.
+
+`claim` is null or exactly `{id,ownerId,claimedAt,observeUntil}`: server UUID-v4 IDs,
+UTC Dates, immutable after creation. It records one local invocation owner, not a
+lease permitting a replacement dispatch. `observeUntil` is the captured O1 local
+budget (1–10000ms) after claim time, not a remote termination promise. No second
+claim, owner takeover or lease-expiry replay. `terminalEvidence` is null or exactly
+`{id,kind,evidenceDigest,actualPaise,inputTokens,outputTokens}`; kind is
+`FINAL_COST` or `DEFINITELY_UNSENT`. The evidence digest is private; token counts
+are null or nonnegative safe integers, not authenticated by their type. FINAL_COST
+requires exact nonnegative all-in actual cost and independently trusted final
+evidence; unsent requires zero cost and null counts. Missing evidence is not zero.
+`safeCode` is null or one fixed code from the operation outcomes below.
+
+All collections use explicit disconnected registration (`autoCreate:false`,
+`autoIndex:false`, `bufferCommands:false`, strict schema, no implicit versionKey,
+no generated accounting timestamps/default counters). Registration performs no
+DDL/connection. Documents stay <=64KiB encoded; bounds follow O1's technical ceiling
+and small fixed metadata, with no unbounded embedded events or private payloads.
+
+Exact index inventory (11 total, including three new-collection `_id_` indexes
+and three required existing dependencies):
+
+| Collection / name                                 | Ordered key                                               | Required options                                      |
+| ------------------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------- |
+| `aiUsageControls / _id_`                          | `{_id:1}`                                                 | built-in unique                                       |
+| `aiUsageControls / uq_ai_usage_scope`             | `{scope:1}`                                               | unique                                                |
+| `aiUsagePeriods / _id_`                           | `{_id:1}`                                                 | built-in unique                                       |
+| `aiUsagePeriods / uq_ai_usage_period`             | `{scope:1,periodKey:1}`                                   | unique                                                |
+| `aiUsageOperations / _id_`                        | `{_id:1}`                                                 | built-in unique                                       |
+| `aiUsageOperations / uq_ai_usage_actor_operation` | `{scope:1,actorId:1,operationId:1}`                       | unique                                                |
+| `aiUsageOperations / uq_ai_usage_open`            | `{scope:1}`                                               | unique, partial `{open:true}`                         |
+| `aiUsageOperations / uq_ai_usage_actor_minute`    | `{scope:1,actorId:1,admissionWindowKey:1}`                | unique, including terminal admitted operations        |
+| `users / _id_`                                    | `{_id:1}`                                                 | existing built-in unique                              |
+| `auditLogs / _id_`                                | `{_id:1}`                                                 | existing built-in unique                              |
+| `auditLogs / uq_ai_usage_audit_version`           | `{resourceType:1,resourceId:1,'metadata.usageVersion':1}` | unique, partial `{resourceType:'AI_USAGE_OPERATION'}` |
+
+All declared indexes require exact ordered keys, uniqueness and partial filters,
+simple collation, not sparse/hidden/TTL. Existing unrelated indexes remain intact;
+this is a required inventory, not permission to remove extras. Missing collections,
+indexes or ambiguous definitions refuse. No startup index creation/repair. Declare
+the new audit index only; physical setup/execution needs separate owner approval.
+
+### G2 atomic admission and transaction boundaries
+
+One bounded transaction uses primary snapshot reads and majority+journaled commit:
+
+1. Validate command/authority; read the actor/key first. If committed and identical
+   intent, return validated recorded state through a protected read, not a second
+   mutation. A different fingerprint refuses. No new quote, window or audit event
+   on an identical replay. Current account eligibility is still required.
+2. Resolve/verify server-owned source, profile and immutable quote; capture time.
+   Reread eligible User, control, current period, active operation and actor/minute
+   marker. All control references must agree. The sole prior open operation's held
+   amount remains in its original period; pass it as `unresolvedPriorPaise` to G1
+   if from an earlier month. An earlier RESERVED or claimed operation is also an
+   unresolved liability; a month rollover does not make it free. Contradictory
+   pointer/open/held state refuses and requires explicit reconciliation.
+3. Build exact G1 facts from these authoritative reads; check positive prior
+   liability/freeze, shared-open, fixed-minute, cap and warning. New admissions
+   consume a minute even if later cancelled. Exactly 100000 is affordable; 100001
+   refuses. Warning is exposure >=80000, including a refused/frozen status read;
+   no automatic cap increase. No caller-supplied `usage` is used.
+4. Fence User `__v`; CAS control/version (active pointer must be null), increment
+   current period held/version, insert the open RESERVED operation at version1,
+   and append its version1 audit event. Record the trusted admission time. Reverify
+   same session and unchanged current month/minute before committing. Every write,
+   including the audit, must succeed together. Denials create no usage operation,
+   admission marker, counter or successful-mutation audit.
+
+The final precommit decision point defines the recorded admission month/minute;
+commit acknowledgement may occur later. Do not claim the application clock check
+is atomic with remote MongoDB commit or provider billing. Also revalidate quote
+expiry and unchanged control/profile references at this point; dispatch later
+requires a fresh check, including dispatchEnabled=true. Initial false is a hard
+dispatch refusal, not a flag the caller can override.
+
+Query open operations by scope/open using the partial index, bounded at2, and
+require exact agreement with the singleton pointer and affected held period.
+Actor/minute uses its exact unique key. This is not an unbounded history scan or
+proof against arbitrary out-of-band database tampering. Before first real use,
+the owner-approved opening baseline must establish all shared existing Studio
+liabilities and exclusive authorized ledger writers; unknown historical/external
+usage must freeze/refuse, never become a manufactured zero opening balance.
+
+The shared control CAS serializes all admissions/transitions across months;
+partial unique open and actor-minute indexes independently defend the two limits.
+Unique actor/key defends idempotency. Transactions and validators alone cannot
+replace physical indexes. A conflicting write or duplicate-key transaction aborts;
+there is no callback/business-operation retry. Perform a separately bounded
+protected read by actor/key for a committed matching result; otherwise report
+`RETRY_LATER` only after a definitely aborted transaction, or `OUTCOME_UNKNOWN`
+when commit/abort evidence is ambiguous. Never interpret a collision as success
+without validating the full matching stored record and audit.
+
+Reuse the existing service bounds: one 10000ms local database operation budget,
+authorization reads <=5000ms and commit <=min(2000ms, remaining). Reserve explicit
+cleanup bounds: abort <=2000ms, endSession <=2000ms after work stops, in finally.
+These are cooperative driver/local limits, not an external hard watchdog; no
+runtime/harness deadlines change. No provider call inside a transaction. Start
+one transaction, attempt commit once, never replay its callback or automatically
+retry dispatch. Timeout/cancellation after commit begins or failed cleanup yields
+OUTCOME_UNKNOWN with only safe error codes; preserve the primary failure and
+cleanup classification in sanitized evidence, not raw driver text. Late work
+must check the closed/cancelled generation before any write/commit/dispatch.
+
+One application commit call does not prove one wire command: preserve only the
+installed driver's existing bounded same-session commit handling within the same
+commit/deadline context, as documented for F043. Never restart a transaction,
+replay business writes or dispatch because of a driver retry label. Verify those
+driver bounds in G2 implementation; uncertainty after that call remains unknown.
+
+### G2 state transitions and dispatch boundary
+
+State is accounting state, never content/editorial status. RESERVED,
+DISPATCH_CLAIMED and UNCERTAIN require `open:true`, held=original reservation,
+actual=null and the shared active pointer. SETTLED/RELEASED require `open:false`,
+held=0, terminal evidence and no active pointer to that terminal row; a newer
+qualified operation may be active. Version increases exactly once
+per committed transition. No operation/period is TTL-expired.
+
+All unlisted state/action pairs refuse. Check version increments and timestamp/
+money additions for overflow; do not wrap, clamp or silently default a missing
+value. Accounted transitions do not establish authenticated generation provenance.
+
+| From               | Action / required evidence                                                                                                                                          | To / atomic effect                                                                                                                                                                                                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Absent             | Qualified admission transaction                                                                                                                                     | RESERVED; increase held, consume actor/minute, claim=null.                                                                                                                                                                                                                                                 |
+| RESERVED           | Explicit cancel by current authorized actor, or explicit internal reconciliation by another current eligible Admin; expected version and claim still null under CAS | RELEASED; definitely never dispatched, subtract held, clear pointer, record unsent evidence and audit. This also resolves an unused reservation after its author was deleted.                                                                                                                              |
+| RESERVED           | Future coordinator revalidates current actor, domain/privacy/profile/quote/time and source, then fences User and commits one claim                                  | DISPATCH_CLAIMED; retain held, write immutable claim and audit. No egress until this commit and cleanup are known successful.                                                                                                                                                                              |
+| DISPATCH_CLAIMED   | Matching owner supplies trusted final all-in usage/cost; current authority/fences/version and evidence checked                                                      | SETTLED; subtract held, add actual to original period settled, clear pointer, terminal evidence/audit. Actual >reservation or resulting exposure >cap also freezes shared control as OVERRUN. Never clamp an incurred overrun away.                                                                        |
+| DISPATCH_CLAIMED   | Timeout, abort, cancellation, crash, malformed result, unknown usage, failed transport/claim cleanup, or observation deadline passed                                | UNCERTAIN; retain full held and active pointer, freeze control as UNCERTAIN, append audit when a safe transaction is possible. If even this write is uncertain, the persisted claim remains open and must be treated as uncertain on read.                                                                 |
+| DISPATCH_CLAIMED   | Positive independently verifiable proof this exact claim never invoked any transport and cannot later do so, supplied through explicit reconciliation               | RELEASED; same atomic subtraction/pointer/audit. NOT_STARTED text, elapsed time, empty output or HTTP failure alone is insufficient. First implementation has no adapter proof; it cannot invent this evidence.                                                                                            |
+| UNCERTAIN          | Explicit currently authorized reconciliation with matching operation/claim and trusted final evidence                                                               | SETTLED or RELEASED under the same accounting rules; no second egress. In this explicit transaction alone, remove this sole open operation's UNCERTAIN reason after proving final cost/no charge and valid counters; retain every other hold and add OVERRUN if needed. No background/time-based unfreeze. |
+| RESERVED           | Quote expires or author/source becomes ineligible                                                                                                                   | No dispatch; remain held until an explicit authorized unsent cancellation. No expiry release/retry.                                                                                                                                                                                                        |
+| SETTLED / RELEASED | Identical terminal evidence ID, digest, kind, amount and usage                                                                                                      | Return existing result; no write/counter/audit duplicate. Conflicting evidence or any other transition refuses.                                                                                                                                                                                            |
+
+No terminal FAILED state silently charges zero. Definitely aborted admission is
+REFUSED without an operation; provider failure after a claim is UNCERTAIN unless
+trusted final cost/unsent proof resolves it. A pre-dispatch claim freezes the
+opportunity for another invocation, not remote execution itself. Claim expiry never
+authorizes takeover. Stale owner/expected-version results refuse ordinary mutation;
+late evidence may be submitted only through explicit reconciliation. Only a matching
+claim owner can perform normal settlement. Another current verified ACTIVE ADMIN
+may reconcile historical usage through this internal service with independently
+verified evidence, audited as performer distinct from original actor; there is no
+new HTTP reconciliation endpoint, caller evidence flag or service-account bypass.
+
+Reconciliation may resolve an operation even when its original author is demoted/
+deleted, its source is unavailable, dispatch is disabled, or its old quote expired:
+these must not make incurred liabilities impossible to account for. The current
+performer and final evidence must still qualify. Preserve the historical quote;
+expiry never reprices an incurred charge. UNKNOWN pricing/evidence retains held.
+OVERRUN/PRICE_UNKNOWN/ACCOUNTING_INVALID/OPERATOR_HOLD cannot be removed by this
+reconciliation method; restoring such a profile needs separately approved operator
+maintenance, not an uncontracted clear-freeze switch. Ordinary successful settlement
+does not clear an unrelated hold.
+
+Successful claim is necessary but not sufficient for dispatch. A future coordinator
+must also have separately approved live spending, a real allowlisted adapter/model,
+current server profile and quote, all F053 privacy/full-prompt/context controls,
+F054 domain/source authority, qualified real storage/index/auth/audit behavior and
+fresh authorization immediately before egress. G1 ALLOW, O1 success or a stored
+claim is never a reusable API/provider capability. O1 gets one invocation with the
+captured bounds; no fallback/retry. Local timeout does not prove remote cancellation
+or no billing. A demotion/deletion/config change after the last check can race
+network egress; neither User fencing nor a MongoDB transaction eliminates that gap.
+Uncertain claim commit forbids egress, even if a later read finds the claim.
+
+### G2 internal operation/API contracts
+
+No HTTP route, browser capability, router/config registration or live adapter is
+part of G2. Proposed internal service signatures are:
+
+```text
+reserve(authority, {operationId, technologyId, source, instructions, inputJson,
+                   requestBounds}) -> RECORDED | REFUSED | OUTCOME_UNKNOWN
+readOperation(authority, {operationId}) -> RECORDED | UNRESOLVED | REFUSED
+cancelUnsent(authority, {operationId, expectedVersion}) -> RECORDED | REFUSED | OUTCOME_UNKNOWN
+claimDispatch(authority, {operationId, expectedVersion}, trustedContext)
+  -> RECORDED | REFUSED | OUTCOME_UNKNOWN
+settle(authority, {operationId, expectedVersion, claimId, ownerId}, trustedEvidence)
+  -> RECORDED | REFUSED | OUTCOME_UNKNOWN
+markUncertain(authority, {operationId, expectedVersion, claimId, ownerId})
+  -> RECORDED | REFUSED | OUTCOME_UNKNOWN
+reconcile(authority, {originalActorId, operationId, expectedVersion}, trustedEvidence)
+  -> RECORDED | REFUSED | OUTCOME_UNKNOWN
+```
+
+`authority` reuses current AuthContext + bounded verify/signal and an existing
+1–128 ASCII requestId (`[A-Za-z0-9_-]`), never a posted actor or bearer token copy.
+`trustedContext`/`trustedEvidence` come from server-owned resolvers/adapter verification,
+not parsed browser JSON. Original actor is implicit except explicit internal
+reconciliation; regular reads are actor-bound. `expectedVersion` is positive safe
+integer. No process-local prepared handle crosses an API boundary.
+
+The server coordinator allocates claimId/ownerId once; `trustedContext` is exactly
+`{claimId,ownerId,request}` where request is the existing bounded O1 request.
+Recompute its request digest/bounds, source and quote/profile checks before the
+claim; no caller's claim identity or context is accepted from HTTP. The coordinator
+already holds those IDs when RECORDED is returned; it must not dispatch after
+OUTCOME_UNKNOWN. Normal settlement/uncertainty requires exact claim/owner, original
+actor and expected version; another Admin uses only explicit reconciliation.
+
+Injected server-only dependencies are `resolveIntent(authority, command, tx)`,
+`resolveQuote(validatedIntent, control, serverTime)` and
+`verifyEvidence(operation, receiptId, kind)`. Each receives the bounded work signal/
+remaining deadline; asynchronous completion after closure is discarded. Intent
+resolution returns only matching Technology/source/request digest/bounds from
+authoritative records; quote resolution returns the exact quote allowlist above;
+evidence verification returns the exact terminalEvidence allowlist. They must never
+authenticate by accepting fields unchanged from a request. No production resolver
+is registered/defaulted in G2; absent resolvers refuse. G2.2 unit doubles explicitly
+simulate these trust boundaries. F054 domain authority and an actual adapter/evidence
+source remain missing before real use, not supplied by an interface or fake.
+
+RECORDED allowlist: `{kind:'RECORDED', operation:{operationId,technologyId,state,
+version,periodKey,reservationPaise,heldPaise,actualPaise,warning80Percent,
+requiresReconciliation,admittedAt,updatedAt}}`; amounts decimal strings, actual
+nullable, Dates ISO UTC. No source/request/quote fingerprints, claim owner, actor
+IDs, session/key, internal price records or raw provider content. The server's
+dispatch coordinator uses validated internal records separately; this DTO grants
+no invocation permission. Require operation/audit/counter linkage before returning
+a successful recorded result. An ordinary read never fences/writes or clears held.
+
+Read all linked projections in one bounded primary snapshot session so mixed
+versions do not create a false RECORDED result; current-account/session checks
+still apply. Close the read-only session in finally. Missing/malformed linkage or
+read/cleanup uncertainty returns UNRESOLVED (or a sanitized authorization refusal),
+never proof that the earlier mutation aborted. A read-only cleanup failure is not
+new evidence that a financial mutation occurred.
+
+For this read DTO, requiresReconciliation is true for DISPATCH_CLAIMED/UNCERTAIN
+or any shared freeze. Treat an unobserved claim outcome as uncertain without
+requiring a successful uncertainty write. warning80Percent uses trusted current
+month settled+held plus prior open liability, checked with bigint; it is not the
+old admission's cached warning and it never grants a new reservation. A future UI
+must label that current exposure separately from the operation's original period.
+
+REFUSED: `{kind:'REFUSED',code,message:'AI usage operation cannot proceed'}`.
+Exact codes: `INVALID_INPUT`, `UNAUTHENTICATED`, `FORBIDDEN`, `SOURCE_UNAVAILABLE`,
+`CONTROL_UNAVAILABLE`, `QUOTE_MISMATCH`, `QUOTE_EXPIRED`, `USAGE_FROZEN`,
+`CONCURRENCY_LIMIT`, `RATE_LIMIT`, `BUDGET_EXCEEDED`, `OPERATION_CONFLICT`,
+`STATE_CONFLICT`, `RETRY_LATER`. Unknown dependency/internal failures map to
+CONTROL_UNAVAILABLE before mutation; no raw issue paths, driver/provider causes,
+credentials, private content or arbitrary exception messages.
+
+OUTCOME_UNKNOWN: `{kind:'OUTCOME_UNKNOWN',code:'OUTCOME_UNKNOWN',
+message:'Outcome is uncertain; reconcile without replay',operationId}`.
+UNRESOLVED read: `{kind:'UNRESOLVED',operationId}` when no validated complete result
+is established. Neither permits automatic reserve/claim/provider replay or a new
+key for the same uncertain intent. Read absence is not a negative commit receipt.
+An authenticated actor/key lookup is the only ordinary recovery path; resolving a
+missing/ambiguous record needs positive abort/commit evidence under explicit
+operator reconciliation, not a guessed delay or absence scan. Raw errors are never
+used as proof of no charge. Future HTTP wrapping must separately define statuses,
+limits and no-store; G2 does not silently implement a new API_DESIGN contract.
+
+### G2 accounting, audit, time and retention
+
+Every transition transaction fences the current performer, CASes control+operation,
+updates the affected period, and appends exactly one audit event; reservation adds
+the unique operation/minute marker. Settlement replaces held with actual once;
+release subtracts only held. Uncertainty keeps held unchanged. Duplicate final
+evidence is read-only; partial counter/audit writes must roll back. Overflow or
+invalid accounting leaves the liability open and refuses; no balance repair.
+
+Extend existing audit category `CONTENT_MANAGEMENT`, resource `AI_USAGE_OPERATION`,
+actions exactly `AI_USAGE_RESERVED`, `AI_USAGE_DISPATCH_CLAIMED`,
+`AI_USAGE_UNCERTAIN`, `AI_USAGE_SETTLED`, `AI_USAGE_RELEASED`. Use independent
+server ObjectId `_id`, `resourceId=operation._id`, authenticated performer `actorId`,
+existing bounded requestId and server createdAt. Metadata allowlist:
+`{operationId,originalActorId,usageVersion,purpose,environment,periodKey,
+policyVersion,profileVersion,pricingVersion,providerAlias,modelAlias,
+reservedPaise,heldPaise,actualPaise,inputTokens,outputTokens,safeCode,evidenceId,
+freezeReasons}`.
+All keys present; nullable fields explicit. Reference/amount/count bounds match
+the operation contract; aliases/versions copied only from validated server quote.
+No quote/request/content digest, raw brief/output, evidence blob, URL, token,
+secret or private source text. The partial unique resource/version index prevents
+duplicate transition audit; op.lastAuditId must reference the exact matching event.
+Earlier events remain append-only. Direct alteration/deletion of ledger/audit
+records is not a reconciliation operation.
+
+Month = Asia/Kolkata UTC+05:30 calendar month over G1's supported range; UTC minute
+uses integer division by 60000, never local locale or rolling-window heuristics.
+Immutable accounting attribution is the admission month: late verified settlement
+updates that original period, never moves/deletes its held liability. Earlier
+open liabilities freeze all new admissions across rollover. A completed old-month
+reservation does not carry an unused allowance into the new month.
+
+**Admission-month attribution is a proposed internal ledger rule, not a claim about
+a provider's invoice/FX/tax month.** The owner must approve its relationship to
+actual billing before live use. If final cost/attribution is uncertain, retain held
+and the global freeze. No automatic cross-period cost transfer. A local execution
+budget/quote expiry cannot bound late remote charges or guarantee calendar-month
+invoice totals; live dispatch must refuse without an approved conservative rule.
+
+Retention duration/access/erasure/backups are UNDECIDED and must be approved before
+real persistent use. No TTL, garbage collector or new indefinite-retention policy.
+Until that policy exists, G2 must not be enabled against real application data.
+Unresolved operations, their periods, keys/minute markers, quote references and
+audit cannot be deleted merely by elapsed time, month rollover or author deletion.
+Any later retention design must preserve obligations/idempotency before erasure.
+Raw provider prompt/output retention remains off in F053; private generated content
+retention is a separate F054 decision. Provider retention/training/region and lawful
+privacy/access choices are still unapproved. No customer-data use permission follows.
+
+### G2 failure and concurrency acceptance scenarios
+
+| Scenario                                                                          | Required outcome                                                                                                                                                     |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Two actors race for shared open slot, including either side of a month boundary   | At most one committed reservation; other aborts/refuses. No double counter/audit.                                                                                    |
+| Same actor, different keys in same fixed minute, first operation already released | Unique minute marker still refuses second admission. Next minute explicitly reevaluates trusted time/usage.                                                          |
+| Same key, same intent races or reappears next month                               | One operation/admission/audit; protected read returns original recorded state. Different intent conflicts, never requotes/replaces old binding.                      |
+| Demotion/suspension/deletion races admission/transition                           | User-version write conflicts or eligibility refuses; ordering may allow a transition committed before authority loss. No claim of cancelling earlier external work.  |
+| Failure before any commit attempt, confirmed abort                                | No partial op/counter/audit; REFUSED/RETRY_LATER, no dispatch.                                                                                                       |
+| Unknown reservation commit, audit failure, abort/endSession failure               | No replay; OUTCOME_UNKNOWN or known rollback classification as warranted. Read reconciliation validates complete linkage; absence remains UNRESOLVED.                |
+| Crash after RESERVED commit but before claim                                      | Liability remains, only explicit known-unsent cancellation; no automatic dispatcher/retry.                                                                           |
+| Crash/timeout after claim commit, before or after possible egress                 | Claimed/open is conservatively uncertain even if no provider request was observed. No owner takeover, expiry release or second invocation.                           |
+| Stale worker, duplicate settlement, conflicting receipts                          | Version/claim/receipt checks reject stale/conflicting effects; identical terminal receipt returns state without duplicate counters/audit.                            |
+| Output invalid/refused/truncated with known bill; usage null/unknown              | Domain failure does not erase verified cost; settle only trusted final cost. Otherwise retain full liability/freeze. O1 success with token metadata is insufficient. |
+| Actual exceeds reservation/cap or pricing changes                                 | Record verified cost once and freeze; cannot undo bill. Old pricing assumptions remain immutable, new admission/claim refuses mismatch.                              |
+| Midnight/month boundary or clock regression during admission                      | Abort/refuse, no callback retry, no resetting old counters/liabilities.                                                                                              |
+| Missing/altered indexes, invalid stored enum/Long/counter/audit/pointer           | Fail closed; no coercion, auto-index, data repair or permissive result.                                                                                              |
+
+### G2 exact proposed implementation inventory and completion criteria
+
+No path below is approved for implementation by this preparation task. Proposed
+combined G2 inventory is **15 paths**; no G1/O1, auth policy, config/env, app/router,
+public API/UI, dependencies or runtime-support file changes:
+
+CREATE:
+
+1. `apps/api/src/modules/ai/ai-usage-ledger.schema.ts`
+2. `apps/api/src/modules/ai/ai-usage-ledger.model.ts`
+3. `apps/api/src/modules/ai/ai-usage-ledger.dto.ts`
+4. `apps/api/src/modules/ai/ai-usage-ledger.transitions.ts`
+5. `apps/api/tests/ai-usage-ledger.test.ts`
+6. `apps/api/src/modules/ai/ai-usage-ledger.repository.ts`
+7. `apps/api/src/modules/ai/ai-usage-ledger.service.ts`
+8. `apps/api/tests/ai-usage-ledger-persistence.test.ts`
+9. `apps/api/tests/ai-usage-ledger.integration.ts`
+
+MODIFY:
+
+10. `apps/api/src/modules/audit/audit.model.ts`
+11. `apps/api/tests/auth-audit.test.ts`
+12. `AGENTS.md`
+13. `docs/features/F053-ai-security-usage-controls.md`
+14. `docs/DATABASE_DESIGN.md`
+15. `docs/DEVELOPMENT_ROADMAP.md`
+
+**Smallest next checkpoint G2.1:** items1–5 and12–15 only, nine paths. Strict
+record/quote/command validation, money/fingerprint vectors, private DTOs, pure
+transition proposals and disconnected models/index declarations. No persistence
+consumer, audit-model edit, registration at startup, provider call or writer.
+Estimate60–90min, hard90 including checks/review. It is a necessary local foundation,
+not a reservation engine or another generic authority framework. Approval must
+explicitly accept the proposed attribution, evidence and storage semantics; no
+provider/model/key selection is needed for inert synthetic tests.
+
+**Then G2.2:** items6–11 plus12–15, ten paths, after a separate approval and stable
+G2.1 source. Internal repository/service implementing these operations with injected
+trusted resolvers and no live adapter; no HTTP/UI/config activation. Estimate two
+bounded60–90min sessions, hard90 each, mocked transactions and prepared real DB
+assertions only. Full G2 source work estimate3–4.5hours; actual real qualification
+and policy/operational decisions are additional. Neither checkpoint starts here.
+
+G2.1 offline acceptance: exact-boundary/hostile-value/unknown-field validation,
+BSON Long and bigint overflow/rounding, deterministic explicit-time/month/minute,
+canonical vectors for all four hashes (including quote changes and exact byte
+changes), immutable identities/quotes/claims, every state/action pair and refusal,
+nonmutation, safe DTO/errors, inert imports and model registration without auto
+connection/DDL. Test the operation-specific rules against the existing transition
+table; G2.1 evaluates supplied facts only and performs no persistence or dispatch:
+
+- Refuse new admission or dispatch when freeze, unresolved prior-period exposure,
+  quote/month mismatch, unknown required evidence or any other defined guard
+  prohibits that action. Do not turn an accounting exception into dispatch authority.
+- Preserve only the table's explicitly permitted accounting, uncertainty,
+  cancellation, settlement and reconciliation proposals, requiring their defined
+  current-performer authority facts, exact state/version/claim binding, evidence
+  and accounting preconditions. G2.1 validates supplied structural facts; later
+  consumers must establish their authority transactionally.
+- Prior-month UNCERTAIN with UNCERTAIN and OPERATOR_HOLD reasons plus trusted
+  final-cost facts may propose SETTLED in its original period through explicit
+  reconciliation; clear only the applicable UNCERTAIN reason and retain
+  OPERATOR_HOLD, with no egress. The same frozen/prior-liability facts do not admit
+  a new reservation or dispatch.
+- RESERVED under an independent hold with positively known-unsent state and the
+  defined authorized cancellation/reconciliation facts may propose RELEASED;
+  retain the independent hold. Invalid or unknown final-cost/unsent evidence
+  refuses settlement/release and preserves the full liability.
+- DISPATCH_CLAIMED with unknown usage and the required uncertainty-transition
+  facts may propose UNCERTAIN, retaining all held exposure and the active pointer.
+  Unknown is never zero; elapsed time/month change alone never releases a hold.
+- Closed records permit only the defined identical terminal-evidence read-only
+  replay, including an old expected version for that nonmutating replay; no new
+  transition, counter/audit write or dispatch. Conflicting terminal evidence and
+  every unlisted state/action pair refuse.
+- Validate the pointer as an ObjectId reference with matching scope/actor/key/open
+  linkage; reject UUID substitution and mismatches. Clear only the matching open
+  row's pointer; permit historical terminal reads while another valid row is active.
+
+G2.2 offline acceptance: mocked transactional success/rollback/audit failure,
+current actor fence and changed/revoked session, operation conflict/replay, source/
+quote/profile mismatch, one-open/minute/CAS collision, boundary rollover,
+commit/cleanup uncertainty, missing read linkage, duplicate/conflicting settlement,
+stale owner and conservative cancellation. Verify adapter is never invoked by this
+service and no retry/default live configuration exists. Mocks establish control
+flow, not database isolation, uniqueness, physical indexes or billing truth.
+
+For each implementation checkpoint: focused tests, full API/test TypeScript,
+production API build/typecheck, targeted lint/formatting, encoding/privacy/scope/
+diff checks and fresh independent source review with findings resolved. Record
+actual branch/base/paths/checks/limitations and READY_FOR_REVIEW when its own
+offline criteria pass; full F053 remains IN_PROGRESS. Delivery requires separate
+owner approval; no automatic next checkpoint or full-feature completion.
+
+Separately authorized real DB acceptance must inventory new G2 cases, isolated
+replica-set target, owned fixtures/index provisioning, protected baseline, bounded
+execution and authenticated RESULT/ACK/cleanup under existing project rules.
+Required assertions: physical index definitions/types; actor/key/open/minute
+uniqueness; concurrent admissions across periods; User demotion/deletion fence;
+counter+audit rollback; exact replay; uncertain commit reconciliation; settlement
+once/overrun; rollover liabilities; immutable evidence and ownership-safe cleanup.
+Use synthetic amounts, no provider/network dispatch. All such cases are presently
+NOT_RUN/unprepared, not part of the original9/P5/API6 groups. No new count/PASS is
+invented by this contract. Live provider/transport/billing/privacy/real UI acceptance
+is an additional, explicitly approved stage after these DB guarantees.
+
+### G2 decisions, dependencies and proposed sequencing
+
+No missing vendor/model prevents G2.1's synthetic structural implementation after
+contract approval. Existing G1/O1 and F044 transaction/fence patterns are available
+but not accepted proof of live safety. Genuine prerequisites for durable real use:
+
+- Owner-approved retained accounting/audit/quote evidence, access/erasure/backups
+  and reconciliation performer policy; no retention duration selected here.
+- Trusted profile/quote/evidence resolver and activation procedure, plus physical
+  collections/indexes and qualified auth/transaction/ownership/cleanup execution.
+  None exists merely because this document specifies it.
+- Before egress: provider/model/project, full-prompt token/context and all-in
+  pricing/FX/tax/fee proof, admission-month versus invoice attribution, source/
+  privacy/provider retention/training approval and separately bounded spending.
+  The INR1000/80% design is not that approval or a production default.
+- F054 outline/source/domain/admitted-output contract and explicit bootstrap order;
+  full F047/F049/F052 prerequisites stay unmet. P0/O1/G1 do not authenticate AI
+  origin or create stored editorial approval. No new dependency cycle is hidden:
+  inert G2.1/2 can be tested with explicit synthetic resolvers; live reliance waits.
+
+Optional later enhancements are multi-provider routing, dashboards, automated
+reconciliation workers, queues and retention jobs. They are not G2 prerequisites
+or part of its inventory. Unknown obligations are not solved by adding a supervisor.
+
+**Proposed G2.1-only sequencing text — PROPOSED — PENDING OWNER APPROVAL:**
+
+> Only after separate owner approval, permit F053 G2.1's exact nine-path offline
+> schema/model/DTO/pure-transition/test and evidence inventory above ahead of full
+> F047/F049/F052 acceptance. Require exact clean dev baseline, stable G1/O1,
+> approved G2 structural semantics, no blocking dependency security finding,
+> focused offline/static/privacy checks and fresh independent review. No G2.2
+> repository/service/audit-model writer, endpoint/UI, configuration activation,
+> provision/DDL, database/provider/network operation, spending or F054 progression
+> is permitted. Existing User/transaction/index/privacy/ownership/RESULT-ACK/cleanup
+> and acceptance requirements remain mandatory; supplied facts and pure transitions
+> grant no authority. No runtime/pin repair, retry, fallback or new dependency.
+> Full F053 stays IN_PROGRESS; preserve every BLOCKED acceptance, NOT_RUN group,
+> permanent UNKNOWN and production NOT_VERIFIED. Every later implementation,
+> persistence/live/Git operation requires separate owner approval. Default sequencing
+> remains unchanged outside this named future checkpoint.
+
+The same inactive proposal is recorded in AGENTS.md; neither location enacts it.
+The exact next action is owner review/approval of this contract and **G2.1 only**,
+or a concrete correction to a stated policy decision, before any implementation.
+
+### G2 documentation verification and handoff
+
+Preparation changes exactly four documents: this record, DATABASE_DESIGN's G2
+appendix, the roadmap's G2 preparation section and AGENTS' inactive proposal.
+No code/test/runtime/Git mutation, network/database/provider/credential action,
+other-worktree edit or Desktop-context update. Executed preparation checks:
+
+- New Markdown fragments: existing Prettier parser/config, formatting PASS.
+- New local links/heading anchors, exact proposed paths/index names and inactive
+  sequencing/status consistency: PASS.
+- Strict UTF-8/no BOM/LF, whitespace, sensitive-pattern scan and source/privacy
+  self-review: PASS; no credentials/private binding contents read.
+- Historical document bytes preserved by insertion only: PASS. Exact four-path
+  primary scope, empty index/unchanged HEAD and all708 tracked-file fingerprints
+  checked; the other11 worktrees' pending-file bytes/heads/index/status preserved.
+- `git diff --check`: PASS. No unchanged G1 tests/build/review or live suite rerun.
+
+Evidence is retained outside the repository in the task's
+`f053-g2-contract-20261106/documentation-checks.json` and before/after snapshots;
+these are local preparation receipts, not a guarded execution manifest or live
+qualification. Final handoff rechecks the exact applied document content/scope.
+Review provenance is this session's document/source self-review, not a fresh
+independent approval. G2 contract readiness is distinct from execution readiness.
+
+Resolved draft gaps: preserve independent freeze reasons during reconciliation;
+allow a currently eligible Admin to cancel a deleted author's known-unsent hold;
+bind recovery to the original quote instead of requoting; distinguish one application
+commit call from bounded driver wire handling. No unresolved blocking source/design
+contradiction identified in this review; the explicitly listed owner/live decisions
+remain prerequisites, not cleared findings or implementation evidence.
+
+Preserve F042/F043 acceptance BLOCKED; F044/F045/F049/F052 incomplete acceptance;
+original9/P5/API6 and all other unexecuted integration groups NOT_RUN; U01–U16
+NOT_RUN with U16 blocked and permanent historical final Job-empty/retained-child
+exit UNKNOWN. Retain combined225 mocked-identity evidence as combined, not a fresh
+full-suite run or live proof. Production readiness remains NOT_VERIFIED.
+
 ## Admin completion reconciliation and G1 review — 2026-11-06
 
 ### G1 integrated development checkpoint — 2026-11-06
