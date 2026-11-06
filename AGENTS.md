@@ -1105,3 +1105,37 @@ Original nine integration records, five P assertions, six API assertions and 225
 existing browser cases remain NOT_RUN. Newly prepared16 U cases stay separately
 NOT_RUN. Production readiness NOT_VERIFIED. No staging, commit or push; every Git
 delivery, live operation and next slice requires separate explicit owner approval.
+
+## Named F045 read-only product-development exception — 2026-11-05
+
+The owner's Product Development Reset authorizes one bounded product slice while
+the U16 QA runner and unrelated verification debt remain blocked. Permit only the
+F045 Module inspection inventory in docs/features/F045-admin-module-management.md:
+protected parent-bound GET inventory/detail and its read-only pane inside existing
+Learning Path detail, focused offline checks and source/security review. This
+supersedes earlier F045 progression prohibitions only for that inventory. No Module
+authoring, proposal persistence, generation, editorial decisions or publication.
+No automatic extension applies to F046 or F049–F054.
+
+Use a separate product branch/worktree from committed dev. Preserve primary dev,
+all U16 pending files, running resource bindings and historical evidence. Do not
+copy unfinished QA changes, refreeze manifests or repair supervisors in this slice.
+U16 remains BLOCKED; forced containment is failure evidence and its historical
+final Job-empty/retained-child exit observations remain UNKNOWN permanently.
+
+Require stable F018/F042/F044 interfaces and no unresolved security defect that
+invalidates dependent work. Reuse current-account Admin checks, strict DTOs,
+bounded parent-scoped reads and account/session invalidation. Applicable focused
+tests, build/typecheck, lint, formatting, scope/privacy and source review are required;
+the modified F044 shared boundary retains its fresh independent-review requirement.
+Unresolved Critical/High findings stop dependent work. Offline results prove no
+live authorization, physical index, transaction, concurrency or cleanup guarantee.
+
+This exception grants no runtime startup, browser/integration execution, live Save,
+database writes/provisioning, permission change or paid AI call. Later live checks
+need their existing separate authorization, exact qualified sources/target/indexes,
+ownership, deadlines, RESULT/ACK and cleanup evidence. Never rely on unverified
+persistence/security to unlock dependent mutations. Keep F042/F043 acceptance
+BLOCKED, F044 IN_PROGRESS, all unexecuted integration/U cases NOT_RUN and production
+NOT_VERIFIED. Existing qualified mocked results retain only their stated scope.
+Feature acceptance and every commit/push still require separate owner approval.

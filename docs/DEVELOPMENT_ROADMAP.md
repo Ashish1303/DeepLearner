@@ -2339,7 +2339,11 @@ browser cases are not prepared/count-added. F044 IN_PROGRESS; F042/F043 acceptan
 BLOCKED; production NOT_VERIFIED. Stale guarded pins and undelivered support remain.
 
 ### F045 — Admin Module Management
-Status: `NOT_STARTED`
+Status: `IN_PROGRESS` — partial read-only inspection, offline product lane only.
+
+Owner-authorized 2026-11-05 under the named bounded exception; see
+[exact contract](features/F045-admin-module-management.md). Module proposals/review
+and release membership remain unimplemented. No final acceptance or live authority.
 
 ### F046 — Admin Topic Management
 Status: `NOT_STARTED`
@@ -3469,3 +3473,48 @@ Desktop QA, explicitly including private Save writes if desired. Current-account
 credentials/session, owned applications and approved test data/target are required;
 browser host safety and all real-integration gates remain unchanged. F044 remains
 IN_PROGRESS; F042/F043 acceptance BLOCKED; production readiness NOT_VERIFIED.
+
+
+## Product lane reconciliation — 2026-11-05
+
+Current product implementation: **F045 Admin Module Management**, only existing
+Module inventory/detail inside Learning Path detail. F044 remains IN_PROGRESS;
+its U checkpoint is implemented/offline reviewed (the earlier top-pointer API-A/U
+proposal wording is historical). The open verification lane remains F042/F043/F044;
+their acceptance is not advanced. This dated product pointer supersedes section
+15's no-F045-progression wording only for this named read-only slice.
+
+The approved product plan is consolidated in PRD section 108. F045 is the next
+hierarchy milestone, not an AI-generation replacement. F049/F050 review, F051
+publication and F052/F053/F054 provider/controls/generation remain separate and
+unimplemented. Their formal dependencies are not silently removed. U16 runner
+failure is not an application defect or a prerequisite for independent read-only
+development. Its 12 pending QA paths and all historical cleanup evidence remain
+untouched in qa/f044-u16.
+
+Selected A: reuse F018 storage, current Admin boundary and F044 selection/UI/read
+patterns. Rejected-for-now B: full Module proposal/editorial/release workflow,
+requiring additional product/security contracts. Estimate 35–60 minutes for this
+offline bounded checkpoint; live QA and acceptance excluded. No dependency added.
+See the F045 contract for exact inventory, checks and current evidence.
+
+The nine original F044 integration records, five P assertions, six API assertions
+and 16 U browser cases stay NOT_RUN. Historical combined 225-identity mocked
+evidence is preserved with its limitations; no new browser run is claimed.
+F042/F043 acceptance BLOCKED; F044 IN_PROGRESS; production NOT_VERIFIED.
+Next recommended development-planning task after owner review: the bounded F054
+outline pilot and explicit F049/F052/F053 prerequisite contract, preserving existing
+feature ownership. No automatic implementation or paid-call approval. Full F045
+proposal/review work remains a separate future contract.
+
+
+F045 read-only checkpoint evidence: READY_FOR_REVIEW — offline only; initial163
+offline PASS plus affected49 and lifecycle8 reruns cover166 distinct tests (not a
+fresh full run).
+API/test TypeScript, API/Admin builds, targeted Admin test types, lint/format/diff
+PASS; one new test-fixture TS2345 resolved. Fresh independent source review has no
+unresolved findings; it confirmed closure of the self-reviewed Medium StrictMode
+reconnect defect and the Low test-fixture typing defect. It did not execute tests. Exact25 paths remain uncommitted
+in the separate product worktree. No runtime/DB/browser/AI operation or Git delivery.
+Next recommended planning task is a bounded F054 outline pilot/prerequisite contract
+under its existing ID, not automatic implementation or reassignment into F044.
