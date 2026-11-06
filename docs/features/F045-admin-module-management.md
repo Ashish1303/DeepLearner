@@ -195,3 +195,262 @@ from private saved inputs. That is a new recommendation, not authorization to
 implement/call a provider or bypass formal dependencies. Separately owner-review
 this checkpoint, then scope Desktop read-only Module QA on qualified delivered
 sources. Do not copy this worktree into a running checkout or invalidate its binding.
+
+
+## Remaining F045 reconciliation and checkpoint M1 proposal — 2026-11-05
+
+> **HISTORICAL PROPOSAL — NOT SELECTED by the owner on 2026-11-05.**
+> Module creation remains AI-led. Manual-origin M1 and its sequencing extension
+> were not approved; no implementation authority exists. The original proposal
+> below is retained as historical evidence, not an outstanding approval request.
+
+
+**Contract preparation only. M1 PROPOSED — PENDING OWNER APPROVAL; NOT_STARTED.**
+The owner authorized one remaining F045 slice only if its product semantics are
+established, otherwise an implementation-ready contract and the exact missing
+decision. That condition is not permission to invent a manual authoring source.
+The existing read-only development exception remains the only active F045 scope;
+AGENTS.md is unchanged. F045 remains IN_PROGRESS, acceptance incomplete.
+
+### Current delivery and remaining product work
+
+Fresh inspection found a clean product/admin-module-inspection worktree at
+1f687bd5f6c83252ed32a0dcf9411bbd3cb9ef2b, empty index. GitHub PR #2 is open/draft,
+targets dev7683811c2c66a90d0a83c6aec1d1025460710b3e, and has that exact product
+head; remote branch refs agree. The preceding evidence's “uncommitted” and F054
+next-task wording is historical, not the current delivery state or recommendation.
+
+| Area                    | Delivered or available                                                                                                                                                                                        | Missing, and whether it blocks M1                                                                                                                                                  |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Module inspection       | Parent-bound protected inventory/detail, archived inspection and read-only Admin pane; offline-reviewed checkpoint in draft PR #2.                                                                            | Live read/UI/database qualification and acceptance remain open; these do not prevent independent inert structure development.                                                      |
+| Module proposals        | No Module proposal schema, admitted producer, writer, API or UI. Existing F018 Module is catalogue storage, not private authoring.                                                                            | The permitted initial candidate origin is an unresolved product decision. Do not implement catalogue CRUD as a substitute.                                                         |
+| Parent identity         | Existing catalogue Technology/LearningPath and both-parent inspection contracts. F044 private Learning Path proposals have separate identities.                                                               | No proposal-to-catalogue mapping exists. Proposed M1 targets existing catalogue parents only; it cannot create a Path or use an F044 proposal ID as a Path ID.                     |
+| Reusable implementation | F018 title/slug/description/order conventions; C1 inert-data validation, canonical digests, strict DTOs and disconnected model patterns; F042/F043 current-account/transaction patterns for later operations. | Stored parent/actor checks, persistence/audit and concurrency must be contracted and implemented before any capture writer; structural validation supplies none of them.           |
+| Editorial and release   | PRD exact-revision policy; F049/F050 review ownership and F051 module-release ownership.                                                                                                                      | Decision records, review queue and release membership are unimplemented; excluded from M1, required before claiming those capabilities.                                            |
+| AI origin               | PRD13/44/105/107 require brief → AI outline → review. F044's separately approved manual brief contains no Modules.                                                                                            | No approved Module-generating source/output producer exists. F054 is not implemented by this proposal, nor required to develop an explicitly approved manual structural exception. |
+
+### One blocking owner decision
+
+**May F045 initially accept explicitly Admin-authored private Module candidates,
+bound to an existing catalogue Technology and LearningPath, before AI generation
+exists, under the exact M1 definition below?** This would be a new, bounded product
+exception, not an inference from the F044 Admin-authored Learning Path brief.
+
+Recommended A: approve that narrow initial origin and M1 offline implementation.
+It allows dependency-first F045 development using existing parent/content patterns,
+without a generic source/admission/provider framework. It does not authorize live
+capture, manual lessons/Topics/interview answers, editorial approval or publication.
+Alternative B: retain AI-only Module candidates. Then candidate creation waits for
+an approved bounded output/producer contract in F054 and its actual dependencies;
+do not invent an ingestion framework or implement F054 in F045 to hide the gap.
+No choice is enacted here. Harness/U16 failures are verification debt, not the
+reason this product-origin decision is needed. No new application defect is inferred.
+
+### Proposed first checkpoint: M1 private initial Module-candidate definition
+
+M1 is the smallest offline implementation prerequisite for later usable capture,
+not a new authoring screen or a claim of usable Save. Define only an initial
+immutable candidate, strict parent-bound structural validation/private DTO and
+explicit disconnected model registration. No new generic authority abstraction,
+source collection, provider enum, lifecycle state or proposal-family framework.
+The intended later user journey is existing Technology → existing Learning Path
+→ enter one Module candidate → explicit private Save → inspect/reconcile that
+candidate. Capture API/UI and their failure/transaction policy need separate exact
+contracts and implementation approval after M1. No save button is added by M1.
+
+All following choices are **new design recommendations pending approval**, not
+requirements retroactively attributed to F018/F044. Existing catalogue/public
+schemas and DTOs remain unchanged.
+
+| Required field                   | Exact M1 constraint and reason                                                                                                                                                                                                                                                                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `_id`                            | Canonical lowercase24-hex string or actual ObjectId at the inert model boundary; sole private candidate identity, not catalogue Module/Path identity. Explicitly supplied; no automatic allocation.                                                                                                                                              |
+| `technologyId`, `learningPathId` | Same identity format, fixed catalogue-parent references. Exact expected `{technologyId, learningPathId}` binding required by record validation/DTO/model construction. Local equality only; no claim the records exist or belong together.                                                                                                       |
+| `schemaVersion`, `revision`      | Both literal integer1. One initial immutable candidate only; no successor/family/predecessor API or update behavior. A future revision contract is not inferred.                                                                                                                                                                                 |
+| `origin`                         | Literal ADMIN_AUTHORED. Identifies declared input origin; never proof of authenticated capture, AI generation, source verification or editorial approval.                                                                                                                                                                                        |
+| `title`                          | Required1–120 UTF-16 units; reuse C1 proposalContent.title exactly, including well-formed Unicode, already-trimmed/nonblank single-line rules. Existing Module title bound.                                                                                                                                                                      |
+| `slug`                           | Required1–100 lowercase ASCII kebab-case, exact end-of-input match, no coercion/repair. Reuse F018 convention. A proposed slug is not reserved; existing catalogue uniqueness is unchanged.                                                                                                                                                      |
+| `description`                    | Required null or plain string1–2000 UTF-16 units, already outer-trimmed/nonblank and well-formed Unicode. LF and tab may occur internally; reject other C0/DEL, NEL and Unicode line/paragraph separator controls. Null means no description; no implicit empty-string/default conversion. Bounded Module summary, not executable HTML/Markdown. |
+| `order`                          | Required nonnegative safe integer, no coercion/default. Reuses F018 display order; not a release position or publication command.                                                                                                                                                                                                                |
+| `objectives`                     | Required ordered1–20 exact-distinct strings; reuse C1 proposalContent.objectives unchanged, each1–240. Makes the private candidate reviewable without duplicating audience/runtime/version metadata. These new Module objectives do not expand catalogue storage.                                                                                |
+| `createdBy`                      | Required canonical actor ObjectId identity, explicit inert input for M1. Future writer must derive it from current fenced Admin authority; client assertion/schema success cannot authenticate the author. Excluded from private response DTO.                                                                                                   |
+| `createdAt`                      | Required finite Date with canonical millisecond ISO round-trip. No automatic clock/default; future writer supplies server UTC. A Date/DTO string is not an admission receipt.                                                                                                                                                                    |
+| `definitionDigest`               | Required64 lowercase-hex SHA-256; recompute against the exact definition below. Integrity only, not signature, authorization or approval.                                                                                                                                                                                                        |
+
+Reject all unknown/operator/dotted fields before projection, accessors/proxies,
+unsupported object prototypes, cycles, sparse/extra-property arrays and malformed
+ObjectIds/Dates. Reuse C1's inert proposalData helper without changing that shared
+implementation. Text is plain data; future UI must render escaped text. Validation
+errors expose only the fixed message `Invalid Module proposal`, not raw values,
+Zod issues, internal exceptions or payload/digest snippets.
+
+Canonical digest bytes are UTF-8 JSON.stringify of this ordered array, with all IDs
+as lowercase strings and createdAt as canonical ISO milliseconds:
+
+```text
+['F045-module-proposal-v1', _id, technologyId, learningPathId,
+ 1, 1, 'ADMIN_AUTHORED', title, slug, description, order,
+ objectives, createdBy, createdAt]
+```
+
+No locale/Unicode normalization, trimming, sorting of objectives or object-key
+enumeration determines the digest. Object property insertion order is irrelevant;
+declared objective order and any defined content/identity/timestamp change matter.
+The normalized complete record including digest must serialize to at most16,384
+UTF-8 bytes. This proposed16KiB cap bounds one Module summary and is independently
+effective for multibyte text within individual field bounds; it is not a parser or
+server transport change. Test exactly the cap and one byte beyond using valid
+Unicode field combinations, plus explicit independent digest vectors.
+
+Private DTO allowlist: `id` (from `_id`), `technologyId`, `learningPathId`,
+`schemaVersion`, `revision`, `origin`, `title`, `slug`, `description`, `order`,
+`objectives`, `createdAt` (ISO). Validate the complete raw record, digest and expected
+both-parent binding first; then omit only `createdBy` and `definitionDigest`.
+Reject extra sensitive fields even when projection could hide them. Exclude source/
+admission/audit IDs, actor metadata, roles, access/session material, internal errors,
+AI/provider data and editorial/job/release state. DTO success proves no stored
+existence, account authority or eligibility; it is not an API capability.
+
+### Proposed model, inventory and offline acceptance
+
+Proposed collection `moduleProposalRevisions`, model `AdminModuleProposalRevision`.
+No automatic import/registration by the application. Explicit registration permits
+only the existing disconnected Mongoose host (readyState0); recognize only the
+identical previously registered model/schema, refuse collisions or connected hosts.
+Disable autoCreate, autoIndex, bufferCommands, timestamps and versionKey. Explicit
+fields only, strict throw, no casting/defaults; all fields immutable. Reuse C1's
+sanitized full-record async/sync validation and supported save/update/replace/
+delete/insertMany/bulkWrite refusal patterns; do not refactor C1 or add shared APIs.
+Model guards are application defenses, not database permissions; native-driver or
+raw-collection bypass protection is not established offline. No writer calls them.
+
+Only MongoDB's normal `_id` uniqueness is intended initially. Declare no additional
+index, TTL, catalogue slug reservation or family uniqueness without an actual writer/
+query contract. No collection/index creation, init, syncIndexes or migration runs.
+
+Exact future M1 CREATE inventory (no other application source):
+
+```text
+apps/api/src/modules/admin/modules/admin-module-proposal.schema.ts
+apps/api/src/modules/admin/modules/admin-module-proposal.dto.ts
+apps/api/src/modules/admin/modules/admin-module-proposal.model.ts
+apps/api/tests/admin-module-proposal.test.ts
+```
+
+On separate approval, MODIFY only AGENTS.md to enact the proposed exception and
+these four existing documents for enactment/evidence: this contract, PRD.md,
+DATABASE_DESIGN.md, DEVELOPMENT_ROADMAP.md. Future M1 combined scope is nine paths;
+current preparation changes only those four documents, not AGENTS.md or source.
+
+Measurable future acceptance:
+
+1. Valid inert fixtures pass; exact field/array/UTF-8 boundaries and missing, extra,
+   operator, malformed/control/Unicode/unsafe-integer inputs are independently checked.
+2. Both expected-parent mismatches and malformed binding objects fail; literal origin,
+   schema/revision rules prevent AI/approved/source-authority claims or successors.
+3. Independent digest vectors cover key insertion order, objective order, null/text,
+   multibyte values, IDs/actor/date changes and raw-record integrity before projection.
+4. Strict DTO privacy rejects raw nested/extra secrets; errors contain no fixture
+   content. Tests use synthetic identities only and do not log negative payloads.
+5. Import/registration produces no connection, listener, collection/index creation or
+   application registration. Inert spies prove refusal of connected hosts/collisions,
+   mutation APIs and altered documents; all resources/doubles restored after tests.
+6. Focused Node tests, full API/test noEmit TypeScript, production API build/typecheck,
+   targeted lint/format/UTF-8/LF/diff/privacy/scope and fresh independent source review
+   pass. No browser/Admin build is needed for an API-only inert definition. No live
+   database/bootstrap/runtime suite is invoked or claimed from mocks.
+
+Estimate after approval:60–90 minutes for M1 implementation/offline review; stop at
+90 minutes if incomplete. Later capture transactions/operation recovery/API/UI are
+not included or estimated as executable here. Their contract must define current-
+account fencing, actual parent validation/eligibility, atomic immutable candidate/
+audit writes, actor-bound idempotency, uncertain-save reconciliation, retention and
+parent lifecycle races before implementation. Existing patterns are reusable, not
+accepted proof or permission to reuse F044 records as a Module source.
+
+### Proposed sequencing extension — NOT ENACTED
+
+> PROPOSED — PENDING OWNER APPROVAL. After the owner explicitly approves the
+> Admin-authored private Module origin, catalogue-parent choice and M1 contract,
+> separately authorize only the four CREATE paths above and five sequencing/evidence
+> documents. Permit disconnected structure/digest/model/DTO work and inert tests
+> while F042/F043/F044 verification and U16 remain blocked. Preserve primary dev,
+> PR #3, U16 and parked support candidates; do not modify running-runtime bindings.
+> No endpoint, UI, persistence writer, database connection/provisioning, source
+> admission, operational capture, approval, publication, AI/provider, additional
+> feature/slice or Git delivery follows. All current-account authorization, actual
+> schema/index/transaction prerequisites, ownership, baselines, deadlines, RESULT/
+> ACK, cleanup and mandatory acceptance gates remain unchanged. A shared security
+> defect invalidating the dependency suspends work. Fresh independent source review
+> and meaningful offline verification are required; neither establishes live proof.
+> Each later implementation/live operation/commit/push needs separate approval.
+
+### Current preparation outcome and parked verification lane
+
+No new user-visible capability or implementation is claimed by this contract.
+The one unresolved product-origin decision above blocks dependent authoring work;
+it is distinct from deferred live verification. The approved manual origin, if any,
+must be explicit and must not be presented as generated or editorially approved.
+F049/F050 own editorial decisions, F051 publication/release membership, F054 AI.
+The proposed F042_F043_OWNED_DISPOSABLE_V1 amendment is not enacted. F042/F043
+integration remediation, support candidates and U16 remain parked; no diagnostics,
+pin reconciliation, candidate installation or harness repair is part of this task.
+F042/F043 acceptance BLOCKED; F044 IN_PROGRESS; F045 acceptance incomplete;
+all unexecuted integration/browser groups and historical UNKNOWN evidence preserved;
+production readiness NOT_VERIFIED. No claim that PR #2 or M1 completes management.
+
+
+## Owner decision: AI-led Module creation — 2026-11-05
+
+The owner selected **AI-led Module creation**. Independent manual-origin Module
+authoring is not approved. The preceding M1 design, four-file implementation
+inventory, manual collection/origin and proposed sequencing extension were
+**PROPOSED BUT NOT APPROVED / NOT SELECTED**. They remain historical, not current
+requirements or a request to reconsider the resolved origin decision. No M1 files
+exist, no M1 implementation authority exists, and no M1 exception is enacted.
+
+F044's separately approved Admin-authored curriculum brief and private Save/recovery
+remain unchanged. A brief is input to a future AI outline; it is not an AI-created
+Module or editorial approval. F045 read-only Module inspection in draft PR #2 is a
+partial deliverable, not complete Module management or accepted persistence.
+
+Admins may review/edit AI-origin proposals only through separately defined
+editorial workflows. No edit endpoint, UI, arbitrary manual-origin import or
+catalogue writer is authorized by that product direction. Changed content needs a
+new exact revision/digest and cannot inherit approval; preserving AI-origin lineage
+does not prove quality, source support or publication eligibility. F049/F050 own
+review decisions/workflows; F051 alone owns publication/release operations. Review,
+editing or even later approval does not itself publish anything.
+
+Remaining F045 product work is AI-origin Module candidate structure/inspection and
+integration with exact-revision review/editing, then separately defined release
+membership. It needs an actual bounded outline/output/admission contract, including
+Module/Path identity mapping and preserved generation provenance. Existing F044
+proposal IDs are not catalogue LearningPath IDs. No new AI-origin model, source
+authority, successor chain or admission guarantee is invented here.
+
+The next recommended enabling checkpoint is **F049 Content Status Workflow — P0
+offline revision-bound transition policy**, detailed in the roadmap's AI-led
+dependency reconciliation. This is a proposal to address the business dependency,
+not automatic next-feature progression or F049 implementation approval. F047's
+formal prerequisite remains unmet; only an explicitly approved P0 development
+exception could permit that isolated policy ahead of full F047. Do not mark F045,
+F047 or F049 complete to obtain generation permission. F052/F053 and F054 remain
+separate, with no selected paid provider/model and no live calls.
+
+Primary dev, PR #3, U16's12 pending files and the parked F042/F043 support candidates
+remain untouched. No F042_F043_OWNED_DISPOSABLE_V1 enactment, diagnostics, pin work,
+runtime change or Git delivery. F042/F043 acceptance BLOCKED; F044 IN_PROGRESS;
+F045 acceptance incomplete; all unexecuted groups and historical UNKNOWN evidence
+preserved; production readiness NOT_VERIFIED.
+
+## Current product/delivery reconciliation — 2026-11-05
+
+Read-only Module inspection remains the only implemented F045 checkpoint, in draft
+PR #2 to dev at 1f687bd5f6c83252ed32a0dcf9411bbd3cb9ef2b. AI-led creation is the
+selected requirement; manual M1 and its exception remain NOT SELECTED. The older
+recommended-P0 wording above is historical: F049 P0 is now independently reviewed
+offline policy only, delivered on a separate dependent branch; it supplies neither
+F045 AI-origin candidates nor actual approval. PR #2's branch/content is unchanged.
+See the [current roadmap](../DEVELOPMENT_ROADMAP.md#f044f054-current-product-and-delivery-ledger--2026-11-05) for dependency/delivery boundaries.
+F045 remains IN_PROGRESS, partial, with incomplete live verification/acceptance.

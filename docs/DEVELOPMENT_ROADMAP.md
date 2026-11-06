@@ -6,13 +6,32 @@
 **Owner:** Project Owner  
 **Rule:** Codex must implement only one approved feature at a time.
 
-**2026-10-31 documentation-only direction approval:** Section 18 reconciles the
+**Historical 2026-10-31 documentation-only direction approval:** Section 18 reconciles the
 AI Content Studio, separate Interview Preparation and persistent LOCAL prerequisite.
 Existing feature IDs, statuses, current pointer and historical evidence are retained.
 No tooling/feature implementation, provisioning, runtime execution or Git delivery
 is authorized by this update. F044 remains NOT_STARTED and not authorized.
 
 ---
+
+## Current reconciliation — 2026-11-05
+
+Current scoped product checkpoint: F049 P0, implemented and READY_FOR_REVIEW —
+offline only. F049 remains IN_PROGRESS; F044/F045 remain partial IN_PROGRESS.
+F046–F048, F050–F054 remain NOT_STARTED. F052 O1 is PROPOSED — PENDING OWNER
+APPROVAL; no active exception or implementation authority. See the current
+[F044–F054 reconciliation](#f044f054-current-product-and-delivery-ledger--2026-11-05).
+
+The dated sections below are historical snapshots unless explicitly identified as
+current. Their former NOT_STARTED/no-delivery wording is not the current status
+after a separately recorded owner decision; their test results and limitations
+remain unchanged. Official statuses use section 2's vocabulary; partial/offline,
+acceptance and delivery are separate evidence fields. Named AGENTS.md exceptions
+qualify the default sequence only for their exact approved slices.
+
+All 92 roadmap IDs/titles are retained. F001–F054 now link existing canonical
+records; F055–F092 remain planned roadmap tickets without standalone contracts.
+No nonexistent link/implementation approval is manufactured for those later IDs.
 
 # 1. Mandatory Rules for Codex
 
@@ -225,6 +244,8 @@ Codex must STOP at `READY_FOR_REVIEW`.
 ## Phase A — Product UI Foundation
 
 ### F001 — Public Landing Page
+
+[Canonical feature record](features/F001-landing-page.md).
 Status: `APPROVED_COMPLETE`
 
 ### F002 — Login Page UI
@@ -639,6 +660,8 @@ limitations and F001-F026 approvals are preserved; F028 is not authorized.
 Owner approved F027 development closure and feature-only Git delivery; no deployment.
 
 ### F028 — Visualization Controls
+
+[Canonical feature record](features/F028-visualization-controls.md).
 **Dependencies:** F027  
 **Status:** `APPROVED_COMPLETE`
 
@@ -981,6 +1004,8 @@ F001-F035 APPROVED_COMPLETE; F037 NOT_STARTED. No browser PASS, production deplo
 future exception or next-feature work is authorized by this approval.
 
 ### F037 — Student Concept Progress
+
+[Canonical feature record](features/F037-student-concept-progress.md).
 **Dependencies:** F036  
 **Status:** `APPROVED_COMPLETE`
 
@@ -1023,6 +1048,8 @@ exception remain unchanged. No production readiness, new execution, persistent
 provisioning or F038/F039 work is authorized; F038 remains NOT_STARTED.
 
 ### F038 — Completion Rules
+
+[Canonical feature record](features/F038-completion-rules.md).
 **Default Passing Score:** 70%  
 **Dependencies:** F037  
 **Status:** `APPROVED_COMPLETE`
@@ -1260,6 +1287,8 @@ security and full real-browser acceptance/regressions remain separately gated.
 F001-F037 stay APPROVED_COMPLETE; F039 stays NOT_STARTED pending separate approval.
 
 ### F039 — Weak / Improving / Strong Classification
+
+[Canonical feature record](features/F039-weak-improving-strong-classification.md).
 **Dependencies:** F037  
 **Status:** `APPROVED_COMPLETE` — LOCAL DEVELOPMENT ONLY
 
@@ -2346,12 +2375,18 @@ Owner-authorized 2026-11-05 under the named bounded exception; see
 and release membership remain unimplemented. No final acceptance or live authority.
 
 ### F046 — Admin Topic Management
+
+[Canonical feature record](features/F046-admin-topic-management.md).
 Status: `NOT_STARTED`
 
 ### F047 — Admin Concept Management
+
+[Canonical feature record](features/F047-admin-concept-management.md).
 Status: `NOT_STARTED`
 
 ### F048 — Admin Concept Editor
+
+[Canonical feature record](features/F048-admin-concept-editor.md).
 **Dependencies:** F047  
 **Status:** `NOT_STARTED`
 
@@ -2360,14 +2395,20 @@ Status: `NOT_STARTED`
 ## Phase L — Content Approval Workflow
 
 ### F049 — Content Status Workflow
+
+[Canonical feature record](features/F049-content-status-workflow.md).
 **States:** DRAFT, AI_GENERATED, IN_REVIEW, CHANGES_REQUIRED, APPROVED, PUBLISHED, ARCHIVED  
 **Dependencies:** F047  
-**Status:** `NOT_STARTED`
+**Status:** `IN_PROGRESS` — partial P0 offline policy only; acceptance incomplete.
 
 ### F050 — Approval Queue
+
+[Canonical feature record](features/F050-approval-queue.md).
 Status: `NOT_STARTED`
 
 ### F051 — Publish / Archive Flow
+
+[Canonical feature record](features/F051-publish-archive-flow.md).
 Status: `NOT_STARTED`
 
 ---
@@ -2375,14 +2416,20 @@ Status: `NOT_STARTED`
 ## Phase M — AI Draft Generation
 
 ### F052 — AI Provider Abstraction
+
+[Canonical feature record](features/F052-ai-provider-abstraction.md).
 **Dependencies:** F049  
 **Status:** `NOT_STARTED`
 
 ### F053 — AI Security & Usage Controls
+
+[Canonical feature record](features/F053-ai-security-usage-controls.md).
 **Dependencies:** F052  
 **Status:** `NOT_STARTED`
 
 ### F054 — AI Concept Draft Generation
+
+[Canonical feature record](features/F054-ai-concept-draft-generation.md).
 Status: `NOT_STARTED`
 
 ### F055 — AI Visualization Suggestion
@@ -2757,9 +2804,19 @@ Stop after updating the roadmap and report the blocker.
 
 # 15. Current Feature Pointer
 
-**Current Feature:** F044 - Admin Learning Path Management (protected proposal API A, offline review)
-**Current Status:** `IN_PROGRESS`
-**Next Feature:** F044 verification/owner review (no additional slice or F045 progression)
+**Current Feature:** F049 — Content Status Workflow (P0 only, offline checkpoint)
+**Current Status:** `IN_PROGRESS` — partial; P0 READY_FOR_REVIEW offline only.
+**Next Feature:** No new implementation authorized. Review the proposed F052 O1
+contract/inventory and O1-only exception before any separate implementation approval.
+
+F044 remains IN_PROGRESS (read-only A/B and C1/S/P/API A/UI U delivered offline),
+as does partial read-only F045 in draft PR #2. The exact F045 and F049 P0 exceptions
+in AGENTS.md supersede earlier progression prohibitions only within their scope.
+The following former pointer is retained as historical evidence:
+
+> **Former Current Feature:** F044 - Admin Learning Path Management (protected proposal API A, offline review)
+> **Former Current Status:** `IN_PROGRESS`
+> **Former Next Feature:** F044 verification/owner review (no additional slice or F045 progression)
 
 **Open verification features:** F042 and F043 remain IN_PROGRESS, acceptance
 BLOCKED; mandatory HTTP/MongoDB/ownership/RESULT-ACK/cleanup gates remain open.
@@ -3518,3 +3575,266 @@ reconnect defect and the Low test-fixture typing defect. It did not execute test
 in the separate product worktree. No runtime/DB/browser/AI operation or Git delivery.
 Next recommended planning task is a bounded F054 outline pilot/prerequisite contract
 under its existing ID, not automatic implementation or reassignment into F044.
+
+
+## F045 remaining product checkpoint decision — 2026-11-05
+
+> **HISTORICAL PROPOSAL — NOT SELECTED by the owner on 2026-11-05.**
+> Module creation remains AI-led. Manual-origin M1 and its sequencing extension
+> were not approved; no implementation authority exists. The original proposal
+> below is retained as historical evidence, not an outstanding approval request.
+
+
+Owner direction is dependency-first F045 continuation; earlier F054-pilot next-task
+recommendations above are historical, not the current priority. F045 remains
+IN_PROGRESS with incomplete acceptance. The read-only Module checkpoint was
+delivered to product/admin-module-inspection at
+1f687bd5f6c83252ed32a0dcf9411bbd3cb9ef2b; PR #2 is open/draft to dev at
+7683811c2c66a90d0a83c6aec1d1025460710b3e as freshly observed in this task.
+Its historical offline evidence is retained, not rerun or promoted to live PASS.
+
+The smallest proposed remaining checkpoint is M1: inert initial private Module
+candidate schema/digest/model/DTO and tests, exactly four CREATE paths in the F045
+contract. Implementation is NOT_STARTED, PROPOSED — PENDING OWNER APPROVAL.
+One product decision is required: permit Admin-authored private candidates under
+existing catalogue Technology/LearningPath before AI, or retain AI-only origin.
+No such exception is implied by F044's separately approved Learning Path brief.
+Recommendation: approve only that narrow origin and the exact M1 contract, then
+separately implement/review the60–90-minute offline definition checkpoint. No new
+active sequencing exception, API/UI/writer, live operation or next feature is enacted.
+Later proposal capture/API/UI, F049/F050 review and F051 releases remain separate;
+F054 is not pulled into F045 or selected merely for a demonstration.
+
+F042/F043 integration remediation, U16 and F042_F043_OWNED_DISPOSABLE_V1 are parked;
+no candidate installation, diagnostics, pin reconciliation or supervisor work.
+F042/F043 acceptance BLOCKED; F044 IN_PROGRESS; all unexecuted integration/browser
+groups and permanent historical UNKNOWN evidence retained; production NOT_VERIFIED.
+Current allowed task outcome is contract preparation pending the product decision,
+not an implementation or acceptance claim. Every Git commit/push remains separate.
+
+
+## AI-led Module decision and next dependency proposal — 2026-11-05
+
+**Owner decision enacted in product documentation only:** Module creation remains
+AI-led. Independent manual-origin M1 was proposed, **NOT APPROVED / NOT SELECTED**;
+its original text remains historical and grants no implementation authority.
+AGENTS.md is unchanged; no M1 or other new sequencing exception is active. F044's
+manual brief workflow is unchanged. Review/editing of AI-origin proposals requires
+its own exact editorial contract and never itself authorizes publication.
+F045 read-only Module inspection is a partial deliverable; acceptance incomplete.
+
+### Actual foundations and ordered dependencies
+
+| Step                             | Existing implementation or exact documented responsibility                                                                                                                                                                                                                                                                                      | Remaining dependency or limitation                                                                                                                                                                         |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Technology selection             | F043 protected inventory/detail and draft metadata controls; F042 current-account boundary.                                                                                                                                                                                                                                                     | Implemented/offline-reviewed, mandatory acceptance still BLOCKED. Neither code reuse nor mocks qualify live security.                                                                                      |
+| Brief and private planning input | F044 C1/S/P/API A/UI U provide private Admin brief/proposal Save and actor-bound recovery.                                                                                                                                                                                                                                                      | Real transaction/index/concurrency and UI verification debt remain; F044 proposal is not a generated outline or catalogue Path.                                                                            |
+| Private content foundations      | F047 **Admin Concept Management**; reconciliation assigns private Concept/mode revisions, source evidence and controlled authoring. Existing F020 catalogue schemas/Student renderers are not those private authoring services.                                                                                                                 | F047 NOT_STARTED; dedicated contract absent. F045/F046 private hierarchy/AI-origin mapping contracts are also missing, despite existing catalogue storage.                                                 |
+| Editorial                        | F049 **Content Status Workflow**, explicitly depends on F047; seven documented states. F050 **Approval Queue** has no explicit dependency field, but consuming real revisions/decisions is a functional requirement. F048 **Admin Concept Editor** explicitly depends on F047, reconciled to review/preview rather than routine manual editing. | Exact decision persistence, source/quality requirements, review/edit/revision API/UI and lineage contracts are missing; never infer them from enums or F044 admission.                                     |
+| Provider abstraction             | F052 **AI Provider Abstraction**, explicitly depends on F049. Architecture requires backend-only adapter and validated structured output.                                                                                                                                                                                                       | No provider module/contract implemented. Offline contracts can be provider-neutral; live provider/model/cost decisions are later.                                                                          |
+| Usage/privacy controls           | F053 **AI Security & Usage Controls**, explicitly depends on F052. Approved direction includes bounds, privacy, reservations/settlement, shared monthly INR1000 cap,80% warning/hard stop.                                                                                                                                                      | No implemented dispatch/budget/admission controls. Unknown charges, replay and retention/privacy need exact contracts; no paid call is eligible now.                                                       |
+| Generate outline                 | F054 **AI Concept Draft Generation** is the actual title; approved reconciliation includes bounded curriculum outlines and Read/Example drafting after exact outline approval. Its ticket has no explicit dependency field.                                                                                                                     | Provider/usage controls, bounded output/AI-origin admission/source schema and an authorized brief are functional prerequisites, not invented formal ticket fields. No generated production content exists. |
+| Review/edit → approved content   | F049/F050 plus actual AI-origin immutable candidates; one Admin may review MVP content, existing independent rubric/policy rules remain.                                                                                                                                                                                                        | New edits require new revision/digest and explicit lineage; approval never transfers to changed content. API/UI and real write/authorization/audit remain future work.                                     |
+| Publication                      | F051 **Publish / Archive Flow**; no explicit dependency field. Approved direction requires reviewed immutable module manifests and atomic publication/audit.                                                                                                                                                                                    | Approval is necessary but not sufficient; release completeness, current authority, source/quality, revision and transaction prerequisites remain mandatory.                                                |
+
+The **formal recorded graph** is F047→F048 and F047→F049→F052→F053; it has no
+explicit cycle. The functional generation path adds F052/F053→F054, then generated
+candidates→F045/F046/F047 reviewable content→F049/F050. If “F047 before F049” means
+full AI-populated authoring must be accepted first, the **inferred bootstrap cycle**
+is F047→F049→F052→F053→F054→AI-origin F047 content. That last edge is a functional
+interpretation, not an explicit F047 dependency declaration. Do not silently remove
+the recorded prerequisite or pretend full-feature acceptance is needed to define
+pure policy. A bounded offline exception can separate foundation implementation
+from final acceptance, without admitting content or authorizing provider dispatch.
+
+### Exactly two implementation approaches
+
+| Approach        | Concrete scope and benefit                                                                                                                                                                                                                             | Cost and prerequisite                                                                                                                                                                                                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A — recommended | F049 P0: three pure schema/policy/test files codifying the already documented AI-origin review transitions and exact revision/digest matching. Reusable by future Module/outline/Concept editorial services; no authority framework, writer or schema. | 60–90 minutes implementation/offline review, hard90-minute stop, after exact contract and P0-only sequencing approval ahead of unmet F047. No provider/model decision.                                                                                                                                  |
+| B — larger      | First contract/build F045/F046/F047 private AI-origin hierarchy/revisions, then full F049 persisted current-Admin decisions/audit, F050 review/edit services and UI, then F052/F053. Gives real reviewable records/queue instead of local policy only. | Multi-checkpoint work, provisionally5–10 engineering days for contracts/code/offline checks; real qualification extra and not presently timeable. Requires actual AI-origin admission/parent mapping, persistence and edit/decision contracts; no AI output can be fabricated to satisfy prerequisites. |
+
+### Recommended next checkpoint: F049 Content Status Workflow — P0
+
+**PROPOSED — PENDING OWNER APPROVAL; NOT_STARTED.** Necessary enabling capability:
+one deterministic, revision-bound review-transition rule usable by later editorial
+services. No new user-visible screen, reviewable content, actual approval or live
+guarantee is delivered by a pure rule. This is a small domain policy, not a registry,
+generic source authority, supervisor, provider or alternative persistence system.
+
+Proposed strict input is `{current:{state,revision:{id,revision,digest}},
+expected:{id,revision,digest},action}`. IDs are canonical lowercase24-hex, revisions
+positive safe integers, digests lowercase64-hex; exact equality of all three
+reference fields is mandatory. Recognize only the seven existing states DRAFT,
+AI_GENERATED, IN_REVIEW, CHANGES_REQUIRED, APPROVED, PUBLISHED, ARCHIVED. No coercion,
+unknown/operator fields, accessor/proxy payloads or silent normalization. No claim
+that a structurally valid reference resolves stored content or authenticates origin.
+
+Implement only these proposed policy decisions:
+
+- AI_GENERATED + SUBMIT_FOR_REVIEW → IN_REVIEW.
+- IN_REVIEW + REQUEST_CHANGES → CHANGES_REQUIRED.
+- IN_REVIEW + APPROVE → APPROVED.
+
+All other state/action pairs fail closed, including direct AI_GENERATED→APPROVED,
+same-state transitions, repeat commands against an already advanced state, DRAFT/manual-origin entry, old CHANGES_REQUIRED
+revision resubmission and any publication/archival action. These conservative P0
+exclusions do not define the complete future seven-state workflow. In particular,
+new AI-origin or Admin-edited descendant revisions need a separately approved
+admission/lineage contract, not a reset of an old revision. No editing or revised-
+content approval inheritance is implemented by P0.
+
+Evaluating the same unchanged input twice returns the same deterministic proposal; P0 has no replay ledger and cannot establish persisted at-most-once behavior. Its repeat-command refusal applies only when the supplied current state has already advanced. The pure function returns only a proposed next-state value, no actor, approval
+receipt, signature or persisted mutation. It is **not authorization**. Before any
+future service applies that result it must resolve actual immutable AI-origin
+content, recheck current verified ACTIVE Admin authority and source/quality/review
+requirements, enforce transaction/revision concurrency and atomic audit. No
+caller-supplied eligibility boolean may replace those checks. P0 cannot mark an
+F044 Admin-authored planning proposal as AI_GENERATED or approved by relabelling it.
+
+Exact proposed P0 CREATE inventory:
+
+```text
+apps/api/src/modules/admin/content-workflow/editorial-transition.schema.ts
+apps/api/src/modules/admin/content-workflow/editorial-transition.policy.ts
+apps/api/tests/editorial-transition.test.ts
+docs/features/F049-content-status-workflow.md
+```
+
+Proposed MODIFY: AGENTS.md for the P0-only exception; docs/PRD.md and this roadmap
+for contract/evidence. Seven paths total in a later authorized checkpoint. Do not
+create those files now; no F044/F045 source/model/audit/shared package change,
+application registration, endpoint, UI, index, dependency or environment variable.
+The new feature contract would record this exact bounded policy, not invent full
+F049/F050 APIs or stored decisions. Existing code conventions and Zod suffice.
+
+Measurable P0 acceptance: all three permitted transitions; exhaustive7×3 matrix
+rejection/acceptance; mismatched ID/revision/digest and unsafe-boundary inputs;
+unknown fields/actions/states; cross-revision refusal and repeat commands against already advanced state; unchanged
+input objects; fixed content-free errors; inert imports and no I/O. Meaningful
+tests must show no APPROVE result for a different revision, no state change to
+PUBLISHED/ARCHIVED and no automatic generation/edit/retry behavior. Run focused
+Node tests, full API/test TypeScript, production API build/typecheck, targeted
+lint/format/UTF-8/LF/privacy/diff and source review. No live or browser suite is
+needed for pure policy, and mocks cannot prove stored authority/audit/concurrency.
+
+**Required owner sequencing decision:** approve the exact P0 contract/inventory
+and authorize only its offline implementation ahead of F047 completion, with a
+named F049-P0-only development exception. F047 remains an unmet formal prerequisite
+for full F049; this does not unlock F052/F053/F054, acceptance, persistence or live
+dispatch. No exception is enacted now; current active AGENTS.md scope is unchanged.
+Provider/model selection is deferred until a concrete adapter/approved budget/live
+dispatch contract actually needs it; no paid service, key or model is chosen here.
+
+F042/F043 acceptance BLOCKED; F044 IN_PROGRESS; F045 acceptance incomplete; F047–
+F054 NOT_STARTED. U16/support work remains parked. All unexecuted integration/
+browser groups and permanent historical UNKNOWN evidence retained; production
+readiness NOT_VERIFIED. No tests or runtime outcomes are upgraded by this proposal.
+
+
+## F049 P0 authorized offline implementation — 2026-11-05
+
+The owner approved the preceding P0 proposal and exact seven-path inventory,
+P0-only sequencing enactment, implementation, focused offline verification and
+fresh independent review. Current product checkpoint is F049 P0 only; unmet F047
+is deferred solely for this pure policy, not completed or accepted. The dedicated
+contract is features/F049-content-status-workflow.md. Older PROPOSED/NOT_STARTED
+P0 wording and earlier no-F049 progression remain historical outside this exception.
+
+Required current.origin:'AI_GENERATED' explicitly validates the supplied origin
+claim, addressing the current authorization's origin tests while preserving the
+three approved transitions and exact ID/revision/digest binding. It does not
+authenticate AI provenance, resolve content, grant Admin authority, mutate state,
+record approval/audit or establish idempotency/at-most-once writes. Future consumers
+must enforce all actual authorization, content/source/quality, transaction/concurrency,
+audit/replay and publication prerequisites. No endpoint, writer, provider, UI or
+F052 implementation is activated. The formal F047→F049→F052→F053 dependencies
+are preserved for full-feature progression. P0 does not complete F047/F049 or
+satisfy every F052 prerequisite. No F054 demo or manual-origin Module M1 is approved.
+
+Initial state: isolated product/admin-module-inspection at
+1f687bd5f6c83252ed32a0dcf9411bbd3cb9ef2b, four pending documentation paths,
+empty index. Seven P0 paths plus the two preserved pre-existing F045/database drafts
+yield nine combined pending paths. Primary dev, PR #2/#3, U16's12 pending files and
+parked support candidates remain untouched; no Git delivery or runtime changes.
+F042/F043 acceptance BLOCKED; F044/F045 acceptance incomplete; F049 partial/offline
+only; original9/P5/API6 integration groups and all unexecuted browser cases remain
+NOT_RUN. Historical UNKNOWN remains; production readiness NOT_VERIFIED.
+
+### P0 offline checkpoint evidence
+
+P0 READY_FOR_REVIEW — offline only, full F049 acceptance incomplete. Final121/121
+focused tests PASS; the separate10/10 origin selection is a subset, not extra
+distinct coverage. Initial independent Low negative-origin test ambiguity resolved;
+unconditional inert setup also preserves standard test selection. Full API/test
+TypeScript, production API build/typecheck, targeted ESLint/format PASS. Fresh
+independent source/document/test-quality review:0 unresolved Critical/High/Medium/
+Low; no independent execution. See the dedicated F049 contract for commands,
+historical initial run, corrections and exact limitations. No live/runtime/provider/
+database/browser check, Git delivery, feature acceptance or F052 activation.
+
+## F044–F054 current product and delivery ledger — 2026-11-05
+
+This current summary reconciles, rather than replaces, the 92-ticket roadmap.
+Workstreams: **hierarchy management F044–F047**, **content/review F048–F050**,
+**publishing F051**, **AI generation F052–F054**. These groupings confer no changed
+IDs, dependency order, implementation or acceptance authority.
+
+| ID and exact title                    | User-visible outcome                                                          | Overall implementation  | Implemented checkpoints                                        | Missing functionality                                                                            | Acceptance / verification                                               | Dependencies / approved exceptions                                                                            | Canonical feature record                                | Delivery location                                                                                 | One next action                                                                                  |
+| ------------------------------------- | ----------------------------------------------------------------------------- | ----------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| F044 — Admin Learning Path Management | Select Technology; inspect Paths; enter brief and private Save/recover.       | IN_PROGRESS; partial    | Read-only A/B; C1/S/P/API A/UI U                               | Full proposal/review integration and acceptance; generation stays F054.                          | Live transaction/index/concurrency and unexecuted groups remain open.   | F017/F042/F043; enacted exact A/B/C1/S/P/A/U offline exceptions.                                              | [F044](features/F044-admin-learning-path-management.md) | dev (delivered checkpoints).                                                                      | Qualify U/live Save only under separate safe-runtime/data approval.                              |
+| F045 — Admin Module Management        | Inspect existing Modules beneath bound Technology + Path.                     | IN_PROGRESS; partial    | Read-only inventory/detail and Module pane                     | AI-origin candidate/review/edit integration and release membership; manual M1 NOT SELECTED.      | 166 distinct retained offline tests; live API/browser/DB unverified.    | F018/F042/F044; read-only exception only; AI-origin mapping missing.                                          | [F045](features/F045-admin-module-management.md)        | Draft [PR #2](https://github.com/Ashish1303/DeepLearner/pull/2), product/admin-module-inspection. | Contract the AI-origin Module boundary after its producer/admission dependency is defined.       |
+| F046 — Admin Topic Management         | Review Topic proposals, coverage and duplicates.                              | NOT_STARTED             | None; F019 catalog is a foundation only                        | Private AI-origin Topic revisions and Admin management.                                          | No feature acceptance/live evidence.                                    | No explicit ticket dependency; functional F045 hierarchy + AI-origin mapping + current Admin.                 | [F046](features/F046-admin-topic-management.md)         | Planning record in this dependent PR.                                                             | Finalize bounded parent/revision/inspection contract.                                            |
+| F047 — Admin Concept Management       | Manage private Concept/mode revisions with sources.                           | NOT_STARTED             | None; F021 catalog/Student modes are not private authoring     | Private source/revision/admission and controlled authoring services.                             | No feature acceptance/live evidence.                                    | No explicit ticket dependency; functional hierarchy + actual AI-origin admission.                             | [F047](features/F047-admin-concept-management.md)       | Planning record in this dependent PR.                                                             | Resolve bounded private revision/source and generation bootstrap contract.                       |
+| F048 — Admin Concept Editor           | Lesson Review Studio and safe Student Preview (reconciled intent).            | NOT_STARTED             | None; Student renderers/designs only                           | Approved safe preview/share and review UI contract.                                              | No Admin preview acceptance.                                            | Explicit F047; functional exact revision/source and separately defined rendering boundary.                    | [F048](features/F048-admin-concept-editor.md)           | Planning record in this dependent PR.                                                             | Finalize review/preview contract after F047 interface.                                           |
+| F049 — Content Status Workflow        | Later exact-revision editorial workflow; P0 has no screen/approval.           | IN_PROGRESS; partial P0 | Pure seven-state/three-action policy; 121 offline tests        | Authority/provenance, stored decisions, concurrency/audit/replay; CHANGES_REQUIRED resubmission. | P0 independently source-reviewed; not real approval or full acceptance. | Explicit F047 remains unmet; enacted P0-only offline exception.                                               | [F049](features/F049-content-status-workflow.md)        | product/f049-p0-editorial-policy, dependent on PR #2.                                             | Review proposed F052 O1 as an independent offline dependency; do not infer full F049 completion. |
+| F050 — Approval Queue                 | Review outlines/lessons; make eligible decisions/request correction.          | NOT_STARTED             | None                                                           | Queue, exact actions/revisions, decision API/UI and correction flow.                             | No real editorial acceptance.                                           | No explicit ticket dependency; functional real candidates + full F049 decisions; AI controls for corrections. | [F050](features/F050-approval-queue.md)                 | Planning record in this dependent PR.                                                             | Contract exact queue/decision surface after authoritative revision semantics.                    |
+| F051 — Publish / Archive Flow         | Release reviewed Modules with stable immutable history.                       | NOT_STARTED             | No Admin release flow; public published-only reads exist       | Eligibility/manifests, atomic release/audit and uncertain reconciliation.                        | No qualified publication/archive evidence.                              | No explicit ticket dependency; functional complete hierarchy, F049/F050 and qualified transactions.           | [F051](features/F051-publish-archive-flow.md)           | Planning record in this dependent PR.                                                             | Finalize release/archival contract after editorial decisions.                                    |
+| F052 — AI Provider Abstraction        | Later provider-neutral generation; proposed O1 is fake-only.                  | NOT_STARTED             | None; O1 contract proposed only                                | Offline port/executor/fake; later real adapter under separate controls.                          | No provider execution or accepted dependency completion.                | Explicit F049; O1-only exception PROPOSED, not enacted; F047/full F049 unmet.                                 | [F052](features/F052-ai-provider-abstraction.md)        | Existing proposed contract included in documentation commit.                                      | Approve O1 contract/eight paths and its bounded offline exception, then implement separately.    |
+| F053 — AI Security & Usage Controls   | Private, bounded generation and explicit cost/exposure controls.              | NOT_STARTED             | None                                                           | Dispatch/privacy, reservation/settlement, cancellation/resume and cap enforcement.               | No qualified budget/privacy/live admission evidence.                    | Explicit F052; later exact egress, uncertainty and accounting contract.                                       | [F053](features/F053-ai-security-usage-controls.md)     | Planning record in this dependent PR.                                                             | Define minimal controls after the provider boundary is approved.                                 |
+| F054 — AI Concept Draft Generation    | Bounded curriculum outline; Read/Example drafts after exact outline approval. | NOT_STARTED             | None; F044 brief and static preview are inputs/references only | Domain output schema/admission, generation and review integration.                               | No generated production content or live AI evidence.                    | No explicit ticket dependency; functional F044, F052/F053, AI-origin schema/admission, F049/F050.             | [F054](features/F054-ai-concept-draft-generation.md)    | Planning record in this dependent PR.                                                             | Define domain outline/output contract dependency-first; no AI demo jump.                         |
+
+### Dependency truth and approved scope
+
+The explicit recorded graph is F047 → F048 and F047 → F049 → F052 → F053;
+it is acyclic. Functional generation adds F052/F053 → F054 → actual AI-origin
+hierarchy/content. Requiring fully AI-populated F047 before any provider foundation
+would create the inferred bootstrap cycle F047 → F049 → F052 → F053 → F054 → F047.
+That last link is functional, not an invented formal dependency. Do not erase it
+or mark F047/full F049 complete. Only F049 P0's exact offline exception is active;
+F052 O1's proposed exception needs separate owner approval. No other new exception.
+
+Modules remain AI-led; independent manual-origin M1 is historical NOT SELECTED,
+with no implementation authority. F044's separately approved manual brief/private
+proposal workflow is unchanged. Authenticated admission is not editorial approval;
+pure P0 evaluation is neither. F049/F050 review/editing does not publish; F051 owns
+publication. Missing CHANGES_REQUIRED resubmission remains explicit. Do not infer
+provider readiness, generation authority or F053 controls from P0 or the O1 draft.
+
+### Evidence and delivery boundaries
+
+Retain P0's previously executed 121/121 focused offline PASS; its 10-case origin
+selection is a subset, not 131 tests. API/test TypeScript, API build, targeted
+lint/format and independent source-only review (zero unresolved after one Low
+test correction) remain applicable because the reviewed application/test bytes
+are unchanged. This reconciliation runs documentation/integrity checks only.
+
+Original F044 nine integration records, five P assertions, six API assertions and
+all 16 U cases remain NOT_RUN. The historical 213 unaffected + 12 corrected mocked
+results cover 225 identities as combined evidence, not a fresh full-suite run,
+live API/database proof or U evidence. F043's 15 MongoDB records remain NOT_RUN.
+F042/F043 acceptance BLOCKED; F044/F045/F049 incomplete acceptance. U16 is BLOCKED;
+forced containment and historical final Job-empty/retained-child exit UNKNOWN
+remain permanent. No current absence reconstructs historical cleanup. Parked
+support/pin/process-access and other unexecuted groups retain their actual status.
+Production readiness NOT_VERIFIED.
+
+The owner authorized three commits on one dependent branch,
+product/f049-p0-editorial-policy, initially targeting product/admin-module-inspection.
+The first four-document boundary is the retained pre-P0 product decision; the
+second seven-path boundary reconstructs reviewed P0 source/authority/evidence;
+this third documentation boundary links the current plan and includes the proposed
+F052 draft plus seven short planned records. No provider source or new implementation.
+PR #2 remains the separate F045-only draft to dev. This dependent PR must not be
+merged automatically; eventual integration/retargeting requires fresh ancestry and
+separate owner approval. Neither PR delivery nor a planned record means acceptance.

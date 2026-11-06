@@ -1,6 +1,27 @@
 # F044 — Admin Learning Path Management
 
-## Status, authority and source precedence
+## Current implementation summary — 2026-11-05
+
+F044 remains IN_PROGRESS, partial and acceptance BLOCKED. Read-only A/B and private
+C1/S/P/proposal API A/UI U checkpoints are delivered in committed dev, with offline
+review scope only. The following earlier A-delivered/U-proposed header is historical;
+the dated U implementation/evidence below supersedes it for implementation status.
+Likewise earlier full-feature field/schema proposals describe their preparation
+stage; later approved C1/S/P/A/U sections supply the scoped implemented contracts.
+No full-feature acceptance or live persistence guarantee follows.
+
+The earlier API/test TypeScript blocker was subsequently corrected in the test-only
+duplicate fixture narrowing; current retained full API/test TypeScript PASS does
+not rewrite the historical failure. Existing observed fresh login/restoration/
+Learning Paths/logout PASS is supplemental, not acceptance or a new execution here.
+Original nine / P five / API six integration groups remain NOT_RUN. Historical
+213 unaffected + 12 corrected mocked results cover 225 identities as combined
+evidence, not a fresh full-suite run; U01–U16 remain NOT_RUN with U16 BLOCKED and
+historical final Job-empty/retained-child exit UNKNOWN. Guarded pin/support and
+physical index/transaction/concurrency gates remain open. F042/F043 acceptance
+BLOCKED; production NOT_VERIFIED. See the [current roadmap](../DEVELOPMENT_ROADMAP.md#f044f054-current-product-and-delivery-ledger--2026-11-05).
+
+## Historical status, authority and source precedence
 
 Latest scoped extension: **proposal API A READY_FOR_REVIEW — offline only; delivered**.
 Checkpoint U: **PROPOSED — PENDING OWNER APPROVAL; NOT_STARTED**.
