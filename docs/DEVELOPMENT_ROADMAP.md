@@ -14,6 +14,22 @@ is authorized by this update. F044 remains NOT_STARTED and not authorized.
 
 ---
 
+## F053 G2.2 offline implementation — 2026-11-06
+
+**G2.2 READY_FOR_REVIEW — offline only; delivery pending. Full F053 IN_PROGRESS; acceptance incomplete.** Owner approval `7e0a761c-9e39-40bd-8ea5-053d725b6398/Pasted text.txt` enacted only the exact ten-path exception in AGENTS. Implementation began IN_PROGRESS on clean primary `dev`, `E:\AI\DeepLearner`, HEAD `7170516f08b914594d84605bbaa7e5771576a7f7`; HEAD/index unchanged, no branch or Git delivery. Historical G2.1/G2 planning/delivery sections below retain their dated meaning.
+
+Implemented internal injected repository/service for actor-bound reservation/recovery, claim, cancellation, settlement, uncertainty and reconciliation; native primary snapshot reads, User-version fencing, control/pointer/period/operation CAS and strict append-only audit boundaries. No production resolver registration, endpoint/UI, actual dispatch or user-facing Generate capability. Current users retain existing private brief/Save functionality.
+
+Exact ten paths: four CREATE `apps/api/src/modules/ai/ai-usage-ledger.repository.ts`, `apps/api/src/modules/ai/ai-usage-ledger.service.ts`, `apps/api/tests/ai-usage-ledger-persistence.test.ts`, `apps/api/tests/ai-usage-ledger.integration.ts`; six MODIFY `apps/api/src/modules/audit/audit.model.ts`, `apps/api/tests/auth-audit.test.ts`, `AGENTS.md`, F053, DATABASE_DESIGN and this roadmap. All remain pending and unstaged. Delivered G1/O1/G2.1 and the other11 worktrees are preserved.
+
+Executed final checks: **65 focused tests PASS** (55 persistence/control-flow +10 affected audit), full API/test TypeScript and production API build/typecheck PASS, targeted lint/format/UTF-8/LF/links/privacy/scope/history/diff PASS. These use synthetic resolvers and inert driver/session doubles. Fresh separate-agent source review APPROVE with zero unresolved findings; reviewer executed no tests and is not an authenticated human/GitHub review. Source/error/deadline/replay fixes and actual provenance are recorded in the [canonical G2.2 handoff](features/F053-ai-security-usage-controls.md#f053-g22-offline-implementation--2026-11-06); external receipts/review are under `f053-g22-20261106T123319Z`. No unchanged G1/O1/G2.1 suites or completed reviews were repeated.
+
+Critical limitation: installed driver abort resolution does not prove a server ACK. After attempted writes, failed/precommit cleanup conservatively records ABORT_UNCONFIRMED/OUTCOME_UNKNOWN. Native read-only snapshot sessions perform no transaction/abort/commit; incomplete linkage/cleanup remains UNRESOLVED. Final async profile validation and last session verification precede a synchronous boundary/expiry guard. Unknown liabilities remain held; independent freezes/original-period accounting survive reconciliation. No result permits provider dispatch.
+
+New prepared `F053_G22_PARENT` + `G22-I01`–`I08` remain **NOT_RUN**, distinct from original9/P5/API6 and browser evidence. Import is inert. The uncertain rollback case is last; an uncertain race stops later cases, never replays a key. Two owned Admins/six distinct synthetic intents, exact physical indexes/target/baseline, source/runtime/result manifests and existing authenticated RESULT/ACK/cleanup qualification need separate approval; preparation proves none of them. No live persistence/provider/network/credential/DDL/provisioning/runtime/harness/pin/dependency operation occurred.
+
+Keep F042/F043 acceptance BLOCKED, F044/F045/F049/F052 incomplete, all unexecuted groups including U01–U16 NOT_RUN, historical combined225 identity evidence separate from new execution, permanent U16 Job-empty/retained-exit UNKNOWN and production NOT_VERIFIED. Full-feature acceptance is unchanged. **Next action:** owner review/authorize ten-path G2.2 checkpoint delivery only; no automatic live verification, activation, F054 or further implementation.
+
 ## F053 G2.1 offline implementation — 2026-11-06
 
 **G2.1 bounded offline development/review/delivery checklist: complete. Full F053 IN_PROGRESS; feature acceptance incomplete.** Implementation started under approval `48487282-8157-4502-a9a8-f3d3728c8266/Pasted text.txt` from the four accepted pending documents on primary `dev`, `E:\AI\DeepLearner`, base `29aa57b3395e1eaf51d5bc68af5de943d6351c61`. Starting fingerprints and historical worktree snapshots remain in external `f053-g21-20261106T101636Z/before.json`. The previously READY_FOR_REVIEW checkpoint is now delivered as recorded below.

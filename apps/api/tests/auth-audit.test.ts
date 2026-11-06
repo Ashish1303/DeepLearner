@@ -3,6 +3,132 @@ import { test } from 'node:test';
 import { Types } from 'mongoose';
 import { Audit, auditSchema } from '../src/modules/audit/audit.model.js';
 import * as repository from '../src/modules/audit/audit.repository.js';
+import { validateLedgerAudit } from '../src/modules/ai/ai-usage-ledger.repository.js';
+
+test('F053 AI usage audit has exact private tuples, explicit identities and no broadened legacy metadata', async () => {
+  const key = (n: number) =>
+    new Types.ObjectId(n.toString(16).padStart(24, '0'));
+  const uuid = (n: number) =>
+    `${n.toString().padStart(8, '0')}-1111-4111-8111-${n.toString().padStart(12, '0')}`;
+  const base = {
+    _id: key(1),
+    category: 'CONTENT_MANAGEMENT',
+    action: 'AI_USAGE_RESERVED',
+    actorId: key(2),
+    resourceType: 'AI_USAGE_OPERATION',
+    resourceId: key(3),
+    requestId: 'synthetic',
+    createdAt: new Date('2026-11-06T10:00:00Z'),
+    metadata: {
+      operationId: uuid(1),
+      originalActorId: key(2),
+      usageVersion: 1,
+      purpose: 'CURRICULUM_OUTLINE',
+      environment: 'DEV',
+      periodKey: '2026-11',
+      policyVersion: uuid(2),
+      profileVersion: uuid(3),
+      pricingVersion: uuid(4),
+      providerAlias: 'test-provider',
+      modelAlias: 'test-model',
+      reservedPaise: '100',
+      heldPaise: '100',
+      actualPaise: null,
+      inputTokens: null,
+      outputTokens: null,
+      safeCode: null,
+      evidenceId: null,
+      freezeReasons: [],
+    },
+  };
+  for (const action of [
+    'AI_USAGE_RESERVED',
+    'AI_USAGE_DISPATCH_CLAIMED',
+    'AI_USAGE_UNCERTAIN',
+    'AI_USAGE_SETTLED',
+    'AI_USAGE_RELEASED',
+  ]) {
+    const terminal =
+      action === 'AI_USAGE_SETTLED' || action === 'AI_USAGE_RELEASED';
+    const row = {
+      ...base,
+      action,
+      metadata: {
+        ...base.metadata,
+        usageVersion: action === 'AI_USAGE_RESERVED' ? 1 : 3,
+        heldPaise: terminal ? '0' : '100',
+        actualPaise: terminal ? '0' : null,
+        evidenceId: terminal ? uuid(5) : null,
+        safeCode: action === 'AI_USAGE_UNCERTAIN' ? 'OUTCOME_UNKNOWN' : null,
+        freezeReasons: action === 'AI_USAGE_UNCERTAIN' ? ['UNCERTAIN'] : [],
+      },
+    };
+    validateLedgerAudit(row);
+    await new Audit(row).validate();
+    if (!terminal)
+      await assert.rejects(new Audit({ ...row, actorId: key(99) }).validate());
+    for (const changed of [
+      { category: 'AUTH' },
+      { resourceType: 'USER' },
+      { metadata: { ...row.metadata, token: 'SYNTHETIC_PRIVATE' } },
+      { metadata: { ...row.metadata, heldPaise: 0 } },
+      { metadata: { ...row.metadata, originalActorId: key(2).toHexString() } },
+      {
+        metadata: {
+          ...row.metadata,
+          freezeReasons: ['UNCERTAIN', 'UNCERTAIN'],
+        },
+      },
+    ])
+      await assert.rejects(new Audit({ ...row, ...changed }).validate());
+    for (const field of Object.keys(row.metadata)) {
+      const metadata: Record<string, unknown> = { ...row.metadata };
+      delete metadata[field];
+      await assert.rejects(new Audit({ ...row, metadata }).validate());
+    }
+  }
+  for (const field of ['_id', 'createdAt']) {
+    const row: Record<string, unknown> = { ...base };
+    delete row[field];
+    await assert.rejects(new Audit(row).validate());
+  }
+  assert.equal(auditSchema.options.autoCreate, false);
+  assert.equal(auditSchema.options.autoIndex, false);
+  const index = auditSchema
+    .indexes()
+    .find(([, options]) => options.name === 'uq_ai_usage_audit_version');
+  assert(index);
+  assert.deepEqual(index[0], {
+    resourceType: 1,
+    resourceId: 1,
+    'metadata.usageVersion': 1,
+  });
+  assert.deepEqual(index[1].partialFilterExpression, {
+    resourceType: 'AI_USAGE_OPERATION',
+  });
+  assert.equal(index[1].unique, true);
+  const legacy = {
+    category: 'AUTH',
+    action: 'AUTH_REGISTERED',
+    actorId: key(2),
+    resourceType: 'USER',
+    resourceId: key(2),
+    requestId: 'synthetic',
+    metadata: { source: 'EMAIL_PASSWORD' },
+  };
+  for (const field of Object.keys(base.metadata).filter(
+    (k) => k !== 'operationId',
+  ))
+    await assert.rejects(
+      new Audit({
+        ...legacy,
+        metadata: {
+          ...legacy.metadata,
+          [field]: (base.metadata as Record<string, unknown>)[field],
+        },
+      }).validate(),
+    );
+});
 
 test('F044 admission/proposal audit tuples require exact private metadata and server identities', async () => {
   const actorId = new Types.ObjectId('a'.repeat(24));
@@ -262,6 +388,14 @@ test('audit schema accepts only bounded F007 actions and metadata offline', asyn
   assert.deepEqual(auditSchema.indexes(), [
     [{ actorId: 1, createdAt: -1 }, {}],
     [{ resourceType: 1, resourceId: 1, createdAt: -1 }, {}],
+    [
+      { resourceType: 1, resourceId: 1, 'metadata.usageVersion': 1 },
+      {
+        name: 'uq_ai_usage_audit_version',
+        unique: true,
+        partialFilterExpression: { resourceType: 'AI_USAGE_OPERATION' },
+      },
+    ],
   ]);
 });
 

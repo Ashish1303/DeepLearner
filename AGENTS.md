@@ -1342,3 +1342,31 @@ cleanup/acceptance gates remain. Preserve other worktrees, historical evidence,
 acceptance blocks, NOT_RUN groups, permanent UNKNOWN and production NOT_VERIFIED.
 No staging, commit, push or merge. Further checkpoints/live/Git actions need their
 own separate approval; the earlier inactive proposal remains historical.
+
+## Named F053 G2.2 offline implementation exception — 2026-11-06
+
+Owner approval `7e0a761c-9e39-40bd-8ea5-053d725b6398/Pasted text.txt` permits only
+the canonical exact ten-path G2.2 internal repository/service/audit/test/evidence
+checkpoint directly on clean primary dev at `7170516f08b914594d84605bbaa7e5771576a7f7`.
+It supersedes the earlier G2.1 no-G2.2 source restriction only for this separately
+approved offline work. Preserve G1/O1/G2.1 and default sequencing outside G2.2.
+
+Require explicit injected synthetic profile/quote/source/evidence/current-account/
+time boundaries, current performer fencing, exact CAS/audit linkage, conservative
+uncertainty and no automatic retry. Start one bounded session/transaction, preserve
+10000ms work, 5000ms authorization, 2000ms commit/abort/endSession limits and existing
+driver same-session bounds. No provider call or dispatch permission follows a claim.
+Require meaningful mocked tests, affected audit regressions, full API/test TypeScript,
+production build/typecheck, targeted lint/format/UTF-8/LF/privacy/scope/diff and fresh
+separate-agent source review. Resolve findings before READY_FOR_REVIEW. Partial
+sessions stay IN_PROGRESS. Full F053 remains IN_PROGRESS, acceptance incomplete.
+
+No live persistence/credentials/database/network/provider calls, DDL/provisioning,
+production resolver/configuration/startup registration, HTTP/UI, spending, new
+dependency/framework, runtime/harness/pin work, retry/fallback or F054 authority.
+No changes outside the ten paths, other worktrees or Desktop QA context. No staging,
+commit, push or merge. Preserve real authorization/transaction/index/privacy/
+ownership/RESULT-ACK/cleanup gates, acceptance blocks, NOT_RUN groups, historical
+UNKNOWN and production NOT_VERIFIED. Future live/Git/checkpoint actions need their
+own approval. This exception establishes no actual persistence or remote billing
+guarantee and must not activate any runtime consumer.

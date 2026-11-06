@@ -1,6 +1,35 @@
 import { profileFieldNames } from '../users/user.schema.js';
 import { Schema, type InferSchemaType } from 'mongoose';
 import { mongoose } from '../../config/database.js';
+import { validateLedgerAudit } from '../ai/ai-usage-ledger.repository.js';
+
+const usageActions = [
+  'AI_USAGE_RESERVED',
+  'AI_USAGE_DISPATCH_CLAIMED',
+  'AI_USAGE_UNCERTAIN',
+  'AI_USAGE_SETTLED',
+  'AI_USAGE_RELEASED',
+];
+const usageMetadataFields = [
+  'originalActorId',
+  'usageVersion',
+  'purpose',
+  'environment',
+  'periodKey',
+  'policyVersion',
+  'profileVersion',
+  'pricingVersion',
+  'providerAlias',
+  'modelAlias',
+  'reservedPaise',
+  'heldPaise',
+  'actualPaise',
+  'inputTokens',
+  'outputTokens',
+  'safeCode',
+  'evidenceId',
+  'freezeReasons',
+];
 
 export const auditSchema = new Schema(
   {
@@ -13,6 +42,7 @@ export const auditSchema = new Schema(
     action: {
       type: String,
       enum: [
+        ...usageActions,
         'CURRICULUM_BRIEF_ADMITTED',
         'LEARNING_PATH_PROPOSAL_REVISION_CREATED',
         'TECHNOLOGY_CREATED',
@@ -49,6 +79,7 @@ export const auditSchema = new Schema(
     resourceType: {
       type: String,
       enum: [
+        'AI_USAGE_OPERATION',
         'USER',
         'PRACTICE_RUBRIC',
         'TECHNOLOGY',
@@ -61,6 +92,8 @@ export const auditSchema = new Schema(
     resourceId: {
       type: Schema.Types.ObjectId,
       ref: function (this: { resourceType: string }) {
+        if (this.resourceType === 'AI_USAGE_OPERATION')
+          return 'AiUsageOperation';
         if (this.resourceType === 'CURRICULUM_BRIEF_REVISION')
           return 'AdminCurriculumBriefRevision';
         if (this.resourceType === 'LEARNING_PATH_PROPOSAL_REVISION')
@@ -84,6 +117,12 @@ export const auditSchema = new Schema(
     metadata: {
       type: new Schema(
         {
+          ...Object.fromEntries(
+            usageMetadataFields.map((field) => [
+              field,
+              { type: Schema.Types.Mixed, default: undefined },
+            ]),
+          ),
           technologyId: { type: Schema.Types.ObjectId, cast: false },
           revision: { type: Number, cast: false },
           operationId: { type: String, cast: false },
@@ -105,6 +144,7 @@ export const auditSchema = new Schema(
             }): boolean {
               const action = this.ownerDocument().action;
               return (
+                !usageActions.includes(action) &&
                 action !== 'USER_PROFILE_UPDATED' &&
                 ![
                   'CURRICULUM_BRIEF_ADMITTED',
@@ -198,6 +238,23 @@ export const auditSchema = new Schema(
 auditSchema.pre('validate', function () {
   const action = this.action;
   const meta = this.metadata;
+  const raw = this.toObject({
+    getters: false,
+    virtuals: false,
+    transform: false,
+  });
+  if (usageActions.includes(action)) {
+    try {
+      if (this.$isDefault('_id') || this.$isDefault('createdAt'))
+        throw new Error('Invalid usage audit');
+      validateLedgerAudit(raw);
+    } catch {
+      this.invalidate('metadata', 'Invalid AI usage audit');
+    }
+    return;
+  }
+  if (usageMetadataFields.some((key) => Object.hasOwn(raw.metadata ?? {}, key)))
+    this.invalidate('metadata', 'AI usage metadata prohibited');
   const brief = action === 'CURRICULUM_BRIEF_ADMITTED';
   if (brief || action === 'LEARNING_PATH_PROPOSAL_REVISION_CREATED') {
     const allowed = brief
@@ -490,6 +547,15 @@ auditSchema.pre('validate', function () {
 
 auditSchema.index({ actorId: 1, createdAt: -1 });
 auditSchema.index({ resourceType: 1, resourceId: 1, createdAt: -1 });
+// Declaration only. Existing autoCreate/autoIndex remain disabled.
+auditSchema.index(
+  { resourceType: 1, resourceId: 1, 'metadata.usageVersion': 1 },
+  {
+    name: 'uq_ai_usage_audit_version',
+    unique: true,
+    partialFilterExpression: { resourceType: 'AI_USAGE_OPERATION' },
+  },
+);
 function immutableAudit(): never {
   throw new Error('Audit records are append-only');
 }

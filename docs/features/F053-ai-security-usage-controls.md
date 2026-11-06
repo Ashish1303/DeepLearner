@@ -1,5 +1,80 @@
 # F053 — AI Security & Usage Controls
 
+## F053 G2.2 offline implementation — 2026-11-06
+
+**G2.2 READY_FOR_REVIEW — offline only. Full F053 IN_PROGRESS; acceptance incomplete; delivery pending and not authorized in this pass.** Implementation began IN_PROGRESS under owner approval `7e0a761c-9e39-40bd-8ea5-053d725b6398/Pasted text.txt`. Primary branch/worktree: `dev`, `E:\AI\DeepLearner`, unchanged HEAD `7170516f08b914594d84605bbaa7e5771576a7f7`, starting tree/index clean. Starting fingerprints and all worktree states: external `f053-g22-20261106T123319Z/before.json`. Earlier G2.1 handoff/preparation/delivery sections retain their dated historical meaning; only this bounded G2.2 source authority/readiness supersedes their no-G2.2/NOT_STARTED directions.
+
+### G2.2 implemented capability and exact ten paths
+
+Explicit factories implement internal actor-bound reserve, readOperation, claimDispatch, cancelUnsent, settle, markUncertain and reconcile. There is no production composition/default profile/resolver registration, route or UI. Required injected dependencies are the repository, current authenticated actor/session verifier, UTC/monotonic clocks, server IDs, authoritative intent/profile/quote and verified receipt resolvers. Missing composition refuses. Synthetic resolvers in tests are not real source, pricing, privacy, owner-spending or provider evidence authority.
+
+CREATE:
+
+- `apps/api/src/modules/ai/ai-usage-ledger.repository.ts`
+- `apps/api/src/modules/ai/ai-usage-ledger.service.ts`
+- `apps/api/tests/ai-usage-ledger-persistence.test.ts`
+- `apps/api/tests/ai-usage-ledger.integration.ts`
+
+MODIFY:
+
+- `apps/api/src/modules/audit/audit.model.ts`
+- `apps/api/tests/auth-audit.test.ts`
+- `AGENTS.md`
+- `docs/features/F053-ai-security-usage-controls.md`
+- `docs/DATABASE_DESIGN.md`
+- `docs/DEVELOPMENT_ROADMAP.md`
+
+The service derives actor/session identity from AuthContext, verifies the same current session and stored verified ACTIVE ADMIN, and performs the conditional User-version fence for every attempted transition. Native writes CAS control/pointer, affected original period and exact actor/key/version operation; reservation inserts its immutable key/minute marker. Operation, counters and one strict append-only audit tuple share the requested primary snapshot/majority+journaled transaction. No provider adapter is imported or invoked; a stored claim is never dispatch permission.
+
+Ordinary recovery reads use **native snapshot sessions** (`snapshot:true`, `causalConsistency:false`) with primary reads and explicit Long preservation, not write transactions. They validate actor/key, open pointer, original/current periods, held counters, actor/minute marker and latest exact audit linkage before private DTO projection. Reads do not fence, mutate, clear liabilities or imply an absent record proves abort. Identical existing reserve intent is recovered without requoting/new admission. Identical verified terminal evidence is read-only, survives the claim deadline and may be inspected by a separately qualified current reconciler after original-author deletion; original actor is never falsely described as currently authorized. Conflicts refuse.
+
+All shared/cross-month/open/minute/budget, source/profile/quote, claim-owner/version and evidence guards reuse unchanged G1/G2.1. Unknown usage stays fully held. Accounting/reconciliation preserves original-period attribution and independent freezes; known actual overrun is recorded once and freezes rather than clamping cost. Historical sources/authors may disappear without preventing correctly authorized final accounting. Missing current-period projection or incomplete linkage yields UNRESOLVED; a mutation with no fully validated result receipt remains OUTCOME_UNKNOWN. No implicit period creation outside new admission or liability reset.
+
+Final asynchronous profile validation precedes the last current-session verification; a synchronous explicit-time/month/minute/quote/observation guard then runs immediately before the sole application commit call. No later async resolver is inserted between that decision and commit. This is an application decision point, not atomicity with remote commit/egress; post-check authority/configuration races and remote billing remain unproven.
+
+### G2.2 cleanup conservatism and installed driver boundary
+
+Retain 10000ms local work, <=5000ms authorization, <=min(2000ms, remaining) commit, separate <=2000ms abort and <=2000ms endSession. Signal/closed-work checks suppress late writes/commit; cleanup is attempted in finally. These cooperative limits are not an external watchdog. No transaction callback/business/dispatch retry or fallback exists. Local tests observe one application commit call, not necessarily one wire command.
+
+Read-only inspection of installed `mongodb` **7.6.0** `lib/sessions.js`/`src/sessions.ts` confirmed commit retry handling stays within the same session/timeout context. Public abortTransaction may suppress command failures and update local session state; promise resolution/hasEnded is **not a positive server abort ACK**. After attempted transaction writes and a precommit failure, the repository records ABORT_UNCONFIRMED and conservatively returns OUTCOME_UNKNOWN even when the inert double rolled back. No unsupported driver option, native-command bookkeeping bypass, command-monitor framework or new permission is introduced. Primary fixed error code/category and cleanup stages are retained separately without raw driver causes/private text. Read-session cleanup uncertainty remains UNRESOLVED. Successful commit plus qualified cleanup/read linkage can return RECORDED.
+
+### G2.2 actual offline checks and source review
+
+- `node --import tsx --test --test-reporter=tap apps/api/tests/ai-usage-ledger-persistence.test.ts apps/api/tests/auth-audit.test.ts`: **65 PASS, 0 FAIL, 0 skipped** (55 persistence/control-flow tests plus 10 affected audit regressions). In-memory native-driver/session doubles and explicit synthetic resolvers only.
+- Full API/test `tsc -p apps/api/tsconfig.test.json --noEmit --incremental false --pretty false`: **PASS** on final source.
+- Production API `tsc -p apps/api/tsconfig.json --incremental false --pretty false`: **PASS** (build/typecheck).
+- Targeted six-file ESLint and Prettier; affected Markdown formatting/local links; UTF-8/no BOM/LF; whitespace/privacy/exact inventory/history; `git diff --check`; delivered G1/O1/G2.1 and other-worktree preservation: **PASS**. Final hashes/commands are in external `f053-g22-20261106T123319Z` receipts; no guarded manifest/pin was refrozen.
+- Fresh separate-agent source/test/documentation review: **APPROVE**, zero unresolved Critical/High/Medium/Low findings. `/root/f053_g22_source_review` is a separate subagent in this assistant session, not an authenticated human/GitHub review; it did not independently execute tests. Actual timestamped artifact: external `f053-g22-20261106T123319Z/independent-review.txt`.
+
+Resolved separate-agent findings: Medium nonterminal audit performer/original-actor linkage and Medium terminal-replay deadline exemption; Low sanitized primary-code retention, hostile/revoked index-array handling and prepared cleanup/error preservation. Root self-review also corrected abort-ACK assumptions, uncertain prepared-intent reuse and final asynchronous authorization/time ordering; the separate reviewer inspected those fixes. Focused service/repository/audit regressions cover the executable changes. Prepared-entry failure aggregation, case ordering and owned-fixture logic were source-reviewed/typechecked only; import inertness was tested, but the guarded entry/runtime paths were not executed. Earlier in-scope TypeScript/lint/index-snapshot failures were corrected without compiler relaxation or weakened assertions; only affected checks were rerun. Delivered G2.1's 159-test evidence is retained against unchanged source, not counted as newly executed.
+
+### G2.2 prepared real assertions — all NOT_RUN
+
+`F053_G22_PARENT` plus eight new assertions, separate from every existing integration group:
+
+1. `G22-I01_INDEX_AND_ATOMIC_RESERVATION`
+2. `G22-I02_IDENTICAL_KEY_AND_CONFLICT`
+3. `G22-I03_CLAIM_SETTLEMENT_REPLAY`
+4. `G22-I04_ATOMIC_ROLLBACK`
+5. `G22-I05_CONCURRENT_ADMISSION`
+6. `G22-I06_ACK_LOSS_READ_RECOVERY`
+7. `G22-I07_CURRENT_ADMIN_DEMOTION_REFUSAL`
+8. `G22-I08_OWNED_CLEANUP_AND_BASELINE`
+
+Import/discovery is inert. Only explicit invocation through the existing supervision capability may register the parent; no connection/provisioning/DDL/launcher or new supervisor exists here. Future prerequisites include a separately approved exact source/runtime/fixture/index/record/result manifest, exclusive disposable replica set `f053-g22-<32hex runId>`, qualified two synthetic Admins and six distinct owned intents, authoritative synthetic profile/source/receipt/time fixtures, all 11 physical indexes, protected baseline and ownership-safe cleanup plus authenticated RESULT/digest ACK. A database name alone proves no ownership. None is qualified by this implementation.
+
+The injected postwrite rollback/UNKNOWN assertion is last, followed only by owned cleanup; its unchanged snapshot observation is not a positive abort ACK. The race case stops before further business operations if any outcome is UNKNOWN, leaving later records NOT_RUN. No losing/uncertain intent is replayed. The acknowledgement-loss case proceeds only via a complete positive committed read. These eight assertions are not claimed independently executable or a qualified all-PASS suite; fresh isolated-case/positive-outcome evidence and existing guarded execution requirements remain prerequisites. No real database assertion executed.
+
+This is a bounded prepared subset, not the complete G2 real-acceptance suite. Cross-month admission races, concurrent User deletion/demotion fencing, real overrun/rollover accounting, immutable-evidence races and every required opening-baseline/exclusive-writer guarantee still require separately scoped fixture/assertion/manifest preparation and real execution. No new case count or PASS is invented for that unprepared work.
+
+### G2.2 remaining gates and exact next action
+
+Users retain existing private brief/Save functionality and gain **no live Generate capability**. No application activation, live persistence, provider/credentials/network operation, spending, DDL/provisioning, runtime/harness/pin work, new dependency, HTTP/UI, F054 or Git delivery occurred. No implementation criterion is left open within this offline checkpoint; real storage isolation/uniqueness/indexes, current-account fencing races, concurrent accounting/audit atomicity, uncertain commits/cleanup, source/pricing/evidence truth, spending/privacy/retention and external billing remain unverified. Production activation stays forbidden while those prerequisites are missing.
+
+Preserve F042/F043 acceptance BLOCKED, F044/F045/F049/F052 incomplete acceptance, original nine integration records/P5/API6 NOT_RUN, all unexecuted browser groups including U01–U16, historical combined 225-identity evidence (not a fresh full-suite run), parked U16 and permanent Job-empty/retained-exit UNKNOWN, production NOT_VERIFIED. Full F053 stays IN_PROGRESS; no full-feature acceptance or further sequencing authority follows.
+
+**Exact next action:** owner review and separate authorization for development-checkpoint delivery of these ten paths. Any real verification/activation or next implementation checkpoint requires its own approved scope and prerequisites; do not start it automatically.
+
 ## F053 G2.1 offline implementation — 2026-11-06
 
 **G2.1 bounded offline development/review/delivery checklist: complete. Full F053 IN_PROGRESS; feature acceptance incomplete.** Implementation started under approval `48487282-8157-4502-a9a8-f3d3728c8266/Pasted text.txt` from the four accepted pending documents on primary `dev`, `E:\AI\DeepLearner`, base `29aa57b3395e1eaf51d5bc68af5de943d6351c61`. Starting fingerprints and historical worktree snapshots remain in external `f053-g21-20261106T101636Z/before.json`. The previously READY_FOR_REVIEW checkpoint is now delivered as recorded below.
