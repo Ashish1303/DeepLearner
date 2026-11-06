@@ -377,3 +377,174 @@ test('native repository issues bounded projected reads with both parent predicat
     else Reflect.deleteProperty(connection, 'db');
   }
 });
+
+/** Inert native-driver double: no connection, fixture or persistent write. */
+async function withStoredTechnologyStatus(
+  technologyStatus: unknown,
+  run: (
+    service: ReturnType<typeof createAdminModuleService>,
+    reads: string[],
+  ) => Promise<void>,
+  moduleStatus: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED' = 'DRAFT',
+) {
+  const connection = mongoose.connection;
+  const ready = Object.getOwnPropertyDescriptor(connection, 'readyState');
+  const db = Object.getOwnPropertyDescriptor(connection, 'db');
+  const reads: string[] = [];
+  Object.defineProperty(connection, 'readyState', {
+    configurable: true,
+    value: 1,
+  });
+  Object.defineProperty(connection, 'db', {
+    configurable: true,
+    value: {
+      collection(name: string) {
+        assert(['technologies', 'learningPaths', 'modules'].includes(name));
+        return {
+          async findOne() {
+            reads.push(name);
+            if (name === 'technologies')
+              return {
+                _id: new Types.ObjectId(technologyId),
+                status: technologyStatus,
+              };
+            if (name === 'learningPaths')
+              return {
+                _id: new Types.ObjectId(learningPathId),
+                technologyId: new Types.ObjectId(technologyId),
+                status: 'ARCHIVED',
+              };
+            return { ...row(), status: moduleStatus };
+          },
+          aggregate() {
+            assert.equal(name, 'modules');
+            reads.push(name);
+            return {
+              async toArray() {
+                return [
+                  {
+                    records: [{ ...row(), status: moduleStatus }],
+                    count: [{ total: 1 }],
+                  },
+                ];
+              },
+            };
+          },
+        };
+      },
+    },
+  });
+  try {
+    await run(
+      createAdminModuleService(adminModuleRepository, () => 0),
+      reads,
+    );
+  } finally {
+    if (ready) Object.defineProperty(connection, 'readyState', ready);
+    else Reflect.deleteProperty(connection, 'readyState');
+    if (db) Object.defineProperty(connection, 'db', db);
+    else Reflect.deleteProperty(connection, 'db');
+  }
+}
+
+for (const operation of ['inventory', 'detail'] as const) {
+  for (const status of ['DRAFT', 'PUBLISHED', 'ARCHIVED'] as const) {
+    test(`native ${operation} accepts exact stored ${status} enum strings`, async () => {
+      await withStoredTechnologyStatus(
+        status,
+        async (service, reads) => {
+          if (operation === 'inventory') {
+            const result = await service.list(query, { actor });
+            assert.equal(result.items[0]?.status, status);
+            assert.equal(result.pagination.total, 1);
+          } else {
+            const result = await service.get(id, technologyId, learningPathId, {
+              actor,
+            });
+            assert.equal(result.status, status);
+            assert.equal(result.id, id);
+          }
+          assert.deepEqual(reads, [
+            'technologies',
+            'learningPaths',
+            'modules',
+            'technologies',
+            'learningPaths',
+          ]);
+        },
+        status,
+      );
+    });
+  }
+  const badStatuses: {
+    label: string;
+    value: unknown;
+    coercions?: () => number;
+  }[] = [
+    { label: 'draft array', value: ['DRAFT'] },
+    { label: 'published array', value: ['PUBLISHED'] },
+    { label: 'archived array', value: ['ARCHIVED'] },
+    { label: 'empty array', value: [] },
+    { label: 'multiple status array', value: ['DRAFT', 'PUBLISHED'] },
+    { label: 'object', value: { internal: 'PRIVATE_MODULE_STATUS_CANARY' } },
+    { label: 'boxed string', value: new String('DRAFT') },
+    { label: 'null', value: null },
+    { label: 'undefined', value: undefined },
+    { label: 'unknown string', value: 'PRIVATE_MODULE_STATUS_CANARY' },
+    { label: 'lowercase', value: 'draft' },
+    { label: 'trailing newline', value: 'DRAFT\n' },
+    { label: 'number', value: 42 },
+    { label: 'boolean', value: true },
+  ];
+  let stringCalls = 0,
+    primitiveCalls = 0;
+  badStatuses.push(
+    {
+      label: 'coercible object',
+      value: {
+        toString() {
+          stringCalls++;
+          return 'DRAFT';
+        },
+      },
+      coercions: () => stringCalls,
+    },
+    {
+      label: 'primitive coercion hook',
+      value: {
+        [Symbol.toPrimitive]() {
+          primitiveCalls++;
+          return 'PUBLISHED';
+        },
+      },
+      coercions: () => primitiveCalls,
+    },
+  );
+  for (const { label, value, coercions } of badStatuses) {
+    test(`native ${operation} rejects malformed Technology status: ${label}`, async () => {
+      await withStoredTechnologyStatus(value, async (service, reads) => {
+        const pending =
+          operation === 'inventory'
+            ? service.list(query, { actor })
+            : service.get(id, technologyId, learningPathId, { actor });
+        await assert.rejects(pending, (error: unknown) => {
+          assert(error instanceof AppError);
+          assert.equal(error.statusCode, 503);
+          assert.equal(error.code, 'DEPENDENCY_UNAVAILABLE');
+          assert.equal(
+            error.message,
+            'Module inspection is temporarily unavailable',
+          );
+          assert.equal(error.details, undefined);
+          assert.equal(error.cause, undefined);
+          assert(
+            !JSON.stringify(error).includes('PRIVATE_MODULE_STATUS_CANARY'),
+          );
+          return true;
+        });
+        assert.deepEqual(reads, ['technologies']);
+        if (coercions) assert.equal(coercions(), 0);
+      });
+    });
+  }
+}
