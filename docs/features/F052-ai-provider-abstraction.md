@@ -1,5 +1,49 @@
 # F052 — AI Provider Abstraction
 
+## Admin completion reconciliation and G1 review — 2026-11-06
+
+**Full-feature status: IN_PROGRESS. Acceptance: INCOMPLETE; no final owner acceptance.**
+Checkpoint readiness/delivery is separate from the official feature status.
+
+| Evidence field                                 | Current verified record                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Intended user outcome / implemented capability | O1 supplies an injected bounded provider-neutral technical interface/executor; the deterministic provider exists only in tests. No vendor/model, production registration, live transport or user Generate capability exists.                                                                                                                                                                                                                                                            |
+| Checkpoint and delivery                        | O1 bounded offline development/review and Git delivery criteria satisfied; full F052 remains partial and acceptance incomplete. Corrected159 focused tests retained; Desktop3-case subset is included, not162. O153875b11f558dcb2c63169c04a8324381ebe6a68, budget correction097a50f34094081e9b3c367e9eeed38f8e4581da; PR #5 merged into dev ef2ec242a3f7d64b1f7b6f9c1f6fd7273457fcba with parents a16a67c08b95d16ee832270e3fc55e02c49f88bd and097a50f34094081e9b3c367e9eeed38f8e4581da. |
+| Remaining product work / verification debt     | Approved live adapter/model/metadata, input/context/transport/pricing/privacy validation and integration with authoritative F053/F054 consumers. Local cancellation does not prove remote cancellation or no billing.                                                                                                                                                                                                                                                                   |
+| Real dependencies                              | Explicit full F049 remains unmet; only O1 offline exception is active. F053 controls and F054 domain/admission required before live use.                                                                                                                                                                                                                                                                                                                                                |
+| Exact next action                              | Keep O1 stable; contract a single disabled-by-default adapter only after live model/price/privacy choices and durable controls, with separately authorized execution.                                                                                                                                                                                                                                                                                                                   |
+
+This is a read-only source/history/evidence reconciliation, not new live QA or
+feature acceptance. Delivery references below are established by local Git objects,
+ancestor checks and retained delivery receipts; network access was prohibited, so
+current GitHub/remote state and CI were not freshly queried. Zero/pending checks
+are not CI PASS. Retain every dated earlier proposal/result as historical evidence.
+
+Current review/documentation branch: `product/f053-control-contract`, base/HEAD
+`ef2ec242a3f7d64b1f7b6f9c1f6fd7273457fcba`, isolated
+`f053-contract-20261106T055602Z/worktree`. No new implementation was started.
+See the [current roadmap review and completion plan](../DEVELOPMENT_ROADMAP.md#admin-completion-reconciliation-and-g1-review--2026-11-06)
+for the combined pending inventory, evidence, milestone and owner decisions. The
+earlier “current”/uncommitted/proposed wording below is an as-of record wherever
+superseded by this section. No full feature is APPROVED_COMPLETE by this update.
+
+## Current delivery reconciliation — 2026-11-06
+
+O1 is delivered and offline-reviewed through merged PR #5 at `ef2ec242a3f7d64b1f7b6f9c1f6fd7273457fcba`
+(reviewed head `097a50f34094081e9b3c367e9eeed38f8e4581da`).
+R5-01 is closed: budgetMs is captured/validated/used once, retaining1–10000ms.
+The correction retains159 focused offline PASS plus full API/test TypeScript,
+API build and targeted lint/format evidence; final Desktop re-review executed
+three selected regressions, a subset of159, and approved the exact head. These
+are retained executions, not tests rerun for this documentation task.
+Full F052 remains IN_PROGRESS, partial and acceptance incomplete. Historical
+preparation/no-delivery/source-pin statements below retain their original scope;
+current corrected pins supersede only the executor/test's original fingerprints.
+[F053's proposed control contract](F053-ai-security-usage-controls.md) grants no
+implementation or live egress. F047/full F049 and F053/privacy/domain/real
+verification gates remain unmet; no provider/model/key, remote-cancellation or
+billing guarantee, generation, editorial approval or publication follows delivery.
+
 ## Current O1 authority — 2026-11-05
 
 Feature **IN_PROGRESS, partial O1 offline implementation only**. The owner approved

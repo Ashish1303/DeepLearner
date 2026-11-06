@@ -1,5 +1,32 @@
 # F044 — Admin Learning Path Management
 
+## Admin completion reconciliation and G1 review — 2026-11-06
+
+**Full-feature status: IN_PROGRESS. Acceptance: BLOCKED.**
+Checkpoint readiness/delivery is separate from the official feature status.
+
+| Evidence field                                 | Current verified record                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Intended user outcome / implemented capability | Technology-bound read-only Path inventory/detail and archived-parent inspection are implemented. Admin can enter a bounded manual brief and use explicit private Save/result/GET recovery UI. This saves brief/proposal input, not generated curriculum; live Save guarantees are not established. No generation, outline editing, editorial approval or publishing is supplied.                                                                                                                                                                              |
+| Checkpoint and delivery                        | A/B/C1/S/P/API A/U development checkpoints delivered and offline-reviewed; mandatory live/slice acceptance remains open. U READY_FOR_REVIEW — offline only. Read-only A/Bce9e4d2542551d58755cba81482900d4b7753934; C1d0a2e5a81023f613aa37a796c2df815446853178; Sf95e1bf025958527df2d75c73716d0ef1e406d24; P594a9bc9b6c150ef7cd6faa7d82ef3c62c3aa5bc; proposal API A7b7c2cbb9c15190c3d5130815281ab3e22467c8c; UI U56458ab5c213928273196f3c76aff2d36a7f5408. All are committed dev ancestors; original delivery was direct to dev, not a fabricated feature PR. |
+| Remaining product work / verification debt     | Original9/P5/API6 integration groups NOT_RUN.16 U mocked cases NOT_RUN; U16 BLOCKED, permanent historical final Job-empty/retained-child exit UNKNOWN. Stale guarded pins and ignored support prevent clean-clone guarded reproducibility. Physical collections/indexes, atomic Save/audit/concurrency, real recovery and lost-context operator reconciliation remain unverified. Memory-only reload/context loss is not safe-to-replay proof.                                                                                                                |
+| Real dependencies                              | F017/F042/F043; source/parent contracts and actual transaction/index qualification; generation F054, decisions F049/F050, release F051.                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Exact next action                              | Separately approve G1 delivery and proposed milestone contracts; qualify existing private Save before relying on it for real generated-content persistence. Do not claim any new live Save result.                                                                                                                                                                                                                                                                                                                                                            |
+
+This is a read-only source/history/evidence reconciliation, not new live QA or
+feature acceptance. Delivery references below are established by local Git objects,
+ancestor checks and retained delivery receipts; network access was prohibited, so
+current GitHub/remote state and CI were not freshly queried. Zero/pending checks
+are not CI PASS. Retain every dated earlier proposal/result as historical evidence.
+
+Current review/documentation branch: `product/f053-control-contract`, base/HEAD
+`ef2ec242a3f7d64b1f7b6f9c1f6fd7273457fcba`, isolated
+`f053-contract-20261106T055602Z/worktree`. No new implementation was started.
+See the [current roadmap review and completion plan](../DEVELOPMENT_ROADMAP.md#admin-completion-reconciliation-and-g1-review--2026-11-06)
+for the combined pending inventory, evidence, milestone and owner decisions. The
+earlier “current”/uncommitted/proposed wording below is an as-of record wherever
+superseded by this section. No full feature is APPROVED_COMPLETE by this update.
+
 ## Current implementation summary — 2026-11-05
 
 F044 remains IN_PROGRESS, partial and acceptance BLOCKED. Read-only A/B and private

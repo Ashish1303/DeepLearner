@@ -1,5 +1,32 @@
 # F049 — Content Status Workflow
 
+## Admin completion reconciliation and G1 review — 2026-11-06
+
+**Full-feature status: IN_PROGRESS. Acceptance: INCOMPLETE; no final owner acceptance.**
+Checkpoint readiness/delivery is separate from the official feature status.
+
+| Evidence field                                 | Current verified record                                                                                                                                                                                                                                                                                                                             |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Intended user outcome / implemented capability | P0 evaluates supplied exact revision/digest and AI-origin claims through three pure transitions. There is no user-visible stored approval, editing/resubmission or publication workflow.                                                                                                                                                            |
+| Checkpoint and delivery                        | P0 bounded offline development/review and Git delivery criteria satisfied; full F049 acceptance incomplete. Retain121 focused tests, not131 after counting its10-case subset. P0e16232c1c2e74a49030ded961a067ace17efd67a plus reconciliationdffbdc7100518769bb638c209aac8763a92a65d7; PR #4 merged to dev a16a67c08b95d16ee832270e3fc55e02c49f88bd. |
+| Remaining product work / verification debt     | Authoritative stored origin/current Admin checks, revision/concurrency, audit/idempotency/replay, AI-origin edit lineage, CHANGES_REQUIRED resubmission and stored editorial decisions.                                                                                                                                                             |
+| Real dependencies                              | Explicit F047 unmet; P0-only exception does not waive full dependency. F050 presents decisions, F051 owns release.                                                                                                                                                                                                                                  |
+| Exact next action                              | Contract exact stored outline decisions/edit lineage against actual admitted candidates; P0 is not current authority or completion of F047.                                                                                                                                                                                                         |
+
+This is a read-only source/history/evidence reconciliation, not new live QA or
+feature acceptance. Delivery references below are established by local Git objects,
+ancestor checks and retained delivery receipts; network access was prohibited, so
+current GitHub/remote state and CI were not freshly queried. Zero/pending checks
+are not CI PASS. Retain every dated earlier proposal/result as historical evidence.
+
+Current review/documentation branch: `product/f053-control-contract`, base/HEAD
+`ef2ec242a3f7d64b1f7b6f9c1f6fd7273457fcba`, isolated
+`f053-contract-20261106T055602Z/worktree`. No new implementation was started.
+See the [current roadmap review and completion plan](../DEVELOPMENT_ROADMAP.md#admin-completion-reconciliation-and-g1-review--2026-11-06)
+for the combined pending inventory, evidence, milestone and owner decisions. The
+earlier “current”/uncommitted/proposed wording below is an as-of record wherever
+superseded by this section. No full feature is APPROVED_COMPLETE by this update.
+
 ## P0 authority and scope — 2026-11-05
 
 Feature IN_PROGRESS, **partial P0 offline implementation only**. Full F049 acceptance
