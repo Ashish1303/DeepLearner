@@ -3064,3 +3064,38 @@ implementation is authorized by this reconciliation. F042/F043 acceptance BLOCKE
 F044/F045/F049 partial, all unexecuted groups and historical UNKNOWN preserved;
 production readiness NOT_VERIFIED. Git authority is limited to the owner's three
 commits, one dependent branch/push and one draft PR; no merge or acceptance.
+
+## 113. Owner-approved F052 O1 offline provider foundation — 2026-11-05
+
+The owner approved only F052 O1's exact eight-path contract and named offline
+sequencing exception ahead of full F047/F049. This supersedes section112's proposed
+O1 status for implementation only; full-feature dependencies/acceptance remain open.
+F052 is IN_PROGRESS, partial. No paid service, vendor/model, credentials, SDK or
+new dependency is chosen. Existing F044 manual brief and AI-led Module direction,
+unselected M1, P0's limited guarantees and F049/F050/F051 ownership are unchanged.
+
+One injected provider-neutral CURRICULUM_OUTLINE port accepts bounded technical
+requests and returns untrusted JSON/safe metadata only. One local executor has
+64KiB input/output ceilings, explicit token bounds, cancellation/deadline handling,
+late-result suppression and no automatic retry/fallback. The deterministic fake
+exists only in tests/helpers. This is an enabling code boundary, not a generation
+screen, real AI output, authenticated origin, domain admission or publication.
+Timer/abort success cannot prove remote termination or no charge. F053 retains
+privacy/dispatch/reservation/uncertainty controls; F054 retains generation/domain
+outline validation; actual live calls require separate approval and qualification.
+
+Require focused inert tests, API/test TypeScript and API build/typecheck, targeted
+lint/format/encoding/privacy/scope/diff and fresh independent review. No runtime,
+database/provider/browser execution or Git delivery is authorized. F042/F043
+acceptance BLOCKED; F044/F045/F049 partial; F047/full F049 unmet; all unexecuted
+groups and historical UNKNOWN preserved; production readiness NOT_VERIFIED.
+
+### O1 implementation evidence
+
+The bounded port/executor and test-only fake are implemented, with156 focused
+offline tests PASS, full API/test TypeScript and API build/typecheck PASS, targeted
+lint/format PASS. Fresh independent read-only review resolved three Low issues;
+zero unresolved findings, no independent execution or live proof. O1 is
+READY_FOR_REVIEW offline only; F052 stays partial IN_PROGRESS. Existing installed
+dependencies were reused without package/lockfile changes. No real provider,
+domain admission, content generation, live call, acceptance or Git delivery follows.
