@@ -45,7 +45,10 @@ export const adminModuleRepository: AdminModuleRepository = {
       );
     work.check();
     if (row === null) return null;
-    if (!['DRAFT', 'PUBLISHED', 'ARCHIVED'].includes(String(row.status)))
+    if (
+      typeof row.status !== 'string' ||
+      !['DRAFT', 'PUBLISHED', 'ARCHIVED'].includes(row.status)
+    )
       throw moduleUnavailable();
     const path = await database()
       .collection('learningPaths')
