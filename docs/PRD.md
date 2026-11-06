@@ -3099,3 +3099,23 @@ zero unresolved findings, no independent execution or live proof. O1 is
 READY_FOR_REVIEW offline only; F052 stays partial IN_PROGRESS. Existing installed
 dependencies were reused without package/lockfile changes. No real provider,
 domain admission, content generation, live call, acceptance or Git delivery follows.
+
+
+## F053 G1 offline usage-policy checkpoint — 2026-11-06
+
+The owner approved only the seven-path pure numeric G1 foundation and bounded
+offline sequencing exception. See the [canonical F053 contract](features/F053-ai-security-usage-controls.md)
+for exact inputs/outcomes, explicit time, budget provenance and evidence. G1 uses
+the documented shared testing cap100,000 paise, ceiling-rounded80% warning, one
+shared open operation and one admission/actor/fixed UTC minute against supplied
+facts. It refuses malformed/unknown facts, stale quote periods, frozen/unresolved
+exposure and unaffordable proposals. It authenticates none of those facts and
+changes no counter/reservation. Fractional money refuses; all sums are exact.
+
+This is partial F053 development, not live budget enforcement or spending approval.
+Existing PRD61 scope remains testing only, not production defaults. No rate/FX/tax/
+fee, provider/model, retention, durable admission/audit, domain generation,
+editorial/publication or live dispatch decision follows. F047/full F049/F052 and
+F053 durable controls remain open. Preserve existing acceptance, NOT_RUN and
+historical UNKNOWN evidence; production NOT_VERIFIED. No live/Git operation is
+authorized by this checkpoint. Future G2 requires its own contract/approval.

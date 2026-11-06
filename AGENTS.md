@@ -1215,3 +1215,75 @@ F052 IN_PROGRESS, partial/offline only; F042/F043 acceptance BLOCKED, F044/F045/
 incomplete, F047/full F049 unmet. All unexecuted groups, permanent historical UNKNOWN
 and production NOT_VERIFIED remain unchanged. Existing ownership/RESULT-ACK and
 deadlines are not altered. No staging/commit/push/PR update or acceptance authority.
+
+## Named F053 G1 offline usage-policy exception — 2026-11-06
+
+The owner approved F053 G1's exact seven-path inventory in the canonical F053
+contract, strict validation, pure supplied-facts reservation proposals, one shared
+open operation, one admission/actor/fixed UTC minute, explicit time and focused
+offline implementation/review. Permit only three CREATE paths for schema/policy/
+tests and four MODIFY paths for AGENTS/PRD/roadmap/F053 evidence. Preserve pending
+F052/F054 documents and all unrelated worktrees/pins/evidence. This supersedes
+earlier no-F053 progression only for G1 ahead of full F052/F047/F049 acceptance.
+
+Require exact base/scope, stable delivered O1, recorded budget-design provenance
+and no blocking dependency security finding. Require meaningful deterministic
+offline boundary/privacy/inertness tests, full API/test TypeScript, production API
+build/typecheck, targeted lint/format/encoding/scope/diff and fresh independent
+source review; resolve findings before checkpoint eligibility. Supplied actor,
+time, pricing and usage facts are not authenticated. A proposal is not permission
+to call a provider, durable reservation, concurrency/authorization/audit or billing
+proof. Unknown exposure must not become zero or be released by time rollover.
+
+No persistence/admission/accounting writer, schema/index provisioning, config or
+secret read, provider/model selection, network/database call, endpoint/UI, live
+spending, retry/fallback, F054 work, runtime/harness/pin repair or next checkpoint.
+No new dependencies. Existing ownership, RESULT/ACK, cleanup and deadlines remain.
+F053 partial IN_PROGRESS only; F042/F043 acceptance BLOCKED; F044/F045/F049 and full
+F052 remain incomplete. Preserve NOT_RUN groups, permanent historical UNKNOWN and
+production NOT_VERIFIED. Default sequencing remains outside G1. No staging,
+commit/push or acceptance authority; every later implementation/live/Git operation
+requires its separate explicit owner approval.
+
+## Checkpoint lifecycle and handoff records — owner direction 2026-11-06
+
+Before each feature/checkpoint, read the roadmap and canonical feature record.
+Record exact scope/exclusions, current official status and checkpoint readiness,
+branch/worktree/base, approved inventory, dependencies and measurable completion
+criteria. Set IN_PROGRESS only when implementation actually starts; planning or
+review alone does not start a feature. Preserve prior work and execution evidence.
+
+At implementation completion, record actual checks, review provenance, limitations
+and remaining criteria. Set a ready checkpoint to READY_FOR_REVIEW; do not hide
+its completed implementation inside a generic IN_PROGRESS label. A partial full
+feature may remain IN_PROGRESS with explicit checkpoint readiness/delivery fields.
+
+After separately approved delivery, record exact commit SHA, PR when one exists,
+target branch and verification evidence. Mark checkpoint completion only when its
+own agreed criteria, required owner approval and required Git delivery are verified.
+A delivered offline foundation is not live feature acceptance. Only the owner may
+approve full-feature APPROVED_COMPLETE, after all agreed scope, mandatory acceptance
+and required delivery are complete. Never infer completion from one commit or unit
+test result. Do not invent a PR for a direct-to-dev delivery.
+
+At every development handoff, update the roadmap and canonical feature record with
+what users can actually do, unverified behavior, pending paths and exact next action.
+Cite each updated path and section in the report; never claim an update without
+that reference. Retain approved status vocabulary. Store acceptance/blocker details
+as separate fields when BLOCKED is not appropriate to the official feature status;
+do not introduce a replacement status vocabulary or overwrite historical evidence.
+No implementation/live/sequencing/Git authority is created by this record-keeping
+rule; each retains its existing separate owner-approval/security gates.
+
+### Working branch and single-writer rule — 2026-11-06
+
+- VS Code Codex performs new development directly on dev and creates no new branches.
+- Codex desktop develops in an isolated feature branch/worktree, followed by reviewed integration into dev.
+- Only one writer may modify a given branch/worktree at a time.
+- Do not edit the same files concurrently across environments.
+- Deliver or explicitly reconcile existing branches with pending work; never discard or recreate that work.
+- Repository protections still apply. If direct dev delivery is prohibited, report the specific conflict; do not bypass protection or silently create a branch.
+
+This governs new work without changing feature, security or acceptance gates.
+The owner separately authorized finishing the existing product/f053-control-contract
+branch in place as a one-time delivery; do not transfer its pending work to dev.

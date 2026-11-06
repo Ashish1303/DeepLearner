@@ -1,5 +1,32 @@
 # F042 — Admin Route Protection
 
+## Admin completion reconciliation and G1 review — 2026-11-06
+
+**Full-feature status: IN_PROGRESS. Acceptance: BLOCKED.**
+Checkpoint readiness/delivery is separate from the official feature status.
+
+| Evidence field                                 | Current verified record                                                                                                                                                                                                                                                                                                              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Intended user outcome / implemented capability | Admin sign-in/restoration/logout and the protected current-account Admin boundary are implemented; business tokens remain inside established controllers. Retained login/restoration/logout observations are supplemental, not a new runtime result.                                                                                 |
+| Checkpoint and delivery                        | Development checkpoints delivered; mandatory Slice1/feature acceptance is still BLOCKED. Frontend571872683dd682c09f08fed3ed304b22cd344c66 and backend34c9f7cebf9e5fc3a955aefbe2f6a59f9e044df0 are ancestors of this base, delivered to dev. Later readiness fix623f0962748358f4ff06ba3505cdec9533d93201 is also included.            |
+| Remaining product work / verification debt     | Finish qualified real current-account/HTTP/MongoDB and forced-timeout verification, authenticated RESULT/digest ACK and protected baselines. Historical authenticated counters remain UNKNOWN/incomplete (not0/0/9), with historical failed baseline attribution retained. Parked support candidates are not installed or qualified. |
+| Real dependencies                              | Existing Auth/User contracts; actual current-account verification and existing ownership/cleanup gates.                                                                                                                                                                                                                              |
+| Exact next action                              | Keep remediation parked under the owner direction; separately approve a genuinely supportable bounded qualification plan before any real execution.                                                                                                                                                                                  |
+
+This is a read-only source/history/evidence reconciliation, not new live QA or
+feature acceptance. Delivery references below are established by local Git objects,
+ancestor checks and retained delivery receipts; network access was prohibited, so
+current GitHub/remote state and CI were not freshly queried. Zero/pending checks
+are not CI PASS. Retain every dated earlier proposal/result as historical evidence.
+
+Current review/documentation branch: `product/f053-control-contract`, base/HEAD
+`ef2ec242a3f7d64b1f7b6f9c1f6fd7273457fcba`, isolated
+`f053-contract-20261106T055602Z/worktree`. No new implementation was started.
+See the [current roadmap review and completion plan](../DEVELOPMENT_ROADMAP.md#admin-completion-reconciliation-and-g1-review--2026-11-06)
+for the combined pending inventory, evidence, milestone and owner decisions. The
+earlier “current”/uncommitted/proposed wording below is an as-of record wherever
+superseded by this section. No full feature is APPROVED_COMPLETE by this update.
+
 ## Status and owner authorization
 
 Feature: **IN_PROGRESS**. Formal dependency: F008. Owner approved the feature
