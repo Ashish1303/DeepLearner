@@ -1,6 +1,22 @@
 # F052 — AI Provider Abstraction
 
-## Status and authority — 2026-11-05
+## Current O1 authority — 2026-11-05
+
+Feature **IN_PROGRESS, partial O1 offline implementation only**. The owner approved
+the exact eight-path contract, O1-only sequencing enactment, implementation,
+focused tests and fresh independent review. O1 is not full F052 acceptance or
+authorization for live generation. The historical proposed/no-source/no-exception
+wording below records preparation/delivery; this later decision supersedes it only
+for the approved offline scope. All technical contracts/bounds below remain active.
+
+Development is isolated on product/f052-o1-offline from delivered checkpoint
+dffbdc7100518769bb638c209aac8763a92a65d7. Parent PR #2/#4 branches, primary dev,
+original pending files, U16 and parked candidates are preserved. No Git delivery
+or runtime operation is authorized. Checks/review results are recorded only after
+execution. **O1 READY_FOR_REVIEW — offline only**; full F052 remains IN_PROGRESS,
+partial and acceptance incomplete. Final executed evidence is recorded below.
+
+## Historical status and authority — 2026-11-05
 
 **PROPOSED — PENDING OWNER APPROVAL. Feature NOT_STARTED.** The owner authorized
 documentation-only definition of this minimum offline foundation, not provider
@@ -275,3 +291,75 @@ preparation-time no-delivery wording above. O1 remains PROPOSED — PENDING OWNE
 APPROVAL and F052 remains NOT_STARTED. No F052 source, active AGENTS.md exception,
 provider/model selection, live dispatch or acceptance is enacted. Newly linked
 F047/F053/F054 planning records do not satisfy their missing contracts.
+
+## O1 implementation and executed offline evidence — 2026-11-05
+
+**READY_FOR_REVIEW — O1 offline checkpoint only. F052 IN_PROGRESS, partial.**
+Implemented exactly the four source/test CREATE paths and four documentation MODIFY
+paths above. One injected technical provider interface/executor, immutable detached
+request, strict inert own-data envelopes, UTF-8/Unicode/JSON-object checks, explicit
+byte/token/local budgets, safe metadata/outcomes and no automatic retries/fallback.
+No live provider/fake registration or application import is added. Domain JSON is
+not validated/admitted as curriculum. No source/authorization/editorial capability.
+
+Request-specific output byte overflow, over-limit output token reports and the
+OUTPUT_LIMIT finish reason return OUTPUT_LIMIT. Globally malformed/oversized or
+non-inert envelopes return MALFORMED_RESPONSE; valid REFUSED returns REFUSED. These
+fixed outcomes disclose no raw provider exception, cause, prompt or private metadata.
+Reported usage is untrusted; unknown stays null. The cooperative local timer/signal
+does not establish remote termination, absence of charging or transport byte bounds.
+
+Executed commands:
+
+```text
+node --import tsx --test --test-reporter=tap apps/api/tests/ai-provider.test.ts
+node node_modules/typescript/bin/tsc -p apps/api/tsconfig.test.json --noEmit --incremental false --pretty false
+node node_modules/typescript/bin/tsc -p apps/api/tsconfig.json --incremental false --pretty false
+node node_modules/eslint/bin/eslint.js apps/api/src/modules/ai/ai-provider.contract.ts apps/api/src/modules/ai/ai-provider.executor.ts apps/api/tests/helpers/fake-ai-provider.ts apps/api/tests/ai-provider.test.ts --max-warnings=0
+node node_modules/prettier/bin/prettier.cjs --check apps/api/src/modules/ai/ai-provider.contract.ts apps/api/src/modules/ai/ai-provider.executor.ts apps/api/tests/helpers/fake-ai-provider.ts apps/api/tests/ai-provider.test.ts
+git diff --check
+```
+
+- Final focused file **156/156 PASS**, zero failed/skipped/cancelled. Covers exact
+  byte/token/Unicode/control bounds; inert raw envelopes before projection; safe
+  errors; immutable copies; one invocation; pre/queued/in-flight cancellation;
+  deadline precedence; late completion/rejection; clock failures; timer/listener
+  cleanup; and inert imports/production fake exclusion.
+- Historical initial sandbox launch failed before assertions with tsx
+  uv_os_get_passwd ENOMEM. Supported command-specific repository-owner execution
+  ran the actual offline file; no Windows Administrator elevation or runtime repair.
+  First owner run153/154 PASS exposed the CR rejection defect. After correction,
+  155/155 PASS; the final156 adds executor-owned bare-promise late-rejection evidence.
+  These are revisions of one file, not additional distinct suites to sum together.
+- Full API/test TypeScript and production API TypeScript emit/build **PASS**.
+  Initial isolated layout lacked existing apps/api/node_modules/cookie declarations,
+  producing TS7016 at refresh-cookie.ts:1 and TS7006 at:14. Reusing the existing
+  installed root/API dependency directories via ignored local junctions resolved
+  both. No dependency installation, package/lockfile edit or source workaround.
+- Targeted ESLint/Prettier **PASS**. Initial no-control-regex lint error was resolved
+  using equivalent character-code checks, not a lint/compiler waiver. Exhaustive
+  C0/DEL checks preserve LF/tab allowance and reject CR. Existing historical Markdown
+  remains formatter-excluded; new/changed documentation fragments are checked apart.
+- Fresh independent agent /root/f052_o1_independent_review performed read-only
+  source/test/document inspection and inspected the retained156-test evidence;
+  did not execute tests, edit files or run services/network/database/Git mutations.
+  Three Low findings closed: first clock exceptions now PROVIDER_FAILED rather
+  than INVALID_REQUEST; CR refusal; and bare-provider late rejection coverage no
+  longer relying only on the fake's eager catch. Final0 Critical/High/Medium/Low
+  unresolved. Implementing-agent execution and self-review remain separate provenance.
+
+Final scope/encoding/privacy/history/preservation results accompany the checkpoint
+handoff. No unrelated tests, bootstrap/integration/browser suite, credentials,
+network/database/provider call, runtime restart or Git delivery was performed.
+The next gate is separate owner approval for an exact offline development commit/
+push, or a separately contracted later slice; no progression is automatic.
+
+Earlier F049/F053 planned-record references to proposed O1 describe the delivered
+parent snapshot; this approved F052 contract/current roadmap now determine O1's
+status. F047/full F049 remain unmet; F053 remains NOT_STARTED and required before
+any separately approved live egress. F054 retains domain generation/admission.
+Original F044 nine, P five, API six and F043 fifteen integration groups and U01–U16
+remain NOT_RUN. The historical225 mocked identities are combined213 unaffected
++12 corrected results, not a fresh full-suite run or live-provider evidence.
+F042/F043 acceptance BLOCKED; F044/F045/F049 incomplete; U16 BLOCKED with permanent
+historical final Job-empty/retained-child exit UNKNOWN; production NOT_VERIFIED.

@@ -1173,3 +1173,45 @@ F049 IN_PROGRESS only as partial offline P0; F042/F043 acceptance BLOCKED, F044/
 acceptance incomplete, F047 unmet. All unexecuted groups and historical UNKNOWN
 remain; production NOT_VERIFIED. Every next implementation/live/Git operation still
 requires its separate explicit authorization. No manual-origin M1 is authorized.
+
+## Named F052 O1 offline provider-foundation exception — 2026-11-05
+
+The owner approved the exact F052 O1 contract/eight-path inventory, O1-only
+sequencing enactment, implementation, focused offline verification and fresh
+independent review. Permit only:
+
+```text
+CREATE apps/api/src/modules/ai/ai-provider.contract.ts
+CREATE apps/api/src/modules/ai/ai-provider.executor.ts
+CREATE apps/api/tests/helpers/fake-ai-provider.ts
+CREATE apps/api/tests/ai-provider.test.ts
+MODIFY docs/features/F052-ai-provider-abstraction.md
+MODIFY AGENTS.md
+MODIFY docs/PRD.md
+MODIFY docs/DEVELOPMENT_ROADMAP.md
+```
+
+This supersedes earlier no-F052 progression solely for backend-only technical
+types/validation, one bounded injected port/executor and deterministic test fake,
+ahead of full F047/F049 completion. Their formal dependencies remain unmet for
+full-feature progression; P0 establishes no authenticated origin or stored decision.
+No vendor/model/key/SDK/configuration, live provider, network/database call, startup
+registration, provider registry, fallback/retry, job/persistence, budget accounting,
+domain outline/admission, editorial/publication or additional slice is permitted.
+
+Require exact delivered base, separate branch/worktree, stable reviewed contracts
+and no blocking dependency security defect. Preserve all other worktrees/pending
+files and running authority; no harness/pin repair. Require strict request/response
+bounds, safe outcomes, cancellation/late suppression, timer/listener cleanup,
+meaningful fake-only tests, full API/test TypeScript, API build/typecheck, targeted
+lint/format/UTF-8/LF/privacy/scope/diff and fresh independent review. Resolve findings
+and rerun only affected checks. No source/fake is registered as a live provider.
+
+A local timeout/abort cannot prove remote termination or absence of billing.
+Unknown JSON/usage remains untrusted; domain validation, source/admission/current
+authority and F053 privacy/budget/dispatch controls plus separate owner approval
+are mandatory before eventual live calls. No direct approval/publication capability.
+F052 IN_PROGRESS, partial/offline only; F042/F043 acceptance BLOCKED, F044/F045/F049
+incomplete, F047/full F049 unmet. All unexecuted groups, permanent historical UNKNOWN
+and production NOT_VERIFIED remain unchanged. Existing ownership/RESULT-ACK and
+deadlines are not altered. No staging/commit/push/PR update or acceptance authority.
