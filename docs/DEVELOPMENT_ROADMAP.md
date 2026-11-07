@@ -4494,3 +4494,92 @@ No live database/provider/browser guarantees follow from offline checks. Preserv
 all NOT_RUN groups, F042/F043 acceptance BLOCKED, other incomplete acceptance,
 permanent historical UNKNOWN and production NOT_VERIFIED. Next action is create
 O0's authorized local commit with only its roadmap hunk; no push or next slice.
+
+## Proposed F054 producer/admission and P1 boundary — 2026-11-07
+
+**Contract READY_FOR_REVIEW — documentation only; PROPOSED — PENDING OWNER APPROVAL. P1 NOT_STARTED.
+Full F054 IN_PROGRESS; acceptance incomplete; production NOT_VERIFIED.**
+O0 is locally committed on dev as4cbee018bda7c775ad712ed0ac724ca016678dcc,
+parent145927dc395399c7c4f2f629dd96f749db25b676, no push. The preceding precommit
+next-action wording is historical. Its53/53 tests/build/static and separate
+source approval are retained, not repeated for this documentation task.
+
+The [producer/admission proposal](features/F054-ai-concept-draft-generation.md#proposed-f054-producer-and-initial-outline-admission--2026-11-07)
+retains one whole initial nested outline as the immutable private review unit.
+Exact F044 brief/proposal/Technology, actor/key, F053 claim/request and trusted
+invocation/completion linkage precede authoritative admission. No nested child/
+catalogue materialization, manual M1, editorial decision or publication. Current
+users gain no Generate screen or new Save behavior.
+
+Recommended P1 is the exact eight-path pure candidate/digest, private DTO and
+completion-to-admission proposal inventory in F054: four CREATE files plus
+AGENTS/F054/DATABASE_DESIGN/roadmap evidence MODIFY paths, after separate approval.
+It can construct/check a host-bound O0 envelope locally, but never invoke a
+provider, admit/persist content or authenticate supplied provenance facts.
+Estimate60–90 active minutes; hard90. P1's exception is proposed, not enacted;
+AGENTS and PRD are unchanged in this preparation.
+
+Live producer/dispatch authority, native attempt/writer/audit contracts, physical
+indexes and actual transactions/concurrency/uncertainty, privacy/retention and
+F053 genuine profile/pricing/evidence/activation remain open. Vendor/model and
+paid calls need separate approval; no selection is needed for synthetic P1.
+
+Only new proposed sections in F054/DATABASE_DESIGN/this roadmap change. Starting
+readiness diffs and every other worktree remain preserved. The preceding preparation
+applied block formatting and passed git diff --check; it did not complete explicit
+format verification, link/privacy checks or focused consistency self-review.
+Its approximately 75-minute duration exceeded its approved timebox; this completion
+pass cannot retroactively make that preparation compliant. No independent approval,
+application suites, runtime/network/database/provider
+operations, Git writes or new execution prompt. Next action: owner reviews P1's
+record/protocol/hash/private-boundary/cap decisions and exact inventory/exception.
+F053 qualification remains BLOCKED/NOT_RUN; all existing acceptance blocks,
+unexecuted groups, historical UNKNOWN and production NOT_VERIFIED stay unchanged.
+
+Completion pass: focused consistency/self-review finished with no blocking
+inconsistency remaining. Explicit verification of the three affected blocks'
+formatting, two new local links/anchors, strict UTF-8/new-block LF, scoped privacy,
+whitespace and preservation checks completed. This is new documentation evidence,
+not independent approval or a rerun of retained O0 checks. The F054 completion-pass
+evidence section records the exact scope. F053/F045/AGENTS/PRD and starting content
+outside the three proposed sections remain unchanged. Users still gain no new
+functionality; next action is owner review of this proposed contract, not P1 work.
+
+## F054 P1 offline implementation — 2026-11-07
+
+**P1 READY_FOR_REVIEW — offline implementation and separate source review.
+Full F054 IN_PROGRESS; acceptance incomplete; production NOT_VERIFIED.**
+Owner approved the exact eight-path candidate/schema/hash/private-DTO/pure-policy
+inventory and P1-only exception on existing dev at
+4cbee018bda7c775ad712ed0ac724ca016678dcc. Earlier proposed text remains historical;
+future producer, attempt/writer/audit/index and live-use designs are not activated.
+
+Implemented strict canonical initial candidates, immutable ISO JSON projections,
+private allowlists and ADMISSION_PROPOSED/content-free REFUSED outcomes. Exact
+F044/F053/request/output/actor/claim/completion bindings are checked against
+supplied facts, not authenticated. No new Generate screen, API, Save behavior,
+writer, registration or dispatch; no provider/database/runtime operation.
+
+Actual author checks: 62/62 focused P1 tests PASS, full API/test TypeScript PASS,
+API production build/typecheck PASS and four-file zero-warning ESLint PASS.
+Final formatting/encoding/privacy/scope/preservation and staged-diff receipts
+are retained with delivery. Separate /root/p1_source_review inspected final
+source/test bytes: APPROVE, zero unresolved findings, no independent test execution.
+Initial ES2022 typing and test-instrumentation/type/lint failures were corrected;
+retained O0 evidence is not relabelled as new execution. See the canonical
+[F054 P1 implementation record](features/F054-ai-concept-draft-generation.md#f054-p1-implementation-checkpoint--2026-11-07).
+
+One authorized local commit targets dev; no PR or push. Exact post-commit
+SHA/parent and verified pending disposition are recorded in:
+C:/Users/Shreeji/AppData/Local/Temp/f054-p1-2026-11-07T15-10-20-945Z/delivery-handoff.md
+This external receipt avoids a self-referential commit hash in committed files.
+F053 and earlier unrelated database/roadmap readiness hunks stay uncommitted.
+No other worktree, PRD, F045 amendment or existing primitive was modified.
+
+Remaining guarantees: authentic current-account/source/producer/control authority,
+physical indexes, live persistence/transactions/concurrency/audit/uncertainty,
+privacy/retention and actual provider/pricing/spending approval. Next action is
+owner review of local P1 delivery and the already-identified producer/completion
+composition boundary; no further implementation is authorized. F053 qualification
+BLOCKED/NOT_RUN, acceptance blocks, all unexecuted groups, historical UNKNOWN and
+production NOT_VERIFIED remain unchanged.

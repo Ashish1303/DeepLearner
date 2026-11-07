@@ -2592,3 +2592,121 @@ Installed mongodb7.6.0 public abortTransaction can suppress command errors. Fail
 Actual offline evidence:65 focused persistence/audit tests PASS; full API/test TypeScript and API production build/typecheck PASS; targeted lint/format/encoding/privacy/history/scope/diff PASS. Fresh separate-agent source-only review APPROVE, no independent test execution. See [G2.2 canonical handoff](features/F053-ai-security-usage-controls.md#f053-g22-offline-implementation--2026-11-06) for exact inventory, prepared parent/eight assertions (all NOT_RUN), resolved findings and external receipts.
 
 All11 required indexes remain physically NOT_VERIFIED; declarations prove no uniqueness, transaction isolation, authorization races or billing truth. Two owned synthetic Admins/six distinct intents and exact source/index/target/baseline/result/cleanup qualification are future prerequisites, not resources created here. Unknown race outcomes stop later assertions; the uncertain rollback observation is last and is not positive abort proof. Live profile/source/pricing/evidence authority, retention and spending activation remain gated. All acceptance blocks/NOT_RUN/historical UNKNOWN and production NOT_VERIFIED persist.
+
+## Proposed F054 initial outline storage boundary — 2026-11-07
+
+**PROPOSED — PENDING OWNER APPROVAL. Documentation only; no model/writer,
+collection/index creation or persistence authority.** Full F054 IN_PROGRESS;
+O0 locally committed/offline READY_FOR_REVIEW. Exact proposed fields, hashes,
+privacy and P1 inventory are in the
+[producer/admission contract](features/F054-ai-concept-draft-generation.md#proposed-f054-producer-and-initial-outline-admission--2026-11-07).
+All earlier pending readiness/history text remains unchanged.
+
+### Aggregates and mapping
+
+- curriculumOutlineCandidates: one immutable initial revision with distinct
+  revision-record/family IDs, complete O0 hierarchy, F044 proposal binding, original
+  actor/time, fixed producer linkage and content/definition digests. AI_GENERATED
+  origin is a structural claim until authentic admission, not editorial state.
+- curriculumOutlineAttempts: one content-operation row per scope/actor/key linked
+  to the existing F053 operation ObjectId and same actor-bound UUID operationId.
+  Immutable intent/request/source/proposal/claim/template and allocated candidate/
+  audit identities; one-way CAS invocation marker and write-once completion/
+  admission receipt. Detailed native schema/writer contract remains deferred.
+  This is not another ledger/job framework; P1 creates no attempt model or writer.
+
+Initial admission creates no child or catalogue records. Future children need
+explicit identities plus exact outline family/revision-record/revision/digest,
+node kind and checked nested path. Array positions identify a location within
+that revision only, never durable cross-revision identity or inherited approval.
+
+Canonical ordered-array hash frames, UTF-8/verbatim text/order/ISO Dates and
+acyclic completion/definition coverage are specified in F054. Proposed candidate
+record cap131072 canonical JSON bytes bounds O0's unchanged65536-byte envelope
+plus fixed metadata; this is a new proposal. No automatic registration/DDL,
+timestamps, mutable revisions, cascade, TTL or migration is authorized.
+F054 defines the allowlisted JSON field order for this size check, lowercase
+24-hex ObjectId strings and ISO timestamps. It does not measure native BSON bytes.
+The raw-output digest and candidate content must derive from the same strict
+provider body; independent digest validity alone is insufficient.
+
+### Proposed index declarations and invariants
+
+Simple collation; no sparse/hidden/TTL alternatives. Declarations are not evidence
+of physical indexes or permission to provision them.
+
+| Collection / name                                        | Ordered key                       | Invariant                                                                                     |
+| -------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------- |
+| curriculumOutlineCandidates / _id_                       | {_id:1}                           | Built-in unique revision identity.                                                            |
+| curriculumOutlineCandidates / uq_outline_family_revision | {outlineId:1,revision:1}          | Unique initial family/revision.                                                               |
+| curriculumOutlineCandidates / uq_outline_attempt         | {'producer.attemptId':1}          | At most one initial candidate per attempt; future successor/index rules need separate review. |
+| curriculumOutlineAttempts / _id_                         | {_id:1}                           | Built-in unique attempt identity.                                                             |
+| curriculumOutlineAttempts / uq_outline_actor_operation   | {scope:1,actorId:1,operationId:1} | One attempt per existing actor-bound operation.                                               |
+| curriculumOutlineAttempts / uq_outline_ledger_operation  | {ledgerOperationId:1}             | One content attempt linked to the authoritative F053 operation record.                        |
+
+Six proposed indexes on two aggregates, including two built-in _id_ indexes.
+Existing users/audit/Technology/F044/F053 indexes remain separate dependencies,
+not replaced or counted as new. Preallocated admission audit _id stays bound to
+the attempt; existing audit _id_ uniqueness and attempt CAS protect replay effects.
+These are future persistence declarations, not P1 index work; P1 creates none.
+Require later exact native-schema,
+permissions and index verification before any writer; no query/DDL ran now.
+
+### Atomicity, uncertainty, privacy and live prerequisites
+
+Future success atomically fences current Admin, inserts one candidate, CASes the
+exact attempt COMMITTED receipt and appends CURRICULUM_OUTLINE_ADMITTED audit.
+Eligible terminal refusal may atomically record REFUSED plus
+CURRICULUM_OUTLINE_ADMISSION_REFUSED audit, no candidate. New action/native audit
+schemas need later approval. Metadata contains fixed IDs/revision/safe codes only.
+
+Stored brief/proposal/audits, F053 operation/claim/request and trusted completion
+must resolve exactly; no output self-attestation. Transaction-snapshot parent
+DRAFT/PUBLISHED checks cannot prevent every concurrent archive/deletion race.
+Retain history; later new admission rechecks eligibility. Protected inspection
+may allow existing archived parent; ordinary missing/mismatched/corrupt-parent
+detail refuses. Parent/author loss does not erase accounting obligations or
+prevent independently authorized F053 reconciliation. Every new protected
+operation needs fresh authority; content recovery remains original-actor-bound.
+
+Provider calls occur outside transactions. A claim is not proof of actual egress,
+authentic output or final cost. Content/audit/attempt atomicity is separate from
+F053 settlement; content writers cannot directly release liabilities/counters.
+Unknown generation/commit/abort/cleanup permits no automatic replay or zero-cost
+inference. Physical uniqueness/transactions/concurrency/rollback remain unverified.
+
+Before real persistence/egress approve access, candidate/attempt/audit/completion
+retention, erasure/backups and provider privacy/training terms. No period, TTL,
+deletion job, infinite retention or raw-response archive is chosen. Private detail
+excludes actor/producer/claim/owner/operation/ledger/internal-proposal metadata;
+O0's brief binding remains private. P1 is synthetic pure schema/digest/DTO/proposal
+work only, with no model, source admission, live operation or auth policy change.
+Preserve all acceptance blocks, NOT_RUN groups, historical UNKNOWN and production
+NOT_VERIFIED.
+
+Completion-pass evidence for this proposed section: focused consistency/self-review,
+explicit block-format verification, local-link/anchor, UTF-8/LF, scoped privacy,
+whitespace and historical-prefix preservation checks completed. The detailed
+record is in the linked F054 completion-pass evidence section. Documentation is
+READY_FOR_REVIEW only; no independent approval, implementation, physical index
+verification or live persistence evidence is implied. All decisions remain proposed.
+
+### P1 implemented offline boundary — 2026-11-07
+
+The owner approved only the eight-path P1 candidate/digest/DTO/pure-proposal
+implementation and bounded exception. That foundation is READY_FOR_REVIEW with
+62 focused tests, full API/test TypeScript, API build and targeted source lint
+PASS, plus separate source-review APPROVE (no independent test execution).
+Canonical P1 values use lowercase 24-hex IDs and immutable ISO timestamps;
+native input Dates are copied, never retained as mutable output objects.
+Final byte measurement includes the entire allowlisted candidate projection.
+Raw-output-to-host-bound-O0 correspondence is enforced, not inferred from hashes.
+
+No native candidate/attempt model, registration, writer, audit action or index
+is implemented or provisioned. The six declarations above remain future design
+constraints requiring separately approved native schemas, permissions and real
+verification. Supplied source/authorization/producer facts are not authority.
+The linked canonical F054 P1 record and its external delivery receipt distinguish
+local structural tests from all deferred live guarantees. Earlier F053 readiness
+hunks remain untouched and uncommitted; no historical UNKNOWN/NOT_RUN or acceptance
+status is cleared. Production remains NOT_VERIFIED.

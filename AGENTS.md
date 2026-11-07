@@ -1399,3 +1399,24 @@ or new dependency. Additional checkpoints need separate approval. F054 is partia
 IN_PROGRESS when implementation starts, with O0 readiness recorded separately;
 full acceptance remains incomplete. Preserve all existing acceptance blocks,
 NOT_RUN groups, permanent historical UNKNOWN and production NOT_VERIFIED.
+
+## Named F054 P1 offline candidate/admission exception — 2026-11-07
+
+The owner explicitly approved the independently reviewed P1 contract and exact
+eight-path inventory: three source files (candidate schema, private DTO and admission policy), one focused test, AGENTS and the scoped F054/database/roadmap
+sections. Permit only strict candidate/digest validation, private projection and
+pure ADMISSION_PROPOSED/refusal evaluation ahead of incomplete full
+F047/F049/F052/F053 acceptance. Work on existing dev; no new branch/dependency.
+
+Require matching reviewed contract fingerprints, preserved pending readiness
+hunks, focused offline tests, full API/test TypeScript, API build, targeted static/
+privacy/scope checks and a fresh separate final source review. Only after these
+pass may the owner's separately explicit approval be used for one local P1
+implementation commit. Stage only the eight approved paths and P1 hunks; no push.
+
+No real resolver, provider/dispatch, spending, model/registration, attempt/admission/
+audit writer, index/provisioning, endpoint/UI, editorial/publication, runtime,
+recovery, binding/pin or other checkpoint authority is granted. Supplied facts and
+matching hashes establish local structure only. A proposal permits no live action.
+All existing acceptance blocks, NOT_RUN/UNKNOWN and production NOT_VERIFIED remain.
+Full F054 stays IN_PROGRESS; P1 readiness and delivery evidence are separate.
