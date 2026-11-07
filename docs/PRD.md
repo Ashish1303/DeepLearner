@@ -3119,3 +3119,25 @@ editorial/publication or live dispatch decision follows. F047/full F049/F052 and
 F053 durable controls remain open. Preserve existing acceptance, NOT_RUN and
 historical UNKNOWN evidence; production NOT_VERIFIED. No live/Git operation is
 authorized by this checkpoint. Future G2 requires its own contract/approval.
+
+## F054 O0 approved outline-domain boundary — 2026-11-07
+
+The owner approved one offline, pure domain-validator checkpoint under F054's
+existing AI-led outline direction (sections13/44/105). The exact seven-path
+inventory and newly approved hierarchy/limits are in the
+[canonical O0 contract](features/F054-ai-concept-draft-generation.md#f054-o0-outline-validator--2026-11-07).
+These limits are O0 decisions, not retrospective claims about the original PRD.
+
+Validate one untrusted JSON outline against the exact supplied F044 brief's
+Technology/id/revision/digest. It contains an ordered title-only Concept hierarchy
+under Topics/Modules and bounded Module objectives; the brief retains audience,
+depth, runtime/version, goals and prerequisites rather than duplicating metadata.
+The result is a read-only structural projection, not authenticated AI generation,
+quality/coverage evidence, catalogue content, a stored proposal or approval.
+
+Current users gain no Generate screen or new Save behavior from O0. Providers,
+F053 activation/accounting, authoritative admission, persistence, review/editing,
+publication and all real acceptance gates remain separate. No existing F044/F052/
+F053 behavior changes; no new dependency, live call or database operation. Synthetic
+fixtures are never represented as genuinely generated content. Preserve blocked
+acceptance, unexecuted groups, historical UNKNOWN and production NOT_VERIFIED.

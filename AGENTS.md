@@ -1370,3 +1370,32 @@ ownership/RESULT-ACK/cleanup gates, acceptance blocks, NOT_RUN groups, historica
 UNKNOWN and production NOT_VERIFIED. Future live/Git/checkpoint actions need their
 own approval. This exception establishes no actual persistence or remote billing
 guarantee and must not activate any runtime consumer.
+
+## Named F054 O0 outline-validator offline exception — 2026-11-07
+
+The owner explicitly approved the F054 O0 contract, bounds, seven-path inventory,
+this O0-only sequencing exception and one local implementation commit after checks
+and separate source review. Permit only the pure outline schema/validator/test and
+AGENTS/PRD/F054/new-roadmap-section inventory in the canonical F054 record, directly
+on existing dev at `145927dc395399c7c4f2f629dd96f749db25b676`.
+
+This exception permits only inert domain structure and supplied-brief binding
+checks ahead of incomplete F047/full F049/F052/F053 acceptance. It completes none
+of those dependencies. No validated result proves authentic AI origin, stored
+existence, current eligibility/authorization, semantic quality, admission, approval
+or publication. F044/F052/F053 behavior and their security boundaries stay unchanged.
+
+Require strict deterministic bounds, safe errors, immutable inputs/fresh read-only
+results, synthetic-only fixtures, focused tests, full API/test TypeScript, API
+build, targeted lint/format/encoding/privacy/diff and a separate source review.
+Resolve blocking findings before the authorized local implementation commit. Stage
+only O0 changes; preserve the pre-existing DATABASE_DESIGN/F053/readiness-roadmap
+diffs unstaged. No push, merge, new branch or documentation-only substitute commit.
+
+No provider execution/keys/model selection, network/database calls, persistence,
+catalogue mutation, endpoints/UI, generation/admission orchestration, editorial
+decision, publication, runtime/transport/maintenance/harness/pin change, provisioning
+or new dependency. Additional checkpoints need separate approval. F054 is partial
+IN_PROGRESS when implementation starts, with O0 readiness recorded separately;
+full acceptance remains incomplete. Preserve all existing acceptance blocks,
+NOT_RUN groups, permanent historical UNKNOWN and production NOT_VERIFIED.
