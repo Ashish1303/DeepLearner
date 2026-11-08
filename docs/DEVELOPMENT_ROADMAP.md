@@ -14,6 +14,22 @@ is authorized by this update. F044 remains NOT_STARTED and not authorized.
 
 ---
 
+## F053 G2 source authority and database-readiness handoff — 2026-11-06
+
+**Historical snapshot — clarified 2026-11-08.** The assessment and checkout/worktree observations below are as of 2026-11-06 at `145927dc395399c7c4f2f629dd96f749db25b676`, not a current environment attestation. The later ownership assessment completed 2026-11-06T14:16:15Z deferred the 13-path package pending a separately decided supported protected-access/baseline solution. Its recommendation remains proposed/inactive, not the current execution instruction; the canonical readiness section records the retained evidence reference. No remediation, package execution, runtime qualification or change of current priorities is authorized.
+
+**Full F053 IN_PROGRESS. G2.1/G2.2 bounded offline development/review/delivery complete; synthetic database qualification BLOCKED; production NOT_VERIFIED.** Documentation-only inspection on clean primary `dev` at `145927dc395399c7c4f2f629dd96f749db25b676`; no new implementation/status completion, runtime, database/provider operation or Git delivery. Current users retain private brief/Save; no live Generate capability.
+
+The [canonical readiness section](features/F053-ai-security-usage-controls.md#f053-g2-authoritative-sources-and-qualification-readiness--2026-11-06) records each source/authority dependency, parent/eight prepared assertions and exact limitations. Explicit synthetic resolvers can qualify the real native repository in a properly isolated database without a paid provider. They cannot activate real application accounting/dispatch or authenticate real profile/pricing/source/receipt truth.
+
+Concrete blockers: no constructed F053 owned context/fixtures or fixed host/record/digest/ACK binding; no approved current F053 source/runtime/index/result package or qualified disposable target; protected-process/baseline capability remains unqualified. Existing F043/F044 fixed profiles are incompatible with F053's record names, five-collection/11-index inventory and run-named database; F044's additional-27019 refusal cannot be silently waived. No repeated permission/hash diagnostics, harness repair or candidate installation occurred.
+
+**Historical next task — deferred, not authorized:** one 60–90-minute (hard 90) offline F053 fixed-binding execution-package checkpoint, exact 13 logical support/documentation paths in the canonical record, preserving existing supervisor, deadlines and ownership checks. No active pin edits; use external candidates where necessary. Stop for required ownership/baseline-policy changes rather than expanding scope. Then a separate owner decision and qualified capability are necessary before any run/provisioning. No provider/model/spending decision is needed for synthetic preparation.
+
+Real-use retention/access/erasure/backups, billing attribution, trusted pricing/privacy, authentic resolver composition and explicit activation/spending remain unresolved. `F053_G22_PARENT` and I01–I08 all stay NOT_RUN; actual audit-insert failure, cross-month and concurrent demotion/deletion, wire unknown-commit and other full-G2 coverage remain separately required. Preserve original integration/browser groups, historical combined 225 evidence, U16's permanent UNKNOWN and F042/F043 acceptance BLOCKED; no gate is cleared.
+
+This task leaves only F053, DATABASE_DESIGN and this roadmap pending, index empty; AGENTS/source and the eleven other worktrees remain unchanged. Existing 65-test/typecheck/build/static and separate-agent source-review evidence is retained, not rerun. Only affected documentation formatting/links/encoding/privacy/history/scope/whitespace checks are executed for this handoff; no new independent source review is claimed.
+
 ## F053 G2.2 offline implementation — 2026-11-06
 
 **G2.2 bounded offline development/review/delivery checklist: complete. Full F053 IN_PROGRESS; feature acceptance incomplete.** Implemented on primary `dev`, `E:\AI\DeepLearner`, from clean base `7170516f08b914594d84605bbaa7e5771576a7f7` under approval `7e0a761c-9e39-40bd-8ea5-053d725b6398/Pasted text.txt`. The earlier READY_FOR_REVIEW checkpoint was separately approved for delivery and pushed as recorded below. Historical sections retain their dated meaning.
