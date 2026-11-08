@@ -1420,3 +1420,31 @@ recovery, binding/pin or other checkpoint authority is granted. Supplied facts a
 matching hashes establish local structure only. A proposal permits no live action.
 All existing acceptance blocks, NOT_RUN/UNKNOWN and production NOT_VERIFIED remain.
 Full F054 stays IN_PROGRESS; P1 readiness and delivery evidence are separate.
+
+## Named F054 offline invocation/completion coordinator exception — 2026-11-08
+
+The owner explicitly approved the independently reviewed six-path boundary and
+one verified local implementation commit on existing dev. Permit only the new
+curriculum-outline-producer.service.ts, its focused test, and scoped AGENTS/F054/
+DATABASE_DESIGN/DEVELOPMENT_ROADMAP contract/evidence sections. This supersedes
+earlier orchestration prohibitions only for an unwired offline coordinator with
+synthetic injected clock, executor, authority, ledger and attempt ports, ahead of
+incomplete full F047/F049/F052/F053 acceptance. No new branch or dependency.
+
+Require exact reviewed contract fingerprints, preserved unrelated readiness hunks,
+meaningful ordering/uncertainty/cancellation/binding tests, full API/test compiler,
+API build, targeted static/privacy/scope checks and fresh separate final source
+review. Resolve findings before the authorized local implementation commit; stage
+only the six approved paths/hunks. No push. Full F054 stays IN_PROGRESS; record
+this checkpoint's implementation and offline readiness separately.
+
+No real provider dispatch, production resolver/composition, Session/security
+amendment, native model/index/writer, actual completion storage/admission, API/UI,
+accounting action, spending, runtime/harness/binding/pin work or other checkpoint
+is authorized. Current User/origin-Session/cancellation serialization and sticky
+deauthorization remain future port obligations, not protections proved here.
+Synthetic ACKs/hashes/flags cannot establish actual authority or durability.
+Preserve all acceptance blocks, NOT_RUN groups, historical UNKNOWN and production
+NOT_VERIFIED. The named exception activates no real storage/retention policy.
+See the [canonical implementation record](docs/features/F054-ai-concept-draft-generation.md#offline-coordinator-implementation-record--2026-11-08)
+for scope, actual verification and separately retained local delivery identity.

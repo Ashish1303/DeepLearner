@@ -4583,3 +4583,101 @@ owner review of local P1 delivery and the already-identified producer/completion
 composition boundary; no further implementation is authorized. F053 qualification
 BLOCKED/NOT_RUN, acceptance blocks, all unexecuted groups, historical UNKNOWN and
 production NOT_VERIFIED remain unchanged.
+
+## Proposed F054 invocation and completion checkpoint — 2026-11-07
+
+**Contract READY_FOR_REVIEW — documentation only. PROPOSED — PENDING OWNER APPROVAL.
+Subsequent implementation NOT_STARTED. Full F054 IN_PROGRESS; acceptance incomplete.**
+Existing dev618303bf83184f64a07f98b3e462eaf5012b56ba, parent O0
+4cbee018bda7c775ad712ed0ac724ca016678dcc. O0/P1 local commits,62 P1 tests and separate
+source review are retained evidence, not rerun or delivered again. No new user
+Generate/Save action or live producer/persistence capability exists.
+
+The [invocation/completion extension](features/F054-ai-concept-draft-generation.md#proposed-invocation-and-durable-completion-extension--2026-11-07)
+defines existing F053 claim acknowledgement followed by F054 invocation-marker
+acknowledgement, both known before one external call by the original live owner.
+Unknown ACK/recovery/missing output never authorizes dispatch or mutation replay.
+It distinguishes observed return, valid output, one durable raw completion,
+candidate admission and accounting. One embedded attempt completion plus metadata
+audit uses unchanged O0/P1 byte/hash/DTO rules; new attempt/checkpoint frames and
+native states are proposed only. No new collection or seventh index is proposed.
+
+Capture requires fresh current authority, an origin-Session write fence, User
+fence and durable attempt-cancellation serialization. Existing code does not
+supply the combined Session gate, sticky deauthorization/session linkage or trusted
+source/profile/claim/producer/native-writer composition. Button-press/external-call
+atomicity is not promised. Missing raw-content retention/access/privacy approval,
+native schemas/actions/permissions and real transaction/index/uncertainty coverage
+remain prerequisites before storage/use, not permission for late background capture.
+
+Smallest later proposal: six paths, two CREATE files
+apps/api/src/modules/ai/curriculum-outline-producer.service.ts and
+apps/api/tests/curriculum-outline-producer.test.ts; four MODIFY files AGENTS,
+F054, DATABASE_DESIGN and this roadmap. Offline internal ordering coordinator and
+fake clock/executor/authority/attempt ports; reuse existing domain validators and
+F053/F052 interfaces. No native repository, production resolver, provider/model/
+key, new framework, API/UI or live invocation. Estimate60–90min, hard90. Its named
+six-path offline sequencing exception is PROPOSED — PENDING OWNER APPROVAL;
+AGENTS is unchanged and implementation has not started.
+
+Only these three new documentation sections change. Preserve pre-existing
+readiness hunks/F053, all other worktrees and source. Focused documentation
+self-review/check evidence follows after execution; no independent approval or
+application suites are claimed. No Git staging/commit/push or runtime operation.
+Next action: owner review of this exact ordering/checkpoint/authority/retention
+proposal and bounded future inventory, not implementation or live execution.
+F053 qualification BLOCKED/NOT_RUN, acceptance blocks, all unexecuted groups,
+historical UNKNOWN and production NOT_VERIFIED remain unchanged.
+
+Documentation completion: focused consistency/security self-review finished,
+no known blocking internal inconsistency. Explicit formatting checks for all three
+new blocks, four new local links/anchors, UTF-8/LF, scoped privacy, whitespace and
+preservation PASS. The checker character/byte-offset issue was corrected before
+PASS; no application/O0/P1 checks reran and no independent approval is claimed.
+All eight retained P1 fingerprints matched before editing. Final pending paths:
+DATABASE_DESIGN, this roadmap, F054 and untouched F053 readiness; index empty.
+All new schemas/APIs/audit/index/security requirements and future six-path
+exception remain PROPOSED — PENDING OWNER APPROVAL; implementation NOT_STARTED.
+
+### Offline coordinator implementation handoff — 2026-11-08
+
+Checkpoint READY_FOR_REVIEW — offline only, on existing dev E:/AI/DeepLearner, baseline
+618303bf83184f64a07f98b3e462eaf5012b56ba. The owner approved the reviewed six paths,
+offline-only sequencing exception and one verified local implementation commit;
+no push. Earlier NOT_STARTED/proposed implementation text above is historical.
+Full F054 remains IN_PROGRESS and acceptance incomplete. No new user-facing
+generation capability or real provider/storage/security composition is added.
+Completion criteria are meaningful synthetic-port tests, API/test compiler/build,
+targeted static/privacy/diff checks and separate final source review. Real native
+schemas, trusted resolvers, Session/cancel/demotion serialization, retention and
+live transaction/index/provider verification remain blocked/deferred. Final checks,
+pending paths and exact next action follow.
+
+Implemented: internal single-use claim/marker/invocation/completion orchestration
+with synthetic ports and bounded clock; exact O0/P1 correspondence; no-replay
+actor-bound inspection. Users still have no new live Generate/Save capability.
+Author-executed 114/114 synthetic tests, full API/test TypeScript, production API
+build, targeted lint and source formatting PASS. Separate agent source review
+/root/coordinator_source_review APPROVE on final hashes, zero unresolved findings;
+reviewer did not run tests/build. Initial test/type/lint findings were resolved.
+No actual database ACK, Session revocation, transaction/index/concurrency, provider
+execution/billing or admission evidence was obtained. O0/P1 were not rerun.
+
+Combined pending inventory before local delivery: six approved coordinator paths
+(two source/test CREATE, AGENTS and three scoped documents) plus unchanged F053
+readiness. Only approved invocation/coordinator sections may be staged; earlier
+database/roadmap readiness hunks remain pending. Final local SHA/parent and
+post-commit state are retained in the timestamped external delivery handoff named
+in the [canonical implementation record](features/F054-ai-concept-draft-generation.md#offline-coordinator-implementation-record--2026-11-08).
+Next action after this checkpoint: bounded review of genuine User/origin-Session/
+cancel serialization and trusted source/claim composition before any native
+adapter. No automatic implementation, push or live action. Full F054 IN_PROGRESS;
+F053 qualification BLOCKED/NOT_RUN, all existing acceptance/unexecuted/UNKNOWN and
+production NOT_VERIFIED remain unchanged.
+
+Final scoped documentation formatting/link/encoding/privacy/preservation and
+diff checks PASS; source/test hashes match the separate review. The checker's
+default-versus-repository Prettier-options discrepancy was fixed before PASS.
+One local six-path implementation commit is authorized subject to exact staged
+integrity. After delivery, only the original three readiness documents remain
+pending; actual resulting identity/state must be verified in the external handoff.

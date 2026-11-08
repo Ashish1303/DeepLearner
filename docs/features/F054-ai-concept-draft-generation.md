@@ -684,3 +684,510 @@ composition contract already identified above, not its implementation or a live
 call. No new checkpoint is started. Preserve F053 qualification BLOCKED/NOT_RUN,
 all acceptance blocks, unexecuted groups, historical UNKNOWN and production
 NOT_VERIFIED. The earlier preparation overrun remains historical noncompliance.
+
+## Proposed invocation and durable completion extension — 2026-11-07
+
+**Contract READY_FOR_REVIEW — documentation only. PROPOSED — PENDING OWNER APPROVAL.**
+Documentation only; subsequent implementation NOT_STARTED. Full F054 remains
+IN_PROGRESS, acceptance incomplete, production NOT_VERIFIED. This section refines
+only the earlier producer/attempt boundary; it does not change O0/P1 or activate
+storage, egress, retention or a background evidence-capture exception.
+
+Baseline: dev618303bf83184f64a07f98b3e462eaf5012b56ba, parent
+4cbee018bda7c775ad712ed0ac724ca016678dcc. O0/P1 are locally committed and reviewed;
+retain their evidence, no reruns or delivery here. P1 remains READY_FOR_REVIEW
+on its own offline scope. Current users gain no new Generate/Save capability.
+
+### Required authority and the coordinator that does not yet exist
+
+Before preparing an attempt, independently resolve the current verified ACTIVE
+Admin, exact authenticated actor/session, eligible Technology, immutable F044 brief
+revision1 and actual initial proposal revision1, their definition/content digests,
+parent/source relationships and admission audits. Reuse the approved actor-bound
+new generation operationId, F053 ledger ObjectId, claim/owner/template/request and
+preallocated candidate/family/terminal-audit identities. Never reuse the F044 Save
+key, infer identity equality, trust caller flags or treat AI_GENERATED/hashes as
+source or dispatch authority.
+
+Missing production composition remains explicit: trusted F044 admission/source
+resolver; genuine F053 profile/quote/privacy/pricing/spending/evidence resolvers;
+full native operation/claim/audit reader; current-session/revocation and durable
+cancellation gates; the approved observing coordinator and native attempt writer.
+Existing LedgerAuthority.verify is an injected callback. Its private RECORDED DTO
+omits claim/owner/request proof; RECORDED or readOperation alone is insufficient.
+JWT verification in authenticate checks token claims/expiry; existing Admin access
+reads User eligibility, not live Session revocation. See the
+[existing JWT verifier](../../apps/api/src/modules/auth/access-token.service.ts) and
+[logout transaction](../../apps/api/src/modules/auth/logout.repository.ts).
+F044/F053 User-version fences
+are useful but do not supply these missing capabilities. No registry is proposed.
+
+Only the separately approved server coordinator holding the original exclusive
+claim owner and uninterrupted invocation context can associate a successful F052
+return with this attempt. It must use the exact resolved/template-bound request,
+not caller JSON or a returned provenance flag. A process-local handle/owner UUID
+is no API capability and cannot substitute for stored binding/authority checks.
+
+### Proposed attempt shape, identity and durable states
+
+**All detailed schemas, methods, audit action and index requirements below are
+PROPOSED — PENDING OWNER APPROVAL; no model or writer exists.** Extend the already
+proposed curriculumOutlineAttempts aggregate, not a new completion collection.
+No prompt or inputJson is stored in it; requests are reconstructed from immutable
+sources/template under approved access, then checked against existing fingerprints.
+
+The exact proposed attempt fields are:
+
+| Field                                                                                                 | Native representation and invariant                                                                                                                                                                                                            |
+| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _id, schemaVersion, scope                                                                             | BSON ObjectId attempt identity; literal1; SHARED_AI_TESTING.                                                                                                                                                                                   |
+| actorId, sessionId, operationId                                                                       | Actor and originating Session BSON ObjectIds; existing actor-bound lowercase UUID-v4 generation key. Session binding is necessary for logout refusal, not a bearer token.                                                                      |
+| technologyId, brief, proposal                                                                         | BSON Technology ObjectId; brief {id:ObjectId,revision:1,digest}; proposal {id:ObjectId,proposalId:ObjectId,revision:1,digest}. Existing F044 digests; no copied content.                                                                       |
+| ledgerOperationId, ledgerIntentFingerprint, intentDigest, requestDigest, templateVersion, quoteDigest | Existing F053 ObjectId, lowercase64-hex fingerprints/digests (including unchanged P1 intentDigest) and template UUID-v4. quoteDigest is existing ledgerQuoteDigest of the exact quote; no duplicate quote/profile or new accounting identity.  |
+| outlineRevisionId, outlineId, terminalAuditId, completionAuditId                                      | Preallocated BSON ObjectIds. Revision/family differ; terminal/completion audit IDs differ. The extra completionAuditId binds one metadata audit to the checkpoint, including when admission never follows.                                     |
+| createdAt, bindingDigest                                                                              | Attempt preparation UTC Date and digest of its immutable binding frame below. Not candidate creation time.                                                                                                                                     |
+| version                                                                                               | Exact nonnegative safe-integer BSON number, CAS-incremented; refuse overflow.                                                                                                                                                                  |
+| phase                                                                                                 | PREPARED, INVOCATION_MARKED, COMPLETION_STORED, ADMITTED or REFUSED. These are F054 phases, not F053 accounting states.                                                                                                                        |
+| invocation                                                                                            | Initially null; once set, exactly {claimVersion,id,ownerId,claimedAt,observeUntil,markedAt}. claimVersion is the acknowledged F053 safe-integer operation version; id/ownerId existing claim UUIDs; times UTC Dates. Never replace/reclaim it. |
+| completion                                                                                            | Initially null; once set, the exact embedded checkpoint below.                                                                                                                                                                                 |
+| cancelledAt                                                                                           | Initially null; a first, authorized durable cancellation UTC Date is sticky. Cancellation changes this cell/version, not historical completion or accounting.                                                                                  |
+| receipt                                                                                               | Initially null; write-once {kind:COMMITTED,candidateId,revision:1,definitionDigest,auditId} or {kind:REFUSED,code,auditId}. Candidate/audit links follow the previous admission contract. No editorial state.                                  |
+
+All fields are required, including literal null cells. Own exact fields only;
+ObjectIds become lowercase24-hex and Dates canonical ISO for JSON/hash projection.
+Strings/digests/UUIDs use P1/F053 rules; version increments are checked safe integers.
+No arbitrary metadata map, copied account/credentials, provider envelope or TTL.
+New attempts explicitly start at phase PREPARED, version0 and null invocation/
+completion/cancelledAt/receipt; no schema default allocates identity, time or state.
+Require attempt.createdAt <= invocation.claimedAt <= invocation.markedAt, with
+markedAt < observeUntil and observeUntil exactly claimedAt plus the unchanged
+F053 request budget. A completion must also have markedAt <= completedAt <=
+completion.createdAt. Refuse clock rollback or inconsistent timing, not repair it.
+The immutable binding fields above (through createdAt, excluding bindingDigest)
+never change. Invocation/completion/receipt cells are single-assignment; phase and
+version cannot move backward. PREPARED has all three cells null; INVOCATION_MARKED
+has invocation only; COMPLETION_STORED has invocation/completion and no receipt;
+ADMITTED has both plus COMMITTED receipt; REFUSED has a REFUSED receipt and never
+a candidate. Refusal can follow INVOCATION_MARKED or COMPLETION_STORED only under
+the separately defined current-authority terminal-refusal transaction. Never
+persist a refusal merely because authority has already been lost. CancelledAt is
+orthogonal, so a cancellation after a completion cannot rewrite that completion.
+
+F053 CLAIM_DISPATCH is not another F054 phase. Its acknowledged committed
+DISPATCH_CLAIMED record can coexist with F054 PREPARED until the marker commits.
+OUTCOME_UNKNOWN/UNRESOLVED are knowledge classifications, not permission to write
+an inferred phase or invent a completion/cancellation receipt after failure.
+
+### Two acknowledgements before one invocation
+
+1. Resolve/fence current authority and prepare the immutable F054 binding with
+   known acknowledged PREPARED state; retain original process/session context.
+   Use separately approved F053 reservation, not a second reservation system.
+2. Call existing F053 claimDispatch once. Require its successful transaction
+   acknowledgement plus independently validated full operation/claim/audit linkage:
+   actor/key/Technology/source/request/bounds/quote/template, same owner/id and
+   current DISPATCH_CLAIMED version. Refused, unknown, unreadable or merely private
+   DTO evidence stops. Do not repeat claim because its acknowledgement is unclear.
+3. With that claim, commit one F054 PREPARED-to-INVOCATION_MARKED CAS transaction.
+   Predicate: exact bindingDigest/version; cancelledAt/invocation/completion/receipt
+   all null; same actor/origin session; fresh User/Session fences, eligible source/
+   parent and exact F053 claim snapshot. Store invocation, increment version, then
+   require known successful bounded commit acknowledgement and clean transaction
+   outcome. A conditional miss/conflict or unknown commit grants no call permission.
+4. In that same retained coordinator, recheck cancellation, current authority,
+   source/privacy/control/claim ownership and deadline immediately before exactly
+   one F052 execute. Both acknowledgements must be known in this uninterrupted
+   context. A recovery read finding a marker does not recreate invocation authority.
+
+Require now before quote.expiresAtMs and claim.observeUntil and the original
+period/profile/quote constraints for dispatch. Preserve original request bounds.
+F052 receives at most the remaining observation/local budget (never above its
+original bound or10000ms); do not extend observeUntil or replace the owner when
+that leaves insufficient time. Its AbortSignal is checked before dispatch and
+on cancellation; no automatic retry, alternate key or fallback provider.
+
+No provider work occurs inside a MongoDB transaction. A final check cannot be
+atomic with external I/O or prevent every revocation/state change after it.
+Exclusive claim/evidence ownership and conservative read refusal are prerequisites;
+F054 cannot directly mutate F053 rows to manufacture a dispatch fence. Conflicting
+ownership/version before invocation stops. A marker means invocation may have
+occurred, not that it certainly occurred. There is no exactly-once remote-processing,
+unsent, unbilled or MongoDB/provider atomicity guarantee. Missing trusted accounting
+and dispatch composition keeps all live use blocked.
+
+### Exact observation and one private completion checkpoint
+
+Distinguish observed provider return, technically/domain-valid output, durable
+completion, admitted candidate and verified cost: none implies another. Only a
+successful F052 outcome observed by the original coordinator within its original
+local/claim observation window is eligible. completedAt is that coordinator's
+explicit return-observation UTC time, consistent with its monotonic budget and
+claimedAt <= completedAt < observeUntil; it is not a provider-declared timestamp.
+Failures, cancelled/deadline outcomes and late underlying promises produce no
+capturable raw content, even if the provider may continue charging.
+
+Retain exact UTF-8 bytes of the successful F052 untrustedJson string. This is not
+a claim about compressed/original HTTP transport bytes. Parse as strict
+{title,modules}, reconstruct host identity/source and apply unchanged O0/P1 to the
+same raw output/candidate/context. Keep both raw and assembled O0 <=65536 bytes
+and the exact request output limit; keep P1's131072-byte candidate cap. No extra
+identity fields, normalization, reserialization, truncation or substitute JSON.
+
+The embedded write-once completion record has exactly:
+
+| Field            | Meaning and rationale                                                                                                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| schemaVersion    | Literal1, fixed projection version.                                                                                                                                                                                      |
+| producer         | Exact P1 producer tuple, unchanged, with native BSON ObjectId references and UTC Dates; existing UUID/digest strings. Supplies immutable attempt/ledger/key/claim/owner/intent/request/template/raw/observation linkage. |
+| rawOutput        | One well-formed primitive string containing the exact bounded successful content-only JSON, including whitespace and escape spelling. Necessary for unchanged P1 recovery; no other response data.                       |
+| createdAt        | Explicit UTC Date assigned once for this checkpoint, >= producer.completedAt; later candidate.createdAt reuses it. This is construction time, not claimed database commit time.                                          |
+| checkpointDigest | Domain-separated integrity digest covering this record and its immutable attempt/marker binding below; not authentication.                                                                                               |
+
+Allocate candidate/family/audit IDs once at preparation, but do not predate the
+candidate with the attempt's earlier createdAt: checkpoint createdAt is selected
+once after observing output. Never regenerate these values after uncertain write.
+The provider-return budget is not extended by a separately bounded completion
+transaction; a previously on-time return may be checkpointed after observeUntil
+only by the still-live original coordinator under fresh capture authority and
+that transaction's unchanged bounds. No delayed background/resumed capture.
+
+A later accounting transition may change the F053 operation version/state without
+changing its preserved claim/request identity. Capture must validate that exact
+historical claim and audit lineage, not require accounting to remain open or
+interpret SETTLED as content success. A missing/mismatched claim history refuses.
+Quote/observation expiry after an on-time return is not permission for a new call;
+current content-storage privacy/authority still must permit the bounded capture.
+
+Only one raw string plus fixed, individually bounded metadata is retained. There
+is no arbitrary archive or separate enlarged output limit. The candidate cap is
+not silently applied to outer JSON-escaped checkpoint text, which is a different
+representation. Native BSON size/permissions must be qualified before persistence;
+no storage-byte measurement or creation is asserted by this document.
+
+Canonical frames: compact JSON.stringify ordered arrays, UTF-8/no BOM/newline,
+lowercase SHA-256, ObjectIds lowercase24-hex, UTC Dates ISO, verbatim validated
+strings. Existing P1 intent/content/completion/definition frames remain unchanged.
+For the attempt immutable binding define:
+
+    ["F054_OUTLINE_ATTEMPT",1,attempt._id,"SHARED_AI_TESTING",actorId,sessionId,
+     operationId,technologyId,[brief.id,1,brief.digest],
+     [proposal.id,proposal.proposalId,1,proposal.digest],ledgerOperationId,
+     ledgerIntentFingerprint,intentDigest,requestDigest,templateVersion,quoteDigest,
+     outlineRevisionId,outlineId,terminalAuditId,completionAuditId,attempt.createdAtISO]
+
+bindingDigest hashes that frame. checkpointDigest hashes exactly:
+
+    ["F054_OUTLINE_CHECKPOINT",1,bindingDigest,
+     [invocation.claimVersion,invocation.id,invocation.ownerId,
+      invocation.claimedAtISO,invocation.observeUntilISO,invocation.markedAtISO],
+     completion.producer.completionDigest,completion.createdAtISO]
+
+Recompute all bindings and unchanged P1 producer.completionDigest, including the
+rawOutputDigest of exact rawOutput. That transitively covers every producer field
+and raw bytes; schemaVersion is fixed by the frame tag. The new binding frame
+covers allocated IDs, source/proposal/actor/session/quote/request linkage. No phase,
+version, cancelledAt, admission receipt, checkpointDigest or future candidate
+backlink feeds bindingDigest or P1 completionDigest; there is no hash cycle.
+Integrity of mutable cells requires CAS/transaction/access controls, not hashes.
+Require producer.attemptId = attempt._id and its ledgerOperationId, operationId,
+intentDigest, requestDigest and templateVersion equal the immutable binding;
+producer.claimId/ownerId equal invocation.id/ownerId. Recompute the existing F053
+request/intent/quote digests from the exact independently resolved records.
+A stored checksum alone cannot validate source, claim or observation authority.
+
+### Conditional storage, audits and no-replay reads
+
+One proposed capture transaction must atomically: validate the exact marker,
+source/parent and authoritative completion linkage; fence current User and origin
+Session; check current cancellation/loss gates; CAS the attempt with exact version,
+INVOCATION_MARKED, cancelledAt/completion/receipt null; set completion and phase
+COMPLETION_STORED; increment version; append one content-free
+CURRICULUM_OUTLINE_COMPLETION_STORED audit under completionAuditId. Proposed audit
+uses existing actor/request/time fields and fixed attempt/Technology/operation IDs
+plus checkpointDigest only, no raw content/session/claim/owner or prompt. Action
+schema and permission additions require later approval; no audit model is changed.
+
+The capture work budget begins when the on-time F052 success is observed and
+includes O0/P1 validation and awaited write work; do not start/reset it only after
+validation. Pass remaining work to every port and retain the existing bounded
+cleanup controls. No unbounded validation-to-storage delay or resumed capture.
+
+One explicit bounded transaction/commit attempt, no callback/mutation replay,
+upsert, replacement or overwrite. Reuse existing10000ms work,5000ms authorization,
+2000ms commit/abort/endSession bounds and qualified same-session driver controls.
+Acknowledge completion only after known commit and required cleanup outcome.
+Any candidate admission is a later separately authorized/fenced transaction,
+with its existing candidate/receipt/terminal-audit atomicity; not part of capture.
+
+An identical existing complete checkpoint is read/validated, never rewritten:
+compare exact raw bytes, full binding/marker/producer/digests and completion audit.
+Different raw bytes conflict even if contentDigest is equal. Hash-only equality,
+partial linkage, missing audit or corrupt cell refuses as UNRESOLVED/corrupt;
+never repair/replace/attach missing content automatically. Proper transactions
+must leave no partial checkpoint/audit, but this remains a live-verification gate.
+Unknown acknowledgement, rollback, abort or cleanup is OUTCOME_UNKNOWN; subsequent
+exact read may establish an already committed checkpoint or receipt. Missing rows
+alone never establish no invocation/no commit or permit another capture write.
+A read failure returns UNRESOLVED, no private driver error or success inference.
+
+Internal actor-bound reads require independently current verified Admin and exact
+actor/attempt/operation/Technology binding, bounded primary snapshot inspection,
+no-store and approved access. A new authenticated session of the same actor may
+inspect already committed evidence, but may not revive invocation/first capture
+under the old session. Other Admins gain no raw completion recovery capability.
+RawOutput stays server-private, not in P1 DTO, Student API, logs, URL or browser
+storage. Later candidate admission can use stored evidence only after its own
+fresh authorization, source/parent/P1 checks and unused-admission receipt check;
+P1 attemptUnused means no initial candidate admission, not no invocation marker.
+The authoritative admission gate also requires cancelledAt=null; this gate is
+composed outside unchanged P1, not inferred from its supplied boolean. Native
+terminal-refusal/recovery mutations remain deferred, not authorized by this shape.
+
+### Authority loss, durable cancellation and transaction ordering
+
+Capture requires both fresh credential verification and an authoritative live
+origin Session (_id=sid, userId=actorId, revokedAt=null, unexpired), plus current
+verified ACTIVE ADMIN User. Current code does not provide a combined transactional
+Session fence. Proposed enforcement writes real __v increments on both User and
+Session with exact observed versions/eligibility and modified-count/ack checks,
+in the same attempt-CAS/checkpoint/audit transaction. Require existing valid safe
+integer versions; missing/overflow refuses, never initialize/migrate silently.
+The Session projection is only _id/userId/revokedAt/expiresAt/__v; the User
+projection is only _id/role/status/emailVerifiedAt/__v. Do not read refresh hashes,
+device/IP data or credentials into this content boundary.
+Session expiry is checked at authorization and immediately before commit under
+trusted time; a TTL declaration or signed sid is not proof of a live Session.
+
+Ordinary logout already writes the Session row, whereas logoutAll also changes
+User. Sharing a real Session write lets logout/revocation conflict with capture;
+a User-only check/fence cannot prove logout ordering. Current demotion/deletion
+fences help only where all eligibility writers serialize correctly. Sticky
+mid-invocation authority loss additionally requires deauthorization to revoke the
+origin sessions in its authoritative transaction (or an equally explicit bounded
+contract amendment), so later promotion does not revive a cancelled invocation.
+That lifecycle linkage is not established by current code; it requires separate
+security review/approval before native/live composition. No global JWT policy or
+logout implementation is changed by this proposal.
+
+Proposed durable cancellation is a content-free actor-bound conditional update
+of cancelledAt plus attempt.version under fresh current authority; it writes the
+same attempt row as capture, never accounting or completion content. The original
+actor may request it from a current session, including a new one; only the origin
+session/coordinator may first capture. Acknowledgement means that cancellation
+transaction committed, not merely that the browser requested abort. Cancellation
+may update only PREPARED/INVOCATION_MARKED/COMPLETION_STORED; a terminal ADMITTED/
+REFUSED attempt is inspected as already terminal without a new cancellation write.
+No cancellation
+endpoint or automatic post-loss cancellation writer is authorized here.
+
+Decision point is the successful serialization/commit of these shared writes:
+revocation/cancellation committing first must make capture fail; capture committing
+first may leave legitimate existing evidence when later logout/cancel commits.
+Current local AbortSignal/authority-loss observation is sticky: before write/commit
+checks it forbids issuing new content writes; while commit is in flight it yields
+uncertainty, not proven rollback or permission to erase/recapture. Never store late
+output through another owner, session or background callback. Discard unsaved raw
+content when capture is refused; retain only already committed evidence under the
+future approved policy. Dropping references is not a physical-memory zeroization guarantee.
+The lost caller is not authorized to persist a new failure
+or diagnostic record merely to explain refusal.
+
+This does not promise ordering by wall-clock button press, an undelivered network
+abort, unseen demotion or exact expiry instant. Transaction conflicts, trusted-time
+checks and sticky durable revocation are the required mechanisms; absolute
+real-time cross-system revocation is not supplied by a pre-write check. If the
+owner requires stronger ordering than this explicit transaction order, native/live
+implementation remains blocked pending that decision. Parent eligibility retains
+P1's acknowledged snapshot archive/deletion race; no cascade/publication follows.
+
+Previously committed completion/admission/audits are not erased on logout,
+demotion or source loss. Without a checkpoint, after marker/return/loss the
+result is UNRESOLVED with possible provider effects, not new durable success/refusal.
+F053 independently retains/reconciles liabilities under its authority/evidence
+rules. Content return/checkpoint/admission is neither final-cost evidence nor a
+DEFINITELY_UNSENT receipt, and cannot release reservations. Content-parent/session
+loss must not block independently authorized accounting reconciliation.
+
+### Interruption and read-recovery matrix
+
+| Cut or uncertainty                             | Established facts / possible external effects                                                       | Permitted action and refusal; forbidden replay                                                                                                                 |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Before F053 claim is sent                      | Prepared intent/reservation may exist; this coordinator has not invoked.                            | Fresh exact reads; do not create another reservation/key. Any F053 definitely-unsent decision needs its own qualified evidence.                                |
+| Claim sent, before known claim ACK             | Claim may have committed; no call permitted.                                                        | Stop dispatch, read exact actor/key/claim/audit. Missing/RECORDED DTO alone is insufficient; no repeated claim or inferred release.                            |
+| Known claim ACK, before marker write           | Exact claim known; F054 PREPARED. No invocation by this uninterrupted owner yet.                    | Only original live authorized owner may perform first marker CAS while all gates pass; recovery after interruption is read-only, not claim/marker replay.      |
+| Marker write sent, before known marker ACK     | Marker may have committed; no invocation is permitted by ambiguous ACK.                             | Read marker/claim; finding it does not restore invocation authority. No marker retry or automatic execute.                                                     |
+| Known marker ACK, before external call         | Both ACKs known only to retained live owner; marker now means possible invocation to other readers. | Original owner may perform one final gate and one execute; cancellation/expiry/lost context stops. Recovery never executes again.                              |
+| Awaiting provider / deadline / process loss    | Call may have reached provider or continue remotely; output/cost unknown.                           | Cancel local consumption, read exact records; no alternate key/owner, redispatch or assumed no-charge.                                                         |
+| Return observed / validating                   | Only bounded local output, not durable content or admission.                                        | Original still-authorized coordinator may validate and attempt first capture; invalid/late/lost authority drops raw content. No repair/replacement generation. |
+| Authority/cancellation lost before capture     | Revocation/cancellation may already be durable; no new capture permission.                          | Stop new content writes; inspect existing evidence only after fresh read authority. Do not write a failure marker from the lost context.                       |
+| Capture transaction sent / before ACK          | Checkpoint+audit may both commit; no durable-success claim yet.                                     | OUTCOME_UNKNOWN until exact valid reads; no insert/commit/capture retry from absence. In-flight abort does not prove rollback.                                 |
+| Known capture ACK / before admission           | Exact completion and audit, but no admitted candidate or verified cost.                             | Current authorized actor can inspect; later admission requires separate fresh fences/receipt/P1 checks. Never call provider again.                             |
+| Admission transaction sent / ACK unknown       | Candidate/receipt/terminal audit may commit atomically.                                             | Read all exact links; return resolved prior result or UNRESOLVED. No mutation/admission replay merely from missing rows.                                       |
+| Known admission ACK / later logout or demotion | Candidate/receipt/audits already committed; accounting remains independent.                         | Preserve evidence and access rules; no erase, regeneration, inherited editorial approval or release inference.                                                 |
+
+### Smallest subsequent implementation proposal and remaining decisions
+
+**PROPOSED — PENDING OWNER APPROVAL; NOT_STARTED.** Recommend one internal,
+offline producer-ordering coordinator with injected existing F052 executor/F053
+service and explicit bounded authority/attempt-read-write ports. It orchestrates
+this sequence and reuses O0/P1; it is not another domain validator, model, queue,
+supervisor, provider registry or production resolver. Test ports are synthetic and
+cannot establish acknowledgement, authority or database guarantees in production.
+
+Exact proposed six paths, no dependency:
+
+CREATE:
+
+- apps/api/src/modules/ai/curriculum-outline-producer.service.ts
+- apps/api/tests/curriculum-outline-producer.test.ts
+
+MODIFY only after approval:
+
+- AGENTS.md — named offline coordinator-only exception.
+- docs/features/F054-ai-concept-draft-generation.md
+- docs/DATABASE_DESIGN.md
+- docs/DEVELOPMENT_ROADMAP.md
+
+Acceptance: inert imports; strict reuse of existing identities/requests/P1;
+ordered claim ACK then marker ACK before at most one execute; every ambiguous/
+refused/conflicting/expired gate makes zero execute calls; no claim/marker/capture
+retry; late/cancelled/authority-lost outputs make zero new capture calls; capture
+uses the exact bytes/frames and fixed IDs/time; identical reads versus conflicts/
+corruption/incomplete audit; all matrix cuts; races under explicit port doubles;
+safe errors/no raw data in results; input immutability; no accounting release.
+Use fake executor/clock/ports only, meaningful unit tests, full API/test compiler,
+API build, targeted lint/format/encoding/privacy/scope/diff and fresh separate
+source review. Estimate60–90 active minutes, hard90 for this one offline scope.
+No vendor/model/key decision is needed for it.
+
+Proposed exception, NOT ACTIVE: permit only those six files ahead of unmet full
+F047/F049/F052/F053 acceptance for offline coordinator/double verification after
+separate owner authorization. No actual provider/native repository/model/index,
+resolver activation, session/auth writer, API/UI, persistence, spending, background
+capture, runtime/harness/pin work or Git delivery. Existing AGENTS is unchanged.
+
+Before real persistence/egress separately approve and implement native attempt/
+completion/audit schemas and restricted immutable permissions, Session/User/cancel
+serialization plus deauthorization-session linkage, trusted source/profile/claim/
+producer composition, exact indexes and real concurrency/rollback/unknown-outcome
+qualification. Access to raw completion, retention period, erasure/backups, audit
+retention and provider privacy/training/egress terms remain undecided. No TTL,
+deletion job, unlimited retention or default production capture is selected.
+The narrow raw-content checkpoint is a proposed retention exception to the earlier
+recommendation against raw archives, not current permission to retain real data.
+
+Owner review must accept/revise the exact new attempt/checkpoint frames and
+fields, one metadata audit, transaction-order revocation semantics, retention/
+access decisions before real use, and the six-path offline implementation boundary.
+No required live prerequisite is portrayed as implemented. All existing acceptance
+blocks, F053 qualification BLOCKED/NOT_RUN, historical UNKNOWN and production
+NOT_VERIFIED remain. This preparation is self-reviewed only; new check evidence
+is recorded below after execution, not inferred from O0/P1 PASS.
+
+### Documentation completion evidence — 2026-11-07
+
+Focused consistency/security self-review completed: identity/native projections,
+state/cancellation/receipt invariants, two-ACK ordering, exact raw output versus
+unchanged O0/P1, complete acyclic hash coverage, authority-loss/session races,
+metadata audit, no-replay recovery and the12 interruption rows agree. No known
+blocking internal inconsistency remains; this is not independent approval.
+
+Executed new checks: explicit Prettier verification of the three appended blocks;
+four new local links/targets/anchors; strict UTF-8/no-BOM/LF/final newline; scoped
+sensitive-pattern scan and manual privacy review; git diff --check; exact prefix
+preservation and unchanged protected-file hashes. The external checker initially
+compared a UTF-16 character offset with a UTF-8 byte count; corrected it and reran
+the affected checks. That failed checker run is not a verification PASS.
+
+All eight starting P1 fingerprints match its retained final evidence. No O0/P1
+approval/review/test/build/delivery was repeated. Sources/tests, AGENTS, PRD,
+F053 readiness and previous shared-document hunks remain unchanged. HEAD and
+parent remain the expected local commits, index empty; pending paths are these
+three documents plus untouched F053 readiness. Actual final fingerprints/check
+receipts and elapsed time are saved in the timestamped external handoff.
+
+Raw storage access/retention/erasure/backups, the proposed completion-audit/native
+schema/permission requirements, Session/deauthorization amendment, trusted producer
+composition and real index/transaction qualification remain future approval gates.
+They are not implementation or live-use authority from this reviewable proposal.
+
+### Offline coordinator implementation record — 2026-11-08
+
+Checkpoint READY_FOR_REVIEW — offline only; final staged integrity is required
+before the separately authorized local commit.
+full F054 IN_PROGRESS, acceptance incomplete. The owner
+approved exactly the six-path offline coordinator and its named sequencing
+exception after the separate Desktop contract review (2026-11-08, APPROVE, exact
+reviewed dev618303bf83184f64a07f98b3e462eaf5012b56ba). Earlier NOT_STARTED/proposed
+implementation wording above is historical; native security/storage/egress and
+retention proposals remain inactive. Only synthetic injected ports are exercised;
+there is no production composition or new user-facing Generate/Save capability.
+
+Working branch/location: existing dev at E:/AI/DeepLearner. Completion requires
+the contracted ordering, exact-byte/P1 validation, no-replay inspection, meaningful
+synthetic tests/static checks and separate final source review before one local
+commit. Preserve pre-existing F053/database/roadmap readiness hunks unstaged.
+Implemented internal capability: one retained context orders independently bound
+claim ACK, marker ACK, one bounded executor invocation and one separately fenced
+completion/audit request. Exact content-only bytes are reconstructed through
+unchanged O0/P1. Unknown ACKs, lost authority, expired observation or invalid
+content do not permit replay. Inspection retires invocation eligibility and only
+validates existing actor-bound evidence; fresh-session historical inspection can
+survive origin-session loss and archived parent status. No writer, admission,
+accounting or production adapter is supplied. Terminal inspection uses existing
+receipt/audit identity/revision/code metadata, not a new terminal digest rule.
+
+Exact source/test paths:
+
+- [Internal coordinator](../../apps/api/src/modules/ai/curriculum-outline-producer.service.ts).
+- [Synthetic focused tests](../../apps/api/tests/curriculum-outline-producer.test.ts).
+
+Author-executed evidence on final source: 114 tests PASS, zero fail/cancel/skip;
+full API/test TypeScript and API production compilation PASS; targeted ESLint and
+explicit source Prettier verification PASS. All ports/clock/executor were inert
+synthetic doubles. The 12 interruption rows are local orchestration/inspection
+checks; the admission-ACK-unknown row inspects completion without executing any
+admission transaction. O0/P1 retained evidence was not rerun or reapproved.
+
+Separate source review: agent /root/coordinator_source_review, final exact-hash
+APPROVE at 2026-11-08 01:51:55 UTC, zero unresolved Critical/High/Medium/Low.
+Reviewer read source/tests/dependencies and rehashed files; it did not execute
+tests/build or authenticate a human reviewer. Author resolved final dispatch
+freshness, exact F053 forwarding, inspection retirement, terminal-audit projection
+and timer-setup issues, with focused regressions. Initial success-path comparison
+failures (producer field order), compiler argument/type errors and an unused-helper
+lint error were corrected; earlier failed runs are not counted as PASS.
+
+Final reviewed SHA-256:
+
+- Service: f75033d918989b975b798a54b82daddc1ebe4fde8225d359f11c7b523194e123.
+- Test: 1d6af6efe8c49f06c3c1d61400f0156bc594e852d76e0de561adff10bd24c754.
+
+Real current User/origin-Session authorization, sticky deauthorization, attempt
+cancellation/CAS, trusted source/profile/quote/claim/audit readers, atomic capture,
+native bounds/indexes/cleanup and provider/billing guarantees remain port
+obligations and live prerequisites. Capture passes unchanged 2000ms commit/abort/
+endSession limits and remaining local work; this proves no native cleanup. Raw
+access/retention/erasure/backups/provider terms remain unapproved for actual use.
+The in-memory service retains only content-free expected checkpoint metadata
+after a capture request, not an unsaved raw-output archive. Matching hashes are
+not authority; no supplied ALLOW/currentAdmin flag activates live use.
+
+Users gain no new live Generate/Save feature. Smallest next boundary: review the
+bounded User/origin-Session/cancellation security amendment and trusted-reader
+composition before any separately approved native adapter. Do not start it here.
+Existing F053 qualification BLOCKED/NOT_RUN, acceptance blocks, unexecuted groups,
+historical UNKNOWN and production NOT_VERIFIED stay unchanged.
+
+Local delivery SHA/parent, exact staged inventory, preservation and actual elapsed
+time are recorded after commit in the external delivery-handoff.md under
+C:/Users/Shreeji/AppData/Local/Temp/f054-coordinator-2026-11-08T01-32-12-515Z/.
+No push or remote acceptance follows this checkpoint.
+
+Final documentation checks PASS: explicit repository-configured Prettier checks
+for all four new blocks, four local targets/anchors, strict UTF-8/LF/no-BOM/final
+newline, scoped sensitive-pattern/manual privacy review, original-prefix and
+F053/PRD byte preservation, source-review hash match and git diff --check. The
+external checker initially used default Prettier options for source verification;
+it was corrected to use repository options and rerun. That checker failure is not
+source-format PASS. No application suite was repeated for documentation changes.

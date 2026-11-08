@@ -2710,3 +2710,116 @@ The linked canonical F054 P1 record and its external delivery receipt distinguis
 local structural tests from all deferred live guarantees. Earlier F053 readiness
 hunks remain untouched and uncommitted; no historical UNKNOWN/NOT_RUN or acceptance
 status is cleared. Production remains NOT_VERIFIED.
+
+## Proposed F054 invocation and completion persistence boundary — 2026-11-07
+
+**Contract READY_FOR_REVIEW — documentation only. PROPOSED — PENDING OWNER APPROVAL.**
+No persistence/model/index/auth-policy implementation or real retention is
+approved. Full F054 IN_PROGRESS; production NOT_VERIFIED. Existing O0/P1 and
+pending F053 readiness text above remain unchanged. Exact definitions are in the
+[F054 invocation/completion proposal](features/F054-ai-concept-draft-generation.md#proposed-invocation-and-durable-completion-extension--2026-11-07).
+
+### One embedded write-once checkpoint
+
+Extend the existing proposed curriculumOutlineAttempts aggregate, no new
+collection. Exact fields/types are in the canonical table: immutable actor/origin
+session/operation/Technology/initial F044 source/proposal; F053 ledger/request/
+intent/template/quote binding; preallocated candidate/family and two distinct
+audit IDs; attempt createdAt/bindingDigest; safe-integer version; phase;
+invocation/completion/cancelledAt/receipt required nullable cells. The new
+completionAuditId binds one metadata-only capture audit independently of later
+admission. Session identity is needed for logout serialization, not disclosure.
+
+Durable F054 phases are PREPARED -> INVOCATION_MARKED -> COMPLETION_STORED ->
+ADMITTED, with eligible separately authorized terminal REFUSED from the marker
+or completion phase. REFUSED never has a candidate. CancelledAt is sticky and
+orthogonal; it cannot erase prior content. F053 DISPATCH_CLAIMED is a separate
+ledger state, not an extra F054 write. UNRESOLVED/OUTCOME_UNKNOWN express lack of
+proof, not an inferred persisted state or permission to write after authority loss.
+
+Embedded completion is exactly schemaVersion:1, unchanged P1 producer tuple,
+rawOutput, createdAt and checkpointDigest. RawOutput retains the exact successful
+F052 content-only string UTF-8 bytes, including whitespace/escape spelling,
+<=65536 and the original request bound. Host-bound O0 remains <=65536; P1 candidate
+remains <=131072. No reserialization, prompts, transport envelope, headers, usage
+archive, provider identity assertion or arbitrary metadata. Native ObjectIds/Dates
+project to canonical hex/ISO; raw string is stored as a string, not parsed/replaced.
+Raw64KiB plus fixed bounded metadata limits the record; this is not a claim that
+outer escaped checkpoint JSON and candidate JSON have the same byte bound.
+
+Candidate IDs are prepared once; completion.createdAt is chosen once after the
+observed producer.completedAt and reused as candidate.createdAt. Do not equate
+attempt creation time or a client timestamp with candidate/commit time. The exact
+F054_OUTLINE_ATTEMPT and F054_OUTLINE_CHECKPOINT ordered-array frames in F054 bind
+all immutable fields and transitively bind raw bytes through unchanged P1
+completionDigest/rawOutputDigest. Mutable phase/version/cancel/receipt are excluded
+from those frames to prevent cycles; they need CAS and access enforcement.
+
+### Transactions, indexes and missing authority
+
+Proposed capture transaction: exact marker/version/no-cancel/no-completion/no-
+receipt CAS; fresh same-transaction User and origin-Session write fences; one
+completion assignment/phase transition; one CURRICULUM_OUTLINE_COMPLETION_STORED
+metadata audit under the preallocated completionAuditId. No write upsert,
+replacement, callback replay or uncertain-commit retry. Require bounded known
+commit/cleanup acknowledgement; unknown remains uncertain and only exact reads
+may resolve an already committed checkpoint/audit. First capture after restart,
+logout, demotion or cancellation is forbidden. Previously committed evidence stays.
+Later candidate/terminal-receipt/audit admission is a separate fresh transaction.
+
+Keep the six previously proposed candidate/attempt indexes unchanged; embedding
+needs no seventh completion index or collection. Existing audit _id uniqueness
+plus exact CAS protects the new fixed audit ID; physical verification remains
+required. No automatic creation/registration or DDL. Before any writer, approve
+native schema/action/permission additions and verify actual indexes, transaction/
+rollback/concurrency, deadlines, ownership and cleanup under separate execution.
+
+A User-only fence does not serialize ordinary logout: existing logout writes
+Session, logoutAll also writes User. Proposed native enforcement must use real
+Session __v/eligibility write-CAS with exact origin sid/userId/unrevoked/unexpired
+checks as well as User-version fencing and attempt cancellation CAS. Missing/
+invalid versions refuse, no repair/default. Sticky demotion loss further needs
+approved deauthorization-to-session-revocation linkage; current code does not
+establish it. Cancellation acknowledged first must defeat capture; capture
+committed first may leave valid prior evidence. No claim about undelivered aborts,
+button-press order, instantaneous expiry or a pre-check preventing every race.
+P1's separately documented Technology snapshot archive/deletion race is unchanged.
+
+Access to raw completion is server-private and original-actor-bound under fresh
+current authorization; no extra P1 DTO/Student/API disclosure. A new session may
+inspect existing records but cannot revive first capture under the old session.
+Source/session loss cannot erase accounting obligations; only independently
+qualified F053 evidence/reconciliation can settle or release liabilities.
+
+Before real storage/use the owner must approve raw-content access, retention,
+erasure/backups, completion/admission audit retention and provider privacy/training/
+egress terms. No period, TTL, deletion job, unlimited retention or late background
+capture exception is selected. Schema allowlists alone do not detect private data
+inside permitted free text. This bounded raw checkpoint is a proposed specific
+exception to the earlier no-response-archive recommendation, not an active policy.
+
+Focused self-review and explicit block formatting, local-link/anchor, UTF-8/LF,
+scoped privacy/whitespace and original-byte preservation checks completed for
+this appended proposal. No independent approval, application tests, DDL or real
+storage evidence is claimed. See the canonical F054 documentation-completion
+record and timestamped handoff for actual results and unchanged limitations.
+
+### Offline coordinator implementation boundary — 2026-11-08
+
+The owner approved only the six-path synthetic-port coordinator implementation,
+now READY_FOR_REVIEW — offline only, under the named AGENTS exception. The preceding native schema,
+Session/deauthorization, transaction, audit/index and retention requirements stay
+proposed and unimplemented. This checkpoint creates no collection, index, model,
+native writer or real completion record. Matching hashes and synthetic ACKs are
+local structural/order evidence, never database or authorization qualification.
+
+The implemented coordinator requests one synthetic marker CAS and one embedded
+completion plus metadata audit, compares exact returned projections and requires
+known ACK/cleanup. It implements no native transaction or audit action/model.
+Historical F053 accounting may advance while the exact original claim lineage is
+retained; no content outcome settles/releases cost. Read recovery never replaces
+raw content or resumes dispatch. Author verification: 114 synthetic tests and
+API/test compiler/build/static checks PASS; separate exact-source review APPROVE.
+This establishes neither actual revocation serialization nor database durability,
+physical indexes, retention permission or runtime ownership. See the canonical
+F054 implementation record for exact hashes, evidence and deferred prerequisites.
