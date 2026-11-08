@@ -1191,3 +1191,474 @@ F053/PRD byte preservation, source-review hash match and git diff --check. The
 external checker initially used default Prettier options for source verification;
 it was corrected to use repository options and rerun. That checker failure is not
 source-format PASS. No application suite was repeated for documentation changes.
+
+## Proposed completion security and trusted-reader amendment — 2026-11-08
+
+**PROPOSED — PENDING OWNER APPROVAL. Design READY_FOR_REVIEW — documentation only;
+source-based self-review only, not independent approval.** This append-only review
+uses dev a1bd3ca22296e2a20099a0a882b8870d5d398c24, parent
+618303bf83184f64a07f98b3e462eaf5012b56ba. The delivered offline coordinator remains
+READY_FOR_REVIEW on its existing scope; full F054 stays IN_PROGRESS, acceptance
+incomplete. No security policy, native adapter, Session writer, storage permission
+or sequencing extension is activated here. Earlier contracts/evidence remain
+historical and unchanged. Users gain no new live generation or Save capability.
+
+### Observed writers and participation
+
+The inventory covers tracked application paths actually inspected, plus relevant
+integration-only counterexamples. It does not certify uninspected external
+administrative/database writers. Such writers must be controlled before live use.
+`__v` is Mongoose's existing default version key, not an implemented revocation
+epoch, and query updates do not automatically increment it.
+
+| Actual writer/source                                                                                                                                                                                                                                                      | Record, transaction and explicit version behavior                                                                                                                                                                                                                                                                                                              | Effect on the proposed fence                                                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Registration](../../apps/api/src/modules/auth/registration.repository.ts), register:88, verify:121, resend:164                                                                                                                                                           | Registration creates a STUDENT/PENDING_VERIFICATION User in a Mongoose transaction; initial model version is supplied by Mongoose. Verification sets ACTIVE/emailVerifiedAt and increments User.__v; resend increments User.__v. Neither revokes Sessions.                                                                                                     | Real User writes conflict with a same-transaction User fence. These are admission/verification, not implemented Admin deauthorization. No restoration may un-revoke an old Session.                                         |
+| [Password login](../../apps/api/src/modules/auth/login.repository.ts):136–211                                                                                                                                                                                             | Transaction rechecks credentials/eligibility, writes User status/lastLoginAt and increments __v with modifiedCount=1, then creates a fresh Session and audit. Expired suspension can reactivate.                                                                                                                                                               | User write conflicts; newly created sid does not transfer an earlier attempt's origin binding. It does not cancel old attempts or implement sticky demotion.                                                                |
+| [Refresh](../../apps/api/src/modules/auth/login.repository.ts):212–310                                                                                                                                                                                                    | Transaction checks Session hash/revocation/expiry and current User. Success increments User.__v, may reactivate an expired suspension, rotates Session hash/lastUsedAt with modifiedCount=1, but does not explicitly increment Session.__v or extend expiresAt. Reuse writes Session.revokedAt/reason and audit without an explicit Session version increment. | Both real Session updates conflict with a Session write. Successful same-sid rotation alone is not deauthorization. Reuse revocation must defeat later capture; replaying refresh is not a capture recovery mechanism.      |
+| [Google login/link](../../apps/api/src/modules/auth/google-auth.repository.ts):69–245                                                                                                                                                                                     | Transaction creates a STUDENT/ACTIVE User, or updates an existing User including possible expired-suspension restoration and increments User.__v with modifiedCount=1; creates a fresh Session/audit.                                                                                                                                                          | Same User conflict and distinct-session rule. No role-demotion/deletion/session-revocation writer is established by account linking.                                                                                        |
+| [Ordinary logout](../../apps/api/src/modules/auth/logout.repository.ts):33–61                                                                                                                                                                                             | Transaction writes matching Session.revokedAt/reason, requires modifiedCount=1, appends audit. No User write or explicit Session.__v increment. Missing/already revoked/hash mismatch returns without that mutation.                                                                                                                                           | A real write to this same Session can serialize against capture; User-only fencing cannot. A browser logout request or invalid/stale refresh cookie is not proof of a committed revocation.                                 |
+| [Logout-all](../../apps/api/src/modules/auth/logout.repository.ts):63–94                                                                                                                                                                                                  | Transaction increments User.__v, then revokes currently unrevoked/unexpired Sessions and records count/audit. User result is not an exact-version/matched-count guard; Session updateMany does not explicitly increment __v.                                                                                                                                   | Shared User/Session writes participate in conflicts, but do not substitute for F054's stricter predicates/acknowledgements. Expired Sessions are refused by time even if not updated.                                       |
+| [Password recovery](../../apps/api/src/modules/auth/password-recovery.repository.ts):97–196, 230–283                                                                                                                                                                      | Forgot increments User.__v without revocation. Reset changes password/increments User.__v and revokes all unrevoked Sessions in the same transaction. Change-password changes User/increments __v, requires a live current-Session write incrementing Session.__v, and revokes other Sessions; the current Session remains valid.                              | Preserve these existing distinctions. Reset/other-session revocations defeat capture. Do not silently redefine password change to revoke its retained current Session. No credentials enter F054's projection.              |
+| [Profile patch](../../apps/api/src/modules/users/user.repository.ts):73–109                                                                                                                                                                                               | withTransaction updates only allowlisted profile/name fields and increments User.__v; modifiedCount=1 plus audit. No Session write.                                                                                                                                                                                                                            | Can cause an ordinary transaction/version conflict; not every User version change is permanent authority loss. No automatic replay follows a conflict.                                                                      |
+| [F043](../../apps/api/src/modules/admin/technologies/admin-technology.repository.ts):172; [F044](../../apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts):257; [F053](../../apps/api/src/modules/ai/ai-usage-ledger.repository.ts):503 | Native transaction predicates require ADMIN/ACTIVE/exact verifiedAt/User.__v and increment User.__v. F053 checks acknowledgement/matched/modified; F044/F043 return matched/modified. None supplies an origin-Session fence.                                                                                                                                   | Reusable User-write pattern, not proof of logout serialization or durable sticky session loss. No change to those features is applied here.                                                                                 |
+| [Session schema/TTL](../../apps/api/src/modules/auth/session.model.ts):18–48                                                                                                                                                                                              | Native Session fields include userId/expiresAt/revokedAt; autoCreate/autoIndex disabled. TTL on expiresAt is declared, not physically verified here. TTL deletion, if active, is a server deletion of the Session, not an application transaction or __v increment.                                                                                            | Row absence refuses. Deletion of the same document participates in write conflicts; delayed TTL never extends eligibility beyond the trusted-time checks. Physical behavior remains unqualified.                            |
+| Role/status disable/suspend, verification removal, User deletion/restoration                                                                                                                                                                                              | No production Admin role/status/deletion endpoint or repository writer was found in the inspected application source. [F043 integration fixtures](../../apps/api/tests/admin-technology.integration.ts):475/493/556/629 include direct demotion/deletion; these are test-only mutators, not a production lifecycle contract.                                   | Sticky deauthorization is missing. Before live use every real eligibility-loss writer must atomically revoke affected origin Sessions with its User mutation/deletion. A test's User-only change cannot prove that linkage. |
+| Attempt cancellation                                                                                                                                                                                                                                                      | Only the proposed cancelledAt/version contract and the coordinator's injected loss signal exist; no native attempt cancellation writer/API is implemented.                                                                                                                                                                                                     | Local abort is sticky only in that retained context. A future cancellation must write the same attempt row as capture; supplied flags or a resolved Promise are not a durable cancellation receipt.                         |
+
+JWT [verification](../../apps/api/src/modules/auth/access-token.service.ts):39
+and [middleware](../../apps/api/src/middleware/authenticate.ts):4 validate signed
+claims/lifetime, not current Session existence/revocation. The current
+[Admin lookup](../../apps/api/src/modules/admin/admin-access.repository.ts):23
+projects User eligibility, without Session or __v. Password recovery already has
+a narrow live-Session write; that is a useful existing pattern, not a global
+authentication amendment. No new requirement is imposed on unrelated endpoints.
+
+### Proposed guarantee and exact transaction conditions
+
+The guarantee is successful shared-write serialization, with bounded trusted-time
+checks. It is not browser button order, an instantaneous expiry boundary or
+atomic ordering with a provider. Present code does not enforce the combined gate.
+
+For first marker and first completion capture, the future transaction must:
+
+1. Freshly verify the actual server-held authenticated context. sub/sid must match
+   the attempt's actorId/origin sessionId; require current ADMIN claim and actual
+   ACTIVE/verified ADMIN User. Do not authenticate a binding object, UUID, hash or
+   coordinator boolean. Check local sticky loss before/after every await and before
+   mutation/commit. Keep the existing 5000ms authorization and 10000ms work bounds;
+   capture work starts at the on-time observation, not after validation.
+2. In the same native session/snapshot read only User {_id,role,status,
+   emailVerifiedAt,__v} and Session {_id,userId,revokedAt,expiresAt,__v}. Require
+   exact native identities, canonical non-null verification/expiry dates, live
+   Session ownership, revokedAt=null and expiresAt > trusted now. Both versions
+   must be existing nonnegative safe integers below MAX_SAFE_INTEGER. Refuse
+   absent/malformed/overflow versions; no repair, defaults or secret projection.
+3. Issue real writes in fixed order User, originating Session, attempt. User
+   predicate is {_id,role:ADMIN,status:ACTIVE,emailVerifiedAt:observed,__v:observed};
+   update only $inc:{__v:1}. Session predicate is {_id:originSid,userId:actorId,
+   revokedAt:null,expiresAt:{$eq:observedExpiresAt,$gt:freshTrustedNow},__v:observed};
+   update only $inc:{__v:1}. For both require
+   acknowledged=true, matchedCount=1, modifiedCount=1. These writes must share the
+   actual transaction containing the attempt CAS and metadata audit, never an
+   earlier independent authorization transaction. They cannot refresh expiry,
+   rotate credentials, reactivate a Session or change account eligibility.
+4. Marker CAS uses exact immutable binding/version, PREPARED and all null cells,
+   then assigns the exact claim snapshot once and increments the checked version.
+   Capture CAS uses exact binding/marker/version, INVOCATION_MARKED and
+   cancelledAt/completion/receipt null; assigns the exact one completion and audit
+   under the allocated ID, increments version once. No upsert/replacement or
+   retry. Native attempt/audit schemas and permissions remain separately required.
+5. Validate source/parent/historical claim relationships within the transaction.
+   Recheck actual credential verification, local loss, trusted time and the fenced
+   Session's expiry immediately before commit. No no-op fence or snapshot read
+   alone suffices. Preserve bounded snapshot/primary/majority-journaled writes,
+   2000ms commit/abort/endSession and existing same-session controls. Required
+   commit and cleanup must be known before reporting recorded success.
+
+Logout/reuse/reset/other-session password revocation committing first must defeat
+the Session write, even though several existing writers do not increment __v:
+the eligibility predicate and MongoDB same-document write conflict both matter.
+Incrementing __v in every logout writer is not required merely to obtain a write
+conflict. Conversely version equality alone does not prove no lifecycle change.
+An unrelated User/refresh write can create a safe conflict/refusal without being
+classified as permanent deauthorization. No automatic transaction callback replay
+is allowed in the new boundary; existing auth repositories' Mongoose transaction
+behavior is not silently replaced by this design.
+
+Demotion/disable/suspension/unverification/deletion committing first must similarly
+defeat the User write. For permanent loss across later restoration, their future
+authoritative transaction must also revoke all unrevoked origin Sessions for that
+User; deletion first fences User, then revokes Sessions, then conditionally removes
+that exact fenced User in the same transaction. This preserves User-first ordering.
+Require
+acknowledged writes and validated finite counts/versions, fail the whole transaction
+on any required failure, and keep existing audit obligations. Do not resurrect a
+revoked row or reuse User/Session identities. Restoring role/status permits a fresh
+login/new attempt after its own checks, not first capture for an old origin sid.
+No such production eligibility-loss writer is implemented here; defining/closing
+that writer set and separately approving its session-impact policy is a live gate.
+This requirement concerns accounts that can originate F054 operations; it does not
+silently replace unrelated Student-only lifecycle policy.
+
+If capture serializes/commits first, later logout/demotion/cancellation may retain
+legitimate prior completion/audit; they do not erase it. If TTL deletion wins, the
+row is missing/conflicting and capture refuses. If expiry passes after the last
+time check while commit is in flight, this contract cannot promise an exact
+server-commit-before-expiry instant. Check/commit latency and external-call races
+remain explicit. Stronger ordering would require a separately reviewed decision,
+not a longer timeout or claimed guarantee from a precheck.
+
+### Sticky loss, cancellation and acknowledgement distinctions
+
+- Local observed loss irreversibly retires the invocation context. Later supplied
+  eligibility or role restoration cannot restart it. This establishes only local
+  suppression; unseen loss needs durable lifecycle linkage.
+- Durably committed Session revocation stays revoked, including after promotion,
+  expired-suspension restoration, refresh or new login. Current-sid password change
+  and successful same-sid refresh remain valid under existing policy unless some
+  other loss is observed/committed. User.__v is not a sticky-loss epoch.
+- Proposed durable cancellation uses fresh current authorization for the original
+  actor and the requesting live Session (which may be new), with User/requesting-
+  Session writes plus exact actor/attempt/binding/version CAS in one transaction.
+  Set cancelledAt once/increment version for PREPARED, INVOCATION_MARKED or
+  COMPLETION_STORED; preserve existing content. Terminal ADMITTED/REFUSED is read
+  as terminal without a cancellation write. No current parent authoring/dispatch
+  eligibility is inferred or granted by metadata cancellation. No API is proposed
+  as implemented. Native cancellation schema/ack/error contract still needs approval.
+- Cancellation committing before capture defeats its cancelledAt=null/version
+  predicate. Capture committing first can leave a checkpoint which later cancellation
+  makes ineligible for admission. Admission requires its own fresh null-cancel gate.
+- Unknown commit/abort/cleanup, including loss while a write is in flight, is
+  OUTCOME_UNKNOWN, not rollback. Bounded exact actor-bound reads may establish
+  already committed evidence; missing rows/read linkage yield UNRESOLVED and never
+  authorize a repeated claim, marker, capture, cancellation or provider call.
+  Losing authority does not grant a background failure/diagnostic write.
+
+Previously committed records remain evidence under approved access. A fresh
+session of the same current Admin may inspect but cannot first-capture an old
+attempt. Another Admin gains no operation/raw-output recovery right. F053
+liabilities persist independently; neither loss, content success, a new month,
+missing parent nor failed inspection means zero cost or released reservation.
+
+### Exact trusted-port composition map
+
+The interfaces are in [OutlineProducerPorts](../../apps/api/src/modules/ai/curriculum-outline-producer.service.ts):65.
+The binding is private linkage, never a bearer capability. Future production ports
+must close over a genuine server-authenticated request/coordinator context, not
+derive authority from their input. A fresh-session read needs a fresh verified
+request context; passing a new sessionId to an old object's inspect method does
+not authenticate it. Do not cache the last check as a reusable authorization ticket.
+
+| Port                               | Authoritative facts and exact bindings                                                                                                                                                                                                                                                        | Existing coverage and missing composition                                                                                                                                                                                                                                                                                                                |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| authority.check(CLAIM/MARK/INVOKE) | Credential sub/sid; current User/live origin Session; admitted F044 brief/initial proposal plus audits; Technology; actor-bound new generation key; exact minimized request/template; F053 control/period/profile/quote/privacy/pricing/spending and ownership/deadline.                      | JWT/Admin User primitives and F044/F053 validators/readers exist. No combined live-Session/source/control resolver is registered. currentAdmin/sourceAdmitted/controlsCurrent must be computed from those sources, not copied flags. Return the exact private projection expected by authorize:492, no credentials.                                      |
+| authority.check(CAPTURE)           | Same origin actor/Session and current content-storage authority/privacy; immutable source/request/quote binding and historical claim; original on-time observation and remaining capture budget.                                                                                              | Quote expiry/month/accounting advancement after on-time return does not itself forbid capture or permit another call. controlsCurrent here means approved current storage/access controls, not a fabricated dispatchEnabled/freeze exemption. Authentic storage policy is unresolved. Fresh transaction-time authority is still required inside capture. |
+| authority.check(READ)              | Fresh requesting Session/current Admin, same original actor/key/attempt/Technology, retained source/admission lineage and historical quote. Origin Session can be revoked; archived parent inspection allowed.                                                                                | The coordinator ignores dispatch-controls currentness/quote expiry for READ; use embedded historical quote, not a new price/default. Missing/mismatched/corrupt source/parent refuses as existing F044 rules require. No inheritance of origin loss, no cross-actor raw access.                                                                          |
+| ledger.claimDispatch               | One existing F053 invocation with exact operationId/expectedVersion and full F052 request plus allocated claimId/ownerId. Known mutation/cleanup ACK and independently validated full native operation/dispatch audit before wrapper RECORDED.                                                | Existing [F053 service](../../apps/api/src/modules/ai/ai-usage-ledger.service.ts):765 and native repository provide bounded transaction machinery. Its private RECORDED DTO omits internal proof and cannot be relabelled as the coordinator ACK. A later read of an old claim never recreates a lost originating ACK.                                   |
+| ledger.readClaim                   | Native operation _id/actor/key/Technology/source, exact request/intent/quote/bounds, immutable claim id/owner/times, dispatch version/audit lineage. Dispatch needs current DISPATCH_CLAIMED/version/last-audit equality; capture/read can inspect preserved history after UNCERTAIN/SETTLED. | [LedgerReader](../../apps/api/src/modules/ai/ai-usage-ledger.repository.ts):52 has operation(actor,key), audit(id), snapshot session support. Historical dispatch-audit lookup/proof composition is missing; do not use the accounting operation's new lastAudit as its dispatch audit. See derivation below.                                            |
+| attempts.mark                      | Current User/origin Session/source controls, exact PREPARED binding/version/null cells and native F053 claim proof, one acknowledged marker CAS/clean outcome.                                                                                                                                | No native attempt schema/writer/permissions. This port is not just an insert or a boolean ACK. Real same-transaction fences remain required.                                                                                                                                                                                                             |
+| attempts.capture                   | Fresh same-transaction combined fences; exact marker/cancel/version/null cells; original observer/P1/raw-byte linkage; one embedded completion and allocated metadata audit; known commit/cleanup.                                                                                            | No native attempt/completion audit action/writer/index qualification. [Audit model](../../apps/api/src/modules/audit/audit.model.ts):45 does not yet admit F054 actions. Never turn a successful synthetic port return into production durability.                                                                                                       |
+| attempts.read                      | Fresh reader authorization inside its bounded primary snapshot; exact actor/attempt/key/Technology; full attempt, required completion audit, candidate/receipt/terminal audit, historical source and claim links; same raw bytes and hashes.                                                  | No native attempt reader. Existing P1 DTO deliberately omits producer/raw/internal fields and cannot supply this proof. Incomplete/corrupt proof returns UNRESOLVED; no backfill, rewrite or admission.                                                                                                                                                  |
+| clock / loss / executor            | Explicit trusted UTC+monotonic time, original retained observing context and sticky delivered loss; approved F052 executor request bound to the verified template/source and F053 claim.                                                                                                      | Local clocks/signals/executor exist as injected interfaces and synthetic tests. No authenticated production producer/egress composition, durable loss delivery or genuine remote cancellation/billing evidence exists. No provider defaults/keys/vendor decision here.                                                                                   |
+
+Each actual port must re-establish the facts needed for its own access/write.
+Separate calls to F044.read and F053.read do not create one shared cross-record
+snapshot. The F044 [reader](../../apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.repository.ts):217
+uses separate primary/majority reads; F053's [run](../../apps/api/src/modules/ai/ai-usage-ledger.repository.ts):465
+uses a native snapshot session for reads. Compose the necessary projections in one
+bounded primary native snapshot per proof (or the actual write transaction), using
+the same qualified database/client session, then close it with known cleanup.
+Do not reuse an earlier authority result as transaction authorization. Read-only
+inspection checks current authority at its actual read/return points and suppresses
+locally observed loss; it does not promise instantaneous revocation of already
+read data or freeze the world across the entire provider invocation.
+
+F044 source evidence must read the immutable brief and initial proposal, validate
+actual content/definition digests, revision1/family/Technology/source and equal
+initial content/creation linkage, and read both exact admission/revision audits.
+Reuse [admitted/captured checks](../../apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.service.ts):388–484.
+The ordinary [proposal DTO](../../apps/api/src/modules/admin/learning-paths/admin-learning-path-proposal.dto.ts):30
+omits private digests and admission/audit/actor evidence, so is insufficient.
+Historical source author/save key are distinct from the current generation actor/
+new operation key. Follow existing F044 protected source-access rules; do not
+invent equality between author and generation actor or cross-actor operation
+recovery. Historical admission survives author demotion/deletion; every new
+operation still requires current authority.
+
+For F053 use [validateLedgerOperation / quote / request primitives](../../apps/api/src/modules/ai/ai-usage-ledger.schema.ts)
+and [validateLedgerAudit / assertLedgerAuditLink](../../apps/api/src/modules/ai/ai-usage-ledger.repository.ts):106–274.
+Before dispatch, validate the actual native current operation and its current
+dispatch audit. After accounting advances, locate exactly one dispatch audit by
+resourceType=AI_USAGE_OPERATION, resourceId=ledgerOperationId and the stored
+invocation.claimVersion, require action=AI_USAGE_DISPATCH_CLAIMED, original actor/
+key/version/time and immutable quote/reservation linkage. The declared
+uq_ai_usage_audit_version index supports this identity; physical proof is absent.
+Current schemas do not store claimId/ownerId directly in audit metadata: the port
+must derive those from the validated native preserved claim and its one-time
+dispatch transition, not invent audit fields or pretend the audit signs them.
+Validate the dispatch-era projection (DISPATCH_CLAIMED, held=reservation,
+actual/evidence/safeCode null, updatedAt=claimedAt, exact historical version/audit),
+while separately validating the current accounting row and audit. Require intact
+trusted-writer immutability/permissions and exact marker linkage. Missing or
+ambiguous history refuses; no audit search by latest timestamp or inferred version.
+The synthetic coordinator audit object is an internal derived projection, not the
+native audit schema. No native audit/schema change is selected by this derivation.
+Mongoose audit hooks do not police arbitrary native/direct database writes;
+approved restricted writer permissions and controlled mutation paths are required
+before interpreting stored history as authoritative.
+
+The internal completion audit projection's digest maps to the approved proposed
+native checkpointDigest metadata. Native actor/requestId/time and allowed resource
+IDs must come from the real server transaction context; the port must not omit
+them merely because the coordinator projection is smaller. Session/claim/owner,
+raw content, prompts and credentials stay out of native content audits and public
+DTOs. No requestId supplied as an arbitrary binding field is authentication.
+
+Actual profile/template/privacy/pricing/spending/evidence authorities remain
+injected F053 dependencies, not registered trusted production sources. A checksum,
+model enum, environment flag or test quote is no approval. Resolve the exact
+approved immutable template/version, reconstruct minimized request from the F044
+brief, and recompute request/intent/quote/P1 bindings. Do not obtain missing proof
+by exposing internal fields through API DTOs, reading credentials, or adding a
+generic authority registry. Unknown commit/read/cleanup fails closed using the
+coordinator's existing safe REFUSED/UNRESOLVED/OUTCOME_UNKNOWN results; preserve
+native primary/cleanup diagnostics privately without content or secrets.
+READ ignoring dispatch controls is never a waiver of approved raw-read/access/
+retention policy: the real read port must enforce that policy independently,
+including for a new Session. That approved policy source does not yet exist in
+production composition; it cannot be replaced with currentAdmin=true.
+
+### Smallest proposed implementation boundary and approvals
+
+Recommend a feature-local current-Admin/origin-Session read/write fence over the
+existing User/Session collections, explicitly injected into a caller-owned native
+transaction. No production registration/default connection, new model/epoch or
+attempt writer. It can implement and offline-test exact projected reads, version/
+eligibility predicates, real $inc writes, acknowledgement checks, explicit time/
+loss and safe failures. It cannot by itself authenticate a supplied actor, enforce
+future demotion writers, atomically store a completion or prove MongoDB races.
+Its narrow operations are current-authority projected read, User/Session write
+fence using the provided active native session, and a fresh precommit time/loss/
+credential check for that transaction's caller. It neither owns commit/abort nor
+returns a transferable capability; the caller remains responsible for the same-
+transaction attempt CAS/audit and known commit/cleanup. Use native collection
+operations over existing fields, not model registration or implicit version repair.
+
+**Exact proposed seven paths; NOT_STARTED, no implementation authority:**
+
+CREATE:
+
+- apps/api/src/modules/ai/curriculum-outline-session-fence.ts
+- apps/api/tests/curriculum-outline-session-fence.test.ts
+
+MODIFY only after approval:
+
+- AGENTS.md
+- docs/features/F042-admin-route-protection.md
+- docs/features/F054-ai-concept-draft-generation.md
+- docs/DATABASE_DESIGN.md
+- docs/DEVELOPMENT_ROADMAP.md
+
+Before: F054 can only consume synthetic authority/fence assertions. After this
+future offline checkpoint: an unregistered feature-local implementation can issue
+the exact existing-record User/Session predicates in a provided transaction and
+refuse malformed/lost authority under inert native-driver doubles. No user-facing
+feature or live capture follows. Estimate60–90 minutes, hard90 including focused
+tests/static checks/separate review. No additional Session model or migration is
+needed merely to use its existing __v; missing stored versions remain refusal.
+
+Measurable acceptance for that scope:
+
+- Strict actor/origin/requesting-session binding and fresh credential reverify
+  callback; no flags/old context can authorize a new session or actor. Tests use
+  synthetic verifier facts; genuine credential authenticity remains a composition
+  obligation, not something those tests establish.
+- Null/deleted/ineligible/mismatched/revoked/expired rows, malformed/missing/overflow
+  versions and unsafe clock/loss refuse; no credential fields are selected.
+- Exact User then Session predicates/$inc, same provided native session and
+  acknowledged/matched/modified=1, no upsert/default/expiry extension or retry.
+- Inert modeled interleavings cover logout, logout-all, reuse/reset, retained versus
+  other-session password change, refresh, profile conflict, demotion/deletion and
+  restoration. Do not claim doubles establish durable loss linkage or real races.
+- A late loss before mutation/commit prevents the next write; an in-flight unknown
+  ACK never becomes success/rollback/replay. Read-only mode has no writes; historical
+  inspection uses a separately verified current session without reviving origin.
+- Full API/test compiler, API build, targeted lint/format/encoding/privacy/scope/
+  diff and fresh separate source review. Real snapshot/write-conflict/TTL/expiry/
+  unknown-commit/cleanup tests require later isolated ownership-qualified execution.
+
+Proposed AGENTS addition, **NOT APPLIED / NOT ACTIVE**: "Permit only the seven
+inventoried F054 Session-fence paths after separate implementation approval,
+offline with injected native-driver doubles, ahead of incomplete full prerequisite
+acceptance. No production wiring, actual database write, global JWT/session-policy
+replacement, new eligibility/cancellation endpoint, provider dispatch or other
+checkpoint is authorized. Existing acceptance and live-verification gates remain."
+
+Proposed F042 addendum, **NOT APPLIED**: "F054's future content marker/capture must
+independently verify and write-fence current User plus the originating live Session
+in the same attempt transaction. This adds no global access-token revocation
+guarantee to F042. Existing logout, refresh and current-session password-change
+semantics remain; any new eligibility-loss writer must receive separately approved
+atomic session-revocation/restore behavior before real composition. No F042
+acceptance result changes." No F053 source/policy amendment is needed merely to
+derive its existing private native history; any new read method still needs its
+own inventoried approval and cannot alter accounting semantics.
+
+Required owner decisions are acceptance of the explicit commit-order/residual-time
+model and future deauthorization-to-session-revocation compatibility policy, then
+separate authorization of the seven-path offline boundary. Before real capture,
+raw-access/retention/erasure/backups/provider terms and native schema/permissions
+also need decisions; no period or stronger guarantee is selected here. These are
+distinct from missing technical prerequisites: controlled eligibility writers,
+native attempt/cancel/audit definitions, trusted source/control/history composition,
+physical indexes, actual transaction/conflict/cleanup qualification and genuine
+observing producer. The proposed helper does not clear those gates. No vendor/
+model/key or spending choice is needed for its offline implementation.
+
+### Review evidence and preservation
+
+Source-based design self-review complete: writer participation, User-first deletion
+ordering, immutable versus current identities, exact same-transaction predicates,
+origin versus fresh reader Session, stage-specific controls, native versus derived
+audit projections, uncertainty/no-replay and next-scope boundaries were checked.
+No known internal blocking inconsistency remains in this proposed design. This is
+not new independent approval or a claim that the missing guarantees already exist.
+
+Executed documentation checks PASS: explicit repository-configured formatting
+verification of all three appended sections, 28 local targets/anchors, strict
+UTF-8/LF/no-BOM/final newline, scoped privacy/manual review, exact old byte-prefix
+preservation, unchanged AGENTS/F053/coordinator/test and 24 inspected source hashes
+matching HEAD, expected Git identities/empty index/four pending paths and
+git diff --check. Initial read-only quoting/glob/path inspection mistakes were
+corrected or narrowed; those commands were not tests or environment probes and
+supplied no positive evidence before correction.
+
+Retained only: O0/P1 and delivered coordinator matching source/test fingerprints,
+114 synthetic tests and separate source-review evidence. No application test,
+compiler/build or prior checkpoint review was repeated. No live operation or Git
+write occurred. The three new sections are F054 (this section), DATABASE_DESIGN
+and roadmap; pending paths now are those three documents plus the byte-identical
+F053 readiness file. Earlier readiness hunks are preserved. All other worktrees
+were not operated on; no global runtime or worktree qualification is claimed.
+
+Exact final fingerprints/results, elapsed time and decision handoff are saved in
+C:/Users/Shreeji/AppData/Local/Temp/f054-completion-security-review-2026-11-08T02-38-56-328Z/handoff.md.
+F053 qualification BLOCKED/NOT_RUN, existing acceptance blocks, all unexecuted
+groups, historical UNKNOWN and production NOT_VERIFIED remain. No implementation,
+execution prompt or active exception follows from this review.
+
+## Offline User/Session fence implementation record — 2026-11-08
+
+**Checkpoint: READY_FOR_REVIEW — offline only. Full F054:
+IN_PROGRESS; acceptance incomplete; native completion capture: BLOCKED.** Owner
+authorization `86d3c04f-b9fc-42d6-bbca-1f6905f15e4a/Pasted text.txt` approves the
+exact seven-path boundary and commit-order/residual-time semantics, not real
+lifecycle implementation. The preceding design-only proposal/evidence is retained
+historically; the named AGENTS exception is now active only for this offline helper.
+Base/parent: dev a1bd3ca22296e2a20099a0a882b8870d5d398c24 /
+618303bf83184f64a07f98b3e462eaf5012b56ba, E:/AI/DeepLearner. No new branch.
+
+### Implemented local interface and responsibilities
+
+The unregistered `createOutlineSessionFence` accepts a strict immutable snapshot
+of mode MARK/CAPTURE/READ, canonical actor/origin/requesting-session/attempt IDs,
+expected binding digest/version/phase and the exact native-Date invocation for
+CAPTURE. MARK requires PREPARED/version0/null invocation; CAPTURE requires
+INVOCATION_MARKED/version>=1/exact invocation. Both require the requesting sid to
+be the origin. READ may use a separately freshly verified sid of the same actor.
+
+Injected collections, credential verifier, clock, loss/work signals and an already
+active caller-owned native ClientSession are mandatory. Every read/write forwards
+that exact session. Missing/ended/inactive sessions refuse; no transaction/session
+is opened, committed, aborted or cleaned up by the helper. The caller must establish
+native-session provenance, approved transaction options and genuine credentials.
+Synthetic supplied facts do not establish their own authority.
+
+`read()` performs only projected User/Session/attempt reads. `fence()` reads fresh
+facts, then writes User followed by Session using the exact predicates above and
+only `$inc:{__v:1}`, upsert=false. Native driver acknowledgements must have
+acknowledged=true, matchedCount=modifiedCount=1, upsertedCount=0 and upsertedId=null;
+unknown/extra/malformed fields fail closed. Existing versions must have increment
+headroom; none is initialized or repaired. No credentials/content are projected.
+
+The attempt projection checks exact native ID, actor/origin IDs, expected binding
+digest, version/phase and, for writes, null cancellation/completion/receipt and the
+exact marker or null initial invocation. READ projects only identity/state/cancel
+metadata and never raw completion. This local guard is not the complete immutable
+binding validator, a cancellation writer or a CAS: the caller must independently
+validate full stored binding/source relationships and issue the exact attempt CAS
+and audit after the User/Session writes in this same transaction. No native attempt
+writer is implemented or implicitly authorized here.
+
+`beforeCommit()` freshly reverifies the original credential, local loss, time and
+fenced expiry, once after a successful fence. The caller must invoke it immediately
+before its own bounded commit. Immutable CHECKED/FENCED/PRECOMMIT_CHECKED results
+are local steps, never permission tickets or recorded capture. A context cannot
+repeat its fence/precommit, restart after observed failure, or run concurrent calls.
+
+Explicit clocks enforce one 5000ms authorization-read window and at most 10000ms
+total local work, additionally bounded by the caller's remaining work. Every await
+and positive return checks sticky loss/expiry/active session. In-flight timeout or
+failure after any write is sent yields content-free OUTCOME_UNKNOWN, including
+partial or malformed acknowledgements; it proves neither rollback nor replay
+permission. Earlier failures yield REFUSED. Timers/listeners are released; a late
+adapter result cannot start the next operation. Local timeout does not prove remote
+cancellation. Commit/abort/endSession remain the caller's existing 2000ms bounds.
+
+### Scope, evidence and remaining gates
+
+Exact seven checkpoint paths: CREATE
+`apps/api/src/modules/ai/curriculum-outline-session-fence.ts` and
+`apps/api/tests/curriculum-outline-session-fence.test.ts`; MODIFY `AGENTS.md`,
+`docs/features/F042-admin-route-protection.md`, this record,
+`docs/DATABASE_DESIGN.md`, `docs/DEVELOPMENT_ROADMAP.md`. F042 receives only the
+approved compatibility note; its JWT/logout/refresh/password policies are unchanged.
+Earlier DATABASE_DESIGN/roadmap readiness hunks and F053 remain outside this commit.
+
+Executed: 142 focused synthetic fence tests PASS; full API/test TypeScript,
+production API no-emit typecheck and emitted build, targeted ESLint and source/test
+Prettier verification PASS. Initial test-only mongoose import and unused argument
+errors were corrected before the passing compiler/lint checks. Separate review
+identified missing post-await positive-return loss validation and permissive absent
+hasEnded handling; both were corrected and covered by regressions before the final
+142-test run. No older suite was repeated without an affected dependency.
+
+Fresh separate source review by Codex subagent `/root/session_fence_review`, same
+shared session/team, APPROVE at 2026-11-08 03:39:03 UTC: no unresolved Critical,
+High, Medium or Low findings. This is not a separately authenticated human/GitHub
+review. The reviewer personally inspected design/source/tests and verified SHA-256,
+but did not execute tests/compiler/build; those checks were author-executed.
+Reviewed source SHA-256:
+cdeb463ab6780e99967444acc4572f975060289f7b4ce160eb292d6bb58bf5f5;
+test SHA-256:
+ce8c74a61d78af5fd688826314abc07f2ac23db4736ef884d9cfc7d81a766b1f.
+Inertness evidence is source inspection, unchanged Mongoose model/connection state
+and absence of prohibited calls, not complete OS/network instrumentation. Named
+logout/reset/password fixtures are supplied facts, not execution of those writers.
+
+Final documentation formatting/links/UTF-8/LF/privacy/scope/preservation and staged
+integrity results, exact locally delivered commit/parent and remaining pending
+readiness inventory are recorded in
+C:/Users/Shreeji/AppData/Local/Temp/f054-session-fence-20261108T033100Z/delivery-handoff.md.
+No PR or push is authorized. O0/P1/coordinator evidence remains retained, not rerun
+or requalified. The external handoff is the delivery identity record; this ready
+offline checkpoint does not establish full-feature acceptance.
+
+Users gain no live Generate/Save capability. Current User/Session writes could
+participate in real document conflicts even when logout does not increment __v,
+but synthetic scenarios do not prove those conflicts. Durable loss across unseen
+demotion/restoration still requires separately approved controlled eligibility-loss
+writers that revoke origin Sessions. Same-sid refresh/retained password change
+remain compatible; TTL delay grants no expiry extension. Capture/revocation order,
+the last-check/commit expiry race and later historical evidence remain as reviewed.
+
+Still required before native capture: genuine authentication and trusted shared-
+snapshot source/control/claim-history readers; lifecycle linkage; native attempt,
+cancellation/completion/audit schemas, restricted writers and physical indexes;
+qualified transaction/conflict/TTL/rollback/unknown-ACK/cleanup behavior; actual
+observing producer and approved raw storage/access/retention/erasure/backups/provider
+privacy policy. F053 liabilities are never released by refusal/loss. No unrelated
+acceptance, NOT_RUN group, historical UNKNOWN or production NOT_VERIFIED changes.
+Next boundary is separately reviewed native composition prerequisites, not automatic
+wiring or another provider call. One verified local commit is authorized; no push.

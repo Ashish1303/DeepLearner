@@ -2823,3 +2823,123 @@ API/test compiler/build/static checks PASS; separate exact-source review APPROVE
 This establishes neither actual revocation serialization nor database durability,
 physical indexes, retention permission or runtime ownership. See the canonical
 F054 implementation record for exact hashes, evidence and deferred prerequisites.
+
+## Proposed F054 completion security and reader constraints — 2026-11-08
+
+**PROPOSED — PENDING OWNER APPROVAL. Design READY_FOR_REVIEW — documentation only;
+source-based self-review, not an active security/schema amendment.** See the [canonical source-based security review](features/F054-ai-concept-draft-generation.md#proposed-completion-security-and-trusted-reader-amendment--2026-11-08).
+Existing coordinator remains offline READY_FOR_REVIEW, full F054 IN_PROGRESS.
+No model, collection/index, credential projection, writer or live binding changes.
+
+### Same-transaction shared writes
+
+Proposed marker/capture must freshly verify the server-owned actor/origin sid and
+current ACTIVE/verified ADMIN User plus the actual live originating Session. Read
+only User {_id,role,status,emailVerifiedAt,__v} and Session
+{_id,userId,revokedAt,expiresAt,__v}. Require present nonnegative safe versions with
+increment headroom; missing/invalid versions refuse, never initialize/backfill.
+Use real checked writes in fixed User -> Session -> attempt order within the
+same snapshot/primary/majority-journaled transaction as the checkpoint/audit:
+
+- User exact identity/ADMIN/ACTIVE/verification timestamp/version predicate,
+  increment only __v.
+- Session exact origin identity/actor/unrevoked/version/observed expiry predicate
+  with expiry > fresh trusted now, increment only __v. Never rotate a token,
+  refresh expiry or reactivate a Session through this fence.
+- Attempt exact binding/version/phase/null-cancel and the approved marker or
+  completion-cell CAS; allocate no replacement identities, write the exact one
+  metadata audit, require acknowledgement/matched/modified counts as applicable.
+
+Recheck credentials/loss/time/expiry immediately before commit. Existing 10000ms
+work, 5000ms authorization and 2000ms commit/abort/endSession remain. Unknown
+commit/abort/cleanup produces no recorded success or automatic replay; exact
+bounded reads can resolve prior evidence, absence cannot prove rollback.
+
+Existing ordinary logout/refresh reuse/batch revocations make real Session writes
+without uniformly incrementing Session.__v. They can still conflict with this
+fence: version is not an all-change or revocation epoch. Logout-all, reset and
+other User writers also conflict through User. Preserve current-sid password-change
+and same-sid refresh semantics. No global JWT/session-policy change is implied.
+
+Proposed sticky deauthorization requires every future eligibility-loss/deletion
+writer to serialize through User and atomically revoke affected unrevoked Sessions;
+restoration never un-revokes/reuses those identities. No production Admin
+demotion/deletion writer was found in inspected application source; test-only
+mutators do not supply the lifecycle contract. This missing controlled-writer
+linkage remains a native-composition gate. Source loss or revocation erases neither
+prior completion nor F053 liabilities. No new revocation epoch or cascade is chosen.
+
+Session TTL is declared at session.model.ts:48, not physically checked here. TTL
+deletion of the fenced Session can conflict; missing rows and expired dates refuse
+even when TTL runs late. A last trusted-time check before commit does not prove
+commit occurred before the exact expiry instant. Successful shared-write commit
+ordering, rather than button-press order or provider atomicity, defines the model.
+
+Proposed cancellation writes the same attempt/version as capture under fresh
+original-actor/current-requesting-Session authority (possibly a new Session), sets
+cancelledAt once and never erases completion. Capture needs the origin Session;
+historical inspection can use a fresh Session. Terminal attempts receive no new
+cancel write. Native cancellation/API/permissions remain unimplemented/unapproved.
+
+### Authoritative private evidence, not DTO expansion
+
+Each port must independently authorize its own bounded snapshot/write transaction.
+F044's separate primary/majority reads and F053's snapshot-session reads cannot be
+combined into a fictional single snapshot merely by calling both services. Future
+proof composition must use one qualified native client/session for the necessary
+User/Session/source/Technology/attempt/ledger/audit projections, close it properly,
+and revalidate transaction-time facts for writes. No caller flag or old result is
+a reusable authorization ticket.
+
+F044 brief/initial-proposal admission and revision audits supply historical source
+evidence only after exact stored digest/actor/family/Technology checks. Its protected
+proposal-result DTO omits needed digests/audits. F053 RECORDED likewise omits full
+operation/request/quote/claim evidence. Do not expand either DTO for this purpose.
+For historical F053 claim proof, resolve the dispatch audit by exact operation and
+stored claim version using the declared uq_ai_usage_audit_version identity. Validate
+the dispatch-era projection and the current operation/accounting history separately.
+Native audits do not contain claimId/ownerId: derive the coordinator's internal
+projection from the preserved claim under verified writer/immutability guarantees;
+do not invent new native audit fields. No physical index verification is claimed.
+
+Authentic profile/template/privacy/pricing/spending, observing producer and storage
+access authorities are unresolved. CAPTURE needs current storage/privacy authority,
+not a second dispatch permission; a historical on-time return may survive later
+quote/month/accounting changes under the existing bounds. READ uses historical
+quote/source evidence and current reader authority. Raw access/retention/erasure/
+backups/provider terms remain undecided; no retention period, TTL or privilege
+expansion is selected. The six existing proposed attempt/candidate indexes remain
+unchanged; no new index or collection is proposed by this security review.
+
+Source-based self-review and documentation checks only; final evidence is in the
+canonical record/external handoff. The proposed seven-path feature-local Session
+fence is NOT_STARTED and needs separate AGENTS/F042/security approval. It adds no
+attempt writer, lifecycle writer or trusted production composition and cannot clear
+the remaining native/live prerequisites. Existing acceptance/NOT_RUN/UNKNOWN and
+production NOT_VERIFIED remain unchanged.
+
+### Offline fence implementation evidence — 2026-11-08
+
+The owner separately approved the exact seven-path offline helper and bounded
+AGENTS/F042 compatibility amendment. The preceding native storage/lifecycle design
+remains proposed beyond that scope. See the [canonical implementation record](features/F054-ai-concept-draft-generation.md#offline-usersession-fence-implementation-record--2026-11-08).
+Checkpoint READY_FOR_REVIEW — offline only; full F054 IN_PROGRESS,
+native completion capture BLOCKED. No model/index/permission or physical database
+change is implemented. Native User/Session projected operations are exercised only
+through synthetic doubles in an existing supplied active session/transaction.
+
+The local helper checks exact actor/origin/attempt digest/version/phase/cancellation
+metadata, then ordered User/Session version increments with exact driver ACK counts.
+The full immutable binding, same-transaction attempt CAS/audit and known commit/
+cleanup remain caller obligations. Read-only mode can use a fresh verified sid for
+the same actor without reviving first capture. PRECOMMIT_CHECKED is not durable
+capture. Missing/expired/revoked rows or malformed versions refuse; no backfill.
+Unknown in-flight writes remain OUTCOME_UNKNOWN with no retry, evidence erasure or
+F053-liability release. Real races, trusted-reader composition, sticky lifecycle
+writers, raw privacy policy and transaction/storage qualification remain open.
+Earlier unrelated F053 readiness hunks are preserved and excluded from delivery.
+Author-executed 142 synthetic tests, full API/test compiler, production API
+typecheck/build, source lint/format PASS. Separate source-only subagent review
+APPROVE with zero unresolved findings; no independent test execution or real
+database verification. Final scoped documentation/staging/preservation checks and
+local commit identity are in the canonical record's external delivery handoff.

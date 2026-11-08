@@ -1244,3 +1244,16 @@ readiness remain NOT_VERIFIED. No browser exception transfers. No F044/other
 feature work or automatic Slice 2 implementation is permitted by this decision.
 Every commit and every push requires separate explicit owner approval. No F042
 acceptance, source, test, adapter or security control changes in this task.
+
+## F054 offline fence compatibility note — 2026-11-08
+
+The owner approved only F054's unregistered seven-path offline User/Session fence.
+Future content marker/capture must independently verify and write-fence current
+User plus the originating live Session in the same attempt transaction. This adds
+no global access-token revocation guarantee to F042. Existing logout, refresh and
+current-session password-change semantics remain unchanged. New eligibility-loss
+writers require separately approved atomic session-revocation/restore behavior
+before real composition. Actual Session writes can conflict without an explicit
+Session.__v increment; version equality alone is not proof of unchanged authority.
+The local helper does not implement those lifecycle writers or native attempt CAS.
+F042 acceptance remains BLOCKED; no prior verification result changes.

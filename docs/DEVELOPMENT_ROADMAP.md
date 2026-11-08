@@ -4681,3 +4681,111 @@ default-versus-repository Prettier-options discrepancy was fixed before PASS.
 One local six-path implementation commit is authorized subject to exact staged
 integrity. After delivery, only the original three readiness documents remain
 pending; actual resulting identity/state must be verified in the external handoff.
+
+## F054 completion security design review — 2026-11-08
+
+**PROPOSED — PENDING OWNER APPROVAL. Design READY_FOR_REVIEW — documentation only;
+not independent approval or implementation authority.** Existing dev
+a1bd3ca22296e2a20099a0a882b8870d5d398c24, parent
+618303bf83184f64a07f98b3e462eaf5012b56ba. The delivered coordinator stays
+READY_FOR_REVIEW — offline only; full F054 IN_PROGRESS, acceptance incomplete.
+Users gain no new Generate/Save action. No source/runtime/Git operation is approved.
+
+The [canonical security review](features/F054-ai-concept-draft-generation.md#proposed-completion-security-and-trusted-reader-amendment--2026-11-08)
+inventories actual User/Session/auth/profile/fence writers, Session TTL and missing
+eligibility/cancellation writers; maps every coordinator port to private native
+source/claim/audit facts and snapshot/current-authority obligations. Ordinary logout
+writes Session without an explicit __v increment, so actual same-document writes
+and eligibility predicates matter; User-only/JWT/pre-read checks are insufficient.
+No broad version increment rewrite or global access-token replacement is selected.
+
+Proposed enforcement: same-transaction User + origin-Session real checked writes
+with the exact attempt-cancellation CAS/checkpoint/audit; bounded trusted-time and
+precommit loss checks; successful commit-order semantics with explicit expiry/
+provider residual races. Sticky deauthorization needs every future eligibility-loss
+writer to atomically revoke Sessions and never revive old sid on restoration.
+Such production demotion/deletion linkage and native attempt cancellation do not
+exist. Previously committed evidence/accounting obligations are preserved; unknown
+ACK/cleanup permits read reconciliation only, never replay or zero-cost inference.
+
+Trusted composition remains missing: private F044 source/admission audits, genuine
+F053 profile/template/privacy/pricing/spending and full claim-history proof, native
+attempt/audit storage permissions and current-session serialization. RECORDED/P1
+DTOs are insufficient; no DTO widening or claim fields invented in audit metadata.
+Existing F044 majority reads and F053 snapshot reads are not one shared snapshot.
+
+**Recommended next boundary, NOT_STARTED:** an unregistered feature-local Session
+read/write fence with inert native-driver doubles, not an attempt adapter/framework.
+Exact seven proposed paths: CREATE
+`apps/api/src/modules/ai/curriculum-outline-session-fence.ts` and
+`apps/api/tests/curriculum-outline-session-fence.test.ts`; MODIFY AGENTS,
+F042, F054, DATABASE_DESIGN and this roadmap, with full paths in the canonical inventory.
+Estimate60–90 minutes, hard90. Separate owner approval must cover the bounded
+offline sequencing and F042 compatibility note; no exception is enacted here.
+Acceptance requires strict identities/versions/time, exact same-session User/Session
+queries and counts, denial/restoration/uncertainty cases, static checks and fresh
+separate source review. Real conflict/TTL/transaction/cleanup proof remains later.
+
+Owner decisions: accept the explicit commit-order/sticky-deauthorization policy
+and separately authorize that scope. Before real storage/egress, resolve retention/
+access/provider terms and native schemas/permissions; technical resolver/lifecycle/
+physical qualification work remains missing regardless of this helper. No vendor
+or spending selection is needed for the offline boundary.
+
+Only three append-only proposed sections change in this review: F054, database and
+this roadmap. Existing readiness hunks and F053 bytes remain; AGENTS and sources/
+tests remain unchanged. Retain matching O0/P1/coordinator evidence without reruns.
+Source-based self-review is complete, no known internal blocking inconsistency;
+no new independent approval is claimed. Explicit three-section formatting,
+28 local links/anchors, UTF-8/LF, privacy, original-prefix/24-source preservation
+and Git whitespace/scope checks PASS. Final fingerprints and elapsed time are
+saved in the canonical record's timestamped external handoff. Current pending
+paths: docs/features/F054-ai-concept-draft-generation.md, docs/DATABASE_DESIGN.md,
+docs/DEVELOPMENT_ROADMAP.md, unchanged docs/features/F053-ai-security-usage-controls.md;
+index empty, expected HEAD/parent unchanged. No application suites were rerun. F053
+qualification BLOCKED/NOT_RUN, all existing acceptance/unexecuted groups, historical
+UNKNOWN and production NOT_VERIFIED remain. Next action is owner review of the
+proposal, not implementation, a runtime attempt or another execution prompt.
+
+## F054 offline User/Session fence checkpoint — 2026-11-08
+
+**Checkpoint READY_FOR_REVIEW — offline only. Full F054
+IN_PROGRESS; acceptance incomplete; native capture BLOCKED.** The owner approved
+the independently reviewed seven-path fence boundary, transaction-order/residual-
+time semantics, bounded exception and one verified local commit; no push. See the
+[canonical implementation record](features/F054-ai-concept-draft-generation.md#offline-usersession-fence-implementation-record--2026-11-08).
+The preceding design-only proposal is historical; only this helper's offline
+exception and F042 compatibility note are enacted, not native lifecycle/storage.
+Branch/worktree/base: dev, E:/AI/DeepLearner,
+a1bd3ca22296e2a20099a0a882b8870d5d398c24. No runtime or other worktree is operated on.
+
+Actual capability: developers have an unregistered injected read/User-Session-
+write/precommit helper with strict origin/actor/attempt guards, active supplied
+session, existing version headroom, fixed write order, exact acknowledgements and
+bounded credential/time/loss checks. Users gain no new live Generate/Save action.
+The caller still owns exact attempt CAS/audit, full source/binding validation and
+known commit/cleanup. No native writer, production registration or global F042
+session-policy change. CHECKED/FENCED/PRECOMMIT_CHECKED are local results only.
+
+Author-executed 142 focused synthetic tests, full API/test TypeScript, API
+typecheck/build, targeted lint and source/test formatting PASS. Fresh separate
+source-only Codex subagent review APPROVE with no unresolved findings; it verified
+final source/test hashes, not independently executed checks. The canonical section
+records resolved findings and review provenance. Final scoped documentation,
+staged integrity and preservation results and exact local commit/parent are in its
+timestamped external delivery handoff; no push/PR is authorized. Scope
+includes two new source/test files plus AGENTS/F042/F054/database/roadmap sections;
+earlier database/roadmap readiness hunks and byte-identical F053 stay unstaged.
+Retain matching O0/P1/coordinator evidence without reruns. Current pending inventory
+is these seven paths plus the existing F053 document; index remains empty until
+authorized staged-integrity checks.
+
+Deferred gates remain controlled eligibility-loss writers, genuine current auth/
+shared-snapshot source/control/claim-history readers, native attempt/cancellation/
+completion/audit storage and indexes, raw privacy policy, actual producer and real
+transaction/conflict/TTL/uncertainty/cleanup qualification. Synthetic tests establish
+none of these. F042/F043 acceptance BLOCKED; F053 qualification BLOCKED/NOT_RUN;
+all unexecuted integration/browser groups, permanent historical UNKNOWN and
+production NOT_VERIFIED remain unchanged. Next action: finish this offline review
+and the one scoped local delivery, then seek approval for the next bounded native
+composition prerequisite; no automatic next checkpoint.

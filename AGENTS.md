@@ -1448,3 +1448,31 @@ Preserve all acceptance blocks, NOT_RUN groups, historical UNKNOWN and productio
 NOT_VERIFIED. The named exception activates no real storage/retention policy.
 See the [canonical implementation record](docs/features/F054-ai-concept-draft-generation.md#offline-coordinator-implementation-record--2026-11-08)
 for scope, actual verification and separately retained local delivery identity.
+
+## Named F054 offline User/Session/cancellation-fence exception — 2026-11-08
+
+Owner authorization `86d3c04f-b9fc-42d6-bbca-1f6905f15e4a/Pasted text.txt`
+enacts only the independently reviewed seven-path offline fence boundary on dev
+at a1bd3ca22296e2a20099a0a882b8870d5d398c24. Permit the two new
+curriculum-outline-session-fence source/test files and scoped AGENTS/F042/F054/
+DATABASE_DESIGN/DEVELOPMENT_ROADMAP sections. Preserve unrelated readiness hunks
+and byte-identical F053 unstaged. No new branch or dependency.
+
+Require synthetic adapters only, exact current User/origin Session/attempt guards,
+an already active caller-owned session/transaction, real ordered User/Session
+increment predicates, strict acknowledgements, bounded credential/time/loss checks,
+focused tests, API/test compiler, API build, static/privacy/scope checks and fresh
+separate final source review. Resolve findings before the separately authorized
+single local implementation commit. No push. Record checkpoint readiness apart
+from full F054 IN_PROGRESS and incomplete acceptance.
+
+This supersedes earlier Session-fence prohibitions only for an unregistered helper.
+No lifecycle/security-source rewrite, native attempt/cancellation/completion/audit
+writer, trusted-reader composition, actual database/provider/runtime operation,
+production wiring, permission/index change, endpoint/UI or other checkpoint is
+authorized. The caller retains exact same-transaction attempt CAS/audit, commit,
+abort and cleanup; supplied facts and local results are not authenticated authority
+or durable capture. No standalone transaction, retry or mutation replay. Preserve
+commit-order/residual-expiry semantics, sticky-loss prerequisites, F053 liabilities,
+all existing acceptance blocks, NOT_RUN, historical UNKNOWN and production
+NOT_VERIFIED. Real concurrency/permissions/retention/cleanup gates remain open.
