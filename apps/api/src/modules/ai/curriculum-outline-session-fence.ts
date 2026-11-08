@@ -80,7 +80,8 @@ const invocationKey = (v: ReturnType<typeof invocation>) =>
   ]);
 function request(v: unknown) {
   const r = ledgerObject(v, {
-    mode: (x) => ledgerEnum(x, ['MARK', 'CAPTURE', 'READ'] as const),
+    mode: (x) =>
+      ledgerEnum(x, ['PREPARE', 'MARK', 'CAPTURE', 'CANCEL', 'READ'] as const),
     actorId: ledgerId,
     originSessionId: ledgerId,
     requestingSessionId: ledgerId,
@@ -97,10 +98,14 @@ function request(v: unknown) {
       ] as const),
     invocation: ledgerNullable(invocation),
   });
-  if (r.mode !== 'READ' && r.requestingSessionId !== r.originSessionId)
+  if (
+    r.mode !== 'READ' &&
+    r.mode !== 'CANCEL' &&
+    r.requestingSessionId !== r.originSessionId
+  )
     throw invalid();
   if (
-    r.mode === 'MARK' &&
+    (r.mode === 'PREPARE' || r.mode === 'MARK') &&
     (r.phase !== 'PREPARED' || r.expectedVersion !== 0 || r.invocation !== null)
   )
     throw invalid();
@@ -111,11 +116,26 @@ function request(v: unknown) {
       r.invocation === null)
   )
     throw invalid();
+  if (r.mode === 'CANCEL') {
+    // Only uncancelled nonterminal states can be fenced for a future cancel CAS.
+    // Each prior transition increments once; cancellation is sticky, never reset.
+    const expected = {
+      PREPARED: 0,
+      INVOCATION_MARKED: 1,
+      COMPLETION_STORED: 2,
+    } as const;
+    if (
+      !(r.phase in expected) ||
+      r.expectedVersion !== expected[r.phase as keyof typeof expected] ||
+      (r.phase === 'PREPARED') !== (r.invocation === null)
+    )
+      throw invalid();
+  }
   return r;
 }
 
 /** One retained context, one fence, one precommit check; no retry or fallback.
- * READ can use a separately verified current sid of the same actor. It cannot
+ * READ/CANCEL can use a separately verified current sid of the same actor. It cannot
  * revive first capture under another origin sid. Native attempt writes are absent.
  */
 export function createOutlineSessionFence(
@@ -306,22 +326,46 @@ export function createOutlineSessionFence(
       phase: 1,
       cancelledAt: 1,
     };
-    if (r!.mode !== 'READ')
-      Object.assign(projection, { invocation: 1, completion: 1, receipt: 1 });
+    if (r!.mode === 'PREPARE') {
+      for (const key of Object.keys(projection)) delete projection[key];
+      projection._id = 1;
+    } else if (r!.mode !== 'READ')
+      Object.assign(projection, {
+        invocation: 1,
+        receipt: 1,
+        ...(r!.mode === 'CANCEL'
+          ? {
+              'completion.schemaVersion': 1,
+              'completion.createdAt': 1,
+              'completion.checkpointDigest': 1,
+            }
+          : { completion: 1 }),
+      });
     const row = await step((maxTimeMS) =>
       ports.attempts.findOne(
-        {
-          _id: ledgerObjectIdFrom(r!.attemptId),
-          actorId: ledgerObjectIdFrom(r!.actorId),
-          sessionId: ledgerObjectIdFrom(r!.originSessionId),
-          bindingDigest: r!.bindingDigest,
-          version: r!.expectedVersion,
-          phase: r!.phase,
-          ...(r!.mode === 'READ' ? {} : { cancelledAt: null }),
-        },
+        r!.mode === 'PREPARE'
+          ? // Check absence by allocated ID alone: a conflicting actor/binding
+            // must not disappear behind a narrower predicate. Other unique keys
+            // and full B remain the caller's same-transaction obligations.
+            { _id: ledgerObjectIdFrom(r!.attemptId) }
+          : {
+              _id: ledgerObjectIdFrom(r!.attemptId),
+              actorId: ledgerObjectIdFrom(r!.actorId),
+              sessionId: ledgerObjectIdFrom(r!.originSessionId),
+              bindingDigest: r!.bindingDigest,
+              version: r!.expectedVersion,
+              phase: r!.phase,
+              ...(r!.mode === 'READ' ? {} : { cancelledAt: null }),
+            },
         { session, maxTimeMS, projection },
       ),
     );
+    if (r!.mode === 'PREPARE') {
+      // Native findOne absence is null, not an invented row or undefined/default.
+      if (row !== null) throw invalid();
+      check();
+      return { user, current };
+    }
     const fields = {
       _id: ledgerObjectId,
       actorId: ledgerObjectId,
@@ -343,8 +387,17 @@ export function createOutlineSessionFence(
         ? ledgerObject(row, fields)
         : ledgerObject(row, {
             ...fields,
-            invocation: r!.mode === 'MARK' ? nil : invocation,
-            completion: nil,
+            invocation:
+              r!.mode === 'MARK' || r!.phase === 'PREPARED' ? nil : invocation,
+            completion:
+              r!.mode === 'CANCEL' && r!.phase === 'COMPLETION_STORED'
+                ? (value: unknown) =>
+                    ledgerObject(value, {
+                      schemaVersion: (v) => ledgerInteger(v, 1, 1),
+                      createdAt: ledgerDate,
+                      checkpointDigest: ledgerDigest,
+                    })
+                : nil,
             receipt: nil,
           });
     if (
@@ -357,7 +410,8 @@ export function createOutlineSessionFence(
     )
       throw invalid();
     if (
-      r!.mode === 'CAPTURE' &&
+      (r!.mode === 'CAPTURE' ||
+        (r!.mode === 'CANCEL' && r!.invocation !== null)) &&
       (!('invocation' in a) ||
         invocationKey(invocation(a.invocation)) !==
           invocationKey(r!.invocation!))

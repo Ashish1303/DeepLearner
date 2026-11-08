@@ -1476,3 +1476,34 @@ or durable capture. No standalone transaction, retry or mutation replay. Preserv
 commit-order/residual-expiry semantics, sticky-loss prerequisites, F053 liabilities,
 all existing acceptance blocks, NOT_RUN, historical UNKNOWN and production
 NOT_VERIFIED. Real concurrency/permissions/retention/cleanup gates remain open.
+
+## Named F054 Checkpoint A PREPARE/CANCEL fence offline exception — 2026-11-08
+
+Owner authorization 5b8147bc-d944-4b76-9a9f-2512ababbe07/Pasted text.txt enacts
+only reviewed Checkpoint A, directly on existing dev at
+970438528822890e792cb35198c5e57232339e79, preserving the three reviewed pending
+native-store contract documents. Exact six MODIFY paths: curriculum-outline-session-
+fence.ts and its test, this AGENTS file, F054, DATABASE_DESIGN and DEVELOPMENT_ROADMAP,
+as enumerated in the canonical F054 Checkpoint A inventory. No new branch/dependency.
+
+Permit only unregistered PREPARE/CANCEL mode extensions and synthetic verification:
+absent-target preparation, fresh same-actor requesting Session cancellation and
+bounded metadata-only selection, preserving MARK/CAPTURE/READ. The caller retains
+full immutable B/source/Technology/control authority, active native transaction,
+attempt insert/CAS, audits, commit/abort/endSession and cleanup. No transferable
+permission or durable result. Require exact predicates/ACKs, no raw reads for cancel,
+ordered User/Session fences, loss/expiry/late-result guards, meaningful focused tests,
+API/test TypeScript, API build/typecheck, static/privacy/scope checks and separate
+final source review. Resolve findings before the separately authorized one local
+implementation commit containing only these six paths and reviewed contract hunks.
+No push. Record implementation readiness and delivery separately from full F054.
+
+This exception does not activate Checkpoint B's repository/audits/index integration,
+production readers/lifecycle/composition, actual cleanup/storage, provider dispatch,
+spending, admission, API/UI, runtime/pin or database operations. B remains NOT_STARTED
+and its exception PROPOSED — PENDING OWNER APPROVAL, NOT ACTIVE. Full F054 stays
+IN_PROGRESS; native capture and F053 qualification remain BLOCKED/NOT_RUN. Preserve
+all acceptance gates, historical UNKNOWN, unexecuted groups and production
+NOT_VERIFIED. Every later checkpoint/live operation/Git delivery needs its own
+authority. This narrow amendment supersedes prior no-mode-extension restrictions
+only for A; it does not change global authentication or cleanup timing policy.

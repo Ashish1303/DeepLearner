@@ -4805,3 +4805,122 @@ all unexecuted integration/browser groups, permanent historical UNKNOWN and
 production NOT_VERIFIED remain unchanged. Next action: finish this offline review
 and the one scoped local delivery, then seek approval for the next bounded native
 composition prerequisite; no automatic next checkpoint.
+
+## F054 native attempt-store contract preparation — 2026-11-08
+
+**PROPOSED — PENDING OWNER APPROVAL. Contract correction AWAITING FOCUSED INDEPENDENT RE-REVIEW — documentation only.** Full F054
+IN_PROGRESS, acceptance incomplete; native completion capture BLOCKED. Proposed
+implementation NOT_STARTED; no active sequencing exception. Documentation only
+on dev970438528822890e792cb35198c5e57232339e79, parent
+4c9f8c330050ccd97f35139ef6e9f13759fec926, E:/AI/DeepLearner; clean/empty-index baseline.
+The F053 readiness documents were locally delivered before this task; their dated
+clarifications are preserved, not reopened. No new branch or runtime operation.
+
+The [canonical native-store proposal](features/F054-ai-concept-draft-generation.md#proposed-native-attemptcancellationcas-audit-store-contract--2026-11-08)
+specifies prepare/mark/capture/cancel/exact inspect over the existing attempt row,
+unchanged phases/hash frames/size bounds. Native versus canonical representations,
+same-transaction User/Session -> attempt -> one audit, exact predicates/ACKs,
+duplicate/terminal/read-only behavior and unknown/cleanup outcomes are explicit.
+The delivered helper needs narrowly proposed PREPARE/CANCEL modes; neither global
+lifecycle policy nor production composition is changed by this contract.
+
+New proposals are three preparation/marker/cancel audit actions and one partial
+audit-version uniqueness index, with invariant-based rationales; existing fixed
+completion/terminal audit IDs and six aggregate indexes remain unchanged. All
+actions/resources/metadata/schema/permissions/indexes stay inactive pending approval.
+Cancellation preserves completion and uses metadata only; it grants no raw read,
+accounting release or new invocation. Recovery observes exact stored evidence,
+never reconstructs original ACKs or authorizes automatic retries/new-key replay.
+
+Users gain no Generate/Save/cancel API or UI. After the proposed offline checkpoint,
+developers would have an unregistered native-store implementation exercised only
+with driver/session/resolver doubles, not proof of real storage/security/durability.
+Later candidate admission reuses existing P1 and its separate candidate/receipt/
+audit transaction; editorial decisions and publication remain separately owned.
+
+The original11-path union is now recorded as two proposed ordered checkpoints,
+with exact repository-relative inventories/acceptance in the canonical proposal:
+A (six paths): fence source/test, AGENTS and F054/database/roadmap; inert absent-attempt
+PREPARE/fresh-session CANCEL/metadata selection, unchanged MARK/CAPTURE/READ, no
+store runner/audit activation. Estimate45–75 active minutes, proposed hard90.
+B (nine paths): new attempt repository/test; additive pure producer exports;
+audit model/auth-audit test; AGENTS and the same three documents. Keep atomic store,
+audits and recovery together; depends on reviewed A and clarified cleanup timing.
+Estimate90–150 active minutes, proposed hard150. Shared documents/AGENTS record A
+then B while preserving history. Combined135–225; no reduced total-effort claim.
+The earlier120–180/hard180 monolithic estimate is historical. No new model/framework,
+queue/supervisor/provider/dependency/registry. Both implementation NOT_STARTED;
+named offline exception remains PROPOSED — PENDING OWNER APPROVAL, NOT ACTIVE.
+Require separate checkpoint-specific authority, affected tests/compiler/build/static
+checks and fresh separate source review; no verified claim for unfinished work.
+
+Cleanup clarification: retain original10000ms work/capture start and coordinator
+response deadline,5000ms authorization, commit positive remaining work with finite
+positive at-most min(2000ms, remaining work) timeout. After expiry/loss, abort and
+endSession on the retained session each use separate finite positive cleanup-only
+allowances at most2000ms, outside expired work, through the qualified same-session
+mechanism. No zero/nonpositive unbounded timeout, work-clock reset, signal revival,
+replacement session/transaction, configuration change, business mutation, retry,
+dispatch or late success. Attempt disposal despite earlier cleanup/observation
+failure; preserve primary/sanitized cleanup errors and OUTCOME_UNKNOWN/UNRESOLVED.
+Late cleanup/port completion cannot recreate an original invocation ACK or replay.
+Future synthetic coverage: expiry before writes/after fences/before audit/during
+commit/cleanup, positive bounded timeout arguments, disposal after abort failure,
+error preservation and rejected late ACKs. Bounds still require real qualification.
+
+Owner decisions next: approve/revise this exact store/fence-mode/outcome boundary,
+three new audit actions and one index, then separately authorize the relevant A/B
+offline checkpoint and bounded exception. Genuine auth/trusted snapshot readers, sticky eligibility-
+loss writers, native schemas/restricted permissions/physical indexes, observing
+producer, raw access/finite retention/erasure/backups/provider privacy and qualified
+real transaction/concurrency/rollback/unknown-outcome/cleanup evidence remain live
+gates. No vendor/model/key/spending decision is needed merely for offline code.
+
+Initial preparation appended only F054/DATABASE_DESIGN/this roadmap. Its new-block
+formatting, five local links/anchors, UTF-8/LF/privacy/scope/whitespace and preservation
+checks PASS: all original document bytes and 17 protected files unchanged. Focused
+security self-review was completed before the independent timing finding; this is
+not independent approval. Matching O0/P1/coordinator/fence evidence remains retained,
+not rerun. Actual results, fingerprints, exact three-document pending inventory,
+empty index/unchanged HEAD and elapsed time are in the canonical section's external
+handoff. No implementation, Git delivery or execution
+prompt follows. F053 qualification BLOCKED/NOT_RUN, existing acceptance blocks,
+all unexecuted groups, permanent historical UNKNOWN and production NOT_VERIFIED
+remain unchanged.
+
+Narrow correction — 2026-11-08: the independent review's Medium cleanup ambiguity
+is addressed by the timing distinction above; its exact A/B recommendation is
+recorded, not enacted. Focused author self-review only; correction awaiting focused
+independent re-review. Current formatting/link/encoding/privacy/scope/whitespace/
+preservation results and fingerprints are in the external correction handoff.
+No user-visible capability changed; pending paths remain F054, DATABASE_DESIGN and
+this roadmap. Next action: focused independent re-review, then separate owner
+authorization before A; do not begin implementation or Git delivery.
+
+### Checkpoint A PREPARE/CANCEL fence progress — 2026-11-08
+
+A READY_FOR_REVIEW — offline only (implementation complete), full F054 IN_PROGRESS with incomplete
+acceptance. Owner approval 5b8147bc-d944-4b76-9a9f-2512ababbe07/Pasted text.txt
+enacts only A's six-path offline exception and authorizes one checked local commit,
+no push. Existing dev970438528822890e792cb35198c5e57232339e79 and the three reviewed
+pending contract documents were verified before coding; no new branch.
+
+Developers gain unregistered PREPARE absence and fresh-session metadata-only CANCEL
+fences, preserving existing modes; users gain no new API/UI operation. The helper
+does not establish full B/source authority or persist an attempt/cancellation/audit;
+the future caller retains those obligations and commit/cleanup. Exact A inventory
+and acceptance above remain six paths. B NOT_STARTED and its exception inactive.
+Executed342/342 synthetic fence tests PASS; full API/test TypeScript, API production
+build/typecheck, targeted lint, formatting, links/UTF-8/LF/privacy/scope/whitespace
+and preservation checks PASS. Initial329 cases passed;13 requested-boundary cases
+were added and final342 passed. Separate assistant source review APPROVE, zero
+findings, on final source/test hashes; reviewer did not independently rerun tests.
+The earlier pending-review wording is historical; focused correction approval
+preceded this A-only authorization. No real persistence/security/cleanup proof.
+Next action: final staged-integrity verification and the authorized six-path local
+commit, then owner A review/separate B decision; no automatic B or push.
+Exact delivery SHA/parent/receipts and actual duration are retained outside repo:
+C:/Users/Shreeji/Documents/Codex/2026-10-24/deeplearner-f042-final-guarded-mongodb-execution/f054-fence-a-20261108T062846Z/delivery-handoff.txt. No real operations.
+Preserve native-capture/F053 blockers, all acceptance blocks, NOT_RUN groups,
+historical UNKNOWN and production NOT_VERIFIED. Pending inventory becomes the
+two fence source/test paths, AGENTS and the three contract/evidence documents.

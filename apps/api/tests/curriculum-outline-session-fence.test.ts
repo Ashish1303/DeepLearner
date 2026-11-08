@@ -29,7 +29,9 @@ const marker = () => ({
   observeUntil: new Date(now + 1000),
   markedAt: new Date(now),
 });
-function harness(mode: 'MARK' | 'CAPTURE' | 'READ' = 'MARK') {
+function harness(
+  mode: 'PREPARE' | 'MARK' | 'CAPTURE' | 'CANCEL' | 'READ' = 'MARK',
+) {
   const request = {
     mode,
     actorId: actor,
@@ -94,7 +96,7 @@ function harness(mode: 'MARK' | 'CAPTURE' | 'READ' = 'MARK') {
     hook: (async () => {}) as (name: string) => Promise<void>,
     userMissing: false,
     sessionMissing: false,
-    attemptMissing: false,
+    attemptMissing: mode === 'PREPARE',
   };
   const session = {
     inTransaction: () => state.active,
@@ -119,11 +121,28 @@ function harness(mode: 'MARK' | 'CAPTURE' | 'READ' = 'MARK') {
         events.push({ name: `${name}.read`, filter, options });
         await state.hook(`${name}.read`);
         if (missing()) return null;
-        return Object.fromEntries(
-          Object.keys(options.projection)
-            .filter((k) => Object.hasOwn(row, k))
-            .map((k) => [k, row[k]]),
-        );
+        const projected: Record<string, unknown> = {};
+        for (const key of Object.keys(options.projection)) {
+          const [parent, child] = key.split('.');
+          if (!parent || !Object.hasOwn(row, parent)) continue;
+          if (!child) {
+            Object.defineProperty(
+              projected,
+              parent,
+              Object.getOwnPropertyDescriptor(row, parent)!,
+            );
+          } else {
+            const value = row[parent];
+            if (!value || typeof value !== 'object' || Array.isArray(value)) {
+              projected[parent] = value;
+            } else {
+              const target = (projected[parent] ??= {});
+              const descriptor = Object.getOwnPropertyDescriptor(value, child);
+              if (descriptor) Object.defineProperty(target, child, descriptor);
+            }
+          }
+        }
+        return projected;
       },
       async updateOne(
         filter: Record<string, unknown>,
@@ -776,4 +795,453 @@ test('inert import registers no models or connections and source contains no tra
     /\.(?:connect|createConnection|startSession|startTransaction|commitTransaction|abortTransaction|endSession|insertOne|deleteOne)\s*\(/,
   );
   assert.doesNotMatch(source, /attempts\.updateOne|process\.env|Date\.now\(/);
+});
+
+function cancelHarness(
+  phase: 'PREPARED' | 'INVOCATION_MARKED' | 'COMPLETION_STORED' = 'PREPARED',
+) {
+  const h = harness('CANCEL');
+  h.request.requestingSessionId = other;
+  h.auth.sid = other;
+  h.sessionRow._id = oid(other);
+  h.request.phase = h.attempt.phase = phase;
+  h.request.expectedVersion =
+    phase === 'PREPARED' ? 0 : phase === 'INVOCATION_MARKED' ? 1 : 2;
+  h.attempt.version = h.request.expectedVersion;
+  h.request.invocation = phase === 'PREPARED' ? null : marker();
+  h.attempt.invocation = h.request.invocation;
+  h.attempt.completion =
+    phase === 'COMPLETION_STORED'
+      ? { schemaVersion: 1, createdAt: new Date(now), checkpointDigest: digest }
+      : null;
+  return h;
+}
+
+test('PREPARE checks genuine absence by allocated ID alone, then fences the original session without inventing an attempt', async () => {
+  const h = harness('PREPARE');
+  const before = JSON.stringify([h.request, h.attempt]);
+  const f = h.create();
+  assert.deepEqual(await f.fence(), { kind: 'FENCED' });
+  const read = h.events.find((e) => e.name === 'attempt.read')!;
+  assert.deepEqual(read.filter, { _id: oid(attemptId) });
+  assert.deepEqual((read.options as { projection: unknown }).projection, {
+    _id: 1,
+  });
+  assert.deepEqual(names(h), [
+    'verify',
+    'user.read',
+    'session.read',
+    'attempt.read',
+    'user.write',
+    'session.write',
+  ]);
+  assert.deepEqual(h.events.find((e) => e.name === 'session.write')!.filter, {
+    _id: oid(sid),
+    userId: oid(actor),
+    revokedAt: null,
+    expiresAt: { $eq: h.sessionRow.expiresAt, $gt: new Date(now) },
+    __v: 3,
+  });
+  assert.deepEqual(await f.beforeCommit(), { kind: 'PRECOMMIT_CHECKED' });
+  assert.equal(JSON.stringify([h.request, h.attempt]), before);
+  assert.equal(names(h).filter((n) => n === 'attempt.read').length, 1);
+  for (const e of h.events.filter((e) => e.options))
+    assert.equal((e.options as { session: unknown }).session, h.session);
+});
+
+for (const existing of [true, { actorId: oid(other) }, {}, undefined])
+  test('PREPARE refuses any existing or ambiguous target without authorizing fences', async () => {
+    const h = harness('PREPARE');
+    h.ports.attempts.findOne = async (filter, options) => {
+      h.events.push({ name: 'attempt.read', filter, options });
+      return existing;
+    };
+    await refused(h);
+    assert.deepEqual(h.events.at(-1)!.filter, { _id: oid(attemptId) });
+  });
+
+test('PREPARE existing row cannot be hidden by a different actor or digest', async () => {
+  const h = harness('PREPARE');
+  h.state.attemptMissing = false;
+  h.attempt.actorId = oid(other);
+  h.attempt.bindingDigest = 'b'.repeat(64);
+  Object.defineProperty(h.attempt, 'completion', {
+    get() {
+      assert.fail('private cell selected');
+    },
+  });
+  await refused(h);
+});
+
+for (const [key, value] of [
+  ['requestingSessionId', other],
+  ['expectedVersion', 1],
+  ['phase', 'INVOCATION_MARKED'],
+  ['invocation', marker()],
+] as const)
+  test(`PREPARE invalid initial ${key} refuses before reads`, async () => {
+    const h = harness('PREPARE');
+    (h.request as Record<string, unknown>)[key] = value;
+    await refused(h);
+    assert.deepEqual(h.events, []);
+  });
+
+for (const phase of [
+  'PREPARED',
+  'INVOCATION_MARKED',
+  'COMPLETION_STORED',
+] as const)
+  test(`CANCEL ${phase} uses fresh requesting sid and exact metadata, preserving existing evidence`, async () => {
+    const h = cancelHarness(phase);
+    const before = JSON.stringify([h.request, h.attempt]);
+    const f = h.create();
+    assert.deepEqual(await f.fence(), { kind: 'FENCED' });
+    assert.deepEqual(h.events.find((e) => e.name === 'session.read')!.filter, {
+      _id: oid(other),
+      userId: oid(actor),
+    });
+    assert.deepEqual(h.events.find((e) => e.name === 'session.write')!.filter, {
+      _id: oid(other),
+      userId: oid(actor),
+      revokedAt: null,
+      expiresAt: { $eq: h.sessionRow.expiresAt, $gt: new Date(now) },
+      __v: 3,
+    });
+    const read = h.events.find((e) => e.name === 'attempt.read')!;
+    assert.deepEqual(read.filter, {
+      _id: oid(attemptId),
+      actorId: oid(actor),
+      sessionId: oid(sid),
+      bindingDigest: digest,
+      version: h.request.expectedVersion,
+      phase,
+      cancelledAt: null,
+    });
+    assert.deepEqual((read.options as { projection: unknown }).projection, {
+      _id: 1,
+      actorId: 1,
+      sessionId: 1,
+      bindingDigest: 1,
+      version: 1,
+      phase: 1,
+      cancelledAt: 1,
+      invocation: 1,
+      receipt: 1,
+      'completion.schemaVersion': 1,
+      'completion.createdAt': 1,
+      'completion.checkpointDigest': 1,
+    });
+    assert.deepEqual(
+      names(h).filter((n) => n.endsWith('.write')),
+      ['user.write', 'session.write'],
+    );
+    for (const e of h.events.filter((e) => e.options)) {
+      assert.equal((e.options as { session: unknown }).session, h.session);
+      if (e.name.endsWith('.write'))
+        assert.deepEqual(e.update, { $inc: { __v: 1 } });
+    }
+    assert.deepEqual(await f.beforeCommit(), { kind: 'PRECOMMIT_CHECKED' });
+    assert.equal(JSON.stringify([h.request, h.attempt]), before);
+    assert.equal(h.timers.size, 0);
+  });
+
+test('CANCEL after completion never selects rawOutput or requires intact raw content', async () => {
+  const h = cancelHarness('COMPLETION_STORED');
+  assert.ok(h.attempt.completion && typeof h.attempt.completion === 'object');
+  Object.defineProperty(h.attempt.completion, 'rawOutput', {
+    enumerable: true,
+    get() {
+      assert.fail('raw payload accessed');
+    },
+  });
+  assert.deepEqual(await h.create().fence(), { kind: 'FENCED' });
+  const p = (
+    h.events.find((e) => e.name === 'attempt.read')!.options as {
+      projection: Record<string, 1>;
+    }
+  ).projection;
+  assert.equal(Object.hasOwn(p, 'completion'), false);
+  assert.equal(
+    Object.keys(p).some((key) => key.includes('rawOutput')),
+    false,
+  );
+});
+
+for (const phase of ['ADMITTED', 'REFUSED', 'UNKNOWN'])
+  test(`CANCEL terminal/unknown request ${phase} refuses before any operation`, async () => {
+    const h = cancelHarness();
+    h.request.phase = phase;
+    await refused(h);
+    assert.deepEqual(h.events, []);
+  });
+
+for (const phase of [
+  'PREPARED',
+  'INVOCATION_MARKED',
+  'COMPLETION_STORED',
+] as const)
+  for (const value of [
+    undefined,
+    null,
+    -1,
+    0.5,
+    '1',
+    Number.MAX_SAFE_INTEGER,
+    3,
+  ])
+    test(`CANCEL ${phase} invalid version ${String(value)} refuses`, async () => {
+      const h = cancelHarness(phase);
+      (h.request as Record<string, unknown>).expectedVersion = value;
+      await refused(h);
+      assert.deepEqual(h.events, []);
+    });
+
+for (const [key, value] of [
+  ['_id', oid(other)],
+  ['actorId', oid(other)],
+  ['sessionId', oid(other)],
+  ['bindingDigest', 'b'.repeat(64)],
+  ['version', 1],
+  ['phase', 'INVOCATION_MARKED'],
+  ['cancelledAt', new Date(now)],
+  ['cancelledAt', undefined],
+  ['receipt', {}],
+  ['receipt', undefined],
+  ['completion', undefined],
+  ['invocation', undefined],
+  ['invocation', marker()],
+  ['completion', {}],
+] as const)
+  test(`CANCEL malformed/mismatched ${key} refuses without writes`, async () => {
+    const h = cancelHarness();
+    h.attempt[key] = value;
+    await refused(h);
+  });
+
+for (const phase of ['INVOCATION_MARKED', 'COMPLETION_STORED'] as const)
+  for (const key of [
+    'id',
+    'ownerId',
+    'claimVersion',
+    'claimedAt',
+    'observeUntil',
+    'markedAt',
+  ] as const)
+    test(`CANCEL ${phase} exact invocation ${key} mismatch refuses`, async () => {
+      const h = cancelHarness(phase);
+      const changed: Record<string, unknown> = { ...marker() };
+      changed[key] =
+        key === 'claimVersion'
+          ? 2
+          : key === 'id' || key === 'ownerId'
+            ? '33333333-3333-4333-8333-333333333333'
+            : new Date(now + 1);
+      h.attempt.invocation = changed;
+      await refused(h);
+    });
+
+for (const [key, value] of [
+  ['schemaVersion', 2],
+  ['schemaVersion', '1'],
+  ['schemaVersion', undefined],
+  ['createdAt', '2026-11-08'],
+  ['createdAt', null],
+  ['createdAt', undefined],
+  ['checkpointDigest', 'private-invalid'],
+  ['checkpointDigest', undefined],
+] as const)
+  test(`CANCEL completion metadata ${key} invalid refuses safely`, async () => {
+    const h = cancelHarness('COMPLETION_STORED');
+    (h.attempt.completion as Record<string, unknown>)[key] = value;
+    await refused(h);
+  });
+
+for (const value of [null, undefined, [], 'synthetic-private', 1])
+  test('CANCEL COMPLETION_STORED requires a present metadata object, not raw payload validation', async () => {
+    const h = cancelHarness('COMPLETION_STORED');
+    h.attempt.completion = value;
+    await refused(h);
+  });
+
+for (const mode of ['PREPARE', 'CANCEL'] as const) {
+  const setup = () =>
+    mode === 'PREPARE' ? harness(mode) : cancelHarness('COMPLETION_STORED');
+  for (const which of ['user', 'sessionRow'] as const)
+    for (const value of [
+      undefined,
+      null,
+      -1,
+      0.5,
+      '1',
+      Number.MAX_SAFE_INTEGER,
+    ])
+      test(`${mode} ${which} strict version ${String(value)} refuses`, async () => {
+        const h = setup();
+        h[which].__v = value;
+        await refused(h);
+      });
+  for (const [key, value] of [
+    ['sub', other],
+    ['sid', sid],
+    ['role', 'STUDENT'],
+    ['plan', 'OTHER'],
+  ] as const)
+    test(`${mode} current credential ${key} mismatch refuses`, async () => {
+      const h = setup();
+      h.auth[key] = key === 'sid' && mode === 'PREPARE' ? other : value;
+      await refused(h);
+    });
+  for (const condition of [
+    'inactive',
+    'ended',
+    'revoked',
+    'expired',
+    'wrongActor',
+    'wrongSession',
+    'missingUser',
+    'missingSession',
+    'demoted',
+  ] as const)
+    test(`${mode} ${condition} refuses without Session revival`, async () => {
+      const h = setup();
+      if (condition === 'inactive') h.state.active = false;
+      if (condition === 'ended') h.state.ended = true;
+      if (condition === 'revoked') h.sessionRow.revokedAt = new Date(now);
+      if (condition === 'expired') h.sessionRow.expiresAt = new Date(now);
+      if (condition === 'wrongActor') h.sessionRow.userId = oid(other);
+      if (condition === 'wrongSession') h.sessionRow._id = oid(attemptId);
+      if (condition === 'missingUser') h.state.userMissing = true;
+      if (condition === 'missingSession') h.state.sessionMissing = true;
+      if (condition === 'demoted') h.user.role = 'STUDENT';
+      await refused(h);
+    });
+  for (const which of ['userAck', 'sessionAck'] as const)
+    for (const field of [
+      'acknowledged',
+      'matchedCount',
+      'modifiedCount',
+      'upsertedCount',
+      'upsertedId',
+    ] as const)
+      test(`${mode} ${which} ${field} failed ACK remains unknown`, async () => {
+        const h = setup();
+        h.state[which] = { ...ack(), [field]: undefined };
+        assert.deepEqual(await h.create().fence(), { kind: 'OUTCOME_UNKNOWN' });
+        if (which === 'userAck')
+          assert.equal(names(h).includes('session.write'), false);
+      });
+  for (const boundary of [
+    'verify',
+    'user.read',
+    'session.read',
+    'attempt.read',
+    'user.write',
+    'session.write',
+  ])
+    for (const signal of ['loss', 'workLoss', 'expiry'] as const)
+      test(`${mode} ${signal} at ${boundary} stops subsequent work and late success`, async () => {
+        const h = setup();
+        h.state.hook = async (name) => {
+          if (name === boundary) {
+            if (signal === 'expiry') h.advance(10000);
+            else h[signal].abort();
+          }
+        };
+        const f = h.create();
+        const expected = {
+          kind: boundary.endsWith('.write') ? 'OUTCOME_UNKNOWN' : 'REFUSED',
+        };
+        assert.deepEqual(await f.fence(), expected);
+        assert.equal(names(h).at(-1), boundary);
+        assert.deepEqual(await f.fence(), expected);
+        assert.equal(h.timers.size, 0);
+      });
+  test(`${mode} precommit reverifies requesting identity and cannot be reused`, async () => {
+    const h = setup(),
+      f = h.create();
+    assert.deepEqual(await f.fence(), { kind: 'FENCED' });
+    h.auth.sid = attemptId;
+    assert.deepEqual(await f.beforeCommit(), { kind: 'OUTCOME_UNKNOWN' });
+    assert.equal(names(h).filter((n) => n.endsWith('.write')).length, 2);
+  });
+  test(`${mode} final return suppresses loss after positive operation continuation`, async () => {
+    const h = setup();
+    let checks = 0;
+    h.ports.work.check = () => {
+      if (names(h).at(-1) === 'session.write' && ++checks === 3) h.loss.abort();
+    };
+    assert.deepEqual(await h.create().fence(), { kind: 'OUTCOME_UNKNOWN' });
+  });
+  for (const boundary of ['attempt.read', 'user.write'] as const)
+    test(`${mode} delayed ${boundary} cannot resume after deadline or create an ACK`, async () => {
+      const h = setup();
+      let arrived!: () => void, release!: () => void;
+      const reached = new Promise<void>((resolve) => {
+        arrived = resolve;
+      });
+      h.state.hook = async (name) => {
+        if (name === boundary) {
+          arrived();
+          await new Promise<void>((resolve) => {
+            release = resolve;
+          });
+        }
+      };
+      const f = h.create(),
+        pending = f.fence();
+      await reached;
+      h.advance(boundary === 'attempt.read' ? 5000 : 10000);
+      const expected = {
+        kind: boundary === 'user.write' ? 'OUTCOME_UNKNOWN' : 'REFUSED',
+      };
+      assert.deepEqual(await pending, expected);
+      const count = h.events.length;
+      release();
+      await Promise.resolve();
+      await Promise.resolve();
+      assert.equal(h.events.length, count);
+      assert.equal(names(h).includes('session.write'), false);
+      assert.deepEqual(await f.beforeCommit(), expected);
+      assert.deepEqual(await f.fence(), expected);
+      assert.equal(h.timers.size, 0);
+    });
+  for (const point of [
+    'loss',
+    'expiry',
+    'revocation-observed',
+    'final-continuation',
+  ] as const)
+    test(`${mode} precommit ${point} preserves unknown after fences`, async () => {
+      const h = setup(),
+        f = h.create();
+      assert.deepEqual(await f.fence(), { kind: 'FENCED' });
+      if (point === 'loss') h.loss.abort();
+      if (point === 'expiry') h.advance(60000);
+      if (point === 'revocation-observed')
+        h.ports.verify = async () => {
+          throw new Error('synthetic-private');
+        };
+      if (point === 'final-continuation') {
+        let checks = 0;
+        h.ports.work.check = () => {
+          if (names(h).at(-1) === 'verify' && ++checks === 3) h.loss.abort();
+        };
+      }
+      assert.deepEqual(await f.beforeCommit(), { kind: 'OUTCOME_UNKNOWN' });
+      assert.equal(names(h).filter((n) => n.endsWith('.write')).length, 2);
+      assert.equal(h.timers.size, 0);
+    });
+}
+
+test('CANCEL observed sticky cancellation cannot be cleared to reuse the retained context', async () => {
+  const h = cancelHarness('COMPLETION_STORED'),
+    f = h.create();
+  h.attempt.cancelledAt = new Date(now);
+  assert.deepEqual(await f.fence(), { kind: 'REFUSED' });
+  h.attempt.cancelledAt = null;
+  assert.deepEqual(await f.fence(), { kind: 'REFUSED' });
+  assert.equal(
+    names(h).some((name) => name.endsWith('.write')),
+    false,
+  );
 });

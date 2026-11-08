@@ -1662,3 +1662,617 @@ privacy policy. F053 liabilities are never released by refusal/loss. No unrelate
 acceptance, NOT_RUN group, historical UNKNOWN or production NOT_VERIFIED changes.
 Next boundary is separately reviewed native composition prerequisites, not automatic
 wiring or another provider call. One verified local commit is authorized; no push.
+
+## Proposed native attempt/cancellation/CAS-audit store contract — 2026-11-08
+
+**PROPOSED — PENDING OWNER APPROVAL. Contract correction AWAITING FOCUSED INDEPENDENT RE-REVIEW — documentation only.** This is
+contract preparation only on dev970438528822890e792cb35198c5e57232339e79, parent
+4c9f8c330050ccd97f35139ef6e9f13759fec926. Full F054 remains IN_PROGRESS; native
+capture remains BLOCKED and the proposed implementation remains NOT_STARTED.
+No implementation, active sequencing, storage/privacy approval or execution follows.
+The earlier attempt/phase/hash/completion/P1 contracts and commit-order/residual-
+time decisions remain unchanged; this section makes their native boundary explicit.
+
+### Store interface, allocation and representations
+
+Propose one unregistered feature-local factory, explicitly supplied the existing
+native Db/MongoClient, trusted clock and server-owned resolver/credential closures.
+No default connection, model registration, collection/index creation or provider.
+Its internal operations are:
+
+| Operation | Exact command material and purpose                                                                                                                                                                              |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| prepare   | Complete existing immutable attempt binding, including its fixed IDs/time/digest; explicitly PREPARED/version0/null invocation, completion, cancelledAt and receipt. Prepare one row, not another reservation.  |
+| mark      | The delivered coordinator's exact {binding,expectedVersion,invocation}; one marker transition after the original known F053 claim ACK.                                                                          |
+| capture   | The delivered {binding,expectedVersion,invocation,completion,audit}; preserve exact successful bytes and original observation context.                                                                          |
+| cancel    | {binding,expectedVersion}; fresh original-actor/current-requesting-Session context. Server chooses cancelledAt and audit identity/time once for this invocation. No supplied raw content or replacement marker. |
+| inspect   | Exact {actorId,attemptId,operationId,technologyId,bindingDigest,mode}, mode METADATA or EVIDENCE; fresh server-verified requesting Session supplied separately. Reconciliation is reads only.                   |
+
+Authority and remaining work are separate trusted arguments, never request-body
+booleans, posted claims or bearer-like prepared handles. MARK/CAPTURE retain the
+existing port command shapes. A later separately reviewed composition closure must
+bind each call to its actual server-authenticated request/original observer; this
+factory does not create that missing authority by accepting a typed argument.
+Commands and returned coordinator projections use the existing canonical hex/ISO
+representations. Only the explicit codec converts validated command values to
+native BSON filters/rows and native reads back to canonical values. An ISO command
+date is not permission to accept a string in a native database Date slot, or to
+change the delivered mark/capture port representation.
+
+The native attempt document is exactly the existing table under
+[proposed attempt shape](#proposed-attempt-shape-identity-and-durable-states),
+including every required null cell. No new attempt field, phase, cancellation
+receipt, revocation epoch, updatedAt, history array or copied request is added.
+Native BSON ObjectIds/Dates and exact safe-integer versions map explicitly to the
+existing lowercase24-hex/canonical-ISO projection; reject strings in native ID/Date
+slots, unknown/operator/accessor/proxy fields and malformed BSON representations.
+No String/date coercion, JSON round-trip of native rows, identity repair or defaults.
+Reuse the existing coordinator/P1/F053 strict parsers and unchanged hash frames;
+expose narrowly needed existing pure helpers instead of creating another validator.
+
+The server allocates attempt ID, outlineRevisionId, outlineId, terminalAuditId and
+completionAuditId once before prepare, preserving their existing distinctness and
+actor-bound generation key/F053 ObjectId bindings. Reuse the fixed F044 brief and
+initial proposal identities; never reuse their Save key as generation operationId.
+The original coordinator allocates one claim/owner and markedAt, and one completion
+createdAt after its on-time observation. Retry/recovery never allocates replacements.
+New prepare/marker/cancel audit IDs are server-allocated once per intended mutation
+and retained in that call; no additional attempt pointer or business operation key.
+
+Raw string and host-assembled O0 remain <=65536 UTF-8 bytes and the original request
+output bound; P1 candidate remains <=131072 canonical JSON bytes. A candidate is
+not embedded in the attempt. Completion stores only the already specified raw
+string/fixed metadata, not prompts, transport envelope or usage archive. The native
+codec must validate the entire closed shape before BSON serialization. These are
+not an outer escaped-JSON/native-BSON128KiB cap or new output limit; actual native
+storage acceptance must be qualified separately. The existing acyclic binding and
+checkpoint frames cover exactly the same fields/bytes; no new digest is introduced.
+
+### Trusted facts and exact conditional operations
+
+Define B as ALL immutable native binding fields through createdAt, plus its
+recomputed bindingDigest, from the existing table. Every update predicate contains
+the full B equality (nested brief/proposal fields explicitly checked), not just an
+unverified digest. Let v be the exact observed/command safe version with headroom;
+I the complete validated native invocation; C the exact validated completion.
+No upsert, replacement, array mutation, overwrite, business callback retry or phase
+inference. Validate the stored required projection before constructing a predicate.
+Full-row validation applies to MARK/CAPTURE and EVIDENCE reads; CANCEL and METADATA
+use the narrower closed metadata projection below and make no claim about
+unselected raw payload validity. B and invocation equality use explicit leaf-field
+predicates, not BSON object property-order assumptions. Each required null predicate
+also requires the field to exist; absent cells are not equivalent to explicit null.
+
+For every operation independently reverify the server-held actor/Session/role/plan,
+current ACTIVE/verified ADMIN User and actual live requesting Session. Use the
+exact projected User/Session fields and predicates already defined in
+[transaction conditions](#proposed-guarantee-and-exact-transaction-conditions).
+MARK/CAPTURE require requesting sid=origin sid and the uninterrupted original
+context. PREPARE binds that same current sid as origin. CANCEL/METADATA inspection
+may use a new verified sid of the SAME actor; this never authorizes old invocation.
+Another Admin cannot take over actor/key/raw recovery. No database/operator account
+or stored hash authenticates a caller.
+
+PREPARE/MARK additionally require independently admitted F044 source/proposal and
+audits, eligible DRAFT/PUBLISHED Technology at snapshot, exact minimized request,
+intent/template/quote and current genuine F053 control/profile/privacy/spending
+facts. PREPARE needs the original known RESERVED operation/no claim before dispatch;
+MARK needs the original known committed claim plus full native dispatch audit proof.
+CAPTURE requires current storage/privacy/source authority and the original on-time
+observer, validating preserved historical claim/dispatch-audit lineage even after
+accounting advances. It does not re-admit financial dispatch or require an old quote
+to remain unexpired after an on-time return. Reuse the
+[trusted-port map](#exact-trusted-port-composition-map); supplied projections are
+not trusted readers and sequential independent service calls are not one snapshot.
+
+| Operation | Exact row predicate/precondition                                                                                                                                                                                                        | Only permitted attempt effect                                                                   | Atomic audit and result obligations                                                                                                          |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| prepare   | No exact actor/key row, ledger-linked row or allocated _id conflict; trusted full B and initial cells/version0; no known earlier uncertain prepare in this retained intent.                                                             | insertOne of the complete explicit PREPARED row.                                                | PREPARED audit at attemptVersion0. Known insert and commit/cleanup required. A duplicate is an exact-read/conflict path, never upsert.       |
+| mark      | B, version:v=0, phase:PREPARED, invocation:null, completion:null, cancelledAt:null, receipt:null; validated exact F053 claim/times.                                                                                                     | $set:{invocation:I,phase:INVOCATION_MARKED}, $inc:{version:1}.                                  | INVOCATION_MARKED audit at v+1. Known original marker commit/cleanup ACK is required before the retained coordinator's final dispatch gate.  |
+| capture   | B, version:v, phase:INVOCATION_MARKED, invocation:I, completion:null, cancelledAt:null, receipt:null; exact observer/raw/P1/source/claim evidence.                                                                                      | $set:{completion:C,phase:COMPLETION_STORED}, $inc:{version:1}.                                  | Existing proposed COMPLETION_STORED audit under completionAuditId at v+1. No candidate or admission receipt.                                 |
+| cancel    | B, version:v, phase equal to the exact observed PREPARED/INVOCATION_MARKED/COMPLETION_STORED value, cancelledAt:null, receipt:null; phase-appropriate explicit null/object-presence gates and projected invocation/checkpoint metadata. | $set:{cancelledAt:serverTime}, $inc:{version:1}; phase/invocation/completion/receipt unchanged. | CANCELLED audit at v+1; no accounting or failure-content write. Current parent authoring/dispatch eligibility is not cancellation authority. |
+| inspect   | Exact actor/_id/key/Technology/B digest and independently validated full stored binding/state; approved read mode.                                                                                                                      | None; no User/Session increments, attempt mutation or audit.                                    | Read-only snapshot, bounded exact audits/receipts/candidate/history as applicable; missing proof stays UNRESOLVED.                           |
+
+CANCEL checks the stored Technology binding but does not require a currently
+authorable parent or financial dispatch eligibility; it grants no raw access. Thus
+an archived/missing parent cannot force another provider call or liability release
+merely to stop future content admission. EVIDENCE inspection still requires the
+approved raw-access policy, intact source relationships and allowed parent-read
+behavior; missing/mismatched/corrupt parent refuses that path. Metadata-only access
+after parent loss remains original-actor/current-Admin/exact-binding and content-free.
+Cancellation selects B, phase/version/cancel/receipt state, the bounded invocation
+metadata and, if present, completion.schemaVersion/createdAt/checkpointDigest, never
+completion.rawOutput. PREPARED requires null invocation/completion; INVOCATION_MARKED
+requires exact I and null completion; COMPLETION_STORED requires I and present object
+completion with the projected fixed metadata. Gate cell existence/types explicitly.
+The exact version CAS and closed single-assignment writers protect the unselected
+completion from concurrent replacement; cancel neither validates nor rewrites its
+raw payload. Unknown/malformed projected metadata refuses; raw corruption cannot be
+converted into verified completion by a successful metadata-only cancellation.
+
+For inserts require acknowledged===true and the exact native insertedId, for both
+attempt and audit. For each update require acknowledged===true, matchedCount===1,
+modifiedCount===1, upsertedCount===0, upsertedId===null. Reject unknown/malformed
+acknowledgements, zero/multiple/coercible counts or increment overflow; never repair.
+If a write has been sent, a failed conditional result/partial operation is not
+claimed rollback: fail the transaction and preserve conservative uncertainty until
+known commit/abort/cleanup evidence justifies any stronger conclusion.
+
+An identical existing prepare/marker/completion/cancel/terminal state is inspected
+without mutation, User/Session increment or another audit. Prepare compares full B;
+marker compares full I; capture compares exact raw string, C, B, I and audit linkage,
+not semantic content/hash alone. Changed immutable material under any unique actor/
+key/ledger/allocated identity is OPERATION_CONFLICT; changed expected state/version
+is STATE_CONFLICT. Never regenerate IDs/time or retry the CAS. Malformed/partial
+stored evidence returns UNRESOLVED, not an idempotent success or repair permission.
+Terminal ADMITTED/REFUSED and already cancelled rows receive no new cancellation
+write; return validated observed evidence only. Cancellation is set once and never
+cleared, even after later role/session restoration. A superseded version requires
+explicit exact inspection; inspection does not authorize another mutation attempt.
+
+### Transaction owner and bounded outcomes
+
+The feature-local native store's operation runner alone starts/owns one session
+from its explicitly injected matching native client and one explicit snapshot/
+primary/majority-journaled transaction per new mutation. It starts neither a
+provider call nor a F053 accounting transaction.
+It passes this SAME ClientSession to all authority/source/claim/attempt/audit reads,
+the User/Session fence and every write. The coordinator owns overall call ordering,
+original context and budgets; the helper does not own commit or confer a ticket.
+
+Order: read/reverify within the transaction; User increment; requesting/origin
+Session increment; exact attempt insert/CAS; one required audit insert; fresh
+credential/loss/time/expiry/source-storage guards; explicit commit; required session
+cleanup; only then acknowledge. Capture's10000ms work budget starts at the original
+on-time observation and includes validation; never restart it at store entry.
+Keep5000ms authorization and the original10000ms work/capture window and
+coordinator response deadline unchanged. Commit requires strictly positive remaining
+work; its timeout is finite, positive and at most min(2000ms, remaining work),
+subject to the existing qualified same-session driver bounds. Never send a zero or
+nonpositive timeout: installed-driver semantics can interpret it as unbounded.
+
+After work expiry/loss, abort and endSession on the retained session each have a
+separate finite, strictly positive allowance of at most2000ms, outside the expired
+work budget. These are cleanup-only allowances, not a reset/extension of business
+authority or the coordinator response deadline. They permit no business mutation,
+retry, dispatch or late success. Use the existing qualified same-session timeout
+mechanism with explicit positive cleanup-operation timeout arguments; do not reset
+the work clock, revive its signal, open another session/transaction or change driver
+configuration. Qualification must establish those cleanup bounds on the retained
+session; if the mechanism cannot honor them, retain unknown/refusal rather than
+substitute zero/unbounded timeouts. Local bounds do not prove remote cancellation
+or rollback. No withTransaction callback replay or explicit retryCommit/redispatch
+loop. Existing driver behavior is not a stronger remote/expiry guarantee; qualify
+it separately.
+One caller-level commit invocation does not promise one wire packet: any installed
+driver-internal behavior must stay within the existing same timeout context and
+bounds, without a new caller commit, transaction or business callback invocation.
+
+The delivered helper has MARK/CAPTURE/READ only. A later approved amendment must
+add narrowly defined PREPARE (no pre-existing attempt row) and CANCEL (current
+requesting sid, exact existing phase/version/cells) modes. Do not fake a MARK, pass
+READ as a write capability or skip Session fencing. Preserve all existing helper
+semantics, strict headroom/ACK checks and inertness. No lifecycle writer changes.
+Read-only inspection uses one active read-only snapshot transaction for the
+helper's projected READ check, no increments or audit/commit, and bounded abort/
+endSession; metadata-only projection avoids selecting completion.rawOutput.
+
+On failure, retain the primary allowlisted stage/code together with bounded cleanup
+codes, reusing ABORT/ABORT_UNCONFIRMED/END_SESSION/NOT_ENDED distinctions. Attempt
+required abort/cleanup in finally without replacing the primary failure. Attempt
+endSession/disposal even if abort, an earlier observation or a cleanup getter fails;
+retain sanitized cleanup failures and attempt the remaining required observations
+without leaking handles to preserve evidence. Cleanup must not be skipped merely
+because work.check has expired. Late cleanup or port completion cannot recreate an
+original invocation ACK or permit replay. Native
+abort Promise resolution/local transaction state alone is not a positive server
+rollback ACK after writes. A commit send/ACK loss, postwrite abort uncertainty,
+unknown cleanup or authority loss while write/commit is in flight yields
+OUTCOME_UNKNOWN. A read/its cleanup failure yields UNRESOLVED. Loss before writes
+refuses; never write a post-loss failure/audit to explain it. No raw exception,
+driver message, URI, token, prompt or content in errors/diagnostics.
+
+Internal success shapes for a NEW known mutation preserve port compatibility:
+mark => {kind:RECORDED,cleanup:COMPLETE,attempt}; capture adds exactly audit in the
+coordinator's existing private projection. Prepare/cancel use the same known-write
+classification: prepare returns exactly {kind:RECORDED,cleanup:COMPLETE,attempt}
+with its null-content initial row; cancel returns exactly
+{kind:RECORDED,cleanup:COMPLETE,metadata}, where metadata is the projection below.
+Exact inspection/no-op reconciliation returns {kind:OBSERVED,cleanup:COMPLETE,
+evidence}; evidence is either {kind:METADATA_ONLY,metadata} or {kind:EXACT,attempt,
+completionAudit,terminalAudit,candidate}. COMPLETE describes this read's cleanup,
+not receipt of an old invocation ACK. Never relabel OBSERVED as RECORDED. Expected
+failures use {kind:REFUSED,code,message} with existing allowlisted
+INVALID_INPUT/UNAUTHENTICATED/FORBIDDEN/SOURCE_UNAVAILABLE/CONTROL_UNAVAILABLE/
+OPERATION_CONFLICT/STATE_CONFLICT codes and a fixed content-free message. Uncertainty
+uses {kind:OUTCOME_UNKNOWN|UNRESOLVED,message,primary,cleanup}; primary is exactly
+{stage,code}, stage from AUTHORIZE/READ/FENCE_USER/FENCE_SESSION/ATTEMPT/AUDIT/COMMIT,
+code from the same allowlist; primary is null when only cleanup failed, and unknown
+driver failures map to CONTROL_UNAVAILABLE without copying driver text. Cleanup
+is an ordered deduplicated subset of the four
+existing cleanup codes above. Fixed message: 'Curriculum outline store is unavailable'.
+No retry advice or private diagnostic details. These are server-internal types,
+not new HTTP/DTO contracts or capabilities.
+
+### Required audits and minimal index amendment
+
+Propose one audit per NEW attempt transition, category CONTENT_MANAGEMENT,
+resourceType CURRICULUM_OUTLINE_ATTEMPT, resourceId=attempt._id, actorId=original
+actor, actual server requestId matching existing1–128-character syntax, and trusted
+createdAt. No audit for refusal before writes, exact duplicate inspection, conflict,
+unknown-outcome diagnostics or ordinary reads. Audit failure invalidates the whole
+transaction; a successful attempt write without its required audit is never success.
+
+Common exact metadata: {attemptId,technologyId,operationId,attemptVersion,
+bindingDigest}. IDs are native ObjectIds, operationId existing UUID-v4, version a
+safe integer, digest existing lowercase64-hex. Resource/metadata identity must
+match the full stored attempt. Add only the action-specific fields below; reject
+unknown fields. No raw text, source body, session/claim/owner, tokens, quote, prompt,
+provider output/usage, free-form reason or approval flag enters an audit.
+The exact native event envelope is {_id,category,action,actorId,resourceType,
+resourceId,requestId,metadata,createdAt}, using existing native ID/Date/string
+representations, with no implicit IDs/time/default fields. The proposed new
+resource is native-only/unpopulated: the audit reference resolver must not fall
+back to User or require registration of a nonexistent attempt Mongoose model.
+
+| Proposed action                      | Audit identity/time and extra metadata                                                                                                           | Invariant/rationale                                                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| CURRICULUM_OUTLINE_PREPARED          | Fresh once-allocated audit _id; createdAt=attempt.createdAt; version0; no extras.                                                                | Establish the protected preparation actor/key/binding event before marker history exists.                              |
+| CURRICULUM_OUTLINE_INVOCATION_MARKED | Fresh once-allocated audit _id; createdAt=I.markedAt; version:v+1; no extras.                                                                    | Record the one content-side invocation marker; F053's separate claim audit cannot attest this later transaction.       |
+| CURRICULUM_OUTLINE_COMPLETION_STORED | Existing completionAuditId; createdAt=C.createdAt; extra checkpointDigest=C.checkpointDigest.                                                    | Existing proposed exact checkpoint/audit linkage, independent of admission.                                            |
+| CURRICULUM_OUTLINE_CANCELLED         | Fresh once-allocated audit _id; createdAt=cancelledAt; version:v+1; no extras.                                                                   | Record the actor's sticky cancellation decision even from a fresh requesting Session; not an accounting release.       |
+| CURRICULUM_OUTLINE_ADMITTED          | Existing terminalAuditId; trusted admission event time; extra outlineId,outlineRevisionId,revision:1.                                            | Existing future atomic candidate/receipt/terminal event; not implemented by this store checkpoint.                     |
+| CURRICULUM_OUTLINE_ADMISSION_REFUSED | Existing terminalAuditId; trusted refusal event time; extra outlineId,outlineRevisionId,revision:1,safeCode from existing outlineAdmissionCodes. | Existing eligible future terminal refusal, no candidate; no new automatic cancellation-to-refusal transition selected. |
+
+The first, second and fourth actions are explicit NEW proposals, not previously
+approved events. They are necessary for one auditable transition/version chain;
+the other three reuse the existing proposed identities/actions. Construct times
+are not claimed database commit times. Recovery requests do not replace the
+historical requestId/time; actual immutable writer provenance remains necessary.
+The native completion audit maps its checkpointDigest to the existing coordinator
+audit projection's digest; terminal projections derive existing outlineId/revision/
+code fields. Do not add claimId/ownerId to native F053 audits or widen public DTOs.
+
+Retain the SIX existing candidate/attempt index declarations unchanged, including
+unique actor/key and ledger-operation mappings. Propose exactly ONE additional
+audit declaration: auditLogs/uq_outline_attempt_audit_version, ordered keys
+{resourceType:1,resourceId:1,'metadata.attemptVersion':1}, unique:true,
+partialFilterExpression:{resourceType:'CURRICULUM_OUTLINE_ATTEMPT'}, simple
+collation, not hidden/sparse/TTL. Rationale: prepare/marker/cancel have no allocated
+audit pointer in B; exact resource/version lookup and at most one action at that
+version need a physical invariant across all six actions, not a latest-time search.
+This is an audit index, not a new completion collection/index or changed hash.
+Seven F054-related declarations now proposed (six aggregate plus one audit);
+existing audit _id_ and general indexes remain separate dependencies. No DDL.
+The repository declares/verifies the exact required existing namespaces/indexes
+without creating them; absent or altered prerequisites refuse before mutation.
+Use the existing pretransaction qualification pattern, not listIndexes inside the
+business transaction. A preflight observation cannot protect against arbitrary
+concurrent DDL: qualified namespace/index stability and restricted writers remain
+live prerequisites. No insert may be used to implicitly create a missing collection.
+
+Physical schema/action/resource/metadata amendments and index/permissions require
+separate approval and qualification. Only closed reviewed native mutation paths
+may insert these events or change attempt cells; protect immutable B and assigned
+I/C/receipt/cancel from update/delete/direct bypass. Mongoose hooks alone do not
+constrain native clients. No new account, privilege, TTL, migration or blanket
+collection deletion is proposed/authorized here.
+
+### Exact recovery reads and interruption behavior
+
+Use the exact actor/_id/key/Technology binding in one bounded primary snapshot;
+when recovering by actor/key also require the supplied allocated _id/ledger binding.
+Read at most one attempt and each required event by exact identity, with duplicate
+detection limit2. Resolve prepare audit by resource/attemptVersion0, marker audit
+by resource/version1 when I exists, completion audit directly by completionAuditId,
+and current cancellation/terminal audit by exact stored version/action and fixed
+terminalAuditId where applicable. Require exact category/action/actor/requestId
+syntax/time/resource/metadata/B/version correspondence and no unexplained phase or
+cell change. Duplicate/extra/missing events or partial evidence yield UNRESOLVED;
+never attach a missing event after the fact. No latest timestamp/global enumeration.
+
+EVIDENCE mode recomputes B and, where their cells exist, I timing and C/raw/
+checkpoint/P1 digests from exact stored bytes and independently trusted F044
+source/Technology plus F053 request/quote/historical dispatch claim and audit.
+PREPARED requires its initial null cells (except a permitted sticky cancellation)
+and preparation/current-state audits, not an invented invocation/completion. A
+ledger claim may already exist before the marker; this neither fills I nor grants
+recovered dispatch authority. F053's later accounting audit/version is not
+its original dispatch proof. For ADMITTED, also read the one allocated candidate
+and terminal audit, reconstruct/revalidate unchanged P1, compare exact candidate/
+receipt IDs/revision/definitionDigest/time and require full linkage. REFUSED must
+have its matching receipt/safe code/terminal audit and no candidate. Unexpected
+candidate or audit cells refuse. Candidate/admission/history remains separate from
+known completion and billing evidence.
+
+The coordinator read adapter may return exactly {attempt,completionAudit,
+terminalAudit,candidate}, with nulls only where the validated phase permits;
+metadata/audit projection is derived from verified native rows, not caller input.
+The adapter must NOT promote OBSERVED evidence to original mark/claim ACKs. A new
+same-actor session may inspect only; it cannot first-capture under the old sid.
+METADATA returns exactly {attemptId,technologyId,operationId,phase,version,
+cancelledAt,hasCompletion,hasReceipt}, with canonical ID/UUID/ISO-or-null fields,
+safe version and strict booleans. It exposes no raw body or claim/source detail;
+presence does not establish valid completion. There is no new public DTO/endpoint.
+
+| Interruption or observed condition                                       | Safe classification and permitted recovery                                                                                                                                      |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Before a write/attempt insert is sent                                    | Refuse on failed guards; exact reads only after interrupted context. No new key/reservation or claim permission from absence.                                                   |
+| After User write or Session write, before attempt effect                 | Stop further writes on loss/failure; required abort/finally; retain OUTCOME_UNKNOWN if write/rollback/cleanup evidence is uncertain.                                            |
+| Attempt insert/CAS sent, before audit insert/ACK                         | No success; attempt and audit must share transaction. Abort uncertainty remains unknown, not a reason to backfill/retry.                                                        |
+| Audit insert sent, before commit                                         | Same uncertainty rule; a local pair of successful insert acknowledgements is not durable success.                                                                               |
+| Commit in flight or ACK lost                                             | OUTCOME_UNKNOWN; exact read may establish already committed evidence, but cannot recreate original invocation permission. No second caller commit invocation or business retry. |
+| Known commit, failed/unknown endSession or loss before returned ACK      | Retain OUTCOME_UNKNOWN/cleanup failure; later exact read can observe evidence but cannot claim the old caller received known clean success.                                     |
+| Missing row, missing audit/receipt, corrupt state or failed read cleanup | UNRESOLVED; absence is neither rollback/no invocation nor definitely-unsent proof. No repair/new-key generation.                                                                |
+| Cancel commits first                                                     | Null-cancel/version CAS defeats later capture/admission; no raw erase or ledger release. A concurrent loser is not automatically retried.                                       |
+| Capture commits first                                                    | Completion/audit may remain; a later separately authorized cancel may set sticky cancellation while preserving them, barring future admission.                                  |
+| Terminal admission commits before cancellation                           | Exact terminal inspection, no new cancel write. No retroactive publication/revocation or content erasure follows.                                                               |
+| Logout/demotion/TTL/expiry or local loss                                 | Preserve approved shared-write commit-order and last-check/commit residual race; no claim of button-order, instant expiry or restored old authority.                            |
+
+Later admission remains the existing separately authorized transaction: fresh
+current actor/session and source/parent/storage authority, null cancelledAt, unused
+receipt, exact C/claim history and unchanged P1; insert allocated initial candidate,
+CAS one COMMITTED receipt/ADMITTED phase and append allocated terminal audit, or
+the already defined eligible terminal REFUSED boundary. This proposal implements
+neither branch, revision editing, editorial approval nor publication. It does not
+add a post-cancellation terminal-refusal path. F053 accounting/reconciliation keeps
+its own current performer/evidence rules; content loss/settlement/admission never
+implies zero charge, unsent proof or released liability.
+
+### Access gates and proposed ordered implementation checkpoints
+
+Raw EVIDENCE read and capture both remain blocked until the owner approves exact
+server-private access/purpose, finite retention, erasure/backups, completion/audit
+retention and provider privacy/training/egress terms. No period, unlimited retention,
+TTL, cleanup job or privileged bypass is selected. Linkable metadata/audit persistence
+also needs its approved access/retention policy; METADATA/CANCEL do not bypass that
+gate. Missing authentic auth/source/control/history prevents the corresponding
+operation even when supplied structure is valid. Closed eligibility-loss writers
+revoking origin Sessions, physical schema/index permissions and real transaction/
+concurrency/rollback/unknown-ACK/cleanup qualification remain additional live gates.
+Synthetic adapters may test the future code without activating any such authority.
+
+Recommend two ordered, independently reviewed OFFLINE checkpoints, not production wiring:
+before, only synthetic coordinator ports and the narrow fence exist; after, code
+can construct/verify the specified native predicates, audits and bounded runner
+under injected driver/session/resolver doubles, with explicit prepare/mark/capture/
+cancel/inspection results. No user can Generate/Save/cancel through a new API/UI.
+
+Original eleven-path union, retained for scope comparison; use the A/B inventories
+below for separately authorized implementation:
+
+CREATE:
+
+- apps/api/src/modules/ai/curriculum-outline-attempt.repository.ts
+- apps/api/tests/curriculum-outline-attempt.test.ts
+
+MODIFY:
+
+- apps/api/src/modules/ai/curriculum-outline-producer.service.ts — narrowly export existing pure attempt/binding/invocation/completion validators and types; preserve port shapes, hash frames and orchestration behavior.
+- apps/api/src/modules/ai/curriculum-outline-session-fence.ts — only the PREPARE/CANCEL modes specified above, no lifecycle writer.
+- apps/api/tests/curriculum-outline-session-fence.test.ts — affected strict mode/predicate/isolation regressions.
+- apps/api/src/modules/audit/audit.model.ts — exact proposed action/resource/metadata allowlists and one partial audit index; no automatic creation or registration of an attempt model.
+- apps/api/tests/auth-audit.test.ts — affected exact audit/index/privacy regressions.
+- AGENTS.md — only after approval, enact the named offline exception below.
+- docs/features/F054-ai-concept-draft-generation.md
+- docs/DATABASE_DESIGN.md
+- docs/DEVELOPMENT_ROADMAP.md
+
+No extra attempt model/validator/DTO, supervisor, queue, provider registry, resolver
+framework, endpoint, UI or new dependency. Use explicit native collection access;
+strict native codec/projections stay feature-local in the repository and reuse
+existing pure validators. The repository must not import the registered Audit model
+or database composition module: follow the existing F053 pattern, exporting its
+pure native audit validator for the audit model hook to reuse, not the reverse.
+No circular model import or factory/adapter registration with an application.
+
+### Proposed Checkpoint A — fence extensions only (six paths)
+
+MODIFY exactly:
+
+1. apps/api/src/modules/ai/curriculum-outline-session-fence.ts
+2. apps/api/tests/curriculum-outline-session-fence.test.ts
+3. AGENTS.md
+4. docs/features/F054-ai-concept-draft-generation.md
+5. docs/DATABASE_DESIGN.md
+6. docs/DEVELOPMENT_ROADMAP.md
+
+Useful result: inert PREPARE/CANCEL modes over caller-owned active-session doubles,
+including absent-attempt preparation, fresh-requesting-session cancellation and
+bounded metadata-only selection. Preserve MARK/CAPTURE/READ behavior. No repository
+stub, audit action activation, store runner or production registration.
+
+Acceptance: exact mode/identity/phase/cell/version/projection/predicate and ACK
+tests; original/fresh sid separation; no raw reads for cancellation; ordered
+User/Session writes and precommit checks; active-session refusal; expiry/loss/late
+results; no default connection/retry/repair; affected compiler/build/static checks
+and fresh separate source review. These establish constructed helper behavior only,
+not commit ownership or live authority. Estimate45–75 active minutes; proposed hard
+limit90. Implementation NOT_STARTED, pending separate owner authorization.
+
+### Proposed Checkpoint B — atomic native store with audits (nine paths)
+
+CREATE exactly:
+
+1. apps/api/src/modules/ai/curriculum-outline-attempt.repository.ts
+2. apps/api/tests/curriculum-outline-attempt.test.ts
+
+MODIFY exactly:
+
+3. apps/api/src/modules/ai/curriculum-outline-producer.service.ts — additive pure exports only.
+4. apps/api/src/modules/audit/audit.model.ts
+5. apps/api/tests/auth-audit.test.ts
+6. AGENTS.md
+7. docs/features/F054-ai-concept-draft-generation.md
+8. docs/DATABASE_DESIGN.md
+9. docs/DEVELOPMENT_ROADMAP.md
+
+Depends on reviewed A and this clarified cleanup contract. Keep native codec/pure
+audit validation, physical-prerequisite verification construction, all five store
+operations, the single runner, atomic audits/results and exact recovery together.
+No production wiring, DDL/database execution, live authority or admission writer.
+The measurable store acceptance below applies to B. Estimate90–150 active minutes;
+proposed hard limit150. Implementation NOT_STARTED, pending separate authorization.
+
+Only AGENTS and the three documentation paths are shared. A first records its
+mode-specific exception/evidence; B later records store/audit-specific authority
+and evidence, preserving A and historical hunks. Source/test responsibilities are
+disjoint. The union remains the original11 paths. Combined estimate135–225 active
+minutes: splitting does not reduce claimed total effort; it creates a useful
+reviewed helper boundary without separating atomic attempt and audit effects.
+The earlier monolithic120–180-minute estimate/hard180 is historical, superseded
+for planning by these two proposed timeboxes. Stop at each hard limit without a
+verified-delivery claim for an unfinished checkpoint; no success stubs or unsafe
+split between attempt/audit effects. Neither exception is active.
+
+Proposed exception **F054 native attempt-store offline only — PROPOSED — PENDING
+OWNER APPROVAL, NOT ACTIVE**: after separate checkpoint-specific approval, permit
+only A's six or B's nine paths in the order above, under synthetic
+driver/session/resolver tests ahead of incomplete full prerequisite acceptance.
+Require stable reviewed contracts, preserved old code behavior, strict predicates/
+privacy/deadlines, full relevant developer checks and fresh separate source review.
+Grant no real database/storage/index permission, genuine reader/lifecycle authority,
+provider dispatch/spending, admission writer, API/UI, runtime/pin work or Git delivery.
+Do not edit AGENTS until separately approved. Full F054 and existing gates remain.
+
+Measurable acceptance: exact native/canonical round trips and unchanged hash vectors;
+all operation predicates/projections/update order and same-session propagation;
+strict initial/null/single-assignment/version/overflow rules; duplicate identity/
+raw-byte conflicts without writes; original versus fresh-session access; every
+audit's exact allowlist/identity/time/version and unique-index declaration;
+cancel/capture/terminal modeled contention; loss at every await and precommit;
+audit-insert/CAS/fence failures, primary plus cleanup errors, late results and all
+matrix cuts with no retry/repair; work expiry before writes, after fences, before
+audit, during commit and during cleanup; finite positive bounded timeout arguments;
+no post-loss business work; disposal after abort/observation failure; primary-error
+preservation and rejection of late invocation ACKs; read privacy and incomplete/duplicate evidence;
+no independent helper transaction or automatic resource creation/inert imports.
+Run focused new/affected tests, full API/test TypeScript, API build/typecheck,
+targeted lint/format/UTF-8/LF/privacy/scope/diff and separate final source review.
+Mocks establish constructed behavior only. Qualified live snapshot/write-conflict/
+unique-index/rollback/wire-unknown/cleanup/permission tests need separate approved
+target, physical prerequisites, original ownership/RESULT-ACK rules and execution.
+
+Owner decisions remain separate from this documentation correction: accept/revise
+the exact store/fence-mode/outcome semantics, three new audit actions and one
+partial audit index, then separately authorize A or B and its bounded exception.
+No provider/model/key or spending choice is needed for offline work. Raw-access,
+lifecycle and persistence qualification remain distinct gates, not resolved by a
+synthetic ALLOW/ACK. This correction awaits focused independent re-review.
+
+### Contract preparation evidence and status
+
+Initial preparation evidence below is historical. The subsequent independent review
+(2026-11-08T053952Z) identified a Medium work-versus-cleanup budget ambiguity.
+This authorized correction separates cleanup-only allowances from work/commit
+authority and records its exact two-checkpoint recommendation; focused author
+self-review is complete, but focused independent re-review remains pending. Clarifications resolved cancellation's metadata-only versus
+raw-read boundary, missing initial cells during recovery, native runner versus
+helper session ownership, and namespace/index qualification without implicit DDL.
+This is author self-review, not independent approval or implementation authority.
+Explicit repository-configured new-block formatting, five local targets/anchors,
+UTF-8/LF/no BOM/final newline, scoped privacy/whitespace, exact three-path scope,
+all original document-byte prefixes and 17 protected file hashes PASS. Formatting
+application was followed by an explicit check-only pass. An initial checker treated
+an internal anchor as a directory and failed; its target handling was corrected
+before PASS, with no runtime probe or original-content edit. One patch context
+failure was narrowed before application. All final verification/fingerprints and
+elapsed time are retained in
+C:/Users/Shreeji/Documents/Codex/2026-10-24/deeplearner-f042-final-guarded-mongodb-execution/f054-native-store-contract-20261108T050727Z/handoff.txt.
+Only this section and matching appended database/roadmap sections changed. The
+saved context is older than current local deliveries; current Git/receipts take precedence.
+O0/P1/coordinator/fence checks/reviews remain retained, not rerun. No active exception,
+implementation, collection/index/account operation or Git delivery occurs here.
+F053 qualification BLOCKED/NOT_RUN, existing acceptance blocks, unexecuted groups,
+historical UNKNOWN and production NOT_VERIFIED remain unchanged.
+
+Correction provenance: C:/Users/Shreeji/Documents/Codex/2026-11-01/referenced-chatgpt-conversation-this-is-an/work/f054-native-store-review-20261108T053952Z/review.md.
+Current correction checks/fingerprints and elapsed time are recorded in the external
+correction handoff, not inferred from the initial preparation evidence above.
+Pending inventory remains these three proposed documentation sections; no user
+capability or implementation status changed. Exact next action: focused independent
+re-review of cleanup timing and the recorded A/B split, before owner implementation
+authorization. All decisions/exceptions remain PROPOSED — PENDING OWNER APPROVAL.
+
+### Checkpoint A fence extensions — implementation record, 2026-11-08
+
+Owner authorization 5b8147bc-d944-4b76-9a9f-2512ababbe07/Pasted text.txt approves
+the reviewed six-path A boundary, A-only offline exception and one verified local
+implementation commit; no push. Focused contract approval is retained at
+C:/Users/Shreeji/Documents/Codex/2026-11-01/referenced-chatgpt-conversation-this-is-an/work/f054-cleanup-split-rereview-20261108T062328Z/review.md.
+Starting dev/HEAD970438528822890e792cb35198c5e57232339e79, index empty, exact three
+pending contract documents and reviewed fingerprints matched. A IN_PROGRESS when
+source implementation began; full F054 remains IN_PROGRESS, acceptance incomplete.
+B remains NOT_STARTED with its exception inactive.
+
+Exact A scope: the six MODIFY paths listed above; no CREATE. PREPARE uses the
+existing strict fence request identity/digest projection, PREPARED/version0/null
+invocation and current origin/requesting sid equality. The helper checks the
+allocated target _id is genuinely absent (native null) with _id-only projection,
+not a narrower actor/digest predicate that could hide a conflict. It allocates or
+inserts nothing. Full B/digest recomputation, actor/key/ledger uniqueness, initial
+null cells and source/Technology/F053 readiness remain the future caller's
+same-transaction obligations, not newly authenticated by this helper.
+
+CANCEL permits the original actor's separately verified fresh requesting sid;
+origin binding remains unchanged. Only uncancelled nonterminal PREPARED/v0,
+INVOCATION_MARKED/v1 and COMPLETION_STORED/v2 histories can be fenced: one increment
+per prior transition and no cancellation reset. Validate exact projected identity/
+digest/version/phase, present-null cancel/receipt, exact invocation when present;
+completion is null before capture or a closed projected schemaVersion1/native
+createdAt/checkpointDigest object after capture. Select only those dotted completion
+metadata fields, never completion itself/rawOutput. Cancellation does not establish
+the validity of unselected raw content. Terminal/already cancelled state refuses
+this mutation fence; future B owns read-only observation and actual cancel CAS/audit.
+
+All modes retain current User/live requesting Session checks, exact ordered native
+increment predicates and strict ACKs, same caller-owned session, one retained
+context, fresh precommit verification and sticky loss/expiry/unknown results.
+No origin-Session revival, owned transaction/cleanup, raw read, attempt write,
+default connection/model registration, retry or transferable capability.
+MARK/CAPTURE/READ behavior and existing source/control/cleanup boundaries remain.
+
+A is READY_FOR_REVIEW — offline only: implementation and required developer checks
+are complete. Executed342/342 synthetic fence tests PASS (includes142 existing-mode
+regressions and200 new A cases); full API/test TypeScript PASS; API production
+build/typecheck PASS; targeted source/test lint PASS. The initial329-case run passed;
+13 supplemental A late-result/precommit/sticky-cancel cases were then added and
+the final342-case run passed. Full API/test typing and targeted lint were rerun
+only for changed test bytes; unchanged production source/build evidence was retained.
+Initial contract pending-re-review wording above is historical: focused contract
+review APPROVE at062328Z resolved the timing finding, then this owner authorized A.
+B's semantics/implementation exception remain proposed/inactive as specified.
+
+Separate assistant subagent /root/fence_a_source_review (same team/session, not a
+separately authenticated human/GitHub identity) reviewed final source/test bytes:
+APPROVE, Critical0/High0/Medium0/Low0. It independently ran scoped diff whitespace
+checks; application tests/compiler/build/lint were author-executed, not independently
+rerun. Review artifact: C:/Users/Shreeji/Documents/Codex/2026-10-24/deeplearner-f042-final-guarded-mongodb-execution/f054-fence-a-20261108T062846Z/independent-source-review.txt.
+Source SHA2564980833af030299763739f02a254b48d6ebcba978a8eb39b59cfbd3cf5a7c222;
+test SHA256df9497a0a6904ccdee48e7e8f155a4c850e4593626ff2194bce3f9b4760731e4.
+No blocking findings or product decisions arose. Supplemental coverage strengthened
+the requested A boundaries; it did not conceal an observed application failure.
+
+Scoped formatting application was followed by explicit check-only verification.
+Local links/anchors, UTF-8/LF/no BOM/newline, privacy/scope, whitespace, exact six
+paths, source-matching receipts and preservation checks PASS. All pre-existing
+reviewed contract bytes/committed checkpoints and14 unaffected protected files are
+unchanged; shared check/step/credential/ACK/fence/precommit implementations remain
+byte-identical. Other worktree identities are unchanged; resources not operated on
+or freshly requalified. Initial sandbox process-creation failure occurred before
+formatting executed; the supported command-specific local route completed checks,
+without Windows elevation/permission changes or environment investigation.
+
+The six-path local implementation commit is separately authorized after final
+staged-integrity checks; exact commit/parent, final fingerprints and timing belong
+to the external delivery handoff, not a self-referential repository SHA edit:
+C:/Users/Shreeji/Documents/Codex/2026-10-24/deeplearner-f042-final-guarded-mongodb-execution/f054-fence-a-20261108T062846Z/delivery-handoff.txt.
+No push or remote synchronization. No user-visible Generate/Save/cancel API/UI.
+Native-store B and genuine readers/lifecycle authority, real transactions, indexes,
+concurrency, raw-retention/privacy and cleanup remain deferred. Synthetic results
+do not prove stored absence uniqueness, authenticated authority, revocation races,
+physical projection behavior, atomicity or durability. No transaction owner or
+cleanup mechanism was implemented in A. F053 BLOCKED/NOT_RUN, all acceptance blocks,
+unexecuted groups, historical UNKNOWN and production NOT_VERIFIED unchanged.
+Exact next action after delivery: owner review of A and separate decision on B;
+do not begin B or generate another execution prompt automatically.
