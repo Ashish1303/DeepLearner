@@ -3127,3 +3127,51 @@ B NOT_STARTED/inactive; no physical collection/index/permissions or raw retentio
 approval follows. All live database/transaction/privacy/cleanup qualification,
 F053 BLOCKED/NOT_RUN, acceptance blocks, historical UNKNOWN and production
 NOT_VERIFIED remain. See canonical A evidence for actual results and limitations.
+
+### Checkpoint B native-store offline construction — 2026-11-08
+
+Owner authorization 67d7349f-6e94-429c-a626-fa0813f107bc/Pasted text.txt enacted
+only the exact nine-path B offline construction and one verified local commit,
+directly on existing dev 6172d375a91ef98fb727da16a34246a5d3a832f8. No push/new branch.
+Initial tree/index were clean; A source/test and reviewed contract fingerprints
+matched. Implementation began as IN_PROGRESS. B is now READY_FOR_REVIEW — offline
+only; full F054 remains IN_PROGRESS, acceptance incomplete. Earlier B NOT_STARTED/
+inactive wording above is dated history, superseded only within this B exception.
+
+Only native operation/audit/index-verification construction against synthetic
+drivers was executed. Six candidate/attempt declarations plus the one exact unique
+partial simple-collation audit-version declaration are unchanged from the approved
+contract. Existing User/Session/audit/F044/F053 physical prerequisites remain
+separate. No collection/index creation or physical qualification occurred.
+One native session/snapshot constructs fences, exact attempt insert/CAS and audit
+before fresh precommit checks; metadata-only cancellation preserves raw cells.
+Current and dispatch-era F053 audit linkage are separately validated in full paths.
+Bounded resource/version history validates allocated audit pointers and rejects
+duplicate/missing/unexplained evidence; metadata presence is not full raw proof.
+
+Author-executed checks: 142/142 focused native-repository and affected auth-audit
+tests PASS, including 12 table-driven mode/signal cases containing 428 fresh
+synthetic await cuts. Full API/test TypeScript, production API build and no-emit
+production typecheck, targeted five-file lint, explicit source/new-block formatting,
+new-link/anchor, UTF-8/LF, privacy/scope, whitespace and preservation checks PASS.
+An initial fixture-author mismatch and routine lint errors were corrected. Separate
+assistant source review by /root/attempt_b_review: APPROVE, Critical/High/Medium/Low
+unresolved 0/0/0/0. Eight preliminary correctness/coverage findings were resolved
+and affected checks rerun. Reviewer independently inspected source/diffs/hashes and
+whitespace, but did not rerun tests/compiler/build/lint. No independently
+authenticated human or GitHub approval is claimed. Completed A/earlier suites were
+retained, not rerun wholesale; protected A bytes and original producer body match.
+
+Doubles establish constructed behavior, not real atomicity, rollback, durability,
+physical indexes, concurrency, wire-unknown cleanup or provider guarantees.
+Genuine current-authority/source/template/privacy/original-observer readers,
+lifecycle/sticky-loss linkage, restricted closed writers, approved raw/metadata/
+audit retention and physical namespace/index/permission/transaction qualification
+remain separate gates. Supplied closures/facts are not authenticated authority.
+No production registration/composition, actual database/provider/network operation,
+DDL, admission writer, API/UI, spending, runtime/binding/pin or dependency change.
+No new Generate/Save/cancel capability is available to application users. Native
+capture and F053 qualification remain BLOCKED/NOT_RUN. Preserve existing acceptance
+blocks, all unexecuted groups, historical UNKNOWN and production NOT_VERIFIED.
+Final staged/local delivery identity is recorded outside the repository in the
+canonical B evidence directory; no real storage/retention policy is activated.

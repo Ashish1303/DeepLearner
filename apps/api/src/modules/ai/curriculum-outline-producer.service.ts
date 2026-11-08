@@ -56,6 +56,22 @@ export interface OutlineWork {
   readonly endSessionMs: 2000;
   check(): void;
 }
+
+// Additive pure codec exports for the unregistered native attempt store. No
+// coordinator port, orchestration, ACK parser or production registration changes.
+export {
+  bindingFields as outlineAttemptBindingFields,
+  parseBinding as parseOutlineAttemptBinding,
+  bindingDigest as outlineAttemptBindingDigest,
+  invocation as parseOutlineInvocation,
+  completion as parseOutlineCompletion,
+  receipt as parseOutlineReceipt,
+  attempt as parseOutlineAttempt,
+  getBinding as outlineAttemptBinding,
+  checkpointDigest as outlineCheckpointDigest,
+  audit as parseOutlineCompletionAudit,
+};
+export type { AttemptBinding, Attempt, Invocation, Completion };
 export interface OutlineClock {
   now(): number;
   monotonic(): number;

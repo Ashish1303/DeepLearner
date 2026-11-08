@@ -2276,3 +2276,76 @@ cleanup mechanism was implemented in A. F053 BLOCKED/NOT_RUN, all acceptance blo
 unexecuted groups, historical UNKNOWN and production NOT_VERIFIED unchanged.
 Exact next action after delivery: owner review of A and separate decision on B;
 do not begin B or generate another execution prompt automatically.
+
+### Checkpoint B native store — implementation record, 2026-11-08
+
+Owner authorization 67d7349f-6e94-429c-a626-fa0813f107bc/Pasted text.txt enacted
+only the exact nine-path B offline construction and one verified local commit,
+directly on existing dev 6172d375a91ef98fb727da16a34246a5d3a832f8. No push/new branch.
+Initial tree/index were clean; A source/test and reviewed contract fingerprints
+matched. Implementation began as IN_PROGRESS. B is now READY_FOR_REVIEW — offline
+only; full F054 remains IN_PROGRESS, acceptance incomplete. Earlier B NOT_STARTED/
+inactive wording above is dated history, superseded only within this B exception.
+
+Implemented the reviewed nine-path inventory above: inert/unregistered native
+codec and prepare/mark/capture/cancel/exact inspection, one supplied native
+client/session/transaction runner, A fences, six exact audit tuples and seven
+F054 index declarations/verifier construction. No implicit collection/index
+creation, upsert, content repair, retries or admission writer. New effects return
+RECORDED only after known commit/cleanup; recovered evidence stays OBSERVED.
+Unknown acknowledgement/cleanup never establishes rollback or replay permission.
+
+Full immutable binding leaf CAS and required-present-null cells preserve write-once
+I/C/cancel/receipt semantics. CANCEL/METADATA project only checkpoint metadata and
+do not read raw output; cancellation preserves completion and does not release
+F053 liabilities. Full evidence checks admitted source/proposal, current accounting
+audit and historical dispatch projection, exact completion/P1 and terminal evidence.
+Historical source admission does not require its author to remain current Admin;
+every new protected operation still requires current actor/Session authority.
+B-local ObjectId/Date guards validate native stored source slots before the reused
+F044 canonical validators; string/coercible stored identities refuse without writes.
+Completion/terminal audit recovery uses bounded resource/version lookup (limit 2),
+then checks the allocated audit ID and exact action/metadata/time; extra versions
+refuse. This is not a direct _id query. Separate source review assessed the
+single-snapshot identity validation as equivalent to the contract's pointer lookup.
+
+The original work/coordinator deadline is never reset. Commit requires positive
+remaining work and its cap; abort/endSession each have a separate finite positive
+<=2,000ms cleanup-only allowance. Disposal is attempted after abort failure; fixed
+primary and cleanup classifications survive. Loss/expiry suppresses late results
+and clean original ACKs. Cleanup grants no new business authority.
+
+Author-executed checks: 142/142 focused native-repository and affected auth-audit
+tests PASS, including 12 table-driven mode/signal cases containing 428 fresh
+synthetic await cuts. Full API/test TypeScript, production API build and no-emit
+production typecheck, targeted five-file lint, explicit source/new-block formatting,
+new-link/anchor, UTF-8/LF, privacy/scope, whitespace and preservation checks PASS.
+An initial fixture-author mismatch and routine lint errors were corrected. Separate
+assistant source review by /root/attempt_b_review: APPROVE, Critical/High/Medium/Low
+unresolved 0/0/0/0. Eight preliminary correctness/coverage findings were resolved
+and affected checks rerun. Reviewer independently inspected source/diffs/hashes and
+whitespace, but did not rerun tests/compiler/build/lint. No independently
+authenticated human or GitHub approval is claimed. Completed A/earlier suites were
+retained, not rerun wholesale; protected A bytes and original producer body match.
+
+Doubles establish constructed behavior, not real atomicity, rollback, durability,
+physical indexes, concurrency, wire-unknown cleanup or provider guarantees.
+Genuine current-authority/source/template/privacy/original-observer readers,
+lifecycle/sticky-loss linkage, restricted closed writers, approved raw/metadata/
+audit retention and physical namespace/index/permission/transaction qualification
+remain separate gates. Supplied closures/facts are not authenticated authority.
+No production registration/composition, actual database/provider/network operation,
+DDL, admission writer, API/UI, spending, runtime/binding/pin or dependency change.
+No new Generate/Save/cancel capability is available to application users. Native
+capture and F053 qualification remain BLOCKED/NOT_RUN. Preserve existing acceptance
+blocks, all unexecuted groups, historical UNKNOWN and production NOT_VERIFIED.
+
+Branch/location: existing dev at E:/AI/DeepLearner. Exact check commands, final
+five source/test hashes, complete nine-path fingerprints, separate review and
+local staged/commit receipt are retained outside the repository at:
+C:/Users/Shreeji/Documents/Codex/2026-10-24/deeplearner-f042-final-guarded-mongodb-execution/f054-attempt-b-20261108T065259Z/
+The delivery handoff records the resulting SHA/parent after the one authorized
+local commit; no remote identity or CI/synchronization claim. Next: final staged
+integrity and local delivery, then owner checkpoint review. The smallest later
+step is a bounded genuine-reader/composition prerequisite review; no live capture
+or additional implementation is authorized automatically.

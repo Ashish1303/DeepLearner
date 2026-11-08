@@ -4,6 +4,144 @@ import { Types } from 'mongoose';
 import { Audit, auditSchema } from '../src/modules/audit/audit.model.js';
 import * as repository from '../src/modules/audit/audit.repository.js';
 import { validateLedgerAudit } from '../src/modules/ai/ai-usage-ledger.repository.js';
+import {
+  outlineAttemptAuditActions,
+  validateOutlineAttemptAudit,
+} from '../src/modules/ai/curriculum-outline-attempt.repository.js';
+
+test('F054 attempt audits use exact action tuples and native-only references without legacy source metadata', async () => {
+  const key = (n: number) =>
+    new Types.ObjectId(n.toString(16).padStart(24, '0'));
+  const common = {
+    _id: key(40),
+    category: 'CONTENT_MANAGEMENT',
+    actorId: key(1),
+    resourceType: 'CURRICULUM_OUTLINE_ATTEMPT',
+    resourceId: key(2),
+    requestId: 'synthetic-outline',
+    createdAt: new Date('2026-11-08T00:00:00Z'),
+  };
+  const metadata = {
+    attemptId: key(2),
+    technologyId: key(3),
+    operationId: '11111111-1111-4111-8111-111111111111',
+    attemptVersion: 0,
+    bindingDigest: 'a'.repeat(64),
+  };
+  for (const action of outlineAttemptAuditActions) {
+    const version =
+      action === 'CURRICULUM_OUTLINE_PREPARED'
+        ? 0
+        : action === 'CURRICULUM_OUTLINE_INVOCATION_MARKED'
+          ? 1
+          : action === 'CURRICULUM_OUTLINE_ADMITTED'
+            ? 3
+            : 2;
+    const terminal =
+      action === 'CURRICULUM_OUTLINE_ADMITTED' ||
+      action === 'CURRICULUM_OUTLINE_ADMISSION_REFUSED';
+    const extra =
+      action === 'CURRICULUM_OUTLINE_COMPLETION_STORED'
+        ? { checkpointDigest: 'b'.repeat(64) }
+        : terminal
+          ? {
+              outlineId: key(4),
+              outlineRevisionId: key(5),
+              revision: 1,
+              ...(action === 'CURRICULUM_OUTLINE_ADMISSION_REFUSED'
+                ? { safeCode: 'OUTPUT_INVALID' }
+                : {}),
+            }
+          : {};
+    const row = {
+      ...common,
+      action,
+      metadata: { ...metadata, attemptVersion: version, ...extra },
+    };
+    validateOutlineAttemptAudit(row);
+    await new Audit(row).validate();
+    for (const field of [
+      'rawOutput',
+      'source',
+      'sessionId',
+      'claimId',
+      'ownerId',
+      'prompt',
+      'quote',
+      'token',
+    ]) {
+      await assert.rejects(
+        new Audit({
+          ...row,
+          metadata: { ...row.metadata, [field]: 'SYNTHETIC_PRIVATE' },
+        }).validate(),
+      );
+      assert.throws(() =>
+        validateOutlineAttemptAudit({
+          ...row,
+          metadata: { ...row.metadata, [field]: 'SYNTHETIC_PRIVATE' },
+        }),
+      );
+    }
+    for (const patch of [
+      { category: 'AUTH' },
+      { resourceType: 'USER' },
+      { resourceId: key(99) },
+    ])
+      await assert.rejects(new Audit({ ...row, ...patch }).validate());
+    const { _id: ignoredId, ...withoutId } = row;
+    void ignoredId;
+    const { createdAt: ignoredTime, ...withoutTime } = row;
+    void ignoredTime;
+    await assert.rejects(new Audit(withoutId).validate());
+    await assert.rejects(new Audit(withoutTime).validate());
+    await assert.rejects(
+      new Audit({
+        ...row,
+        action: 'AUTH_LOGIN_SUCCESS',
+        resourceType: 'USER',
+        resourceId: row.actorId,
+      }).validate(),
+    );
+  }
+  const ref = auditSchema.path('resourceId').options.ref;
+  assert.equal(typeof ref, 'function');
+  assert.throws(
+    () =>
+      Reflect.apply(
+        ref as (...args: unknown[]) => unknown,
+        { resourceType: 'CURRICULUM_OUTLINE_ATTEMPT' },
+        [],
+      ),
+    /cannot be populated/,
+  );
+  assert.equal(
+    Reflect.apply(
+      ref as (...args: unknown[]) => unknown,
+      { resourceType: 'USER' },
+      [],
+    ),
+    'User',
+  );
+  const index = auditSchema
+    .indexes()
+    .filter(
+      ([, options]) => options.name === 'uq_outline_attempt_audit_version',
+    );
+  assert.equal(index.length, 1);
+  assert.deepEqual(index[0]![0], {
+    resourceType: 1,
+    resourceId: 1,
+    'metadata.attemptVersion': 1,
+  });
+  assert.equal(index[0]![1].unique, true);
+  assert.deepEqual(index[0]![1].partialFilterExpression, {
+    resourceType: 'CURRICULUM_OUTLINE_ATTEMPT',
+  });
+  assert.deepEqual(index[0]![1].collation, { locale: 'simple' });
+  assert.equal(auditSchema.options.autoCreate, false);
+  assert.equal(auditSchema.options.autoIndex, false);
+});
 
 test('F053 AI usage audit has exact private tuples, explicit identities and no broadened legacy metadata', async () => {
   const key = (n: number) =>
@@ -388,6 +526,15 @@ test('audit schema accepts only bounded F007 actions and metadata offline', asyn
   assert.deepEqual(auditSchema.indexes(), [
     [{ actorId: 1, createdAt: -1 }, {}],
     [{ resourceType: 1, resourceId: 1, createdAt: -1 }, {}],
+    [
+      { resourceType: 1, resourceId: 1, 'metadata.attemptVersion': 1 },
+      {
+        name: 'uq_outline_attempt_audit_version',
+        unique: true,
+        partialFilterExpression: { resourceType: 'CURRICULUM_OUTLINE_ATTEMPT' },
+        collation: { locale: 'simple' },
+      },
+    ],
     [
       { resourceType: 1, resourceId: 1, 'metadata.usageVersion': 1 },
       {

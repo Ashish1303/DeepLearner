@@ -2,6 +2,19 @@ import { profileFieldNames } from '../users/user.schema.js';
 import { Schema, type InferSchemaType } from 'mongoose';
 import { mongoose } from '../../config/database.js';
 import { validateLedgerAudit } from '../ai/ai-usage-ledger.repository.js';
+import {
+  outlineAttemptAuditActions,
+  validateOutlineAttemptAudit,
+} from '../ai/curriculum-outline-attempt.repository.js';
+
+const outlineMetadataFields = [
+  'attemptId',
+  'attemptVersion',
+  'bindingDigest',
+  'checkpointDigest',
+  'outlineId',
+  'outlineRevisionId',
+];
 
 const usageActions = [
   'AI_USAGE_RESERVED',
@@ -43,6 +56,7 @@ export const auditSchema = new Schema(
       type: String,
       enum: [
         ...usageActions,
+        ...outlineAttemptAuditActions,
         'CURRICULUM_BRIEF_ADMITTED',
         'LEARNING_PATH_PROPOSAL_REVISION_CREATED',
         'TECHNOLOGY_CREATED',
@@ -80,6 +94,7 @@ export const auditSchema = new Schema(
       type: String,
       enum: [
         'AI_USAGE_OPERATION',
+        'CURRICULUM_OUTLINE_ATTEMPT',
         'USER',
         'PRACTICE_RUBRIC',
         'TECHNOLOGY',
@@ -92,6 +107,11 @@ export const auditSchema = new Schema(
     resourceId: {
       type: Schema.Types.ObjectId,
       ref: function (this: { resourceType: string }) {
+        // Native-only resource: never populate it as User or invent a model.
+        if (this.resourceType === 'CURRICULUM_OUTLINE_ATTEMPT')
+          throw new Error(
+            'Native curriculum outline resources cannot be populated',
+          );
         if (this.resourceType === 'AI_USAGE_OPERATION')
           return 'AiUsageOperation';
         if (this.resourceType === 'CURRICULUM_BRIEF_REVISION')
@@ -117,6 +137,12 @@ export const auditSchema = new Schema(
     metadata: {
       type: new Schema(
         {
+          ...Object.fromEntries(
+            outlineMetadataFields.map((field) => [
+              field,
+              { type: Schema.Types.Mixed, default: undefined },
+            ]),
+          ),
           ...Object.fromEntries(
             usageMetadataFields.map((field) => [
               field,
@@ -145,6 +171,9 @@ export const auditSchema = new Schema(
               const action = this.ownerDocument().action;
               return (
                 !usageActions.includes(action) &&
+                !outlineAttemptAuditActions.some(
+                  (allowed) => allowed === action,
+                ) &&
                 action !== 'USER_PROFILE_UPDATED' &&
                 ![
                   'CURRICULUM_BRIEF_ADMITTED',
@@ -243,6 +272,21 @@ auditSchema.pre('validate', function () {
     virtuals: false,
     transform: false,
   });
+  if (outlineAttemptAuditActions.some((allowed) => allowed === action)) {
+    try {
+      if (this.$isDefault('_id') || this.$isDefault('createdAt'))
+        throw new Error('Invalid outline audit');
+      validateOutlineAttemptAudit(raw);
+    } catch {
+      this.invalidate('metadata', 'Invalid curriculum outline audit');
+    }
+    return;
+  }
+  if (
+    this.resourceType === 'CURRICULUM_OUTLINE_ATTEMPT' ||
+    outlineMetadataFields.some((key) => Object.hasOwn(raw.metadata ?? {}, key))
+  )
+    this.invalidate('metadata', 'Curriculum outline metadata prohibited');
   if (usageActions.includes(action)) {
     try {
       if (this.$isDefault('_id') || this.$isDefault('createdAt'))
@@ -547,6 +591,16 @@ auditSchema.pre('validate', function () {
 
 auditSchema.index({ actorId: 1, createdAt: -1 });
 auditSchema.index({ resourceType: 1, resourceId: 1, createdAt: -1 });
+// Declaration only; native prerequisites must be qualified before any writer.
+auditSchema.index(
+  { resourceType: 1, resourceId: 1, 'metadata.attemptVersion': 1 },
+  {
+    name: 'uq_outline_attempt_audit_version',
+    unique: true,
+    partialFilterExpression: { resourceType: 'CURRICULUM_OUTLINE_ATTEMPT' },
+    collation: { locale: 'simple' },
+  },
+);
 // Declaration only. Existing autoCreate/autoIndex remain disabled.
 auditSchema.index(
   { resourceType: 1, resourceId: 1, 'metadata.usageVersion': 1 },

@@ -1507,3 +1507,41 @@ all acceptance gates, historical UNKNOWN, unexecuted groups and production
 NOT_VERIFIED. Every later checkpoint/live operation/Git delivery needs its own
 authority. This narrow amendment supersedes prior no-mode-extension restrictions
 only for A; it does not change global authentication or cleanup timing policy.
+
+## Named F054 Checkpoint B atomic attempt-store offline exception — 2026-11-08
+
+Owner authorization 67d7349f-6e94-429c-a626-fa0813f107bc/Pasted text.txt enacted
+only the exact nine-path B offline construction and one verified local commit,
+directly on existing dev 6172d375a91ef98fb727da16a34246a5d3a832f8. No push/new branch.
+Initial tree/index were clean; A source/test and reviewed contract fingerprints
+matched. Implementation began as IN_PROGRESS. B is now READY_FOR_REVIEW — offline
+only; full F054 remains IN_PROGRESS, acceptance incomplete. Earlier B NOT_STARTED/
+inactive wording above is dated history, superseded only within this B exception.
+
+Permit only two CREATE paths (curriculum-outline-attempt.repository.ts and its
+focused test) and seven MODIFY paths (additive pure producer exports, audit.model.ts,
+auth-audit.test.ts, AGENTS and F054/DATABASE_DESIGN/DEVELOPMENT_ROADMAP), exactly as
+enumerated in canonical B. Preserve A fence source/test byte-identical. This amends
+prior no-native-writer prohibitions only for synthetic injected-driver construction.
+No business retry/replay or reconstructed originating acknowledgement.
+
+Require exact native/canonical/hash/state/audit linkage, same-session User/Session
+fence/attempt/audit/precommit effects, conservative unknown outcomes, original
+work/commit deadline and separate positive cleanup-only allowances, each <=2,000ms.
+Required offline checks and separate source review completed; exact final staged
+scope/bytes/whitespace remain the local delivery gate. Record the local SHA/parent
+and receipt outside the repository; no cosmetic follow-up or push.
+
+Doubles establish constructed behavior, not real atomicity, rollback, durability,
+physical indexes, concurrency, wire-unknown cleanup or provider guarantees.
+Genuine current-authority/source/template/privacy/original-observer readers,
+lifecycle/sticky-loss linkage, restricted closed writers, approved raw/metadata/
+audit retention and physical namespace/index/permission/transaction qualification
+remain separate gates. Supplied closures/facts are not authenticated authority.
+No production registration/composition, actual database/provider/network operation,
+DDL, admission writer, API/UI, spending, runtime/binding/pin or dependency change.
+No new Generate/Save/cancel capability is available to application users. Native
+capture and F053 qualification remain BLOCKED/NOT_RUN. Preserve existing acceptance
+blocks, all unexecuted groups, historical UNKNOWN and production NOT_VERIFIED.
+Additional checkpoints/live/Git delivery require separate explicit authority.
+No next checkpoint follows automatically.
