@@ -13,17 +13,7 @@ import {
   ledgerObjectId,
   ledgerUuid,
   ledgerSame,
-  validateReserveCommand,
-  validateLedgerOperation,
-  ledgerQuoteDigest,
-  ledgerIntentFingerprint,
-  ledgerRequestDigest,
-  validateLedgerQuote,
 } from './ai-usage-ledger.schema.js';
-import {
-  validateLedgerAudit,
-  assertLedgerAuditLink,
-} from './ai-usage-ledger.repository.js';
 import {
   outlineAttemptBindingFields,
   parseOutlineAttemptBinding,
@@ -42,6 +32,10 @@ import {
   type OutlineWork,
   type OutlineClock,
 } from './curriculum-outline-producer.service.js';
+import {
+  createOutlineEvidenceReader,
+  OutlineEvidenceFailure,
+} from './curriculum-outline-evidence.reader.js';
 import { createOutlineSessionFence } from './curriculum-outline-session-fence.js';
 import {
   freezeOutline,
@@ -49,7 +43,6 @@ import {
   outlineRawOutputDigest,
   outlineContentDigest,
   outlineDefinitionDigest,
-  outlineIntentDigest,
   validateOutlineCandidate,
 } from './curriculum-outline-candidate.schema.js';
 import {
@@ -57,12 +50,6 @@ import {
   proposeOutlineAdmission,
 } from './curriculum-outline-admission.policy.js';
 import { validateCurriculumOutline } from './curriculum-outline.validator.js';
-import {
-  validateCurriculumBriefRecord,
-  curriculumBriefProposalBinding,
-} from '../admin/learning-paths/admin-curriculum-brief.schema.js';
-import { validateProposalRevisionCreation } from '../admin/learning-paths/admin-learning-path-proposal.schema.js';
-import { aiUsageTimeAt } from './ai-usage-control.schema.js';
 
 const message = 'Curriculum outline store is unavailable';
 type Code =
@@ -1657,241 +1644,42 @@ export function createOutlineAttemptRepository(
       a: Decoded['canonical'] | undefined,
       m: Mode,
     ) {
-      const parent = ledgerObject(
-        await find(
-          'technologies',
-          { _id: oid(b.technologyId) },
-          { _id: 1, status: 1 },
-        ),
-        {
-          _id: ledgerObjectId,
-          status: (v) =>
-            ledgerEnum(v, ['DRAFT', 'PUBLISHED', 'ARCHIVED'] as const),
-        },
-      );
-      if (
-        ledgerHex(parent._id) !== b.technologyId ||
-        (parent.status === 'ARCHIVED' && (m === 'PREPARE' || m === 'MARK'))
-      )
-        throw new Failure('SOURCE_UNAVAILABLE');
-      const briefRow = await find('curriculumBriefRevisions', {
-        _id: oid(b.brief.id),
-      });
-      // F044's pure validators also accept canonical DTO identities. A native
-      // stored source must prove its original BSON slots before normalization.
-      for (const key of ['_id', 'technologyId', 'createdBy'])
-        ledgerObjectId(field(briefRow, key));
-      ledgerDate(field(briefRow, 'createdAt'));
-      const brief = validateCurriculumBriefRecord(briefRow, b.technologyId);
-      const proposalRow = await find('learningPathProposalRevisions', {
-        _id: oid(b.proposal.id),
-      });
-      for (const key of ['_id', 'proposalId', 'technologyId'])
-        ledgerObjectId(field(proposalRow, key));
-      ledgerObjectId(field(field(proposalRow, 'source'), 'id'));
-      ledgerDate(field(proposalRow, 'createdAt'));
-      const proposal = validateProposalRevisionCreation(
-        proposalRow,
-        curriculumBriefProposalBinding(brief, b.technologyId),
-      );
-      if (
-        brief.contentDigest !== b.brief.digest ||
-        proposal.definitionDigest !== b.proposal.digest ||
-        proposal.proposalId !== b.proposal.proposalId ||
-        proposal.proposalId !== brief._id ||
-        proposal.createdAt.getTime() !== brief.createdAt.getTime() ||
-        brief.operationId === b.operationId
-      )
-        throw new Failure('SOURCE_UNAVAILABLE');
-      const content = (r: typeof brief | typeof proposal) => ({
-        title: r.title,
-        objectives: r.objectives,
-        audience: r.audience,
-        depth: r.depth,
-        runtime: r.runtime,
-        technologyVersion: r.technologyVersion,
-        prerequisites: r.prerequisites,
-      });
-      if (!ledgerSame(content(brief), content(proposal))) bad();
-      const sourceAudit = await find('auditLogs', { _id: oid(brief._id) }),
-        revisionAudit = await find('auditLogs', { _id: oid(proposal._id) });
-      const validateSourceAudit = (raw: unknown, briefEvent: boolean) =>
-        ledgerObject(raw, {
-          _id: ledgerObjectId,
-          category: exact('CONTENT_MANAGEMENT'),
-          action: exact(
-            briefEvent
-              ? 'CURRICULUM_BRIEF_ADMITTED'
-              : 'LEARNING_PATH_PROPOSAL_REVISION_CREATED',
-          ),
-          actorId: ledgerObjectId,
-          resourceType: exact(
-            briefEvent
-              ? 'CURRICULUM_BRIEF_REVISION'
-              : 'LEARNING_PATH_PROPOSAL_REVISION',
-          ),
-          resourceId: ledgerObjectId,
-          requestId,
-          createdAt: ledgerDate,
-          metadata: (v) =>
-            briefEvent
-              ? ledgerObject(v, {
-                  technologyId: ledgerObjectId,
-                  revision: one,
-                  operationId: ledgerUuid,
-                })
-              : ledgerObject(v, {
-                  proposalId: ledgerObjectId,
-                  revision: one,
-                  sourceId: ledgerObjectId,
-                  sourceRevision: one,
-                }),
-        });
-      const sa = validateSourceAudit(sourceAudit, true),
-        pa = validateSourceAudit(revisionAudit, false);
-      if (
-        ledgerHex(sa._id) !== brief._id ||
-        ledgerHex(sa.resourceId) !== brief._id ||
-        ledgerHex(sa.actorId) !== brief.createdBy ||
-        sa.createdAt.getTime() !== brief.createdAt.getTime() ||
-        ledgerHex(ledgerObjectId(field(sa.metadata, 'technologyId'))) !==
-          b.technologyId ||
-        field(sa.metadata, 'operationId') !== brief.operationId ||
-        ledgerHex(pa._id) !== proposal._id ||
-        ledgerHex(pa.resourceId) !== proposal._id ||
-        ledgerHex(pa.actorId) !== brief.createdBy ||
-        pa.createdAt.getTime() !== proposal.createdAt.getTime() ||
-        pa.requestId !== sa.requestId ||
-        ledgerHex(ledgerObjectId(field(pa.metadata, 'proposalId'))) !==
-          brief._id ||
-        ledgerHex(ledgerObjectId(field(pa.metadata, 'sourceId'))) !== brief._id
-      )
-        bad();
-      const op = validateLedgerOperation(
-        await find('aiUsageOperations', { _id: oid(b.ledgerOperationId) }),
-      );
-      assertLedgerAuditLink(
-        op,
-        await find('auditLogs', { _id: op.lastAuditId }),
-      );
-      const cmd = validateReserveCommand(
-        await bounded(() => readCommand(b, { session: session!, work })),
-      );
-      if (
-        ledgerHex(op._id) !== b.ledgerOperationId ||
-        ledgerHex(op.actorId) !== b.actorId ||
-        op.operationId !== b.operationId ||
-        ledgerHex(op.technologyId) !== b.technologyId ||
-        ledgerHex(op.source.id) !== b.brief.id ||
-        op.source.digest !== b.brief.digest ||
-        op.intentFingerprint !== b.ledgerIntentFingerprint ||
-        op.requestDigest !== b.requestDigest ||
-        op.quoteDigest !== b.quoteDigest ||
-        ledgerQuoteDigest(validateLedgerQuote(op.quote)) !== b.quoteDigest ||
-        op.quote.templateVersion !== b.templateVersion ||
-        !ledgerSame(op.requestBounds, cmd.requestBounds) ||
-        cmd.operationId !== b.operationId ||
-        cmd.technologyId !== b.technologyId ||
-        !ledgerSame(cmd.source, b.brief) ||
-        cmd.inputJson !== JSON.stringify(content(brief)) ||
-        ledgerRequestDigest({
-          instructions: cmd.instructions,
-          inputJson: cmd.inputJson,
-        }) !== b.requestDigest ||
-        ledgerIntentFingerprint({ actorId: b.actorId, command: cmd }) !==
-          b.ledgerIntentFingerprint
-      )
-        bad();
-      const intent = {
-        schemaVersion: 1,
-        technologyId: b.technologyId,
-        brief: b.brief,
-        proposal: b.proposal,
-        operationId: b.operationId,
+      if (m === 'CANCEL' || m === 'METADATA') bad();
+      const activeSession = session!;
+      const assertContext = (supplied: ClientSession) => {
+        remaining();
+        if (supplied !== activeSession || session !== activeSession) bad();
       };
-      if (
-        outlineIntentDigest({
-          actorId: b.actorId,
-          intent,
-          ledgerIntentFingerprint: b.ledgerIntentFingerprint,
-          templateVersion: b.templateVersion,
-        }) !== b.intentDigest
-      )
-        bad();
-      if (m === 'PREPARE') {
-        if (op.state !== 'RESERVED' || op.claim !== null) bad();
-      } else if (a?.invocation) {
-        const i = a.invocation,
-          c = op.claim;
-        if (
-          !c ||
-          i.id !== c.id ||
-          i.ownerId !== c.ownerId ||
-          i.claimedAt !== c.claimedAt.toISOString() ||
-          i.observeUntil !== c.observeUntil.toISOString() ||
-          new Date(b.createdAt).getTime() > c.claimedAt.getTime() ||
-          c.claimedAt.getTime() > Date.parse(i.markedAt) ||
-          Date.parse(i.markedAt) >= c.observeUntil.getTime() ||
-          c.observeUntil.getTime() - c.claimedAt.getTime() !==
-            cmd.requestBounds.budgetMs
-        )
-          bad();
-        const auditRows = await many(
-          'auditLogs',
-          {
-            resourceType: 'AI_USAGE_OPERATION',
-            resourceId: op._id,
-            'metadata.usageVersion': i.claimVersion,
+      try {
+        return await createOutlineEvidenceReader({
+          db,
+          client,
+          session: activeSession,
+          work,
+          clock: deps.clock,
+          loss: deps.loss,
+          check: () => {
+            assertContext(activeSession);
           },
-          2,
-        );
-        if (auditRows.length !== 1) bad();
-        const audit = validateLedgerAudit(auditRows[0]);
-        if (
-          audit.action !== 'AI_USAGE_DISPATCH_CLAIMED' ||
-          ledgerHex(audit.actorId) !== b.actorId ||
-          ledgerHex(audit.resourceId) !== b.ledgerOperationId ||
-          audit.metadata.operationId !== b.operationId ||
-          ledgerHex(audit.metadata.originalActorId) !== b.actorId ||
-          audit.metadata.usageVersion !== i.claimVersion ||
-          audit.createdAt.toISOString() !== i.claimedAt ||
-          op.version < i.claimVersion
-        )
-          bad();
-        // Reconstruct only the contract-defined dispatch-era projection of the
-        // validated current operation. This is not a write/retry or a replacement
-        // for separately validating the current accounting row/audit above.
-        const historical = validateLedgerOperation({
-          ...op,
-          state: 'DISPATCH_CLAIMED',
-          version: i.claimVersion,
-          open: true,
-          heldPaise: op.reservationPaise,
-          actualPaise: null,
-          terminalEvidence: null,
-          safeCode: null,
-          lastAuditId: audit._id,
-          updatedAt: c.claimedAt,
-        });
-        assertLedgerAuditLink(historical, audit);
-        if (
-          m === 'MARK' &&
-          (op.state !== 'DISPATCH_CLAIMED' ||
-            op.version !== i.claimVersion ||
-            ledgerHex(op.lastAuditId) !== ledgerHex(audit._id))
-        )
-          bad();
-      } else if (m !== 'EVIDENCE') bad();
-      if (m === 'PREPARE' || m === 'MARK') {
-        const now = deps.clock.now();
-        if (
-          now < op.quote.effectiveAtMs ||
-          now >= op.quote.expiresAtMs ||
-          aiUsageTimeAt(now).periodKey !== op.quote.periodKey
-        )
-          bad();
+          findOne: (collection, filter, opts) => {
+            assertContext(opts.session);
+            return find(collection, filter, opts.projection);
+          },
+          findMany: (collection, filter, opts) => {
+            assertContext(opts.session);
+            return many(collection, filter, opts.limit, opts.projection);
+          },
+          readCommand: (binding, ctx) => {
+            assertContext(ctx.session);
+            if (ctx.work !== work) bad();
+            return bounded(() => readCommand(binding, ctx));
+          },
+        }).read({ binding: b, invocation: a?.invocation ?? null, mode: m });
+      } catch (error) {
+        if (error instanceof OutlineEvidenceFailure)
+          throw new Failure(error.code);
+        throw error;
       }
-      return { brief, proposal, cmd, parent: parent.status };
     }
     function validateCompletion(
       b: AttemptBinding,

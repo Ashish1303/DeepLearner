@@ -42,6 +42,7 @@ import {
   validateLedgerOperation,
 } from '../src/modules/ai/ai-usage-ledger.schema.js';
 import { ledgerAuditFor } from '../src/modules/ai/ai-usage-ledger.repository.js';
+import { outlineCoordinatorRead } from '../src/modules/ai/curriculum-outline-evidence.reader.js';
 
 const id = (n: number) => n.toString(16).padStart(24, '0'),
   oid = (n: number) => new Types.ObjectId(id(n));
@@ -1836,6 +1837,30 @@ test('namespace/index absence and a mismatched client refuse before transaction/
   assert.equal(
     ((await other.prepare(h.prepared, h.work)) as Row).kind,
     'REFUSED',
+  );
+});
+
+test('B delegated full evidence remains read-only and cannot convert metadata or duplicate observations to mutation ACKs', async () => {
+  const h = await ready('COMPLETION_STORED');
+  const exact = await h.inspect();
+  const expected = {
+    binding: h.binding,
+    actorId: id(3),
+    requestingSessionId: id(11),
+  };
+  const read = outlineCoordinatorRead(exact, expected);
+  assert.equal(read.attempt.phase, 'COMPLETION_STORED');
+  assert.equal(Object.hasOwn(read, 'kind'), false);
+  assert.equal(mutations(h).length, 0);
+  const metadata = await h.inspect('METADATA');
+  assert.throws(() => outlineCoordinatorRead(metadata, expected));
+  const duplicate = await h.capture();
+  assert.equal((duplicate as Row).kind, 'OBSERVED');
+  assert.deepEqual(outlineCoordinatorRead(duplicate, expected), read);
+  assert.equal(mutations(h).length, 0);
+  assert.equal(
+    h.calls.some((c) => c.name === 'policy:EVIDENCE'),
+    true,
   );
 });
 

@@ -1545,3 +1545,41 @@ capture and F053 qualification remain BLOCKED/NOT_RUN. Preserve existing accepta
 blocks, all unexecuted groups, historical UNKNOWN and production NOT_VERIFIED.
 Additional checkpoints/live/Git delivery require separate explicit authority.
 No next checkpoint follows automatically.
+
+## Named F054 R1 offline evidence-reader exception — 2026-11-09
+
+Owner authorization fe13ba10-04d0-4d15-b3b1-e956273a1eb9/Pasted text.txt enacts
+only the reviewed eight-path R1 offline evidence-reader scope on existing dev
+91c89fb5cbde3838afc768cac247b94b58e0f781. Initial tree/index clean; reviewed source
+and proposal fingerprints matched. R1 IN_PROGRESS from implementation start;
+full F054 remains IN_PROGRESS with incomplete acceptance. One writer, no branch.
+Owner separately authorized one verified commit and one normal dev push after
+offline checks, separate final source review and fresh remote/protection gates.
+
+Permit only curriculum-outline-evidence.reader.ts and its focused test CREATE;
+B attempt repository/test and scoped AGENTS/F054/DATABASE_DESIGN/DEVELOPMENT_ROADMAP
+MODIFY paths. Extract/reuse existing native source/claim checks, same supplied
+session, bounded work and strict read-only coordinator projection. Preserve B
+transaction ownership, operations, fences/audits, deadlines and conservative errors.
+No original mutation ACK may be reconstructed from OBSERVED/EXACT read evidence.
+No new authority flags, generic framework, transaction owner or production wiring.
+
+Require synthetic drivers/injected sessions only; focused R1 and affected B/audit
+regressions, full API/test TypeScript, API build/typecheck, targeted static/privacy/
+scope checks and separate final source review. Resolve findings before final exact
+staged integrity/commit; push only after fresh ancestry and applicable protections.
+No actual database/provider/runtime/browser call, physical DDL, migration, new
+dependency, genuine request/lifecycle composition, access/retention activation,
+claim-ACK mutation adapter, admission writer, API/UI, editorial or publication.
+Native copies/type shapes/hashes do not authenticate authority or qualify storage.
+Preserve F053 BLOCKED/NOT_RUN, all acceptance blocks/unexecuted groups, historical
+UNKNOWN and production NOT_VERIFIED. Additional slices/live work need separate
+approval; no automatic next milestone. Earlier maps remain dated history until
+the scoped R1 reconciliation records their current offline construction status.
+
+R1 implementation and offline verification reached READY_FOR_REVIEW. Separate
+final source review APPROVE with zero unresolved findings; evidence is recorded
+in the canonical F054 R1 section and external f054-r1-20261109T141707Z handoff.
+Only final scoped staging/commit and fresh protection/ancestry-gated normal push
+remain authorized. All other exclusions and full-feature acceptance gates above
+remain active. No later checkpoint follows automatically.

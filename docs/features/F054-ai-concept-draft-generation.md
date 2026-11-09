@@ -2349,3 +2349,115 @@ local commit; no remote identity or CI/synchronization claim. Next: final staged
 integrity and local delivery, then owner checkpoint review. The smallest later
 step is a bounded genuine-reader/composition prerequisite review; no live capture
 or additional implementation is authorized automatically.
+
+### R1 evidence-reader implementation record — 2026-11-09
+
+Owner authorization fe13ba10-04d0-4d15-b3b1-e956273a1eb9/Pasted text.txt enacts
+only the reviewed eight-path R1 offline evidence-reader scope on existing dev
+91c89fb5cbde3838afc768cac247b94b58e0f781. Initial tree/index clean; reviewed source
+and proposal fingerprints matched. R1 IN_PROGRESS from implementation start;
+full F054 remains IN_PROGRESS with incomplete acceptance. One writer, no branch.
+Owner separately authorized one verified commit and one normal dev push after
+offline checks, separate final source review and fresh remote/protection gates.
+
+The exact eight paths are the two new evidence reader/test, B repository/test,
+AGENTS and this F054/DATABASE_DESIGN/DEVELOPMENT_ROADMAP evidence. Approved contract:
+C:/Users/Shreeji/Documents/Codex/2026-10-24/deeplearner-f042-final-guarded-mongodb-execution/f054-trusted-reader-review-20261109T135656Z/report.txt.
+Implement reusable same-snapshot F044 source/audit and current/historical F053 proof,
+plus strict OBSERVED/EXACT read-result projection. No new currentAdmin or controls
+approval flag; supplied callbacks remain caller obligations. Metadata/CANCEL do
+not call the full source/raw reader. Existing raw access and lifecycle gates remain.
+Initial implementation entry above is superseded by the completed evidence below.
+Do not infer native transactions/indexes/permissions/authenticity from doubles.
+F053 qualification BLOCKED/NOT_RUN, existing acceptance blocks, historical UNKNOWN
+and production NOT_VERIFIED unchanged. Next: final staged integrity and authorized Git delivery, then owner checkpoint
+review. No live operation or automatic next checkpoint.
+
+Exact implemented inventory follows.
+
+- `apps/api/src/modules/ai/curriculum-outline-evidence.reader.ts`
+- `apps/api/tests/curriculum-outline-evidence.test.ts`
+- `apps/api/src/modules/ai/curriculum-outline-attempt.repository.ts`
+- `apps/api/tests/curriculum-outline-attempt.test.ts`
+- `AGENTS.md`
+- `docs/features/F054-ai-concept-draft-generation.md`
+- `docs/DATABASE_DESIGN.md`
+- `docs/DEVELOPMENT_ROADMAP.md`
+
+Implemented createOutlineEvidenceReader is inert and unregistered. It validates
+the exact B F044 brief/revision/family/Technology/digests and both admission audit
+allowlists, separately from current generation authority. It validates the full
+native F053 operation/current audit/request/quote and exactly one immutable
+dispatch-version audit when invocation evidence exists. Current MARK equality
+remains distinct from historical UNCERTAIN/SETTLED evidence. PREPARE requires null
+invocation; MARK/CAPTURE require it. No inferred claim version or liability release.
+
+The private result contains brief, proposal, cmd, parent, sourceAudit,
+proposalAudit, operation, currentAudit, dispatchAudit and nullable claimProof.
+Existing F044/F053 field allowlists and native checks are reused unchanged.
+The derived coordinator claim audit has only id/action/operationId/actorId/claimId/
+ownerId/claimVersion; operationId here is the bound ledger ObjectId, not the actor
+UUID. No claim metadata is invented in the stored audit. Stored source authorship
+can differ from the current generation actor without erasing historical admission.
+
+All proof reads receive the exact supplied active native session and original
+work. Checks surround every awaited callback and suppress late/lost/ended/replaced
+contexts. Caller-supplied callbacks must remain bounded by that work. B delegates
+its existing bounded callbacks and retains transaction/fence/audit/cleanup ownership.
+Public driver client/session checks are used; native driver ownership enforcement
+and actual snapshot authenticity are not established by synthetic doubles.
+
+outlineCoordinatorRead accepts only complete OBSERVED/EXACT evidence with COMPLETE
+read cleanup and the contracted immutable B, actor and syntactically valid
+requesting Session ID. Actual fresh current same-actor Session authorization remains the
+caller's independently enforced obligation. It validates completion/raw/hash/audit,
+phase/version, cancellation, terminal receipt and P1 candidate linkage and returns
+only attempt/completionAudit/terminalAudit/candidate. Canonical projections are
+frozen; native Date/BSON values are fresh defensive data rather than immutable
+capabilities. METADATA/CANCEL remain outside the full source/raw reader. The bridge
+refuses metadata/unknown/partial/cross-bound evidence and never creates RECORDED,
+original claim ACKs, mutation permission or replay authority.
+
+Genuine request verification, approved template/access/retention policy and closed
+writers, lifecycle-loss participation, original claim-ACK adaptation, production
+composition, candidate admission and real database snapshot/transaction/index/
+permission/cleanup qualification remain separate prerequisites. This construction
+adds no schema, DDL, default connection, production registration, route or UI.
+F053 qualification BLOCKED/NOT_RUN, F042/F043 acceptance BLOCKED, all unexecuted
+groups, historical UNKNOWN and production NOT_VERIFIED remain unchanged.
+
+Checkpoint R1 is READY_FOR_REVIEW — offline only. Implementation and required
+developer checks are complete. Final staged integrity and fresh GitHub ancestry/
+protection checks remain the separately authorized delivery gates. Full F054 stays
+IN_PROGRESS with incomplete acceptance; no new user-facing Generate/Save/reopen.
+
+Author-executed checks on matching final source/test bytes PASS. New R1 file has
+71/71 tests. B/auth-audit has 143/143 passing results from the same-source combined
+draft run, retained separately in b-audit-results.json; the two new R1 terminal
+fixture failures in that run were corrected and covered by the later 71-test run.
+This is combined evidence, not a fresh all-files 214-PASS run. Full API/test
+TypeScript, API production build and production no-emit typecheck, scoped ESLint
+with zero warnings, and fresh-process inert import with Mongoose registration/
+connection entry points disabled PASS. Initial draft import/unused-import/fixture
+issues were corrected. The first full compiler attempt timed out without errors;
+the serial full check passed. No database/bootstrap/browser/provider suite ran.
+
+Separate source reviewer /root/r1_source_review inspected and hashed the final
+four source/test files. APPROVE, zero unresolved Critical/High/Medium/Low findings.
+Provenance is a separately tasked assistant subagent in this team/session, not an
+authenticated human or submitted GitHub review. It did not rerun author checks.
+Exact receipts, source fingerprints, separate review, final documentation/static
+checks and commit/push identities are retained outside the repository at
+C:/Users/Shreeji/Documents/Codex/2026-10-24/deeplearner-f042-final-guarded-mongodb-execution/f054-r1-20261109T141707Z/.
+The final delivery-handoff.txt records actual Git outcomes without a cosmetic
+self-referential follow-up edit. No unaffected checkpoint suites were rerun.
+
+R1 reconciles the dated pre-B trusted-port map's missing-construction entries.
+B now supplies the unregistered attempt prepare/mark/capture/cancel/inspect store
+and audit construction with injected native-driver doubles. R1 supplies its
+reusable source/claim evidence reader and exact read-result bridge. These
+construction claims supersede only the older map's corresponding missing native
+reader/writer statements, including the old no-cancellation-writer entry. They do
+not establish genuine production authority, live persistence or a cancellation
+API. Candidate admission, original claim ACK adaptation and genuine lifecycle/
+access-policy composition remain missing. Historical acceptance limits stand.
